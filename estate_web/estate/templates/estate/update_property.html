@@ -1,0 +1,60 @@
+{% extends 'estate/base.html' %}
+
+{% block content %}
+<div class="container mt-5"> {# Added a container for better centering and spacing #}
+    {% if user.is_authenticated %}
+        <div class="row justify-content-center"> {# Centers the content #}
+            <div class="col-md-8"> {# Sets a reasonable width for the form on medium screens and up #}
+                {# Changed text color to primary, increased font weight, and added shadow #}
+                <h1 class="text-center mb-4 text-primary fw-bold text-shadow">Update Property Details</h1>
+                <hr class="mb-4 border-primary"> {# Added primary color to the HR #}
+
+                {% if submitted %}
+                    <div class="alert alert-success text-center border-success" role="alert">
+                        <h3 class="alert-heading text-success">Success!</h3> {# Explicitly colored alert heading #}
+                        Your property details have been updated.
+                        <hr class="border-success"> {# Added HR to alert #}
+                        <p class="mb-0">You can now view your changes or return to the dashboard.</p>
+                        <div class="d-flex justify-content-center mt-3"> {# Flexbox for button alignment #}
+                            <a href="{% url 'best-deals-r' %}" class="btn btn-outline-success mx-2">View All Rent Deals</a>
+                            <a href="{% url 'user-dashboard' %}" class="btn btn-outline-secondary mx-2">Go to Dashboard</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <form action="" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded shadow"> {# Changed bg-light to bg-white for sharper contrast, increased shadow #}
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3"> {# Margin bottom for each form field #}
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold text-dark">{{ field.label_tag }}</label> {# Bold label, dark text #}
+                                {{ field }} {# The actual form input field (assumes form.py has form-control classes) #}
+                                {% if field.help_text %}
+                                    <small class="form-text text-info fst-italic">{{ field.help_text }}</small> {# Muted info text, italic #}
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger mt-1 p-2 small">{{ error }}</div> {# Smaller padding for errors #}
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger mt-3">{{ error }}</div> {# Displays non-field specific errors #}
+                            {% endfor %}
+                        {% endif %}
+                        <div class="d-grid gap-2"> {# Makes the button full width and adds a gap #}
+                            <button type="submit" class="btn btn-primary btn-lg mt-3 shadow-sm">Save Changes</button> {# Prominent success button with shadow #}
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-danger text-center mt-5 border-danger" role="alert"> {# Changed warning to danger for stronger message #}
+            <h2 class="alert-heading text-danger">Access Denied!</h2>
+            <p class="lead">Sorry, you need to be logged in to access this page.</p>
+            <hr class="border-danger">
+            <p>Please log in or create an account to manage your properties.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3 shadow-sm">Log In Here</a> {# Consistent primary button with shadow #}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

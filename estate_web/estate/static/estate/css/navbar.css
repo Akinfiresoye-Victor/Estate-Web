@@ -1,0 +1,79 @@
+/* Add these to your CSS file, like wishlist.css or a more global CSS file */
+
+/* General Navbar Text */
+.navbar.bg-dark {
+    /* Ensure all text directly within the navbar is bright white */
+    color: #fff;
+}
+
+.navbar-brand {
+    color: #fff !important; /* Make sure brand name is clearly white */
+}
+
+/* Navbar links */
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85); /* Slightly less than pure white for active/hover states */
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+    color: #fff; /* Pure white for active and hover states */
+}
+
+.navbar-nav .nav-link.disabled {
+    color: rgba(255, 255, 255, 0.4); /* Make disabled links visibly lighter */
+}
+
+
+/* Offcanvas Menu */
+.offcanvas.text-bg-dark {
+    background-color: #1a1a1a; /* A slightly darker shade if needed, but your var(--card-bg) works */
+    color: #fff; /* Ensure all text in offcanvas is white */
+}
+
+.offcanvas-header .offcanvas-title {
+    color: #fff; /* Offcanvas title should be white */
+}
+
+.offcanvas-body .navbar-nav .nav-link {
+    color: #fff; /* Ensure all nav links in offcanvas are white */
+}
+
+/* Dropdown Menu (within offcanvas) */
+.offcanvas .dropdown-menu.dropdown-menu-dark {
+    background-color: #212529; /* Standard Bootstrap dark dropdown background */
+}
+
+.offcanvas .dropdown-menu.dropdown-menu-dark .dropdown-item {
+    color: rgba(255, 255, 255, 0.85); /* Default dropdown item text */
+}
+
+.offcanvas .dropdown-menu.dropdown-menu-dark .dropdown-item:hover,
+.offcanvas .dropdown-menu.dropdown-menu-dark .dropdown-item:focus {
+    background-color: rgba(255, 255, 255, 0.15); /* Light hover background */
+    color: #fff; /* Pure white text on hover */
+}
+
+/* Customer Support / Footer in Offcanvas */
+.offcanvas-footer .text-white {
+    color: #fff !important; /* Ensure footer text is white */
+}
+
+.offcanvas-footer .text-white a {
+    color: #fff; /* Make links in footer pure white */
+    text-decoration: none; /* Remove underline */
+}
+
+.offcanvas-footer .text-white a:hover {
+    text-decoration: underline; /* Add underline on hover for links */
+}
+
+.offcanvas-footer .text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important; /* Keep copyright text muted */
+}
+
+/* Search Input Placeholder */
+.navbar .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
+    opacity: 1; /* Firefox default is lower opacity */
+}
