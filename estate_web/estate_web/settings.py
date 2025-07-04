@@ -12,7 +12,7 @@ SECRET_KEY = config('SECRET_KEY')  # Use from .env
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']  # You can restrict this later with your custom domain or Render URL
+ALLOWED_HOSTS = ['https://estate-web-vzpk.onrender.com/']  # You can restrict this later with your custom domain or Render URL
 
 # Application definition
 INSTALLED_APPS = [
