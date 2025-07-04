@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Environments
+.env
+venv/
+env/
+# virtualenv/
+# local_settings.py
+
+# Editor files
+.idea/
+*.swp
+*.bak
+*.swo
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Django specific
+db.sqlite3
+media/ # If you store user-uploaded media files here
+static_cdn/ # If you collect static files here
+logs/
+*.log
+
+# Python specific
+*.seed
+dist/
+build/
+develop-eggs/
+.eggs/
+
+# Other temporary files
+*~

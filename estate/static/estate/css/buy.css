@@ -1,0 +1,74 @@
+:root { /* This is now your default (light) theme */
+    --bg-color: #ffffff; /* Changed to white */
+    --card-bg: #f8f9fa; /* Light card background */
+    --text-light: #333333; /* Dark text for light mode */
+    --text-muted: #6c757d; /* Standard muted for light mode */
+    --blue: #0d6efd; /* Keep blue consistent */
+    --border-color: #dee2e6; /* Light border color */
+  }
+
+[data-theme="dark"] { /* This defines your dark theme overrides */
+    --bg-color: #121212; /* Dark background */
+    --card-bg: #1e1e1e; /* Dark card background */
+    --text-light: #f0f0f0; /* Light text for dark mode */
+    --text-muted: #0d6efd; /* Lighter muted for dark mode */
+    --blue: #0d6efd; /* Keep blue consistent */
+    --border-color: #333; /* Dark border color */
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-light); /* Use text-light for main body text color */
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .card {
+    background-color: var(--card-bg);
+    color: var(--text-light); /* Card text uses light text color */
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, background-color 0.3s, color 0.3s, border-color 0.3s; /* Add transitions for smooth theme change */
+  }
+
+  .card:hover {
+    transform: scale(1.02);
+  }
+
+  .text-muted { /* This will now correctly transition */
+    color: var(--text-muted) !important; /* Use !important to override Bootstrap's default muted */
+    transition: color 0.3s;
+  }
+
+  .btn-outline-primary {
+    border-color: var(--blue);
+    color: var(--blue);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transition */
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--blue);
+    color: white;
+  }
+
+  .hr-custom {
+    height: 3px;
+    background-color: var(--blue);
+    border: none;
+    width: 100px;
+    margin: 0 auto 1rem;
+  }
+
+  .text-primary {
+    color: var(--blue) !important;
+  }
+
+  /* Specific styles for elements that might not directly inherit from body/card */
+  .list-unstyled li strong {
+    color: var(--text-light); /* Ensure strong tags in lists adapt */
+  }
+
+  /* Adjust text color for alerts if needed, they have their own background so might need specific overrides */
+.alert {
+  background-color: var(--card-bg); /* so it's readable in dark mode */
+  border-color: var(--border-color);
+}
+
