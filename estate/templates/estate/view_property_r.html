@@ -1,0 +1,134 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+{% load property_extras %}
+
+{% block content %}
+<div class="container mt-5 py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12">
+
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="{% url 'rent-prop' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-2"></i> Back to Rental Listings
+                </a>
+            </div>
+
+            <!-- Main Card -->
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-lg-5">
+
+                    <!-- Title and Location -->
+                    <h1 class="display-5 fw-bold text-primary mb-2">{{ property.summary|default:"Beautiful Rental Property" }}</h1>
+                    <p class="lead text-muted mb-2">
+                        <i class="bi bi-geo-alt-fill me-2"></i>Location: {{ property.location|default:"Unknown Location" }}
+                    </p>
+                    <p class="lead text-muted mb-4">
+                        <i class="bi bi-globe me-2"></i>State: {{ property.state|default:"Unspecified" }}
+                    </p>
+
+                    <!-- Main Image -->
+                    <div class="mb-4">
+                        {% if property.base_image %}
+                            <img src="{{ property.base_image.url }}"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/800x600/E0F2F7/007BFF?text=No+Image+Provided';"
+                                 class="img-fluid rounded-4 shadow-sm w-100 object-fit-cover"
+                                 alt="Main Property Image"
+                                 style="max-height: 400px;">
+                        {% else %}
+                            <img src="https://placehold.co/800x600/E0F2F7/007BFF?text=No+Base+Image"
+                                 class="img-fluid rounded-4 shadow-sm w-100 object-fit-cover"
+                                 alt="Placeholder Image"
+                                 style="max-height: 400px;">
+                        {% endif %}
+                    </div>
+
+                    <!-- Gallery Images -->
+                    {% with property|get_images as gallery_images %}
+                        {% if gallery_images %}
+                        <div class="mb-5">
+                            <h5 class="text-secondary fw-bold mb-3">Gallery</h5>
+                            <div class="row g-3">
+                                {% for img in gallery_images %}
+                                    <div class="col-6 col-md-4">
+                                        <img src="{{ img.url }}"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/300x200/E0F2F7/007BFF?text=No+Image';"
+                                             class="img-fluid rounded-3 shadow-sm"
+                                             alt="Property Image {{ forloop.counter }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Price and Description -->
+                    <hr class="border-primary opacity-25">
+                    <h2 class="text-success fw-bold mb-4">₦{{ property.price_range|default:"N/A" }}<small class="text-muted fw-normal"> / month</small></h2>
+                    <p class="text-secondary">{{ property.description|default:"No detailed description available for this rental property." }}</p>
+
+                    <!-- Features and Agent Info -->
+                    <div class="row mt-5">
+                        <div class="col-md-6 mb-4">
+                            <h5 class="text-primary mb-3">Key Features</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Bedrooms
+                                    <span class="badge bg-primary rounded-pill">{{ property.bedrooms|default:"N/A" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Bathrooms
+                                    <span class="badge bg-primary rounded-pill">{{ property.bathrooms|default:"N/A" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <h5 class="text-primary mb-3">Agent Details</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Listed By
+                                    <span class="badge bg-secondary rounded-pill">{{ property.owner|default:"N/A" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Last Updated
+                                    <span class="badge bg-secondary rounded-pill">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Listed On
+                                    <span class="badge bg-secondary rounded-pill">{{ property.listed_date|date:"M d, Y"|default:"N/A" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact Buttons -->
+                    <div class="text-center my-5">
+                        <a href="tel:{{ property.phone_number|default:'' }}" class="btn btn-primary btn-lg px-4 me-2">
+                            <i class="bi bi-telephone-fill me-2"></i> Call Agent
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-lg px-4">
+                            <i class="bi bi-person-circle me-2"></i> View Agent Profile
+                        </a>
+                        <p class="text-muted mt-3">Phone: {{ property.phone_number|default:"N/A" }}</p>
+                        <p class="text-muted">Negotiable: {{ property.get_negotiate_display|default:"N/A" }}</p>
+                    </div>
+
+                    <!-- Map Section -->
+                    <div class="text-center mt-5">
+                        <h3 class="text-primary mb-3">Property Location</h3>
+                        <div class="bg-light p-4 rounded-3 border">
+                            <p class="text-muted mb-0">Map integration coming soon!</p>
+                            <img src="https://placehold.co/600x300/F0F0F0/6C757D?text=Map+Placeholder" 
+                                 alt="Map Placeholder" 
+                                 class="img-fluid rounded-3 mt-3">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

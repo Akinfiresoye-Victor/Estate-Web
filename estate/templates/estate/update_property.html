@@ -1,0 +1,23 @@
+{%extends 'estate/base.html'%}
+
+{%block content %}
+{%if user.is_authenticated%}
+
+<center>
+<h1>Sell Property</h1>
+</center>
+<br/><br/>
+{% if submitted %}
+Your Form has been submitted
+{%else%}
+    <form action="" method=POST enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type= "submit" value= "submit" class="btn btn-secondary">
+    </form>
+{%endif%}
+{%else%}
+<h1> Sorry You dont have access to this page unless yore logged in </h1>
+<center><a href={%url 'login'%}>Login</a></center>
+{%endif%}
+{% endblock %}

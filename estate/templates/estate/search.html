@@ -1,0 +1,67 @@
+{% extends 'estate/base.html' %}
+
+{% block content %}
+{% if searched %}
+<div class="container">
+  <div class="text-center mb-4">
+    <h1 class="display-4 text-success">Results for {{ searched }}</h1>
+    <hr class="w-25 mx-auto bg-success">
+  </div>
+
+  <!-- Green cards for Rent -->
+  <div class="row">
+    {% for property in properties %}
+      {% if property.available %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card border-success shadow h-100 d-flex flex-column">
+            <div class="card-body bg-light d-flex flex-column">
+              <h5 class="card-title text-success">{{ property.summary }}</h5>
+              <h6 class="text-muted">Location: {{ property.location }}</h6>
+              <hr>
+              <ul class="list-unstyled">
+                <li><strong>Description:</strong> {{ property.description }}</li>
+                <li><strong>Price Range:</strong> ₦{{ property.price_range }}</li>
+                <li><strong>Phone Number:</strong> {{ property.phone_number }}</li>
+              </ul>
+              <div class="mt-auto text-center">
+                <a href={%url 'view-property-r' property.id%} class="btn btn-success">View Property</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Blue cards for Buy -->
+  <div class="row mt-4">
+    {% for properties in properties1 %}
+      {% if properties.available %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card border-primary shadow h-100 d-flex flex-column">
+            <div class="card-body bg-light d-flex flex-column">
+              <h5 class="card-title text-primary">{{ properties.summary }}</h5>
+              <h6 class="text-muted">Location: {{ properties.location }}</h6>
+              <hr>
+              <ul class="list-unstyled">
+                <li><strong>Description:</strong> {{ properties.property_description }}</li>
+                <li><strong>Price:</strong> ₦{{ properties.price }}</li>
+                <li><strong>Phone Number:</strong> {{ properties.phone_number }}</li>
+                <li><strong>Negotiable:</strong> {{ properties.get_negotiate_display }}</li>
+              </ul>
+              <div class="mt-auto text-center">
+                <a href={%url 'view-property-s' properties.id%} class="btn btn-primary">View Property</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% else %}
+<h1> You forgot to search something </h1>
+<br/>
+{% endif %}
+{% endblock %}
