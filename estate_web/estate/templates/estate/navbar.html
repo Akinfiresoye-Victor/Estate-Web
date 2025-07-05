@@ -1,0 +1,100 @@
+<nav class="navbar bg-dark fixed-top" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold">Estate Web</a>
+    <div class="d-flex ms-auto align-items-center">
+      <form class="d-flex me-3" role="search" method="POST" action="{% url 'search-property' %}">
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" placeholder="Search Properties" aria-label="Search" name="searched">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+
+    <div class="offcanvas offcanvas-end text-bg-dark d-flex flex-column justify-content-between" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div>
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Explore</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body">
+          <ul class="navbar-nav flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href={%url 'best-deals-rent'%}>Best Deals(Rent)</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href={%url 'best-deals-sale'%}>Best Deals(Sale)</a>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Find Home
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="{% url 'rent-prop' %}">Rent Home</a></li>
+                <li><a class="dropdown-item" href="{% url 'buy-property' %}">Buy Home</a></li>
+                <li><a class="dropdown-item" href={% url 'wishlist'%}>Wishlist</a></li>
+              </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Property Management
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="{% url 'lease-property' %}">Lease Property</a></li>
+                <li><a class="dropdown-item" href="{% url 'sell-property' %}">Sell Property</a></li>
+                <li><a class="dropdown-item" href="{% url 'my-listings' %}">My Listings</a></li>
+              </ul>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'user-profile' %}">User Profile</a>
+            </li>
+            <div class="offcanvas-footer border-top border-secondary px-3 py-4">
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Property Near You (coming soon...)</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" aria-disabled="true">Dark Theme (coming soon...)</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="offcanvas-footer border-top border-secondary px-3 py-4">
+        <div class="text-white">
+          <h6 class="fw-bold mb-3">Customer Support</h6>
+          <ul class="list-unstyled mb-3">
+            <li class="mb-2">
+              <i class="bi bi-envelope me-2"></i>
+              <a href="mailto:support@estateweb101@gmail.com" class="text-white text-decoration-none">Contact Us</a>
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-question-circle me-2"></i>
+              <a href="#" class="text-white text-decoration-none">FAQs (Contact us directly👆)</a>
+            </li>
+            <li>
+              <i class="bi bi-shield-lock me-2"></i>
+              <a href="#" class="text-white text-decoration-none">Terms & Privacy</a>
+            </li><br/>
+            <center>
+              <li class="mb-2">
+                <i class="bi bi-shield-lock me-2"></i>
+                <a class="btn btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+              </li>
+            </center>
+          </ul>
+          <p class="text-center small text-white-50 mb-0">&copy; 2024 Estate Web</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
