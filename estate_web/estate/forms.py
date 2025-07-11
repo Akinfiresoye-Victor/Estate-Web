@@ -41,7 +41,7 @@ class LeaseForm(ModelForm):
 }
         widgets= {'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Property Description'}),
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Oda Road, Kagola, Plot2,3'}),
-                    'price_range': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g: 100,000'}),
+                    'price_range': forms.TextInput(attrs={'class': 'form-control'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
                     # 'state': forms.ChoiceField(choices=[('', 'Any State')]+STATES, attrs={'class': 'form-control'}),
                     'summary': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g 2 Bedroom Flat, Penthouse'}),
