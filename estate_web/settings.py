@@ -91,7 +91,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # For collectstatic
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://my-bucket.s3.amazonaws.com/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field
