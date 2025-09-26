@@ -41,6 +41,7 @@ def sell_property(request):
             form= SellForm
             if 'submitted' in request.GET:
                 submitted=True
+        messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
         return render(request, 'estate/sell_property.html', {'form': form, 'submitted':submitted})
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
@@ -62,6 +63,7 @@ def lease_property(request):
             form= LeaseForm
             if 'submitted' in request.GET:
                 submitted=True
+        messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
         return render(request, 'estate/lease_property.html', {'form': form, 'submitted':submitted})
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
@@ -165,6 +167,7 @@ def view_property_on_sale(request, property_id):
     if request.user.is_authenticated:
         #actual line that does the heavy lifting
         property= PropertyManagementSale.objects.get(pk=property_id)
+        messages.success(request, 'Image Problem will be fixed soon stay alert for future updates')
         return render(request, 'estate/view_property_s.html', {'property':property})
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
@@ -176,6 +179,7 @@ def view_property_on_lease(request, property_id):
     if request.user.is_authenticated:
         #actual line that does the heavy lifting
         property= PropertyManagementRent.objects.get(pk=property_id)
+        messages.success(request, 'Image Problem will be fixed soon stay alert for future updates')
         return render(request, 'estate/view_property_r.html', {'property':property})
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
