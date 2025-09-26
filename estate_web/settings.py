@@ -12,6 +12,25 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='estate-web.onrender.com', cast=Csv())
 
 
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # REQUIRED
+        'DIRS': [],  # You can add any custom template directories here
+        'APP_DIRS': True,  # Important: looks for templates inside each app
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',  # REQUIRED for admin
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+
 # Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
