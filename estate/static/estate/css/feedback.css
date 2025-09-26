@@ -1,0 +1,36 @@
+body {
+    background-color: #f9f9f9;
+    padding: 50px;
+    font-family: Arial, sans-serif;
+}
+
+.feedback-container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.success-message {
+    margin-bottom: 20px;
+    color: green;
+    font-weight: bold;
+}
+
+.feedback-container textarea {
+    width: 100%;
+    min-height: 150px; /* bigger text box */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+.feedback-container button {
+    display: block;     /* center the button */
+    margin: 20px auto 0 auto;
+    padding: 10px 30px;
+    font-size: 16px;
+}

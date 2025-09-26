@@ -18,12 +18,12 @@
 
         <div class="offcanvas-body">
           <ul class="navbar-nav flex-grow-1 pe-3">
-            <li class="nav-item">
+            {% comment %} <li class="nav-item">
               <a class="nav-link active" aria-current="page" href={%url 'best-deals-rent'%}>Best Deals(Rent)</a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href={%url 'best-deals-sale'%}>Best Deals(Sale)</a>
-            </li>
+            </li> {% endcomment %}
 
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -49,6 +49,10 @@
 
             <li class="nav-item">
               <a class="nav-link" href="{% url 'user-profile' %}">User Profile</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'feedback' %}">Feedback/Review</a>
             </li>
             <div class="offcanvas-footer border-top border-secondary px-3 py-4">
             <li class="nav-item">

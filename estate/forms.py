@@ -2,7 +2,7 @@
 
 from django import forms
 from django.forms import ModelForm
-from .models import PropertyManagementRent, PropertyManagementSale
+from .models import PropertyManagementRent, PropertyManagementSale, Feedback
 from .choices import STATES
 
 
@@ -86,3 +86,11 @@ class SellForm(ModelForm):
                     'negotiate': forms.Select(attrs={'class': 'form-control'}),
                     'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
 }
+
+
+class FeedbackForm(ModelForm):
+    class Meta:
+        model=Feedback
+        fields=('feedback',)
+        labels={'feedback': '',}
+        widgets={'feedback': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'Please enter your feedback'}),}

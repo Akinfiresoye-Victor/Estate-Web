@@ -1,15 +1,15 @@
 '''Handles Main Functionality of the Website'''
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import PropertyManagementSale, PropertyManagementRent
-from .forms import LeaseForm, SellForm
+from .models import PropertyManagementSale, PropertyManagementRent, Feedback
+from .forms import LeaseForm, SellForm, FeedbackForm
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from members.forms import UpdateUserForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-
+from django.core.mail import send_mail
 
 
 
@@ -22,6 +22,28 @@ def welcome_page(request):
         return render(request, 'estate/welcome_page.html')
 
 
+
+
+def feedback(request):
+    submitted = False
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback_instance = form.save()  # save to DB
+            messages.success(request, 'Thanks for your feedback!')
+
+            subject = "New Feedback Received"
+            message = f"Feedback:\n{feedback_instance.feedback}"
+            recipient_list = [settings.EMAIL_HOST_USER]
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+
+            return HttpResponseRedirect('/feedback?submitted=True')
+    else:
+        form = FeedbackForm()
+        if 'submitted' in request.GET:
+            submitted = True
+
+    return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
 
 '''Property Management Function'''
 #Function/View which manages the uploading of properties for sale
@@ -186,22 +208,24 @@ def view_property_on_lease(request, property_id):
         return redirect('welcome-page')
 
 
-#View/Function that queries the datatbase containing the properties on lease and ordering them from the lowest price to the highest price
-def best_deals_on_lease(request):
-    if request.user.is_authenticated:
-        property_on_lease= PropertyManagementRent.objects.order_by('price_range').all()
-        return render(request, 'estate/best_deals_r.html', {'property': property_on_lease})
-    else:
-        return redirect('welcome-page')
+# #View/Function that queries the datatbase containing the properties on lease and ordering them from the lowest price to the highest price
+# def best_deals_on_lease(request):
+#     if request.user.is_authenticated:
+#         property_on_lease= PropertyManagementRent.objects.order_by('price_range').all()
+#         return render(request, 'estate/best_deals_r.html', {'property': property_on_lease})
+#     else:
+#         return redirect('welcome-page')
 
 
-#View/Function that queries the datatbase containing the properties on sale and ordering them from the lowest price to the highest price
-def best_deals_on_sale(request):
-    if request.user.is_authenticated:
-        property_on_sale= PropertyManagementSale.objects.order_by('price').all()
-        return render(request, 'estate/best_deals_s.html', {'property': property_on_sale})
-    else:
-        return redirect('welcome-page')
+# #View/Function that queries the datatbase containing the properties on sale and ordering them from the lowest price to the highest price
+# def best_deals_on_sale(request):
+#     if request.user.is_authenticated:
+#         property_on_sale= PropertyManagementSale.objects.order_by('price').all()
+#         return render(request, 'estate/best_deals_s.html', {'property': property_on_sale})
+#     else:
+#         return redirect('welcome-page')
+
+
 
 
 

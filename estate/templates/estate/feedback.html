@@ -1,0 +1,39 @@
+{% extends 'estate/base.html' %}
+{% load static%}
+
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/feedback.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<br/>
+<div class="feedback-container">
+    <h2 class="text-center">We value your feedback</h2>
+    <p class="text-center">Your feedback helps us improve!</p>
+
+    <!-- Display Django messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+
+    <!-- Thank you message if submitted -->
+    {% if submitted %}
+        <div class="alert alert-success" role="alert">
+            Thanks for your feedback!
+        </div>
+    {% endif %}
+
+    <!-- Feedback Form -->
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+</form>
+
+</div>
+{%endblock%}

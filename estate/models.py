@@ -3,6 +3,7 @@
 from django.db import models
 from datetime import datetime
 from .choices import STATES
+import django
 
 
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
@@ -70,3 +71,7 @@ class PropertyManagementRent(models.Model):
 
 
 
+class Feedback(models.Model):
+    email=models.EmailField('Your Email')
+    feedback= models.CharField(max_length=300, blank=False)
+    date_sent= models.DateField(default=django.utils.timezone.now)
