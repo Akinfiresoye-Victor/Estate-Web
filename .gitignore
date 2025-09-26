@@ -11,7 +11,7 @@ env/
 # Django stuff
 *.log
 staticfiles/
-media/
+
 
 # IDE/editor
 .vscode/
