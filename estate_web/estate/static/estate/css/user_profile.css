@@ -1,0 +1,151 @@
+
+  :root { /* Default (Light) Theme Variables */
+    --primary-bg-color: #ffffff; /* Main background for light mode */
+    --primary-text-color: #333333; /* Main text color for light mode */
+    --card-bg-color: #f8f9fa; /* Card background for light mode */
+    --card-border-color: #dee2e6; /* Card border for light mode */
+    --heading-color: #333333; /* General heading color */
+    --muted-text-color: #6c757d; /* Muted text color */
+    --link-color: #0d6efd; /* Primary link/button color (blue) */
+
+    /* Specific button colors for light theme */
+    --btn-primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --btn-outline-primary-border: #667eea;
+    --btn-outline-primary-color: #667eea;
+    --btn-outline-primary-hover-bg: #667eea;
+    --btn-outline-primary-hover-color: #ffffff;
+
+    --btn-outline-secondary-border: #6c757d;
+    --btn-outline-secondary-color: #6c757d;
+    --btn-outline-secondary-hover-bg: #6c757d;
+    --btn-outline-secondary-hover-color: #ffffff;
+
+    --btn-outline-success-border: #198754; /* Green */
+    --btn-outline-success-color: #198754;
+    --btn-outline-success-hover-bg: #198754;
+    --btn-outline-success-hover-color: #ffffff;
+
+    --btn-outline-danger-border: red;
+    --btn-outline-danger-color: red;
+    --btn-outline-danger-hover-bg: red;
+    --btn-outline-danger-hover-color: white;
+  }
+
+  [data-theme="dark"] { /* Dark Theme Overrides */
+    --primary-bg-color: #121212;
+    --primary-text-color: #f0f0f0;
+    --card-bg-color: #1e1e1e;
+    --card-border-color: #333;
+    --heading-color: #f0f0f0;
+    --muted-text-color: #999;
+    --link-color: #92a4ed; /* Lighter blue for dark mode */
+
+    /* Specific button colors for dark theme */
+    --btn-primary-bg: #2a2a2a; /* Solid dark background for primary button */
+    --btn-outline-primary-border: #92a4ed;
+    --btn-outline-primary-color: #92a4ed;
+    --btn-outline-primary-hover-bg: #92a4ed;
+    --btn-outline-primary-hover-color: #1e1e1e;
+
+    --btn-outline-secondary-border: #a0a0a0;
+    --btn-outline-secondary-color: #a0a0a0;
+    --btn-outline-secondary-hover-bg: #a0a0a0;
+    --btn-outline-secondary-hover-color: #1e1e1e;
+
+    --btn-outline-success-border: #2ecc71; /* Brighter green for dark mode */
+    --btn-outline-success-color: #2ecc71;
+    --btn-outline-success-hover-bg: #2ecc71;
+    --btn-outline-success-hover-color: #1e1e1e;
+
+    --btn-outline-danger-border: #dc3545; /* Bootstrap red */
+    --btn-outline-danger-color: #dc3545;
+    --btn-outline-danger-hover-bg: #dc3545;
+    --btn-outline-danger-hover-color: white;
+  }
+
+  /* Base styles applied using variables */
+  body {
+    background-color: var(--primary-bg-color);
+    color: var(--primary-text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-color);
+    transition: color 0.3s ease;
+  }
+
+  .text-muted { /* Overrides Bootstrap's !important */
+    color: var(--muted-text-color) !important;
+    transition: color 0.3s ease;
+  }
+
+  .text-primary { /* Overrides Bootstrap's !important for blue text */
+    color: var(--link-color) !important;
+    transition: color 0.3s ease;
+  }
+
+  .card {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--card-border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Use generic shadow, might need a variable for shadow color */
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+  }
+
+  /* Specific styles for buttons to use variables */
+  .btn-outline-primary {
+    border-color: var(--btn-outline-primary-border);
+    color: var(--btn-outline-primary-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .btn-outline-primary:hover {
+    background-color: var(--btn-outline-primary-hover-bg);
+    color: var(--btn-outline-primary-hover-color);
+  }
+
+  .btn-outline-secondary {
+    border-color: var(--btn-outline-secondary-border);
+    color: var(--btn-outline-secondary-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .btn-outline-secondary:hover {
+    background-color: var(--btn-outline-secondary-hover-bg);
+    color: var(--btn-outline-secondary-hover-color);
+  }
+
+  .btn-outline-success {
+    border-color: var(--btn-outline-success-border);
+    color: var(--btn-outline-success-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .btn-outline-success:hover {
+    background-color: var(--btn-outline-success-hover-bg);
+    color: var(--btn-outline-success-hover-color);
+  }
+
+  .btn-outline-danger {
+    border-color: var(--btn-outline-danger-border);
+    color: var(--btn-outline-danger-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .btn-outline-danger:hover {
+    background-color: var(--btn-outline-danger-hover-bg);
+    color: var(--btn-outline-danger-hover-color);
+  }
+
+  .btn-primary { /* For the filled primary buttons */
+      background: var(--btn-primary-bg);
+      border: none; /* Remove default border */
+      color: white; /* Keep text white for filled primary */
+      transition: background 0.3s ease;
+  }
+  .btn-primary:hover {
+      box-shadow: var(--btn-primary-hover-shadow);
+  }
+
+  /* Specific override for the profile initial avatar */
+  .rounded-circle.bg-primary {
+    background-color: var(--link-color) !important; /* Use the themed link color */
+    color: white !important; /* Keep text white on this background */
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }

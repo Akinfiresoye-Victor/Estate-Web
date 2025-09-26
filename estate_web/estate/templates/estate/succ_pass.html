@@ -1,0 +1,40 @@
+{% extends 'estate/base.html' %}
+
+{% load static%}
+
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/settings.css' %}">
+{% endblock %}
+
+
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="card mt-5">
+        <div class="card-body p-5 text-center">
+          <div class="success-icon">
+            <i class="fas fa-check text-white fa-2x"></i>
+          </div>
+          <h2 class="text-success mb-3">Password Changed Successfully!</h2>
+          <p class="text-muted mb-4">
+            Your password has been updated successfully. You can now use your new password to log in.
+          </p>
+          <div class="d-grid gap-2">
+            <a href="{% url 'user-profile' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-home me-2"></i>Go to Dashboard
+            </a>
+            <a href="{% url 'change-password' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-key me-2"></i>Change Password Again
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'estate/base.html' %}
+
+{% load static%}
+
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/settings.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container py-5">
+  <h2 class="mb-4 fw-bold text-center text-primary">Account & Privacy Settings</h2>
+
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <form method="POST" action="#" class="card shadow-sm p-4 bg-body border-0 text-body">
+        {% csrf_token %}
+
+        <!-- Personal Info -->
+        <h5 class="mb-3 text-primary">Personal Information <strong>(Read Only)</strong></h5>
+        <div class="mb-3">
+          <label for="first_name" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="last_name" class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+        </div>
+
+        <hr>
+
+        <!-- Communication Preferences -->
+        <h5 class="mb-3 text-primary">Communication Preferences</h5>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" value="1" id="notifyEmail" checked>
+          <label class="form-check-label" for="notifyEmail">
+            Receive updates via Email
+          </label>
+        </div>
+
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" value="1" id="notifySMS">
+          <label class="form-check-label" for="notifySMS">
+            Receive updates via SMS
+          </label>
+        </div>
+
+        <!-- Privacy -->
+        <h5 class="mb-3 text-primary">Privacy</h5>
+        <div class="form-check form-switch mb-4">
+          <input class="form-check-input" type="checkbox" id="accountVisibility" checked>
+          <label class="form-check-label" for="accountVisibility">
+            Make my profile visible to property owners
+          </label>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{% url 'update-profile' user.id %}" class="btn btn-outline-primary btn-sm">Update Profile</a>
+          <center><a href="{% url 'user-profile' %}" class="btn btn-outline-success btn-sm">Dashboard</a></center>
+          <a href="{% url 'change-password' %}" class="btn btn-outline-secondary btn-sm">Change Password</a>
+
+        </div>
+      </form>
+
+      <!-- Danger Zone -->
+      <div class="card mt-4 border border-danger bg-body text-body">
+        <div class="card-body">
+          <h5 class="card-title text-danger">Delete Account</h5>
+          <p class="card-text">This action is irreversible. All your listings, saved properties, and profile data will be permanently deleted.</p>
+          <a href={%url 'delete-account'%} class="btn btn-danger">Delete My Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

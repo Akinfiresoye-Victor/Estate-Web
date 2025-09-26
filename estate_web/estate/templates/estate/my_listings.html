@@ -1,0 +1,80 @@
+{% extends 'estate/base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<br/>
+
+<div class="container">
+  <div class="text-center mb-4">
+    <h1 class="display-4" style="color: var(--bs-success, #198754);">My Listings</h1>
+    <hr class="w-25 mx-auto" style="border-top: 2px solid var(--bs-success, #198754);">
+  </div>
+
+  <!-- Lease Listings -->
+  <div class="row">
+    {% for property in property1 %}
+      {% if property %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card border-0 shadow h-100 d-flex flex-column" style="background-color: var(--bs-light, #f8f9fa);">
+            <div class="card-body d-flex flex-column position-relative">
+              <span class="badge text-bg-success position-absolute top-0 end-0 m-2">On Lease</span>
+              <h5 class="card-title fw-semibold" style="color: var(--bs-success, #198754);">{{ property.summary }}</h5>
+              <h6 class="text-muted">Location: {{ property.location }}</h6>
+              <hr>
+              <ul class="list-unstyled small text-secondary">
+                <li><strong>Description:</strong> {{ property.description }}</li>
+                <li><strong>Price Range:</strong> ₦{{ property.price_range }}</li>
+                <li><strong>Phone Number:</strong> {{ property.phone_number }}</li>
+              </ul>
+              <div class="mt-auto d-flex justify-content-between">
+                <a href="{% url 'update-property' property_id=property.id %}" class="btn btn-outline-success btn-sm">Update</a>
+                <a href="{% url 'delete-property-r' property_id=property.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Sale Listings -->
+  <div class="row mt-4">
+    {% for property in property2 %}
+      {% if property %}
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card border-0 shadow h-100 d-flex flex-column" style="background-color: var(--bs-light, #f8f9fa);">
+            <div class="card-body d-flex flex-column position-relative">
+              <span class="badge text-bg-primary position-absolute top-0 end-0 m-2">On Sale</span>
+              <h5 class="card-title fw-semibold" style="color: var(--bs-primary, #0d6efd);">{{ property.summary }}</h5>
+              <h6 class="text-muted">Location: {{ property.location }}</h6>
+              <hr>
+              <ul class="list-unstyled small text-secondary">
+                <li><strong>Description:</strong> {{ property.property_description }}</li>
+                <li><strong>Price:</strong> ₦{{ property.price }}</li>
+                <li><strong>Phone Number:</strong> {{ property.phone_number }}</li>
+                <li><strong>Negotiable:</strong> {{ property.get_negotiate_display }}</li>
+              </ul>
+              <div class="mt-auto d-flex justify-content-between">
+                <a href="{% url 'update-property-s' property_id=property.id %}" class="btn btn-outline-primary btn-sm">Update</a>
+                <a href="{% url 'delete-property-s' property_id=property.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {% if not property1 and not property2 %}
+  <center>
+      <a href="{% url 'user-profile' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </center>
+    <div class="alert alert-warning text-center mt-4" role="alert">
+      You don't have any listings yet.
+    </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

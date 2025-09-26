@@ -1,0 +1,80 @@
+:root {
+  --bg-color: #ffffff;
+  --card-bg: #f8f9fa;
+  --text-light: #333333;
+  --text-muted: #6c757d;
+  --green: #198754;
+  --border-color: #dee2e6;
+  --card-shadow: rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-light: #f0f0f0;
+  --text-muted: #999;
+  --green: #2ecc71;
+  --border-color: #333;
+  --card-shadow: rgba(0,0,0,0.3);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card {
+  background-color: var(--card-bg);
+  color: var(--text-light);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px var(--card-shadow);
+  transition: transform 0.2s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+  transition: color 0.3s ease;
+}
+
+.btn-outline-success {
+  border-color: var(--green);
+  color: var(--green);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-outline-success:hover {
+  background-color: var(--green);
+  color: white;
+}
+
+.hr-custom {
+  height: 3px;
+  background-color: var(--green);
+  border: none;
+  width: 100px;
+  margin: 0 auto 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.text-success {
+  color: var(--green) !important;
+  transition: color 0.3s ease;
+}
+
+.list-unstyled li strong {
+  color: var(--text-light);
+}
+
+.card-body .position-absolute.top-0.end-0.m-2 {
+  color: var(--green);
+  transition: color 0.3s ease;
+}
+
+.alert {
+  color: var(--text-light);
+}

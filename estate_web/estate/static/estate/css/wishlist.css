@@ -1,0 +1,104 @@
+:root {
+  --bg-dark: #f7f4f4; /* Light grey for overall background (matches your screenshot) */
+  --card-bg: #1e1e1e; /* Very dark grey for card backgrounds */
+  --text-light: #f0f0f0; /* Light grey for general text on dark cards */
+  --border-dark: #333; /* Dark border for cards */
+  --muted-text: #999; /* Medium grey for muted text */
+  --highlight-green: #28a745; /* Green for success/highlights (e.g., button, "Saved Properties" title) */
+  --highlight-blue: #66b3ff; /* Lighter blue for better contrast on dark backgrounds (original was #007bff, which is too dark) */
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: #333; /* Default body text color for content on the light background */
+}
+
+/* Ensure headings outside cards (like "Saved Properties") are dark by default, unless otherwise specified */
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+}
+
+.card {
+  background-color: var(--card-bg);
+  color: var(--text-light); /* Ensures default text inside the card is light */
+  border: 1px solid var(--border-dark);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card-body {
+  /* Keep background-color on .card, no need to repeat here unless specific override */
+  color: var(--text-light); /* Ensures text directly in card-body is light */
+}
+
+/* Ensure all common text elements within card-body explicitly inherit the light text color */
+.card-body p,
+.card-body span,
+.card-body div,
+.card-body strong,
+.card-body small {
+    color: var(--text-light) !important; /* Use !important to override potential Bootstrap defaults */
+}
+
+/* Ensure headings and titles inside cards are light */
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6, .card .card-title {
+    color: var(--text-light);
+}
+
+
+.text-muted {
+  color: var(--muted-text) !important;
+}
+
+/* --- Button Styling --- */
+.btn-success {
+  background-color: var(--highlight-green);
+  border-color: var(--highlight-green);
+  color: #fff; /* White text for contrast on green button */
+}
+.btn-success:hover {
+  background-color: #218838; /* Slightly darker green on hover */
+  border-color: #218838;
+}
+
+.btn-primary {
+  background-color: var(--highlight-blue);
+  border-color: var(--highlight-blue);
+  color: #fff; /* White text for contrast on blue button */
+}
+.btn-primary:hover {
+  background-color: #007bff; /* Revert to original Bootstrap blue or slightly darker for hover */
+  border-color: #007bff;
+}
+
+/* --- Text and Border Classes based on Theme Highlights --- */
+.text-success, .border-success {
+  color: var(--highlight-green) !important;
+  border-color: var(--highlight-green) !important;
+}
+
+.text-primary, .border-primary {
+  color: var(--highlight-blue) !important; /* This is the crucial fix for blue text on dark cards */
+  border-color: var(--highlight-blue) !important;
+}
+
+.hr-custom {
+  height: 4px;
+  background-color: var(--highlight-green);
+  border: none;
+  width: 100px;
+  margin: 0 auto 1rem;
+}
+
+/* You might want to style the main "Saved Properties" heading directly if it's not .text-success */
+/* Example:
+.page-title-heading {
+    color: var(--highlight-green);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: bold;
+}
+*/

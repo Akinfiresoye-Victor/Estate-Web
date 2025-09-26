@@ -1,0 +1,100 @@
+{% extends 'estate/base.html' %}
+
+{% load static%}
+
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/user_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="container py-5">
+  <h2 class="mb-4 text-center fw-bold">Your Profile Dashboard</h2>
+
+  <div class="card mb-5 shadow-sm">
+    <div class="card-body d-flex flex-column flex-md-row align-items-center">
+      {% if user.profile.image %}
+        <img src="{{ user.profile.image.url }}" class="rounded-circle me-md-4 mb-3 mb-md-0" alt="Profile" style="width: 100px; height: 100px; object-fit: cover;">
+      {% else %}
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-md-4 mb-3 mb-md-0"
+             style="width: 100px; height: 100px; font-size: 2rem;">
+          {{ user.username|first|upper }}
+        </div>
+      {% endif %}
+
+      <div>
+        <h5 class="mb-1">
+          {% if user.first_name and user.last_name %}
+            {{ user.first_name }} {{ user.last_name }}
+            <small class="d-block text-muted">@{{ user.username }}</small>
+          {% else %}
+            {{ user.username }}
+          {% endif %}
+        </h5>
+        <p class="text-muted mb-3">{{ user.email }}</p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'update-profile' user.id %}" class="btn btn-outline-primary btn-sm">Update Profile</a>
+          <a href={%url 'change-password'%} class="btn btn-outline-danger btn-sm">Change Password</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">My Property Listings</h5>
+          <p class="card-text text-muted flex-grow-1">View, edit, or add new properties to showcase your listings.</p>
+          <div class="d-flex flex-wrap gap-2 mt-auto">
+            <a href="{% url 'my-listings' %}" class="btn btn-sm btn-primary">Manage Listings</a>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Add New
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'sell-property' %}">Sell</a></li>
+                <li><a class="dropdown-item" href="{% url 'lease-property' %}">Lease</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">My Saved Properties</h5>
+          <p class="card-text text-muted flex-grow-1">Track properties you favorited and revisit them anytime.</p>
+          <a href="{% url 'wishlist' %}" class="btn btn-sm btn-primary mt-auto">View Wishlist</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">My Applications (Coming Soon.....)</h5>
+          <p class="card-text text-muted flex-grow-1">Follow up on rental or purchase applications you submitted.</p>
+          <a href="#" class="btn btn-sm btn-primary mt-auto">Review Applications</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Account & Privacy</h5>
+          <p class="card-text text-muted flex-grow-1">Adjust your personal details, visibility, and privacy settings.</p>
+          <a href="{% url 'settings' %}" class="btn btn-sm btn-outline-secondary mt-auto">Manage Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br/><br/><br/><br/>
+{% endblock %}

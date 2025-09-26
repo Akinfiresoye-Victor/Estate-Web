@@ -1,0 +1,90 @@
+{% extends 'estate/base.html' %}
+
+{% block content %}
+{% if searched %}
+<div class="container mt-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 text-success animate__animated animate__fadeInDown">Search Results for "<span class="text-primary">{{ searched }}</span>"</h1>
+    <hr class="w-50 mx-auto border-success border-3 opacity-75">
+  </div>
+
+  {# --- For Rent Properties --- #}
+  {% if properties %}
+  <h2 class="text-success mb-4 animate__animated animate__fadeInLeft">Properties for Rent</h2>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+    {% for property in properties %}
+      {% if property.available %}
+        <div class="col animate__animated animate__fadeInUp">
+          <div class="card h-100 shadow-lg border-success rounded-3 overflow-hidden">
+            <div class="card-body d-flex flex-column p-4">
+              <h5 class="card-title text-success mb-2">{{ property.summary }}</h5>
+              <h6 class="card-subtitle mb-3 text-muted">Location: {{ property.location }}</h6>
+              <p class="card-text flex-grow-1">{{ property.description|truncatechars:100 }}</p>
+              <ul class="list-unstyled mb-3">
+                <li><strong>Price Range:</strong> <span class="text-success">₦{{ property.price_range }}</span></li>
+                <li><strong>Phone:</strong> {{ property.phone_number }}</li>
+              </ul>
+              <div class="mt-auto text-center">
+                <a href="{% url 'view-property-r' property.id %}" class="btn btn-success btn-lg px-4 rounded-pill">View Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center animate__animated animate__fadeIn" role="alert">
+    No properties found for rent matching your search.
+  </div>
+  {% endif %}
+
+  ---
+  <div class="my-5"></div> {# Adds some space between sections #}
+  ---
+
+  {# --- For Sale Properties --- #}
+  {% if properties1 %}
+  <h2 class="text-primary mb-4 animate__animated animate__fadeInRight">Properties for Sale</h2>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for property_sale in properties1 %} {# Renamed variable for clarity #}
+      {% if property_sale.available %}
+        <div class="col animate__animated animate__fadeInUp">
+          <div class="card h-100 shadow-lg border-primary rounded-3 overflow-hidden">
+            <div class="card-body d-flex flex-column p-4">
+              <h5 class="card-title text-primary mb-2">{{ property_sale.summary }}</h5>
+              <h6 class="card-subtitle mb-3 text-muted">Location: {{ property_sale.location }}</h6>
+              <p class="card-text flex-grow-1">{{ property_sale.property_description|truncatechars:100 }}</p>
+              <ul class="list-unstyled mb-3">
+                <li><strong>Price:</strong> <span class="text-primary">₦{{ property_sale.price }}</span></li>
+                <li><strong>Phone:</strong> {{ property_sale.phone_number }}</li>
+                <li><strong>Negotiable:</strong> {{ property_sale.get_negotiate_display }}</li>
+              </ul>
+              <div class="mt-auto text-center">
+                <a href="{% url 'view-property-s' property_sale.id %}" class="btn btn-primary btn-lg px-4 rounded-pill">View Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info text-center mt-4 animate__animated animate__fadeIn" role="alert">
+    No properties found for sale matching your search.
+  </div>
+  {% endif %}
+
+</div>
+
+{% else %}
+<div class="container mt-5 text-center">
+  <div class="alert alert-warning animate__animated animate__bounceIn" role="alert">
+    <h4 class="alert-heading">Oops!</h4>
+    <p>It looks like you haven't searched for anything yet. Please use the search bar to find properties.</p>
+    <hr>
+    <p class="mb-0">Start by typing what you're looking for, like "apartment" or "Lagos."</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

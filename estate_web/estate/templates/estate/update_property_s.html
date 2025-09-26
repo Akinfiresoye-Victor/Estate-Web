@@ -1,0 +1,88 @@
+{% extends 'estate/base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg p-4 mb-5">
+                <div class="card-body">
+                    <h2 class="card-title text-center text-success mb-4">Update Property Listing</h2>
+                    <hr class="mb-4">
+
+                    {% if submitted %}
+                        <div class="alert alert-success text-center" role="alert">
+                            Your property listing has been updated successfully!
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'best-deals-r' %}" class="btn btn-outline-success">View All Rent Deals</a>
+                            <a href="{% url 'user-dashboard' %}" class="btn btn-outline-secondary ms-2">Go to Dashboard</a>
+                        </div>
+                    {% else %}
+                        <form action="" method="POST" enctype="multipart/form-data" novalidate>
+                            {% csrf_token %}
+
+                            {% for field in form %}
+                                {% if field.is_hidden %}
+                                    {{ field }} {# Render hidden fields directly #}
+                                {% else %}
+                                    <div class="mb-3">
+                                        {{ field.label_tag }}
+                                        {% if field.field.widget.input_type == 'checkbox' %}
+                                            <div class="form-check">
+                                                {{ field }}
+                                                <label class="form-check-label" for="{{ field.id_for_label }}">
+                                                    {{ field.label }}
+                                                </label>
+                                                {% if field.help_text %}
+                                                    <div class="form-text text-muted">{{ field.help_text }}</div>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            {{ field }}
+                                            {% if field.help_text %}
+                                                <div class="form-text text-muted">{{ field.help_text }}</div>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        {% comment %} Display field-specific errors {% endcomment %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% comment %} Display non-field errors (e.g., from form.is_valid()) {% endcomment %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {% for error in form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">Update Property</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+    <div class="container mt-5 text-center">
+        <h1 class="display-5 text-danger">Sorry! You don't have access to this page unless you're logged in.</h1>
+        <p class="lead mt-3">Please log in to update properties.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">Login Here</a>
+    </div>
+{% endif %}
+{% endblock %}
