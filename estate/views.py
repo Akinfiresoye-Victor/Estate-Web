@@ -332,21 +332,3 @@ def delete_account(request):
 
 
 
-'''Search Functionality'''
-#View that handles the search functionality of the website
-def search_property(request):
-    if request.user.is_authenticated:
-        #The searched functionality is set empty as default
-        searched=''
-        #If searched it would then filter all the items in both rent and sale datatbase and brings out their result in respect to properties title
-        if request.method=='POST':
-            #the item searched for is then passed to get the data from both datatbse
-            searched= request.POST['searched']
-            properties1=PropertyManagementRent.objects.filter(summary__contains=searched)
-            properties2=PropertyManagementSale.objects.filter(summary__contains=searched)
-            return render(request, 'estate/search.html', {'searched':searched, 'properties':properties1, 'properties1':properties2})
-        else:
-            return render(request, 'estate/search.html', {'searched':searched})
-    else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
