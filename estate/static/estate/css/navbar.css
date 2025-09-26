@@ -71,9 +71,3 @@
 .offcanvas-footer .text-white-50 {
     color: rgba(255, 255, 255, 0.5) !important; /* Keep copyright text muted */
 }
-
-/* Search Input Placeholder */
-.navbar .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text */
-    opacity: 1; /* Firefox default is lower opacity */
-}

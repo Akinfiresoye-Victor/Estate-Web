@@ -12,7 +12,6 @@ urlpatterns = [
     path('sell_property', views.sell_property, name="sell-property"),
     path('lease_property', views.lease_property, name="lease-property"),
     path('buy_property', views.buy_property, name="buy-property"),
-    path('search_property', views.search_property, name="search-property"),
     path('update_property/<property_id>', views.update_property_rent, name="update-property"),
     path('update_property_s/<property_id>', views.update_property_sale, name="update-property-s"),
     path('my_listings', views.listed_properties, name="my-listings"),
