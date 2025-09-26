@@ -5,7 +5,7 @@ from datetime import datetime
 from .choices import STATES
 
 
-#model handling the datatabase requirements cointaining all the property up for sale requirements
+#model handling the datatabase requirements cointaining all the property up for sale requirements.
 class PropertyManagementSale(models.Model):
     user_id=models.IntegerField('Landlord', blank=False, default=1)
     summary=models.CharField('Short building tag', max_length=30, default=None)
