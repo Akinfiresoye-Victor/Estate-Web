@@ -6,20 +6,20 @@
 {% endblock %}
 
 {% block content %}
-
-<br/>
 <div class="feedback-container">
-    <h2 class="text-center">We value your feedback</h2>
-    <p class="text-center">Your feedback helps us improve!</p>
-
-
-
-    <!-- Feedback Form -->
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Submit Feedback</button>
-    </form>
+    <div class="feedback-card">
+        <h2 class="text-center">💬 We Value Your Feedback</h2>
+        <p class="text-center text-muted">Your thoughts help us improve and grow.</p>
+        <!-- Feedback Form -->
+        <form method="POST" class="feedback-form shadow-sm p-3 rounded">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.feedback }}
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary px-4 py-2"> Submit Feedback</button>
+            </div>
+        </form>
+    </div>
 </div>
-
 {% endblock %}
