@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
+from django.conf import settings
 
 
 
@@ -24,20 +25,20 @@ def welcome_page(request):
 
 
 
-def feedback(request):
+def feedbacks(request):
     submitted = False
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
         if form.is_valid():
-            feedback_instance = form.save()  # save to DB
-            messages.success(request, 'Thanks for your feedback!')
-
+            feedback_instance = form.save(commit=False) 
             subject = "New Feedback Received"
             message = f"Feedback:\n{feedback_instance.feedback}"
             recipient_list = [settings.EMAIL_HOST_USER]
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-
-            return HttpResponseRedirect('/feedback?submitted=True')
+            messages.success(request, 'Thanks for your feedback!')
+            form.save()
+            submitted=True
+            return redirect('feedback')
     else:
         form = FeedbackForm()
         if 'submitted' in request.GET:
@@ -334,7 +335,7 @@ def change_password_success(request):
 
 
 #Users Settings(More feautures will be added in future updates)
-def settings(request):
+def profile_settings(request):
     messages.success(request, 'Communication Prefrences and privacy will come in future Updates Stayed Tuned😊')
     return render(request, 'estate/settings.html', {})
 
