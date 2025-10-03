@@ -1,104 +1,352 @@
 :root {
-  --bg-dark: #f7f4f4; /* Light grey for overall background (matches your screenshot) */
-  --card-bg: #1e1e1e; /* Very dark grey for card backgrounds */
-  --text-light: #f0f0f0; /* Light grey for general text on dark cards */
-  --border-dark: #333; /* Dark border for cards */
-  --muted-text: #999; /* Medium grey for muted text */
-  --highlight-green: #28a745; /* Green for success/highlights (e.g., button, "Saved Properties" title) */
-  --highlight-blue: #66b3ff; /* Lighter blue for better contrast on dark backgrounds (original was #007bff, which is too dark) */
+  --primary-color: #1a3c4e;
+  --secondary-color: #c19b76;
+  --accent-color: #8b7355;
+  --lease-color: #28a745;
+  --lease-dark: #218838;
+  --sale-color: #007bff;
+  --sale-dark: #0056b3;
+  --text-dark: #2c3e50;
+  --text-light: #6c757d;
 }
 
-body {
-  background-color: var(--bg-dark);
-  color: #333; /* Default body text color for content on the light background */
+.page-header {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+  padding: 3rem 0 2rem;
+  margin-bottom: 3rem;
+  color: #fff;
 }
 
-/* Ensure headings outside cards (like "Saved Properties") are dark by default, unless otherwise specified */
-h1, h2, h3, h4, h5, h6 {
-    color: #333;
+.page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
-.card {
-  background-color: var(--card-bg);
-  color: var(--text-light); /* Ensures default text inside the card is light */
-  border: 1px solid var(--border-dark);
-  transition: transform 0.2s ease;
+.page-header p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin-bottom: 0;
 }
 
-.card:hover {
-  transform: scale(1.02);
+.section-header {
+  margin-top: 2rem;
 }
 
-.card-body {
-  /* Keep background-color on .card, no need to repeat here unless specific override */
-  color: var(--text-light); /* Ensures text directly in card-body is light */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  padding-bottom: 0.8rem;
+  border-bottom: 3px solid;
+  display: inline-block;
 }
 
-/* Ensure all common text elements within card-body explicitly inherit the light text color */
-.card-body p,
-.card-body span,
-.card-body div,
-.card-body strong,
-.card-body small {
-    color: var(--text-light) !important; /* Use !important to override potential Bootstrap defaults */
+.section-title i {
+  margin-right: 0.5rem;
 }
 
-/* Ensure headings and titles inside cards are light */
-.card h1, .card h2, .card h3, .card h4, .card h5, .card h6, .card .card-title {
-    color: var(--text-light);
+.lease-section {
+  color: var(--lease-color);
+  border-bottom-color: var(--lease-color);
 }
 
-
-.text-muted {
-  color: var(--muted-text) !important;
+.sale-section {
+  color: var(--sale-color);
+  border-bottom-color: var(--sale-color);
 }
 
-/* --- Button Styling --- */
-.btn-success {
-  background-color: var(--highlight-green);
-  border-color: var(--highlight-green);
-  color: #fff; /* White text for contrast on green button */
-}
-.btn-success:hover {
-  background-color: #218838; /* Slightly darker green on hover */
-  border-color: #218838;
-}
-
-.btn-primary {
-  background-color: var(--highlight-blue);
-  border-color: var(--highlight-blue);
-  color: #fff; /* White text for contrast on blue button */
-}
-.btn-primary:hover {
-  background-color: #007bff; /* Revert to original Bootstrap blue or slightly darker for hover */
-  border-color: #007bff;
-}
-
-/* --- Text and Border Classes based on Theme Highlights --- */
-.text-success, .border-success {
-  color: var(--highlight-green) !important;
-  border-color: var(--highlight-green) !important;
-}
-
-.text-primary, .border-primary {
-  color: var(--highlight-blue) !important; /* This is the crucial fix for blue text on dark cards */
-  border-color: var(--highlight-blue) !important;
-}
-
-.hr-custom {
-  height: 4px;
-  background-color: var(--highlight-green);
+.property-card {
   border: none;
-  width: 100px;
-  margin: 0 auto 1rem;
+  border-radius: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background: #fff;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.08);
 }
 
-/* You might want to style the main "Saved Properties" heading directly if it's not .text-success */
-/* Example:
-.page-title-heading {
-    color: var(--highlight-green);
-    text-align: center;
-    margin-bottom: 2rem;
-    font-weight: bold;
+.property-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
 }
-*/
+
+.lease-card {
+  border-left: 4px solid var(--lease-color);
+}
+
+.sale-card {
+  border-left: 4px solid var(--sale-color);
+}
+
+.property-image {
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lease-image {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.sale-image {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.property-image::before {
+  content: '🏠';
+  position: absolute;
+  font-size: 5rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.3;
+}
+
+.property-status {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lease-status {
+  background: var(--lease-color);
+}
+
+.sale-status {
+  background: var(--sale-color);
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  background: rgba(255,255,255,0.95);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+.wishlist-btn:hover {
+  background: #fff;
+  transform: scale(1.1);
+}
+
+.lease-btn {
+  color: var(--lease-color);
+}
+
+.sale-btn {
+  color: var(--sale-color);
+}
+
+.property-card .card-body {
+  padding: 1.8rem;
+}
+
+.property-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  line-height: 1.3;
+}
+
+.lease-title {
+  color: var(--lease-dark);
+}
+
+.sale-title {
+  color: var(--sale-dark);
+}
+
+.property-location {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lease-accent {
+  color: var(--lease-color);
+}
+
+.sale-accent {
+  color: var(--sale-color);
+}
+
+.property-price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  margin: 1rem 0;
+}
+
+.lease-price {
+  color: var(--lease-color);
+}
+
+.sale-price {
+  color: var(--sale-color);
+}
+
+.property-details {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+  margin: 1rem 0;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.detail-label {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.detail-value {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.property-description {
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.negotiable-badge {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.negotiable-badge.not-negotiable {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.btn-view-property {
+  color: #fff;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.lease-btn-primary {
+  background: var(--lease-color);
+}
+
+.lease-btn-primary:hover {
+  background: var(--lease-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  color: #fff;
+}
+
+.sale-btn-primary {
+  background: var(--sale-color);
+}
+
+.sale-btn-primary:hover {
+  background: var(--sale-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+  color: #fff;
+}
+
+.no-properties {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-light);
+}
+
+.no-properties i {
+  font-size: 5rem;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.no-properties h3 {
+  color: var(--primary-color);
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.no-properties p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.no-properties .btn {
+  padding: 0.8rem 1.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.no-properties .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .property-price {
+    font-size: 1.5rem;
+  }
+
+  .no-properties .btn {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}

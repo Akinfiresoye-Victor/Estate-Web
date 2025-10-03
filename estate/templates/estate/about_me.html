@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>About Us - Estate Web</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-color: #1a3c4e;
+    --secondary-color: #c19b76;
+    --accent-color: #8b7355;
+    --text-dark: #2c3e50;
+    --text-light: #6c757d;
+    --bg-light: #f8f9fa;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+  }
+
+  /* Navigation */
+  .navbar {
+    background: #fff;
+    padding: 1.2rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  .navbar-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color) !important;
+    letter-spacing: 1px;
+  }
+
+  .nav-link {
+    color: var(--text-dark) !important;
+    font-weight: 500;
+    margin: 0 1rem;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: var(--secondary-color) !important;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    background: var(--secondary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .btn-primary-custom {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 0;
+  }
+
+  .btn-primary-custom:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  /* Hero Section */
+  .page-hero {
+    background: linear-gradient(rgba(26, 60, 78, 0.85), rgba(26, 60, 78, 0.85)), 
+                url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center/cover;
+    padding: 8rem 0 5rem;
+    color: #fff;
+    text-align: center;
+  }
+
+  .page-hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.8s ease;
+  }
+
+  .page-hero p {
+    font-size: 1.3rem;
+    max-width: 700px;
+    margin: 0 auto;
+    opacity: 0.95;
+    animation: fadeInUp 0.8s ease 0.2s backwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Story Section */
+  .story-section {
+    padding: 6rem 0;
+    background: #fff;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+  }
+
+  .section-subtitle {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .story-content {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--text-dark);
+  }
+
+  .story-content p {
+    margin-bottom: 1.5rem;
+  }
+
+  .highlight-box {
+    background: var(--bg-light);
+    border-left: 4px solid var(--secondary-color);
+    padding: 2rem;
+    margin: 2rem 0;
+    border-radius: 0;
+  }
+
+  .highlight-box h4 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  /* Developer Profile */
+  .developer-section {
+    padding: 6rem 0;
+    background: var(--bg-light);
+  }
+
+  .profile-card {
+    background: #fff;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border-radius: 0;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--bg-light);
+  }
+
+  .profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 4rem;
+    color: #fff;
+    border: 5px solid #fff;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  }
+
+  .profile-name {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-title {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .skill-badge {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .skill-badge:hover {
+    background: var(--secondary-color);
+    transform: translateY(-3px);
+  }
+
+  /* Vision Section */
+  .vision-section {
+    padding: 6rem 0;
+    background: #fff;
+  }
+
+  .vision-card {
+    padding: 2.5rem;
+    background: var(--bg-light);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--secondary-color);
+  }
+
+  .vision-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .vision-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .vision-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  /* Projects Section */
+  .projects-section {
+    padding: 6rem 0;
+    background: var(--bg-light);
+  }
+
+  .project-card {
+    background: #fff;
+    padding: 2rem;
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+  }
+
+  .project-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  }
+
+  .project-number {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 1rem;
+  }
+
+  .project-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+
+  .project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .tech-tag {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 3px;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: #fff;
+    padding: 5rem 0;
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+  }
+
+  .contact-info-box {
+    background: rgba(255,255,255,0.1);
+    padding: 2rem;
+    margin-top: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .contact-item {
+    margin: 1rem 0;
+    font-size: 1.1rem;
+  }
+
+  .contact-item a {
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 2px solid var(--secondary-color);
+    transition: all 0.3s ease;
+  }
+
+  .contact-item a:hover {
+    color: var(--secondary-color);
+  }
+
+  /* Footer */
+  footer {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 3rem 0 1.5rem;
+    text-align: center;
+  }
+
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+  }
+
+  .footer-text {
+    color: #888;
+    margin-top: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+
+    .profile-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .skills-grid {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .nav-link {
+      margin: 0.5rem 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">Estate Web</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="tel:091385489855">Contact</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="page-hero">
+  <div class="container">
+    <h1>About Estate Web</h1>
+    <p>Built with passion, powered by technology, designed for the future of real estate in Nigeria</p>
+  </div>
+</section>
+
+<!-- Story Section -->
+<section class="story-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <p class="section-subtitle text-center">The Story</p>
+        <h2 class="section-title text-center">How Estate Web Came to Life</h2>
+        
+        <div class="story-content mt-5">
+          <p>
+            Estate Web was born from a simple observation: Nigeria's real estate market needed a modern, accessible platform that connects buyers, sellers, and renters without the traditional barriers. As someone studying Computer Science and working towards becoming an AI Engineer, I saw an opportunity to combine my passion for technology with solving a real-world problem.
+          </p>
+
+          <p>
+            This platform isn't backed by a large corporation or a team of dozens. It's a solo venture—built line by line, feature by feature, by a developer who believes that one person with the right skills and determination can create something meaningful.
+          </p>
+
+          <div class="highlight-box">
+            <h4>The Mission</h4>
+            <p class="mb-0">
+              To revolutionize how Nigerians interact with the real estate market by leveraging modern web technologies and, eventually, artificial intelligence to create smarter property recommendations, accurate price predictions, and fraud detection systems that protect users.
+            </p>
+          </div>
+
+          <p>
+            Estate Web is more than just a property listing site. It's a vision for what's possible when you combine technical expertise with a deep understanding of local market challenges. Every feature—from the user dashboard to the property comparison tools—has been crafted with Nigerian users in mind.
+          </p>
+
+          <p>
+            This is just the beginning. As the platform grows, so will its capabilities, incorporating machine learning algorithms to provide personalized recommendations and market insights that help users make better decisions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Developer Section -->
+<section class="developer-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <p class="section-subtitle text-center">Meet the Developer</p>
+        <h2 class="section-title text-center mb-5">The Person Behind the Platform</h2>
+
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar">👨‍💻</div>
+            <h3 class="profile-name">Akinfiresoye Victor</h3>
+            <p class="profile-title">Solo Developer & Computer Science Student</p>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <h4 style="color: var(--primary-color); margin-bottom: 1.5rem;">Background</h4>
+              <p style="line-height: 1.8;">
+                I'm currently pursuing a 5-year Computer Science degree with a clear goal: becoming an AI Engineer. But I'm not waiting until graduation to build. I'm actively developing real-world applications that solve problems I see around me.
+              </p>
+              <p style="line-height: 1.8;">
+                My journey into web development started with Python, and I've since mastered frameworks like Django and Flask to build robust, scalable applications. Estate Web represents the culmination of countless hours of learning, coding, debugging, and iterating.
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h4 style="color: var(--primary-color); margin-bottom: 1.5rem;">Technical Arsenal</h4>
+              <div class="skills-grid">
+                <div class="skill-badge">Python</div>
+                <div class="skill-badge">Django</div>
+                <div class="skill-badge">Flask</div>
+                <div class="skill-badge">Tkinter</div>
+                <div class="skill-badge">Socket Programming</div>
+                <div class="skill-badge">Web Scraping</div>
+                <div class="skill-badge">BeautifulSoup</div>
+                <div class="skill-badge">Data Science</div>
+                <div class="skill-badge">HTML/CSS</div>
+                <div class="skill-badge">Bootstrap</div>
+                <div class="skill-badge">JavaScript</div>
+                <div class="skill-badge">SQL</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Vision Section -->
+<section class="vision-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <p class="section-subtitle text-center">The Vision</p>
+        <h2 class="section-title text-center mb-5">Where Estate Web is Heading</h2>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="vision-card">
+              <div class="vision-icon">🤖</div>
+              <h3>AI-Powered Recommendations</h3>
+              <p>
+                Implementing machine learning algorithms to analyze user preferences and property data, delivering personalized property recommendations that match exactly what you're looking for.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="vision-card">
+              <div class="vision-icon">💰</div>
+              <h3>Smart Price Prediction</h3>
+              <p>
+                Using data science to predict fair market values for properties based on location, features, and market trends—helping buyers avoid overpaying and sellers price competitively.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="vision-card">
+              <div class="vision-icon">🛡️</div>
+              <h3>Fraud Detection Systems</h3>
+              <p>
+                Leveraging AI to identify suspicious listings and protect users from scams—a critical feature in Nigeria's real estate market where trust is often a challenge.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="vision-card">
+              <div class="vision-icon">🇳🇬</div>
+              <h3>Nigeria-First, Then Beyond</h3>
+              <p>
+                Starting with Nigeria's housing market to solve local challenges, then scaling the platform to serve other African markets facing similar real estate accessibility issues.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Projects Section -->
+<section class="projects-section">
+  <div class="container">
+    <p class="section-subtitle text-center">Portfolio Highlights</p>
+    <h2 class="section-title text-center mb-5">Other Projects & Experiments</h2>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="project-card">
+          <div class="project-number">01</div>
+          <h4>Estate Web Platform</h4>
+          <p>Full-stack real estate marketplace with user dashboards, property listings, and comparison tools.</p>
+          <div class="project-tech">
+            <span class="tech-tag">Django</span>
+            <span class="tech-tag">HTML/CSS</span>
+            <span class="tech-tag">postgreSQL</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="project-card">
+          <div class="project-number">02</div>
+          <h4>Password Manager</h4>
+          <p>Secure multi-user password management system with login/logout functionality and encryption.</p>
+          <div class="project-tech">
+            <span class="tech-tag">Flask</span>
+            <span class="tech-tag">Python</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="project-card">
+          <div class="project-number">03</div>
+          <h4>Real Estate News Scraper</h4>
+          <p>Automated web scraping tool that fetches daily real estate news and market updates.</p>
+          <div class="project-tech">
+            <span class="tech-tag">BeautifulSoup</span>
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Web Scraping</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="project-card">
+          <div class="project-number">04</div>
+          <h4>Bible Idle Game</h4>
+          <p>Interactive biblical-themed idle game built with Tkinter, featuring progression mechanics and storytelling.</p>
+          <div class="project-tech">
+            <span class="tech-tag">Tkinter</span>
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Game Dev</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Let's Build the Future Together</h2>
+    <p>Estate Web is growing every day. Join the platform, explore properties, or reach out to discuss collaborations and ideas.</p>
+    
+    <div class="row justify-content-center mt-5">
+      <div class="col-md-8">
+        <div class="contact-info-box">
+          <h4 style="margin-bottom: 1.5rem;">Get In Touch</h4>
+          <div class="contact-item">
+            📧 Email: <a href="mailto:eninlavictor30@gmail.com">eninlavictor30@gmail.com</a>
+          </div>
+          <div class="contact-item">
+            📞 Phone: <a href="tel:091385489855">091385489855</a>
+          </div>
+          <div class="contact-item" style="margin-top: 2rem;">
+            <a href="{%url 'register-user'%}" class="btn btn-primary-custom" style="background: #fff; color: var(--primary-color);">Start Using Estate Web</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-brand">Estate Web</div>
+    <p class="footer-text">Built solo by Akinfiresoye Victor & a sprinkle of AI | &copy; 2025 Estate Web. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

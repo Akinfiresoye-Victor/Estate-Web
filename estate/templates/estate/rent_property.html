@@ -1,56 +1,77 @@
 {% extends 'estate/base.html' %}
 {% load static%}
-
-
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/rent.css' %}">
 {% endblock %}
-
 {% block content %}
 
-<br/>
-
-<div class="container">
-  <div class="text-center mb-4">
-    <h1 class="display-4 text-success">On Lease</h1>
-    <hr class="hr-custom">
+<div class="page-header">
+  <div class="container">
+    <h1>Properties for Lease</h1>
+    <p>Find the perfect rental property from our available listings</p>
   </div>
+</div>
 
-  <div class="row">
-    {% for lease in leased %}
-      {% if lease.available %}
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card shadow h-100 d-flex flex-column">
-            <div class="card-body d-flex flex-column position-relative">
-
-              <a href="{% url 'toggle-wishlist-rent' lease.id %}" class="position-absolute top-0 end-0 m-2">
-                {% if lease.whilist %}
-                  <i class="fas fa-bookmark"></i>
-                {% else %}
-                  <i class="far fa-bookmark"></i>
-                {% endif %}
-              </a>
-
-              <h5 class="card-title fw-semibold text-success">{{ lease.summary }}</h5>
-              <h6 class="text-muted">Location: {{ lease.location }}</h6>
-              <h6 class="text-muted">State: {{ lease.state }}</h6>
-              <hr>
-              <ul class="list-unstyled small text-muted">
-                <li><strong>Description:</strong> {{ lease.description }}</li>
-                <li><strong>Price Range:</strong> ₦{{ lease.price_range }}</li>
-                <li><strong>Phone Number:</strong> {{ lease.phone_number }}</li>
-                <li><strong>Date Listed:</strong> {{ lease.listed_date|date:"M d, Y" }}</li>
-              </ul>
-              <div class="mt-auto text-center">
-                <a href="{% url 'view-property-r' property_id=lease.id %}" class="btn btn-outline-success">
-                  View Property
+<div class="container mb-5">
+  <div class="row g-4">
+    {% if leased %}
+      {% for lease in leased %}
+        {% if lease.available %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card property-card h-100">
+              <div class="property-image">
+                <div class="property-status">For Lease</div>
+                <a href="{% url 'toggle-wishlist-rent' lease.id %}" class="wishlist-btn">
+                  {% if lease.whilist %}
+                    <i class="fas fa-bookmark"></i>
+                  {% else %}
+                    <i class="far fa-bookmark"></i>
+                  {% endif %}
                 </a>
+              </div>
+              
+              <div class="card-body d-flex flex-column">
+                <h5 class="property-title">{{ lease.summary }}</h5>
+                
+                <div class="property-location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ lease.location }}, {{ lease.state }}</span>
+                </div>
+                
+                <div class="property-price">₦{{ lease.price_range }}</div>
+                
+                <p class="property-description">{{ lease.description }}</p>
+                
+                <div class="property-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ lease.phone_number }}</span>
+                  </div>
+                </div>
+                
+                <div class="date-listed mb-3">
+                  <i class="far fa-calendar-alt"></i> Listed {{ lease.listed_date|date:"M d, Y" }}
+                </div>
+                
+                <div class="mt-auto">
+                  <a href="{% url 'view-property-r' property_id=lease.id %}" class="btn btn-view-property">
+                    View Details
+                  </a>
+                </div>
               </div>
             </div>
           </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="no-properties">
+          <i class="fas fa-home"></i>
+          <h3>No Properties Available for Lease</h3>
+          <p>Check back soon for new rental listings or contact us to list your property.</p>
         </div>
-      {% endif %}
-    {% endfor %}
+      </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

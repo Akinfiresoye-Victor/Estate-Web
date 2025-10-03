@@ -11,39 +11,9 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from django.conf import settings
-from datetime import date
-from bs4 import BeautifulSoup
-from urllib.request import urlopen, Request
-from urllib.error import HTTPError, URLError
-from fake_useragent import UserAgent
-import re
+from . import news_scrape as ns
 
 
-
-
-ue= UserAgent().random
-url="https://www.nigeriahousingmarket.com/"
-headers={"User-Agent": ue}
-req= Request(url, headers=headers)
-html=urlopen(req)
-bs=BeautifulSoup(html, 'lxml')
-profile_headline= bs.find('h4', style="white-space:pre-wrap;")
-profile_headline=profile_headline.text
-
-
-headlines = [h.get_text(strip=True) for h in bs.find("h4")]
-article_urls = []
-for headline in headlines:
-    slug = re.sub(r'[^a-z0-9]+', '-', headline.lower()).strip('-')
-    full_url = f"https://www.nigeriahousingmarket.com/interviews-opinions/{slug}"
-    article_urls.append(full_url)
-    
-for article in article_urls:
-    url=article
-    headers={"User-Agent":ue}
-    req= Request(url,headers=headers)
-html=urlopen(req)
-bs=BeautifulSoup(html, 'lxml')
 
 
 
@@ -56,24 +26,29 @@ def welcome_page(request):
         return render(request, 'estate/welcome_page.html')
 
 
-
+def about_us(request):
+    return render(request, 'estate/about_me.html')
 
 
 def articles(request):
     #estate article headlines
-    headlines= bs.find('div', class_="blog-item-top-wrapper")
-    headlines=headlines.text
-    #estate article summary
-    article= bs.find('div', class_="row sqs-row")
-    article=article.text
-    full_article= "https://www.nigeriahousingmarket.com/"
-    return render(request,'estate/article.html', {'headline':headlines,
+    try:
+        headlines= ns.bs.find('div', class_="blog-item-top-wrapper")
+        headlines=headlines.text
+        #estate article summary
+        article= ns.bs.find('div', class_="row sqs-row")
+        article=article.text
+        full_article= "https://www.nigeriahousingmarket.com/"
+        return render(request,'estate/article.html', {'headline':headlines,
                                                     'article':article,
                                                     "full_article":full_article})
-
+    except:
+        messages.success(request, ns.error)
+        return redirect('user-profile')
 
 
 def feedbacks(request):
+    messages.success(request, "DON'T PRESS SUBMIT!!!, Error dey dey there for now")
     submitted = False
     if request.method == 'POST':
         form = FeedbackForm(request.POST)
@@ -115,8 +90,8 @@ def sell_property(request):
         messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
         return render(request, 'estate/sell_property.html', {'form': form, 'submitted':submitted})
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        messages.success(request, ('Join us Now to start'))
+        return redirect('login')
 
 
 #Function/View that manages the uploading of properties for Rent
@@ -137,8 +112,8 @@ def lease_property(request):
         messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
         return render(request, 'estate/lease_property.html', {'form': form, 'submitted':submitted})
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        messages.success(request, ('Join us Now to start'))
+        return redirect('login')
 
 
 #Function/View that queries and brings out all the property being leased
@@ -148,8 +123,8 @@ def rent_property(request):
         leased_property_list= PropertyManagementRent.objects.order_by('-listed_date').all()
         return render(request, 'estate/rent_property.html', {'leased': leased_property_list})
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        messages.success(request, ('Join us Now to start'))
+        return redirect('login')
 
 
 #Function/View that queries and brings out all the property on sale
@@ -159,8 +134,8 @@ def buy_property(request):
         propery_sale_list=PropertyManagementSale.objects.order_by('-listed_date').all()
         return render(request, 'estate/buy_property.html', {'buy': propery_sale_list})
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        messages.success(request, ('Join us Now to start'))
+        return redirect('login')
 
 
 #View/Function that handles the updating of property already available for rent
@@ -283,7 +258,11 @@ def view_property_on_lease(request, property_id):
 #view handling the users profile settings
 def user_profile(request):
     if request.user.is_authenticated:
-        return render(request, 'estate/user_profile.html', {'headline': profile_headline})
+        try:
+            return render(request, 'estate/user_profile.html', {'headline': ns.profile_headline})
+        except:
+            messages.success(request, ns.error)
+            return redirect('user-profile')
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')

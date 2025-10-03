@@ -1,60 +1,87 @@
 {% extends 'estate/base.html' %}
 {% load static%}
-
-
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/buy.css' %}">
 {% endblock %}
-
 {% block content %}
 
-
-<br/>
-
-<div class="container">
-  <div class="text-center mb-4">
-    <h1 class="display-4 text-primary">On Sale</h1>
-    <hr class="hr-custom">
+<div class="page-header">
+  <div class="container">
+    <h1>Properties for Sale</h1>
+    <p>Discover your dream property from our curated collection</p>
   </div>
+</div>
 
-  <div class="row">
-    {% for bought in buy %}
-      {% if bought.available %}
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card shadow h-100 d-flex flex-column">
-            <div class="card-body d-flex flex-column position-relative">
-
-              <a href="{% url 'toggle-wishlist-buy' bought.id %}"
-                 class="position-absolute top-0 end-0 m-2"
-                 style="z-index: 1; font-size: 1.5rem; color: var(--blue);">
-                {% if bought.whilist %}
-                  <i class="fas fa-bookmark"></i>
-                {% else %}
-                  <i class="far fa-bookmark"></i>
-                {% endif %}
-              </a>
-
-              <h5 class="card-title fw-semibold text-primary">{{ bought.summary }}</h5>
-              <h6 class="text-muted">Location: {{ bought.location }}</h6>
-              <h6 class="text-muted">State: {{ bought.state }}</h6>
-              <hr>
-              <ul class="list-unstyled small text-muted">
-                <li><strong>Description:</strong> {{ bought.property_description }}</li>
-                <li><strong>Price:</strong> ₦{{ bought.price }}</li>
-                <li><strong>Phone Number:</strong> {{ bought.phone_number }}</li>
-                <li><strong>Negotiable:</strong> {{ bought.get_negotiate_display }}</li>
-                <li><strong>Date Listed:</strong> {{ bought.listed_date|date:"M d, Y" }}</li>
-              </ul>
-              <div class="mt-auto text-center">
-                <a href="{% url 'view-property-s' property_id=bought.id %}" class="btn btn-outline-primary">
-                  View Property
+<div class="container mb-5">
+  <div class="row g-4">
+    {% if buy %}
+      {% for bought in buy %}
+        {% if bought.available %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card property-card h-100">
+              <div class="property-image">
+                <div class="property-status">For Sale</div>
+                <a href="{% url 'toggle-wishlist-buy' bought.id %}" class="wishlist-btn">
+                  {% if bought.whilist %}
+                    <i class="fas fa-bookmark"></i>
+                  {% else %}
+                    <i class="far fa-bookmark"></i>
+                  {% endif %}
                 </a>
+              </div>
+              
+              <div class="card-body d-flex flex-column">
+                <h5 class="property-title">{{ bought.summary }}</h5>
+                
+                <div class="property-location">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ bought.location }}, {{ bought.state }}</span>
+                </div>
+                
+                <div class="property-price">₦{{ bought.price }}</div>
+                
+                <p class="property-description">{{ bought.property_description }}</p>
+                
+                <div class="property-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ bought.phone_number }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Negotiable</span>
+                    <span class="detail-value">
+                      {% if bought.negotiate %}
+                        <span class="negotiable-badge">Yes</span>
+                      {% else %}
+                        <span class="negotiable-badge not-negotiable">No</span>
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="date-listed mb-3">
+                  <i class="far fa-calendar-alt"></i> Listed {{ bought.listed_date|date:"M d, Y" }}
+                </div>
+                
+                <div class="mt-auto">
+                  <a href="{% url 'view-property-s' property_id=bought.id %}" class="btn btn-view-property">
+                    View Details
+                  </a>
+                </div>
               </div>
             </div>
           </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="no-properties">
+          <i class="fas fa-home"></i>
+          <h3>No Properties Available</h3>
+          <p>Check back soon for new listings or contact us to list your property.</p>
         </div>
-      {% endif %}
-    {% endfor %}
+      </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
