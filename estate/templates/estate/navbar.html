@@ -1,6 +1,6 @@
 <nav class="navbar bg-dark fixed-top" data-bs-theme="dark">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold">Estate Web</a>
+    <a class="navbar-brand fw-bold" href="{%url 'articles'%}">Estate Web</a>
     <div class="d-flex ms-auto align-items-center">
 
 
@@ -24,7 +24,9 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href={%url 'best-deals-sale'%}>Best Deals(Sale)</a>
             </li> {% endcomment %}
-
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'articles' %}">Latest News</a>
+            </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Find Home

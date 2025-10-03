@@ -27,7 +27,8 @@ urlpatterns = [
     path('edit_password_success', views.change_password_success, name="password-success"),
     path('settings', views.profile_settings, name="settings"),
     path('delete_account', views.delete_account, name="delete-account"),
-    path('feedback', views.feedbacks, name='feedback')
+    path('feedback', views.feedbacks, name='feedback'),
+    path('latest_news', views.articles, name='articles')
     # path('best_deals_rent', views.best_deals_on_lease, name="best-deals-rent"),
     # path('best_deals_sale', views.best_deals_on_sale, name="best-deals-sale"),
 ]

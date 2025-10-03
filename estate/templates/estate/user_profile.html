@@ -13,6 +13,16 @@
 
 <div class="container py-5">
   <h2 class="mb-4 text-center fw-bold">Your Profile Dashboard</h2>
+  <div class="card mb-5 shadow-sm">
+  <div class="card-body">
+    <h5 class="card-title">Today's Real Estate News</h5>
+    <p class="card-text">
+      <strong>{{ headline }}</strong>
+    </p>
+    <a href="{% url 'articles' %}" class="btn btn-sm btn-outline-primary">Read More</a>
+  </div>
+</div>
+
 
   <div class="card mb-5 shadow-sm">
     <div class="card-body d-flex flex-column flex-md-row align-items-center">

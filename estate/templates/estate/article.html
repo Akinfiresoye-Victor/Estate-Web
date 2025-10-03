@@ -1,0 +1,25 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'estate/css/news.css' %}">
+
+<div class="news-container">
+    <h1 class="page-title">📰 Real Estate News</h1>
+    <div class="news-meta">
+        <h2 class="headline">{{ headline }}</h2>
+    </div>
+
+    <div class="news-article">
+        <p>{{ article }}</p>
+    </div>
+
+    <div class="news-footer">
+        <a href="{{ full_article }}" target="_blank" class="read-more">
+            Read Full Details →
+        </a>
+    </div>
+</div>
+<center><h6><strong>Source: nigeriahousingmarket.com</strong> </h6> </center>
+{% endblock %}

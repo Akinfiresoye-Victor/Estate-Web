@@ -11,6 +11,39 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from django.conf import settings
+from datetime import date
+from bs4 import BeautifulSoup
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError, URLError
+from fake_useragent import UserAgent
+import re
+
+
+
+
+ue= UserAgent().random
+url="https://www.nigeriahousingmarket.com/"
+headers={"User-Agent": ue}
+req= Request(url, headers=headers)
+html=urlopen(req)
+bs=BeautifulSoup(html, 'lxml')
+profile_headline= bs.find('h4', style="white-space:pre-wrap;")
+profile_headline=profile_headline.text
+
+
+headlines = [h.get_text(strip=True) for h in bs.find("h4")]
+article_urls = []
+for headline in headlines:
+    slug = re.sub(r'[^a-z0-9]+', '-', headline.lower()).strip('-')
+    full_url = f"https://www.nigeriahousingmarket.com/interviews-opinions/{slug}"
+    article_urls.append(full_url)
+    
+for article in article_urls:
+    url=article
+    headers={"User-Agent":ue}
+    req= Request(url,headers=headers)
+html=urlopen(req)
+bs=BeautifulSoup(html, 'lxml')
 
 
 
@@ -22,6 +55,21 @@ def welcome_page(request):
     else:
         return render(request, 'estate/welcome_page.html')
 
+
+
+
+
+def articles(request):
+    #estate article headlines
+    headlines= bs.find('div', class_="blog-item-top-wrapper")
+    headlines=headlines.text
+    #estate article summary
+    article= bs.find('div', class_="row sqs-row")
+    article=article.text
+    full_article= "https://www.nigeriahousingmarket.com/"
+    return render(request,'estate/article.html', {'headline':headlines,
+                                                    'article':article,
+                                                    "full_article":full_article})
 
 
 
@@ -235,7 +283,7 @@ def view_property_on_lease(request, property_id):
 #view handling the users profile settings
 def user_profile(request):
     if request.user.is_authenticated:
-        return render(request, 'estate/user_profile.html', {})
+        return render(request, 'estate/user_profile.html', {'headline': profile_headline})
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
