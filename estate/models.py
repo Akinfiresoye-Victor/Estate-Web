@@ -21,6 +21,7 @@ class PropertyManagementSale(models.Model):
     available= models.BooleanField('Available', default=True)
     last_updated = models.DateTimeField(auto_now=True)#To pull out the last time the particular model was actually updated 
     whilist=models.BooleanField('Add to Whilist', default=False)
+    compare=models.BooleanField('Compare', default=False)
     base_image= models.ImageField(null=True, blank=True, upload_to="images/buy")
     image1= models.ImageField(null=True, blank=True, upload_to="images/buy")
     image2= models.ImageField(null=True, blank=True, upload_to="images/buy")
@@ -57,6 +58,7 @@ class PropertyManagementRent(models.Model):
     bathrooms = models.IntegerField(default=1, blank=True, null=True)
     last_updated = models.DateTimeField(auto_now=True)
     whilist=models.BooleanField('Add to Whilist', default=False)
+    compare=models.BooleanField('Compare', default=False)
     base_image= models.ImageField(null=True, blank=True, upload_to="images/rent")
     image1= models.ImageField(null=True, blank=True, upload_to="images/rent")
     image2= models.ImageField(null=True, blank=True, upload_to="images/rent")

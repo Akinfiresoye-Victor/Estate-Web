@@ -17,6 +17,22 @@ from . import news_scrape as ns
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #Basic Welcome page for users/guests
 def welcome_page(request):
     if request.user.is_authenticated:
@@ -33,10 +49,10 @@ def about_us(request):
 def articles(request):
     #estate article headlines
     try:
-        headlines= ns.bs.find('div', class_="blog-item-top-wrapper")
+        headlines= ns.bs.find('div', class_="blog-item-title")
         headlines=headlines.text
         #estate article summary
-        article= ns.bs.find('div', class_="row sqs-row")
+        article= ns.bs.find('div', class_="blog-item-content e-content")
         article=article.text
         full_article= "https://www.nigeriahousingmarket.com/"
         return render(request,'estate/article.html', {'headline':headlines,
@@ -259,7 +275,7 @@ def view_property_on_lease(request, property_id):
 def user_profile(request):
     if request.user.is_authenticated:
         try:
-            return render(request, 'estate/user_profile.html', {'headline': ns.profile_headline})
+            return render(request, 'estate/user_profile.html', {'headline': ns.article_headline})
         except:
             messages.success(request, ns.error)
             return redirect('user-profile')
@@ -306,6 +322,7 @@ def toggle_wishlist_buy(request, property_id):
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')    
+
 
 
 #View/Function That shows all property added to favourites

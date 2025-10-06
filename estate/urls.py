@@ -30,6 +30,8 @@ urlpatterns = [
     path('feedback', views.feedbacks, name='feedback'),
     path('latest_news', views.articles, name='articles'),
     path('about_us', views.about_us, name='about'),
+    
+    
     # path('best_deals_rent', views.best_deals_on_lease, name="best-deals-rent"),
     # path('best_deals_sale', views.best_deals_on_sale, name="best-deals-sale"),
 ]

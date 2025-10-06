@@ -27,16 +27,17 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'articles' %}">Latest News</a>
             </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Find Home
-              </a>
-              <ul class="dropdown-menu dropdown-menu-dark">
-                <li><a class="dropdown-item" href="{% url 'rent-prop' %}">Rent Home</a></li>
-                <li><a class="dropdown-item" href="{% url 'buy-property' %}">Buy Home</a></li>
-                <li><a class="dropdown-item" href={% url 'wishlist'%}>Wishlist</a></li>
-              </ul>
-            </li>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Find Home
+  </a>
+  <ul class="dropdown-menu dropdown-menu-dark">
+    <li><a class="dropdown-item" href="{% url 'rent-prop' %}">Rent Home</a></li>
+    <li><a class="dropdown-item" href="{% url 'buy-property' %}">Buy Home</a></li>
+    <li><a class="dropdown-item" href="{% url 'wishlist' %}">Wishlist</a></li>
+    <li><hr class="dropdown-divider"></li>
+  </ul>
+</li>
 
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -25,13 +25,17 @@
         {% if saved1.whilist %}
           <div class="col-md-6 col-lg-4">
             <div class="card property-card lease-card h-100">
-              <div class="property-image lease-image">
-                <div class="property-status lease-status">For Lease</div>
-                <a href="{% url 'toggle-wishlist-rent' saved1.id %}" class="wishlist-btn lease-btn">
-                  <i class="{% if saved1.whilist %}fas{% else %}far{% endif %} fa-bookmark"></i>
-                </a>
-              </div>
-              
+            <div class="property-image lease-image">
+            <div class="property-status lease-status">For Lease</div>
+            <a href="{% url 'toggle-wishlist-rent' saved1.id %}" class="wishlist-btn lease-btn">
+              <i class="{% if saved1.whilist %}fas{% else %}far{% endif %} fa-bookmark"></i>
+            </a>
+            <a href="{% url 'add-r-compare' saved1.id %}" class="compare-btn lease-btn">
+              <i class="fas fa-plus"></i>
+            </a>
+          </div>
+                  
+                  
               <div class="card-body d-flex flex-column">
                 <h5 class="property-title lease-title">{{ saved1.summary }}</h5>
                 
@@ -76,12 +80,11 @@
         {% if saved2.whilist %}
           <div class="col-md-6 col-lg-4">
             <div class="card property-card sale-card h-100">
-              <div class="property-image sale-image">
-                <div class="property-status sale-status">For Sale</div>
-                <a href="{% url 'toggle-wishlist-buy' saved2.id %}" class="wishlist-btn sale-btn">
-                  <i class="{% if saved2.whilist %}fas{% else %}far{% endif %} fa-bookmark"></i>
-                </a>
-              </div>
+            <div class="property-image sale-image">
+              <div class="property-status sale-status">For Sale</div>
+              <a href="{% url 'toggle-wishlist-buy' saved2.id %}" class="wishlist-btn sale-btn">
+                <i class="{% if saved2.whilist %}fas{% else %}far{% endif %} fa-bookmark"></i>
+              </a>
               
               <div class="card-body d-flex flex-column">
                 <h5 class="property-title sale-title">{{ saved2.summary }}</h5>
@@ -138,5 +141,7 @@
     </div>
   {% endif %}
 </div>
+
+
 
 {% endblock %}
