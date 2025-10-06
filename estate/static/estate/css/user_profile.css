@@ -312,3 +312,102 @@
         font-size: 1.5rem;
       }
     }
+
+@media (max-width: 768px) {
+  /* Header */
+  .dashboard-header {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+
+  .dashboard-header h2 {
+    font-size: 1.8rem;
+  }
+
+  /* News cards stack better */
+  .news-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .news-card .card-body {
+    padding: 1.5rem;
+  }
+
+  .news-card h5 {
+    font-size: 1rem;
+  }
+
+  .news-card .card-text strong {
+    font-size: 1rem;
+  }
+
+  /* Profile section */
+  .profile-card .card-body {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .profile-avatar,
+  .profile-avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1rem;
+  }
+
+  .profile-info h5 {
+    font-size: 1.4rem;
+  }
+
+  .profile-info .email {
+    font-size: 0.9rem;
+  }
+
+  /* Dashboard cards stack nicely */
+  .dashboard-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .dashboard-card .card-body {
+    padding: 1.5rem;
+  }
+
+  .dashboard-card h5 {
+    font-size: 1.1rem;
+  }
+
+  /* Buttons scale better */
+  .btn,
+  .btn-primary-custom,
+  .btn-outline-custom,
+  .btn-success-custom,
+  .btn-outline-danger-custom {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  /* Dropdown alignment */
+  .dropdown-menu {
+    width: 100%;
+  }
+}
+
+/* Even smaller phones */
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .news-card .card-body,
+  .profile-card .card-body {
+    padding: 1rem;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+  }
+}
