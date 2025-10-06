@@ -12,7 +12,7 @@ Estate-Web is a simple Django-based website that helps users find properties wit
 - Contact forms / member/inquiry support (allows interaction with property owners or agents)  
 - User/member signup/authentication (if included)  
 - Media handling (uploading / managing property photos)  
-- Search/filter (if implemented) by location, price, etc.
+- Web Scraping With BeautigulSoup4 to keep one updated with estate related news
 
 ---
 
