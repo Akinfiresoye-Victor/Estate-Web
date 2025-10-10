@@ -403,5 +403,69 @@ def delete_account(request):
         messages.success(request, 'Account has been deleted Successfully')
         return redirect('welcome-page')
 
+def general_search(request):
+    searched=''
+
+    
+    if request.method== 'POST':
+        searched=request.POST['searched']
+        
+        properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
+        properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
+        context=  {'searched':searched,'on_sale':properties_on_sale,
+                                        'on_lease':properties_on_lease,}
+        
+        
+        return render(request, 'estate/search.html',context)
+    else:
+        return render(request, 'estate/search.html', {})
+
+
+
+
+
+
+
+
+
+
+# location= request.POST['location']
+#         state= request.POST['state']
+#         bedrooms=request.POST['bedrooms']
+#         bathrooms=request.POST['bathrooms']
+        
+#         properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
+#         properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
+        
+#         '''Deeper Search'''
+#         if location:
+#             location_sale=properties_on_sale.filter(location__icontains=location)
+#             location_rent=properties_on_lease.filter(location__icontains=location)
+#         if state:
+#             state_sale=properties_on_sale.filter(state__icontains=state)
+#             state_rent=properties_on_lease.filter(state__icontains=state)
+#         if bedrooms:
+#             bedroom_sale=properties_on_sale.filter(bedrooms__icontains=bedrooms)
+#             bedroom_rent=properties_on_lease.filter(bedrooms__icontains=bedrooms)
+#         if bathrooms:
+#             bathrooms_sale=properties_on_sale.filter(bathrooms__icontains=bathrooms)
+#             bathrooms_rent=properties_on_lease.filter(bathrooms__icontains=bathrooms)
+#         context=  {'searched':searched,'on_sale':properties_on_sale,
+#                                         'on_lease':properties_on_lease,
+#                                         'location_s':location_sale,
+#                                         'location_r':location_rent,
+#                                         'state_s': state_sale,
+#                                         'state_r': state_rent,
+#                                         'bedroom_s':bedroom_sale,
+#                                         'bedroom_r': bedroom_rent,
+#                                         'bathroom_s': bathrooms_sale,
+#                                         'bathroom_r':bathrooms_rent}
+        
+        
+#         return render(request, 'estate/search.html',context)
+#     else:
+#         return render(request, 'estate/search.html', {})
+
+
 
 

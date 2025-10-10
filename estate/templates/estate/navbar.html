@@ -2,8 +2,12 @@
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="{%url 'articles'%}">Estate Web</a>
     <div class="d-flex ms-auto align-items-center">
-
-
+            <form class="d-flex" role="search" method=POST action="{% url 'general-search' %}">
+                {% csrf_token %}
+                <input class="form-control me-2" type="search"  placeholder="Search Properties" aria-label="Search" name="searched" >
+                <button class="btn btn-outline-success" type="submit">Search</button>
+                
+            </form>
       <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

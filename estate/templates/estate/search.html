@@ -1,0 +1,137 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/search.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-search"></i> Search Results</h1>
+    {% if searched %}
+      <p>Showing results for: <strong>"{{ searched }}"</strong></p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container search-container">
+  {% if searched %}
+    {% if on_sale or on_lease %}
+      
+      <!-- Sale Properties Section -->
+      {% if on_sale %}
+        <div class="section-header mb-4">
+          <h2 class="section-title sale-section">
+            <i class="fas fa-home"></i> Properties for Sale
+            <span class="result-count">{{ on_sale|length }}</span>
+          </h2>
+        </div>
+        <div class="row g-4 mb-5">
+          {% for sale in on_sale %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card property-card sale-card h-100">
+                <div class="property-image sale-image">
+                  <div class="property-status sale-status">For Sale</div>
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                  <h5 class="property-title sale-title">{{ sale.summary }}</h5>
+                  
+                  <div class="property-location">
+                    <i class="fas fa-map-marker-alt sale-accent"></i>
+                    <span>{{ sale.location }}, {{ sale.state }}</span>
+                  </div>
+                  
+                  <div class="property-price sale-price">₦{{ sale.price }}</div>
+                  
+                  <p class="property-description">{{ sale.property_description }}</p>
+                  
+                  <div class="mt-auto">
+                    <a href="{% url 'view-property-s' property_id=sale.id %}" class="btn btn-view-property sale-btn-primary">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Lease Properties Section -->
+      {% if on_lease %}
+        <div class="section-header mb-4">
+          <h2 class="section-title lease-section">
+            <i class="fas fa-key"></i> Properties for Lease
+            <span class="result-count">{{ on_lease|length }}</span>
+          </h2>
+        </div>
+        <div class="row g-4">
+          {% for lease in on_lease %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card property-card lease-card h-100">
+                <div class="property-image lease-image">
+                  <div class="property-status lease-status">For Lease</div>
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                  <h5 class="property-title lease-title">{{ lease.summary }}</h5>
+                  
+                  <div class="property-location">
+                    <i class="fas fa-map-marker-alt lease-accent"></i>
+                    <span>{{ lease.location }}, {{ lease.state }}</span>
+                  </div>
+                  
+                  <div class="property-price lease-price">₦{{ lease.price_range }}/mo</div>
+                  
+                  <p class="property-description">{{ lease.description }}</p>
+                  
+                  <div class="mt-auto">
+                    <a href="{% url 'view-property-r' property_id=lease.id %}" class="btn btn-view-property lease-btn-primary">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    {% else %}
+      <!-- No Results Found -->
+      <div class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>No Properties Found</h3>
+        <p>We couldn't find any properties matching "<strong>{{ searched }}</strong>"</p>
+        <div class="suggestions">
+          <h5>Try searching for:</h5>
+          <ul>
+            <li>Different location names</li>
+            <li>Property types (house, apartment, land)</li>
+            <li>Broader search terms</li>
+          </ul>
+        </div>
+        <div class="mt-4">
+          <a href="{% url 'buy-property' %}" class="btn btn-browse me-2">Browse All Sales</a>
+          <a href="{% url 'rent-prop' %}" class="btn btn-browse lease">Browse All Rentals</a>
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <!-- Invalid Search -->
+    <div class="no-results">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h3>Invalid Search</h3>
+      <p>Please enter a valid search term to find properties</p>
+      <div class="mt-4">
+        <a href="{% url 'buy-property' %}" class="btn btn-browse me-2">Browse All Sales</a>
+        <a href="{% url 'rent-prop' %}" class="btn btn-browse lease">Browse All Rentals</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
