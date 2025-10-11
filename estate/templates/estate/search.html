@@ -99,7 +99,8 @@
           <i class="fas fa-search"></i>
           <h3>No Results Found</h3>
           <p>No properties match your search for "{{ searched }}". Try different keywords or check our 
-            <a href="{% url 'home' %}" class="text-primary text-decoration-none">homepage</a> 
+            <a href="{% url 'rent-prop' %}" class="text-primary text-decoration-none">Properties On Lease</a>
+            or <a href="{% url 'buy-property' %}" class="text-primary text-decoration-none">Properties On Sale</a>
             for featured listings.
           </p>
         </div>
@@ -112,7 +113,7 @@
         <i class="fas fa-exclamation-triangle"></i>
         <h3>Invalid Search</h3>
         <p>Please enter a valid search term to continue.</p>
-        <a href="{% url 'home' %}" class="btn btn-primary mt-3">Back to Home</a>
+        <a href="{% url 'user-profile' %}" class="btn btn-primary mt-3">Dashboard</a>
       </div>
     </div>
   {% endif %}
