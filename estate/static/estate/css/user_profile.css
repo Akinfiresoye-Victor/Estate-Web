@@ -266,11 +266,13 @@
       border-radius: 0;
       border: none;
       box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      background: #383838;
     }
 
     .dropdown-item {
       padding: 0.7rem 1.5rem;
       transition: all 0.2s ease;
+      color: var(--text-dark);
     }
 
     .dropdown-item:hover {

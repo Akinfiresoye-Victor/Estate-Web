@@ -1,80 +1,186 @@
 {% extends 'estate/base.html' %}
-
+{% load static %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/my_listings.css' %}">
+{% endblock %}
 {% block content %}
+
 {% if user.is_authenticated %}
-<br/>
 
-<div class="container">
-  <div class="text-center mb-4">
-    <h1 class="display-4" style="color: var(--bs-success, #198754);">My Listings</h1>
-    <hr class="w-25 mx-auto" style="border-top: 2px solid var(--bs-success, #198754);">
-  </div>
-
-  <!-- Lease Listings -->
-  <div class="row">
-    {% for property in property1 %}
-      {% if property %}
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card border-0 shadow h-100 d-flex flex-column" style="background-color: var(--bs-light, #f8f9fa);">
-            <div class="card-body d-flex flex-column position-relative">
-              <span class="badge text-bg-success position-absolute top-0 end-0 m-2">On Lease</span>
-              <h5 class="card-title fw-semibold" style="color: var(--bs-success, #198754);">{{ property.summary }}</h5>
-              <h6 class="text-muted">Location: {{ property.location }}</h6>
-              <hr>
-              <ul class="list-unstyled small text-secondary">
-                <li><strong>Description:</strong> {{ property.description }}</li>
-                <li><strong>Price Range:</strong> ₦{{ property.price_range }}</li>
-                <li><strong>Phone Number:</strong> {{ property.phone_number }}</li>
-              </ul>
-              <div class="mt-auto d-flex justify-content-between">
-                <a href="{% url 'update-property' property_id=property.id %}" class="btn btn-outline-success btn-sm">Update</a>
-                <a href="{% url 'delete-property-r' property_id=property.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-
-  <!-- Sale Listings -->
-  <div class="row mt-4">
-    {% for property in property2 %}
-      {% if property %}
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card border-0 shadow h-100 d-flex flex-column" style="background-color: var(--bs-light, #f8f9fa);">
-            <div class="card-body d-flex flex-column position-relative">
-              <span class="badge text-bg-primary position-absolute top-0 end-0 m-2">On Sale</span>
-              <h5 class="card-title fw-semibold" style="color: var(--bs-primary, #0d6efd);">{{ property.summary }}</h5>
-              <h6 class="text-muted">Location: {{ property.location }}</h6>
-              <hr>
-              <ul class="list-unstyled small text-secondary">
-                <li><strong>Description:</strong> {{ property.property_description }}</li>
-                <li><strong>Price:</strong> ₦{{ property.price }}</li>
-                <li><strong>Phone Number:</strong> {{ property.phone_number }}</li>
-                <li><strong>Negotiable:</strong> {{ property.get_negotiate_display }}</li>
-              </ul>
-              <div class="mt-auto d-flex justify-content-between">
-                <a href="{% url 'update-property-s' property_id=property.id %}" class="btn btn-outline-primary btn-sm">Update</a>
-                <a href="{% url 'delete-property-s' property_id=property.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-
-  {% if not property1 and not property2 %}
-  <center>
-      <a href="{% url 'user-profile' %}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
-      </a>
-    </center>
-    <div class="alert alert-warning text-center mt-4" role="alert">
-      You don't have any listings yet.
+<div class="listings-wrapper">
+  <div class="listings-container">
+    
+    <!-- Page Header -->
+    <div class="listings-header">
+      <div class="header-icon">
+        <i class="bi bi-card-list"></i>
+      </div>
+      <h1 class="listings-title">My Property Listings</h1>
+      <p class="listings-subtitle">Manage all your rental and sale properties</p>
     </div>
-  {% endif %}
+
+    <!-- Check if user has any listings -->
+    {% if property1 or property2 %}
+      
+      <!-- Lease/Rent Listings Section -->
+      {% if property1 %}
+        <div class="section-header">
+          <div class="section-icon lease">
+            <i class="bi bi-building"></i>
+          </div>
+          <div class="section-info">
+            <h2 class="section-title">Rental Properties</h2>
+            <p class="section-count">{{ property1|length }} listing{{ property1|length|pluralize }}</p>
+          </div>
+        </div>
+
+        <div class="listings-grid">
+          {% for property in property1 %}
+            {% if property %}
+              <div class="listing-card lease-card">
+                <div class="card-badge lease-badge">
+                  <i class="bi bi-key-fill me-1"></i>
+                  On Lease
+                </div>
+                
+                <div class="card-content">
+                  <h3 class="property-title">{{ property.summary }}</h3>
+                  
+                  <div class="property-location">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>{{ property.location }}</span>
+                  </div>
+
+                  <div class="property-details">
+                    <div class="detail-item">
+                      <i class="bi bi-text-paragraph"></i>
+                      <span class="detail-label">Description:</span>
+                      <span class="detail-value">{{ property.description|truncatewords:15 }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                      <i class="bi bi-currency-exchange"></i>
+                      <span class="detail-label">Price Range:</span>
+                      <span class="detail-value">₦{{ property.price_range }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                      <i class="bi bi-telephone-fill"></i>
+                      <span class="detail-label">Contact:</span>
+                      <span class="detail-value">{{ property.phone_number }}</span>
+                    </div>
+                  </div>
+
+                  <div class="card-actions">
+                    <a href="{% url 'update-property' property_id=property.id %}" class="btn-update lease-btn">
+                      <i class="bi bi-pencil-square me-1"></i>
+                      Update
+                    </a>
+                    <a href="{% url 'delete-property-r' property_id=property.id %}" class="btn-delete">
+                      <i class="bi bi-trash-fill me-1"></i>
+                      Delete
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Sale Listings Section -->
+      {% if property2 %}
+        <div class="section-header sale-section">
+          <div class="section-icon sale">
+            <i class="bi bi-house-check-fill"></i>
+          </div>
+          <div class="section-info">
+            <h2 class="section-title">Properties for Sale</h2>
+            <p class="section-count">{{ property2|length }} listing{{ property2|length|pluralize }}</p>
+          </div>
+        </div>
+
+        <div class="listings-grid">
+          {% for property in property2 %}
+            {% if property %}
+              <div class="listing-card sale-card">
+                <div class="card-badge sale-badge">
+                  <i class="bi bi-tag-fill me-1"></i>
+                  On Sale
+                </div>
+                
+                <div class="card-content">
+                  <h3 class="property-title">{{ property.summary }}</h3>
+                  
+                  <div class="property-location">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>{{ property.location }}</span>
+                  </div>
+
+                  <div class="property-details">
+                    <div class="detail-item">
+                      <i class="bi bi-text-paragraph"></i>
+                      <span class="detail-label">Description:</span>
+                      <span class="detail-value">{{ property.property_description|truncatewords:15 }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                      <i class="bi bi-cash-stack"></i>
+                      <span class="detail-label">Price:</span>
+                      <span class="detail-value">₦{{ property.price }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                      <i class="bi bi-telephone-fill"></i>
+                      <span class="detail-label">Contact:</span>
+                      <span class="detail-value">{{ property.phone_number }}</span>
+                    </div>
+
+                    <div class="detail-item">
+                      <i class="bi bi-chat-dots-fill"></i>
+                      <span class="detail-label">Negotiable:</span>
+                      <span class="detail-value">{{ property.get_negotiate_display }}</span>
+                    </div>
+                  </div>
+
+                  <div class="card-actions">
+                    <a href="{% url 'update-property-s' property_id=property.id %}" class="btn-update sale-btn">
+                      <i class="bi bi-pencil-square me-1"></i>
+                      Update
+                    </a>
+                    <a href="{% url 'delete-property-s' property_id=property.id %}" class="btn-delete">
+                      <i class="bi bi-trash-fill me-1"></i>
+                      Delete
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="bi bi-inbox"></i>
+        </div>
+        <h3 class="empty-title">No Listings Yet</h3>
+        <p class="empty-message">You haven't created any property listings. Start adding properties to showcase them here.</p>
+        <a href="{% url 'user-profile' %}" class="btn-dashboard">
+          <i class="bi bi-arrow-left me-2"></i>
+          Back to Dashboard
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
 </div>
+
 {% endif %}
+
+<!-- Include Bootstrap Icons if not already in base.html -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 {% endblock %}

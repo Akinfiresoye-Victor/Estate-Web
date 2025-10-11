@@ -1,5 +1,5 @@
 {% extends 'estate/base.html' %}
-{% load static%}
+{% load static %}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/wishlist.css' %}">
 {% endblock %}
@@ -7,32 +7,68 @@
 
 <div class="page-header">
   <div class="container">
-    <h1>My Saved Properties</h1>
-    <p>Properties you've bookmarked for future reference</p>
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fas fa-heart"></i>
+      </div>
+      <h1>My Saved Properties</h1>
+      <p>Your curated collection of dream properties</p>
+    </div>
   </div>
 </div>
 
-<div class="container mb-5">
+<div class="container pb-5">
+  
+  <!-- Statistics Bar -->
+  {% if wishlist_rent or wishlist_sale %}
+  <div class="stats-bar">
+    <div class="stat-item lease-stat">
+      <i class="fas fa-key"></i>
+      <div class="stat-info">
+        <span class="stat-number">{{ wishlist_rent|length }}</span>
+        <span class="stat-label">For Lease</span>
+      </div>
+    </div>
+    <div class="stat-item sale-stat">
+      <i class="fas fa-home"></i>
+      <div class="stat-info">
+        <span class="stat-number">{{ wishlist_sale|length }}</span>
+        <span class="stat-label">For Sale</span>
+      </div>
+    </div>
+    <div class="stat-item total-stat">
+      <i class="fas fa-bookmark"></i>
+      <div class="stat-info">
+        <span class="stat-number">{{ wishlist_rent|length|add:wishlist_sale|length }}</span>
+        <span class="stat-label">Total Saved</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Lease Properties Section -->
   {% if wishlist_rent %}
-    <div class="section-header mb-4">
+    <div class="section-header">
       <h2 class="section-title lease-section">
         <i class="fas fa-key"></i> For Lease
       </h2>
+      <p class="section-subtitle">Properties available for rent</p>
     </div>
     <div class="row g-4 mb-5">
       {% for saved1 in wishlist_rent %}
         {% if saved1.whilist %}
           <div class="col-md-6 col-lg-4">
             <div class="card property-card lease-card h-100">
-            <div class="property-image lease-image">
-            <div class="property-status lease-status">For Lease</div>
-            <a href="{% url 'toggle-wishlist-rent' saved1.id %}" class="wishlist-btn lease-btn">
-              <i class="{% if saved1.whilist %}fas{% else %}far{% endif %} fa-bookmark"></i>
-            </a>
-          </div>
-                  
-                  
+              <div class="property-image lease-image">
+                <div class="property-status lease-status">
+                  <i class="fas fa-key me-1"></i> For Lease
+                </div>
+                <a href="{% url 'toggle-wishlist-rent' saved1.id %}" class="wishlist-btn lease-btn" title="Remove from wishlist">
+                  <i class="fas fa-heart"></i>
+                </a>
+                <div class="image-overlay"></div>
+              </div>
+              
               <div class="card-body d-flex flex-column">
                 <h5 class="property-title lease-title">{{ saved1.summary }}</h5>
                 
@@ -41,20 +77,23 @@
                   <span>{{ saved1.location }}, {{ saved1.state }}</span>
                 </div>
                 
-                <div class="property-price lease-price">₦{{ saved1.price_range }}</div>
+                <div class="property-price lease-price">
+                  ₦{{ saved1.price_range }}
+                  <span class="price-period">/month</span>
+                </div>
                 
-                <p class="property-description">{{ saved1.description }}</p>
+                <p class="property-description">{{ saved1.description|truncatewords:20 }}</p>
                 
                 <div class="property-details">
                   <div class="detail-item">
-                    <span class="detail-label">Phone</span>
+                    <i class="fas fa-phone-alt lease-accent"></i>
                     <span class="detail-value">{{ saved1.phone_number }}</span>
                   </div>
                 </div>
                 
-                <div class="mt-auto">
+                <div class="card-actions mt-auto">
                   <a href="{% url 'view-property-r' property_id=saved1.id %}" class="btn btn-view-property lease-btn-primary">
-                    View Details
+                    <i class="fas fa-eye me-2"></i> View Details
                   </a>
                 </div>
               </div>
@@ -67,21 +106,26 @@
 
   <!-- Sale Properties Section -->
   {% if wishlist_sale %}
-    <div class="section-header mb-4">
+    <div class="section-header">
       <h2 class="section-title sale-section">
         <i class="fas fa-home"></i> For Sale
       </h2>
+      <p class="section-subtitle">Properties available for purchase</p>
     </div>
     <div class="row g-4">
       {% for saved2 in wishlist_sale %}
         {% if saved2.whilist %}
           <div class="col-md-6 col-lg-4">
             <div class="card property-card sale-card h-100">
-            <div class="property-image sale-image">
-              <div class="property-status sale-status">For Sale</div>
-              <a href="{% url 'toggle-wishlist-buy' saved2.id %}" class="wishlist-btn sale-btn">
-                <i class="{% if saved2.whilist %}fas{% else %}far{% endif %} fa-bookmark"></i>
-              </a>
+              <div class="property-image sale-image">
+                <div class="property-status sale-status">
+                  <i class="fas fa-tag me-1"></i> For Sale
+                </div>
+                <a href="{% url 'toggle-wishlist-buy' saved2.id %}" class="wishlist-btn sale-btn" title="Remove from wishlist">
+                  <i class="fas fa-heart"></i>
+                </a>
+                <div class="image-overlay"></div>
+              </div>
               
               <div class="card-body d-flex flex-column">
                 <h5 class="property-title sale-title">{{ saved2.summary }}</h5>
@@ -93,28 +137,38 @@
                 
                 <div class="property-price sale-price">₦{{ saved2.price }}</div>
                 
-                <p class="property-description">{{ saved2.property_description }}</p>
+                <p class="property-description">{{ saved2.property_description|truncatewords:20 }}</p>
                 
                 <div class="property-details">
                   <div class="detail-item">
-                    <span class="detail-label">Phone</span>
-                    <span class="detail-value">{{ saved2.phone_number }}</span>
+                    <i class="fas fa-bed sale-accent"></i>
+                    <span class="detail-value">{{ saved2.bedrooms|default:"N/A" }} Beds</span>
                   </div>
                   <div class="detail-item">
-                    <span class="detail-label">Negotiable</span>
-                    <span class="detail-value">
-                      {% if saved2.negotiate %}
-                        <span class="negotiable-badge">Yes</span>
-                      {% else %}
-                        <span class="negotiable-badge not-negotiable">No</span>
-                      {% endif %}
-                    </span>
+                    <i class="fas fa-bath sale-accent"></i>
+                    <span class="detail-value">{{ saved2.bathrooms|default:"N/A" }} Baths</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="fas fa-phone-alt sale-accent"></i>
+                    <span class="detail-value">{{ saved2.phone_number }}</span>
                   </div>
                 </div>
                 
-                <div class="mt-auto">
+                <div class="negotiable-info">
+                  {% if saved2.negotiate %}
+                    <span class="negotiable-badge">
+                      <i class="fas fa-handshake me-1"></i> Negotiable
+                    </span>
+                  {% else %}
+                    <span class="negotiable-badge not-negotiable">
+                      <i class="fas fa-ban me-1"></i> Fixed Price
+                    </span>
+                  {% endif %}
+                </div>
+                
+                <div class="card-actions mt-auto">
                   <a href="{% url 'view-property-s' property_id=saved2.id %}" class="btn btn-view-property sale-btn-primary">
-                    View Details
+                    <i class="fas fa-eye me-2"></i> View Details
                   </a>
                 </div>
               </div>
@@ -127,18 +181,22 @@
 
   <!-- Empty State -->
   {% if not wishlist_rent and not wishlist_sale %}
-    <div class="no-properties">
-      <i class="fas fa-bookmark"></i>
-      <h3>No Saved Properties</h3>
-      <p>Start exploring and bookmark properties you're interested in!</p>
-      <div class="mt-4">
-        <a href="{% url 'buy' %}" class="btn btn-primary me-2">Browse Properties for Sale</a>
-        <a href="{% url 'rent' %}" class="btn btn-success">Browse Properties for Lease</a>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-heart-broken"></i>
+      </div>
+      <h3>No Saved Properties Yet</h3>
+      <p>Start building your dream property collection! Browse through our listings and bookmark the ones you love.</p>
+      <div class="empty-actions">
+        <a href="{% url 'rent-prop' %}" class="btn btn-empty lease-btn-primary">
+          <i class="fas fa-key me-2"></i> Browse For Lease
+        </a>
+        <a href="{% url 'buy-property' %}" class="btn btn-empty sale-btn-primary">
+          <i class="fas fa-home me-2"></i> Browse For Sale
+        </a>
       </div>
     </div>
   {% endif %}
 </div>
-
-
 
 {% endblock %}

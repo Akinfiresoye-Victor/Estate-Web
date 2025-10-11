@@ -1,115 +1,168 @@
 <!doctype html>
 {% load static %}
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register - Estate Web</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  </head>
-  <body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register - Estate Web</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  {%load static%}
+  <link rel="stylesheet" href="{% static 'members/css/register.css' %}">
+</head>
+<body>
+  
+  <!-- Messages Container -->
+  <div class="messages-container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-custom fade show" role="alert">
+          <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}x-circle-fill{% else %}info-circle-fill{% endif %} me-2"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
 
+  <!-- Register Card -->
+  <div class="register-wrapper">
+    <div class="register-container">
+      <div class="register-card">
+        
+        <!-- Brand Header -->
+        <div class="register-header">
+          <div class="brand-logo">
+            <i class="bi bi-house-door-fill"></i>
+          </div>
+          <h1 class="brand-name">Estate Web</h1>
+          <h2 class="register-title">Create Account</h2>
+          <p class="register-subtitle">Join us to discover your dream property</p>
+        </div>
 
-        {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-
-    <div class="d-flex justify-content-center align-items-center min-vh-100">
-      <div class="col-12 col-md-6 col-lg-5">
-
+        <!-- Error Alert -->
         {% if form.errors %}
-          <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <h5 class="alert-heading">Registration Error!</h5>
-            <ul class="list-unstyled mb-0">
+          <div class="error-alert">
+            <div class="error-header">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>Registration Error!</span>
+            </div>
+            <ul class="error-list">
               {% for field, errors in form.errors.items %}
                 {% for error in errors %}
                   <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
                 {% endfor %}
               {% endfor %}
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         {% endif %}
 
-        <div class="card shadow-lg p-4 bg-white rounded-4 border-0">
-          <div class="card-body">
-            <div class="text-center mb-3">
-              <h2 class="card-title text-primary fw-bold mb-0">
-                <i class="bi bi-person-plus-fill me-2"></i>
-                Register
-              </h2>
-              <p class="text-muted mt-2">Create your account to get started.</p>
+        <!-- Register Form -->
+        <form method="POST" action="{% url 'register-user' %}" class="register-form">
+          {% csrf_token %}
+
+          <!-- First Name & Last Name Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                <i class="bi bi-person-fill me-2"></i>First Name
+              </label>
+              {{ form.first_name }}
             </div>
+            <div class="form-group">
+              <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                <i class="bi bi-person-fill me-2"></i>Last Name
+              </label>
+              {{ form.last_name }}
+            </div>
+          </div>
 
-            <form method="POST" action="{% url 'register-user' %}">
-              {% csrf_token %}
+          <!-- Username & Email Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.username.id_for_label }}" class="form-label">
+                <i class="bi bi-at me-2"></i>Username
+              </label>
+              {{ form.username }}
+            </div>
+          </div>
 
-              <!-- First + Last Name -->
-              <div class="row g-3">
-                <div class="col-md-6">
-                  {{ form.first_name.label_tag }}
-                  {{ form.first_name }}
-                </div>
-                <div class="col-md-6">
-                  {{ form.last_name.label_tag }}
-                  {{ form.last_name }}
-                </div>
-              </div>
+          <!-- Password & Confirm Password Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="{{ form.password1.id_for_label }}" class="form-label">
+                <i class="bi bi-lock-fill me-2"></i>Password
+              </label>
+              {{ form.password1 }}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.password2.id_for_label }}" class="form-label">
+                <i class="bi bi-shield-lock-fill me-2"></i>Confirm Password
+              </label>
+              {{ form.password2 }}
+            </div>
+          </div>
 
-              <!-- Username + Password1 -->
-              <div class="row g-3 mt-2">
-                <div class="col-md-6">
-                  {{ form.username.label_tag }}
-                  {{ form.username }}
-                </div>
-                <div class="col-md-6">
-                  {{ form.password1.label_tag }}
-                  {{ form.password1 }}
-                </div>
-              </div>
+          <button type="submit" class="btn-submit">
+            <span>Create Account</span>
+            <i class="bi bi-arrow-right-circle-fill"></i>
+          </button>
 
-              <!-- Email full width -->
-              <div class="mt-2">
-                {{ form.email.label_tag }}
-                {{ form.email }}
-              </div>
+          <div class="login-section">
+            <p class="login-text">Already have an account?</p>
+            <a href="{% url 'login' %}" class="btn-login">
+              Sign In
+            </a>
+          </div>
+        </form>
 
-              <!-- Confirm Password full width -->
-              <div class="mt-2">
-                {{ form.password2.label_tag }}
-                {{ form.password2 }}
-              </div>
+      </div>
 
-              <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">Register</button>
-              </div>
-
-              <div class="text-center mt-3">
-                <small class="text-muted">
-                  Already have an account?
-                  <a href="{% url 'login' %}" class="text-decoration-none">Login here</a>
-                </small>
-              </div>
-            </form>
+      <!-- Decorative Side Panel -->
+      <div class="side-panel">
+        <div class="side-content">
+          <i class="bi bi-building-fill-check"></i>
+          <h3>Start Your Journey</h3>
+          <p>Create an account to access exclusive listings and personalized recommendations</p>
+          <div class="features">
+            <div class="feature-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Verified Properties</span>
+            </div>
+            <div class="feature-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Instant Notifications</span>
+            </div>
+            <div class="feature-item">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Save Favorites</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'members/js/password_rules.js' %}"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const flashMessages = document.querySelectorAll('.alert-custom');
+      const delay = 5000;
 
-<script src="{% static 'members/js/password_rules.js' %}"></script>
-
-  </body>
+      flashMessages.forEach(function(alertElement) {
+        setTimeout(function() {
+          alertElement.classList.remove('show');
+          alertElement.addEventListener('transitionend', function() {
+            alertElement.remove();
+          }, { once: true });
+        }, delay);
+      });
+    });
+  </script>
+</body>
 </html>

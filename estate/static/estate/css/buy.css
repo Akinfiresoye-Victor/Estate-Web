@@ -2,8 +2,8 @@
   --primary-color: #1a3c4e;
   --secondary-color: #c19b76;
   --accent-color: #8b7355;
-  --lease-color: #28a745;
-  --lease-dark: #218838;
+  --lease-color: #4428a7;
+  --lease-dark: #2b2188;
   --text-dark: #2c3e50;
   --text-light: #6c757d;
 }
@@ -48,7 +48,7 @@
 /* Property image */
 .property-image {
   height: 250px;
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #231199 0%, #3b38ef 100%);
   position: relative;
   overflow: hidden;
 }
@@ -191,7 +191,7 @@
 .btn-view-property:hover {
   background: var(--lease-dark);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 5px 15px rgba(61, 40, 167, 0.3);
   color: #fff;
 }
 

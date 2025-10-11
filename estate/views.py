@@ -156,36 +156,42 @@ def buy_property(request):
 
 #View/Function that handles the updating of property already available for rent
 def update_property_rent(request, property_id):
-    if request.user.is_authenticated:
-        #gets the particular listing that needs to be updated using their id
-        property=PropertyManagementRent.objects.get(pk= property_id)
-        #instance=property then fills the form based on previous data
-        form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Property Updated Successfully")
-            return redirect('my-listings')
-        return render(request, 'estate/update_property.html', {'property': property, 'form': form})
-    else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
-
+    try:
+        if request.user.is_authenticated:
+            #gets the particular listing that needs to be updated using their id
+            property=PropertyManagementRent.objects.get(pk= property_id)
+            #instance=property then fills the form based on previous data
+            form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Property Updated Successfully")
+                return redirect('my-listings')
+            return render(request, 'estate/update_property.html', {'property': property, 'form': form})
+        else:
+            messages.success(request, ('You need to be logged in to accesss this page'))
+            return redirect('welcome-page')
+    except Exception as e:
+        print(f"Error is: {e}")
 
 #View/Function that handles the updating of property already available for sale
 def update_property_sale(request, property_id):
-    if request.user.is_authenticated:
-        #gets the particular listing that needs to be updated using their id
-        property=PropertyManagementSale.objects.get(pk= property_id)
-        #instance=property then fills the form based on previous data
-        form= SellForm(request.POST or None, request.FILES or None, instance=property)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Property Updated Successfully")
-            return redirect('my-listings')
-        return render(request, 'estate/update_property_s.html', {'property': property, 'form': form})
-    else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+    try:
+        if request.user.is_authenticated:
+            #gets the particular listing that needs to be updated using their id
+            property=PropertyManagementSale.objects.get(pk= property_id)
+            #instance=property then fills the form based on previous data
+            form= SellForm(request.POST or None, request.FILES or None, instance=property)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Property Updated Successfully")
+                return redirect('my-listings')
+            return render(request, 'estate/update_property_s.html', {'property': property, 'form': form})
+        else:
+            messages.success(request, ('You need to be logged in to accesss this page'))
+            return redirect('welcome-page')
+    except Exception as e:
+        print(f"Error is: {e}")
+
 
 
 #View/Function that deletes unwanted lisings from a users listings
@@ -404,22 +410,24 @@ def delete_account(request):
         return redirect('welcome-page')
 
 def general_search(request):
-    searched=''
+    try:
+        searched=''
 
-    
-    if request.method== 'POST':
-        searched=request.POST['searched']
         
-        properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
-        properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
-        context=  {'searched':searched,'on_sale':properties_on_sale,
-                                        'on_lease':properties_on_lease,}
-        
-        
-        return render(request, 'estate/search.html',context)
-    else:
-        return render(request, 'estate/search.html', {})
-
+        if request.method== 'POST':
+            searched=request.POST['searched']
+            
+            properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
+            properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
+            context=  {'searched':searched,'on_sale':properties_on_sale,
+                                            'on_lease':properties_on_lease,}
+            
+            
+            return render(request, 'estate/search.html',context)
+        else:
+            return render(request, 'estate/search.html', {})
+    except Exception as e:
+        print(f"Error {e}")
 
 
 

@@ -1,0 +1,638 @@
+/* General Layout */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+/* Sell Wrapper */
+.sell-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.sell-container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+/* Success Card */
+.success-card {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.success-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 4.5rem;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1565c0;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    font-size: 1.15rem;
+    color: #6c757d;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.success-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-dashboard {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    color: #fff;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-dashboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
+    color: #fff;
+}
+
+/* Access Denied */
+.access-denied {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.denied-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #e53935 0%, #ef5350 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 4rem;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(229, 57, 53, 0.3);
+}
+
+.denied-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c62828;
+    margin-bottom: 1rem;
+}
+
+.denied-message {
+    font-size: 1.15rem;
+    color: #6c757d;
+    margin-bottom: 2.5rem;
+}
+
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    color: #fff;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
+    color: #fff;
+}
+
+/* Sell Card */
+.sell-card {
+    padding: 2.5rem;
+}
+
+/* Header Section */
+.sell-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #e3f2fd;
+}
+
+.header-icon {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(25, 118, 210, 0.3);
+}
+
+.sell-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1565c0;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+.sell-subtitle {
+    color: #6c757d;
+    font-size: 1rem;
+    margin: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Form Section */
+.form-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e3f2fd;
+}
+
+.section-header i {
+    font-size: 1.8rem;
+    color: #1976d2;
+}
+
+.section-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1565c0;
+    margin: 0;
+}
+
+/* Image Upload */
+.image-formset-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.image-form-row {
+    background: #e3f2fd;
+    border: 2px solid #bbdefb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.image-form-row:hover {
+    border-color: #42a5f5;
+    box-shadow: 0 4px 15px rgba(25, 118, 210, 0.1);
+}
+
+.image-upload-box {
+    margin-bottom: 1rem;
+}
+
+.image-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1565c0;
+    margin-bottom: 0.8rem;
+}
+
+.image-label i {
+    font-size: 2rem;
+    color: #42a5f5;
+}
+
+.form-input-file {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px dashed #bbdefb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    background: #fff;
+    cursor: pointer;
+}
+
+.form-input-file:hover {
+    border-color: #1976d2;
+}
+
+.current-image-preview {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.preview-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.current-image-preview img {
+    max-width: 100%;
+    max-height: 180px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.delete-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    background: #fff5f5;
+    border: 1px solid #ffcdd2;
+    border-radius: 6px;
+}
+
+.delete-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.delete-checkbox label {
+    font-size: 0.9rem;
+    color: #e53935;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Form Fields */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #1565c0;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+}
+
+.form-label i {
+    color: #42a5f5;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border: 2px solid #bbdefb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    background: #e3f2fd;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #1976d2;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #adb5bd;
+}
+
+/* Help Text */
+.form-help-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.4rem;
+    font-style: italic;
+}
+
+/* Error Alert */
+.error-alert {
+    background: #fff5f5;
+    border: 2px solid #e53935;
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.error-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #e53935;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.8rem;
+}
+
+.error-header i {
+    font-size: 1.2rem;
+}
+
+.error-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.error-list li {
+    color: #2c3e50;
+    font-size: 0.9rem;
+    padding: 0.3rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.error-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0.5rem;
+    color: #e53935;
+    font-weight: bold;
+}
+
+/* Field Error */
+.field-error {
+    color: #e53935;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.field-error i {
+    font-size: 1rem;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e3f2fd;
+}
+
+.btn-submit {
+    width: 100%;
+    background: linear-gradient(135deg, #a6d1fc 0%, #a6d1fc 100%);
+    color: #fff;
+    border: none;
+    padding: 1.2rem;
+    border-radius: 8px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.3);
+}
+
+.btn-submit i {
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-submit:hover i {
+    transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+
+    .sell-card,
+    .success-card,
+    .access-denied {
+        padding: 2rem 1.5rem;
+    }
+
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5rem;
+    }
+
+    .sell-title {
+        font-size: 1.8rem;
+    }
+
+    .sell-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .success-icon,
+    .denied-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 3.5rem;
+    }
+
+    .success-title,
+    .denied-title {
+        font-size: 1.8rem;
+    }
+
+    .success-message,
+    .denied-message {
+        font-size: 1rem;
+    }
+
+    .image-formset-container {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header h3 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .sell-card,
+    .success-card,
+    .access-denied {
+        padding: 1.5rem 1rem;
+    }
+
+    .header-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .sell-title {
+        font-size: 1.5rem;
+    }
+
+    .sell-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .success-icon,
+    .denied-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 3rem;
+    }
+
+    .success-title,
+    .denied-title {
+        font-size: 1.5rem;
+    }
+
+    .success-message,
+    .denied-message {
+        font-size: 0.95rem;
+    }
+
+    .btn-dashboard,
+    .btn-login {
+        padding: 0.9rem 2rem;
+        font-size: 0.95rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .section-header i {
+        font-size: 1.5rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .image-form-row {
+        padding: 1.2rem;
+    }
+
+    .form-input,
+    .form-textarea,
+    .btn-submit {
+        padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .sell-title {
+        font-size: 1.3rem;
+    }
+
+    .success-title,
+    .denied-title {
+        font-size: 1.3rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .form-input,
+    .form-textarea,
+    .btn-submit {
+        font-size: 0.9rem;
+    }
+}

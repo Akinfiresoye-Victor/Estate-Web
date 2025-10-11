@@ -7,22 +7,33 @@
     <title>Estate Web</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
+    <!-- Navbar CSS MUST load before page-specific CSS -->
+    <link rel="stylesheet" href="{% static 'estate/css/navbar.css' %}">
 
-
-    {% block extra_css %}{% endblock %}  <!-- ✅ This enables custom CSS per page -->
+    {% block extra_css %}{% endblock %}  <!-- Page-specific CSS loads after -->
+    
+    <style>
+      /* Global fix for fixed navbar */
+      body {
+        padding-top: 80px !important;
+      }
+    </style>
   </head>
   <body>
     {% include 'estate/navbar.html' %}
-    <br/>
-    <div class="container mt-5">
+    
+    <div class="container">
         {% if messages %}
             {% for message in messages %}
-              <div class="alert alert-success fade show" role="alert">
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             {% endfor %}
         {% endif %}
+        
         {% block content %}
         {% endblock %}
     </div>

@@ -4,6 +4,19 @@
   --accent-color: #8b7355;
   --text-dark: #2c3e50;
   --text-light: #6c757d;
+  --hover-overlay: rgba(193, 155, 118, 0.1);
+}
+
+/* ============================================
+   NAVBAR CUSTOMIZATION
+   ============================================ */
+
+/* Main Navbar - CHANGE COLOR HERE */
+.navbar-custom {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #2a5266 100%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.8rem 1rem;
+  transition: all 0.3s ease;
 }
 
 /* Navbar Brand */
@@ -11,35 +24,382 @@
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   letter-spacing: 1px;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-brand:hover {
+  color: var(--secondary-color) !important;
+  transform: translateY(-2px);
+}
+
+.navbar-brand i {
+  font-size: 1.7rem;
   color: var(--secondary-color);
 }
 
-/* Offcanvas */
+/* ============================================
+   SEARCH BAR
+   ============================================ */
+
+.search-form {
+  margin: 0;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 25px;
+  padding: 0.4rem 0.6rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-container:focus-within {
+  box-shadow: 0 4px 16px rgba(193, 155, 118, 0.3);
+  transform: translateY(-2px);
+}
+
+.search-icon {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.search-input {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.95rem;
+  width: 200px;
+  transition: width 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: none;
+  width: 250px;
+}
+
+.search-input::placeholder {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.btn-search {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.btn-search:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(193, 155, 118, 0.4);
+}
+
+.btn-search i {
+  font-size: 1.2rem;
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+  border: 2px solid var(--secondary-color);
+  padding: 0.5rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-toggler:hover {
+  background-color: var(--hover-overlay);
+  transform: scale(1.05);
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.25rem rgba(193, 155, 118, 0.25);
+}
+
+/* ============================================
+   OFFCANVAS SIDEBAR
+   ============================================ */
+
+.offcanvas-custom {
+  background: linear-gradient(180deg, var(--primary-color) 0%, #2a5266 100%);
+  width: 320px !important;
+}
+
 .offcanvas-title {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
   color: #fff;
+  display: flex;
+  align-items: center;
 }
 
-/* Dropdown styling */
-.dropdown-divider {
-  border-color: rgba(255, 255, 255, 0.2);
-  margin: 0.5rem 0;
+.offcanvas-title i {
+  color: var(--secondary-color);
 }
 
-.dropdown-menu-dark {
-  background-color: #2c3e50;
+.offcanvas-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.offcanvas-body {
+  padding: 1.5rem 1rem;
+}
+
+/* ============================================
+   NAVIGATION LINKS
+   ============================================ */
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  padding: 0.8rem 1rem;
+  margin: 0.2rem 0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background: var(--hover-overlay);
+  color: var(--secondary-color) !important;
+  padding-left: 1.5rem;
+  transform: translateX(5px);
+}
+
+.nav-link i {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover i {
+  transform: scale(1.15);
+}
+
+.nav-link.active {
+  background: var(--hover-overlay);
+  color: var(--secondary-color) !important;
+  border-left: 3px solid var(--secondary-color);
+}
+
+/* Coming Soon Links */
+.coming-soon {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.coming-soon .badge {
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Nav Divider */
+.nav-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 1rem 0;
+  list-style: none;
+}
+
+/* ============================================
+   DROPDOWN MENU
+   ============================================ */
+
+.dropdown-toggle::after {
+  transition: transform 0.3s ease;
+}
+
+.dropdown-toggle[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-custom {
+  background-color: #234455 !important;
+  border: 1px solid rgba(193, 155, 118, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin-top: 0.5rem;
 }
 
 .dropdown-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+  padding: 0.7rem 1.2rem;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
 }
 
 .dropdown-item:hover {
-  background-color: var(--primary-color);
-  padding-left: 1.5rem;
+  background-color: var(--hover-overlay) !important;
+  color: var(--secondary-color) !important;
+  padding-left: 1.8rem;
 }
+
+.dropdown-item i {
+  color: var(--secondary-color);
+  font-size: 1rem;
+}
+
+.dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.1);
+  margin: 0.5rem 0;
+}
+
+/* ============================================
+   OFFCANVAS FOOTER
+   ============================================ */
+
+.offcanvas-footer {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.footer-content h6 {
+  color: var(--secondary-color);
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.footer-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.footer-link:hover {
+  color: var(--secondary-color);
+  padding-left: 0.5rem;
+}
+
+.footer-link i {
+  color: var(--secondary-color);
+}
+
+/* Logout Button */
+.btn-logout {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+  color: #fff;
+}
+
+.btn-logout i {
+  font-size: 1.1rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.3rem;
+  }
+
+  .navbar-brand i {
+    font-size: 1.4rem;
+  }
+
+  .search-container {
+    padding: 0.3rem 0.5rem;
+  }
+
+  .search-input {
+    width: 150px;
+    font-size: 0.85rem;
+  }
+
+  .search-input:focus {
+    width: 180px;
+  }
+
+  .btn-search {
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-search i {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-custom {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+
+  .search-input {
+    width: 120px;
+  }
+
+  .search-input:focus {
+    width: 150px;
+  }
+
+  .offcanvas-custom {
+    width: 280px !important;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.7rem 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .search-input {
+    width: 100px;
+    font-size: 0.8rem;
+  }
+
+  .search-input:focus {
+    width: 120px;
+  }
+
+  .btn-search {
+    width: 28px;
+    height: 28px;
+  }
+}
+
