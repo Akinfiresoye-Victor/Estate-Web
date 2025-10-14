@@ -10,6 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='estate-web.onrender.com', cast=Csv())
+CSRF_TRUSTED_ORIGINS = ["https://estate-web-sufx.onrender.com"]
+
 
 
 
