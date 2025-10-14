@@ -21,18 +21,6 @@ from . import news_scrape as ns
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 #Basic Welcome page for users/guests
 def welcome_page(request):
     if request.user.is_authenticated:
@@ -47,43 +35,50 @@ def about_us(request):
 
 
 def articles(request):
-    #estate article headlines
-    try:
-        headlines= ns.bs.find('div', class_="blog-item-title")
-        headlines=headlines.text
-        #estate article summary
-        article= ns.bs.find('div', class_="blog-item-content e-content")
-        article=article.text
-        full_article= "https://www.nigeriahousingmarket.com/"
-        return render(request,'estate/article.html', {'headline':headlines,
-                                                    'article':article,
-                                                    "full_article":full_article})
-    except:
-        messages.success(request, ns.error)
-        return redirect('user-profile')
+    if request.user.is_authenticated:
+        #estate article headlines
+        try:
+            headlines= ns.bs.find('div', class_="blog-item-title")
+            headlines=headlines.text
+            #estate article summary
+            article= ns.bs.find('div', class_="blog-item-content e-content")
+            article=article.text
+            full_article= "https://www.nigeriahousingmarket.com/"
+            return render(request,'estate/article.html', {'headline':headlines,
+                                                        'article':article,
+                                                        "full_article":full_article})
+        except:
+            messages.success(request, ns.error)
+            return redirect('user-profile')
+    else:
+        messages.success(request, ('You need to be logged in to accesss this page'))
+        return redirect('welcome-page')
 
 
 def feedbacks(request):
-    messages.success(request, "DON'T PRESS SUBMIT!!!, Error dey dey there for now")
-    submitted = False
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback_instance = form.save(commit=False) 
-            subject = "New Feedback Received"
-            message = f"Feedback:\n{feedback_instance.feedback}"
-            recipient_list = [settings.EMAIL_HOST_USER]
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-            messages.success(request, 'Thanks for your feedback!')
-            form.save()
-            submitted=True
-            return redirect('feedback')
+    if request.user.is_authenticated:
+        messages.success(request, "DON'T PRESS SUBMIT!!!, Error dey dey there for now")
+        submitted = False
+        if request.method == 'POST':
+            form = FeedbackForm(request.POST)
+            if form.is_valid():
+                feedback_instance = form.save(commit=False) 
+                subject = "New Feedback Received"
+                message = f"Feedback:\n{feedback_instance.feedback}"
+                recipient_list = [settings.EMAIL_HOST_USER]
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+                messages.success(request, 'Thanks for your feedback!')
+                form.save()
+                submitted=True
+                return redirect('feedback')
+        else:
+            form = FeedbackForm()
+            if 'submitted' in request.GET:
+                submitted = True
+        return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
     else:
-        form = FeedbackForm()
-        if 'submitted' in request.GET:
-            submitted = True
-
-    return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
+        messages.success(request, ('You need to be logged in to accesss this page'))
+        return redirect('welcome-page')
 
 '''Property Management Function'''
 #Function/View which manages the uploading of properties for sale
@@ -156,8 +151,8 @@ def buy_property(request):
 
 #View/Function that handles the updating of property already available for rent
 def update_property_rent(request, property_id):
-    try:
-        if request.user.is_authenticated:
+    if request.user.is_authenticated:
+        try:
             #gets the particular listing that needs to be updated using their id
             property=PropertyManagementRent.objects.get(pk= property_id)
             #instance=property then fills the form based on previous data
@@ -167,16 +162,18 @@ def update_property_rent(request, property_id):
                 messages.success(request, "Property Updated Successfully")
                 return redirect('my-listings')
             return render(request, 'estate/update_property.html', {'property': property, 'form': form})
-        else:
-            messages.success(request, ('You need to be logged in to accesss this page'))
-            return redirect('welcome-page')
-    except Exception as e:
-        print(f"Error is: {e}")
+        except Exception as e:
+            print(f"Error is: {e}")
+    else:
+        messages.success(request, ('You need to be logged in to accesss this page'))
+        return redirect('welcome-page')
+
 
 #View/Function that handles the updating of property already available for sale
 def update_property_sale(request, property_id):
-    try:
-        if request.user.is_authenticated:
+    if request.user.is_authenticated:
+        try:
+            
             #gets the particular listing that needs to be updated using their id
             property=PropertyManagementSale.objects.get(pk= property_id)
             #instance=property then fills the form based on previous data
@@ -186,12 +183,11 @@ def update_property_sale(request, property_id):
                 messages.success(request, "Property Updated Successfully")
                 return redirect('my-listings')
             return render(request, 'estate/update_property_s.html', {'property': property, 'form': form})
-        else:
-            messages.success(request, ('You need to be logged in to accesss this page'))
-            return redirect('welcome-page')
-    except Exception as e:
-        print(f"Error is: {e}")
-
+        except Exception as e:
+            print(f"Error is: {e}")
+    else:
+        messages.success(request, ('You need to be logged in to accesss this page'))
+        return redirect('welcome-page')
 
 
 #View/Function that deletes unwanted lisings from a users listings
@@ -381,13 +377,23 @@ def change_password(request):
 
 #Just a basic view to handle the url pointing to where the site will go after the password has been changed
 def change_password_success(request):
-    return render(request, 'estate/succ_pass.html')
+    if request.user.is_authenticated:
+        return render(request, 'estate/succ_pass.html')
+    else:
+        messages.success(request, 'You need to be logged in to access this page')
+        return redirect('welcome-page')
+
 
 
 #Users Settings(More feautures will be added in future updates)
 def profile_settings(request):
-    messages.success(request, 'Communication Prefrences and privacy will come in future Updates Stayed Tuned😊')
-    return render(request, 'estate/settings.html', {})
+    if request.user.is_authenticated:
+        messages.success(request, 'Communication Prefrences and privacy will come in future Updates Stayed Tuned😊')
+        return render(request, 'estate/settings.html', {})
+    else:
+        messages.success(request, 'You need to be logged in to access this page')
+        return redirect('welcome-page')
+
 
 
 #View/Function that deletes a users account from the User datatbase and all the properties related to the user so it basically clears all the users datat from the site
@@ -410,24 +416,28 @@ def delete_account(request):
         return redirect('welcome-page')
 
 def general_search(request):
-    try:
-        searched=''
+    if request.user.is_authenticated:
+        try:
+            searched=''
 
-        
-        if request.method== 'POST':
-            searched=request.POST['searched']
             
-            properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
-            properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
-            context=  {'searched':searched,'on_sale':properties_on_sale,
-                                            'on_lease':properties_on_lease,}
-            
-            
-            return render(request, 'estate/search.html',context)
-        else:
-            return render(request, 'estate/search.html', {})
-    except Exception as e:
-        print(f"Error {e}")
+            if request.method== 'POST':
+                searched=request.POST['searched']
+                
+                properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
+                properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
+                context=  {'searched':searched,'on_sale':properties_on_sale,
+                                                'on_lease':properties_on_lease,}
+                
+                
+                return render(request, 'estate/search.html',context)
+            else:
+                return render(request, 'estate/search.html', {})
+        except Exception as e:
+            print(f"Error {e}")
+    else:
+        messages.success(request, 'You need to be logged in to access this page')
+        return redirect('welcome-page')
 
 
 
@@ -475,18 +485,22 @@ def general_search(request):
 #         return render(request, 'estate/search.html', {})
 
 def community(request):
-    user=request.user
-    username=user.username
-    try:
-        get_room= Room.objects.get(room_name='estatecommunity')
-    except Room.DoesNotExist:
-            get_room= Room(room_name='estatecommunity')
-            get_room.save()
-    community_room=Room.objects.get(room_name='estatecommunity')
-    get_messages=Messages.objects.filter(room=community_room)
-    return render(request, 'estate/community.html', {'text_messages':get_messages,
-                                                    "user":username,
-                                                    'room_name': community_room
-                                                    })
+    if request.user.is_authenticated:
+        user=request.user
+        username=user.username
+        try:
+            get_room= Room.objects.get(room_name='estatecommunity')
+        except Room.DoesNotExist:
+                get_room= Room(room_name='estatecommunity')
+                get_room.save()
+        community_room=Room.objects.get(room_name='estatecommunity')
+        get_messages=Messages.objects.filter(room=community_room)
+        return render(request, 'estate/community.html', {'text_messages':get_messages,
+                                                        "user":username,
+                                                        'room_name': community_room
+                                                        })
+    else:
+        messages.success(request, 'You need to be logged in to access this page')
+        return redirect('welcome-page')
 
 
