@@ -1,0 +1,163 @@
+{% extends 'estate/base.html' %}
+{% load static%}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/community.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<div class="page-header">
+  <div class="container">
+    <h1><i class="fas fa-comments"></i> Estate Web Community</h1>
+    <p>Connect with other members,collaborate, and expand your knowledge on real estate</p>
+  </div>
+</div>
+
+<div class="chat-container">
+  <div class="chat-wrapper">
+    
+    <!-- Chat Card -->
+    <div class="chat-card">
+      <div class="chat-header">
+        <div class="chat-info">
+          <h2><i class="fas fa-users"></i> Community Chat</h2>
+          <span class="online-status">
+            <i class="fas fa-circle"></i> Online
+          </span>
+        </div>
+      </div>
+
+      <!-- Chat Messages -->
+      <div class="chat-messages" id="chatContainer">
+        {% for i in text_messages %}
+          {% if i.sender != user %}
+            <div class="message-wrapper received">
+              <div class="message-bubble">
+                <div class="message-header">
+                  <span class="sender-name">{{ i.sender }}</span>
+                </div>
+                <p class="message-text">{{ i.message }}</p>
+              </div>
+            </div>
+          {% else %}
+            <div class="message-wrapper sent">
+              <div class="message-bubble">
+                <p class="message-text">{{ i.message }}</p>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input">
+        <form action="" id="message-form" method="POST">
+          {% csrf_token %}
+          <div class="input-wrapper">
+            <textarea 
+              id="msg" 
+              name="message" 
+              placeholder="Type your message here..." 
+              required
+              rows="1"></textarea>
+            <button class="btn-send" type="submit">
+              <i class="fas fa-paper-plane"></i>
+              <span>Send</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Determine the WebSocket protocol based on the application's URL
+  const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+  const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/community/{{room_name}}/`;
+
+  // Create a new WebSocket connection
+  const socket = new WebSocket(wsEndpoint);
+
+  // Successful connection event
+  socket.onopen = (event) => {
+    console.log("WebSocket connection opened!");
+    document.querySelector('.online-status').innerHTML = '<i class="fas fa-circle"></i> Online';
+  };
+
+  // Socket disconnect event
+  socket.onclose = (event) => {
+    console.log("WebSocket connection closed!");
+    document.querySelector('.online-status').innerHTML = '<i class="fas fa-circle"></i> Offline';
+  };
+
+  // Form submit listener
+  document.getElementById('message-form').addEventListener('submit', function(event){
+    event.preventDefault();
+    const message = document.getElementById('msg').value;
+    if (message.trim()) {
+      socket.send(
+        JSON.stringify({
+          'message': message,
+          'room_name': '{{room_name}}',
+          'sender': '{{user}}',
+        })
+      );
+    }
+  });
+
+  // Response from consumer on the server
+  socket.addEventListener("message", (event) => {
+    const messageData = JSON.parse(event.data)['message'];
+    console.log(messageData);
+
+    var sender = messageData['sender'];
+    var message = messageData['message'];
+
+    // Empty the message input field after the message has been sent
+    if (sender == '{{user}}'){
+      document.getElementById('msg').value = '';
+      document.getElementById('msg').style.height = 'auto';
+    }
+
+    // Append the message to the chatbox
+    var chatContainer = document.getElementById('chatContainer');
+    if (sender != '{{user}}') {
+      chatContainer.innerHTML += `
+        <div class="message-wrapper received">
+          <div class="message-bubble">
+            <div class="message-header">
+              <span class="sender-name">${sender}</span>
+            </div>
+            <p class="message-text">${message}</p>
+          </div>
+        </div>
+      `;
+    } else {
+      chatContainer.innerHTML += `
+        <div class="message-wrapper sent">
+          <div class="message-bubble">
+            <p class="message-text">${message}</p>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+
+  // Auto-resize textarea
+  const textarea = document.getElementById('msg');
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+</script>
+
+{% endblock %}

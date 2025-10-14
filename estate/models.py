@@ -77,3 +77,19 @@ class Feedback(models.Model):
     email=models.EmailField('Your Email')
     feedback= models.CharField(max_length=300, blank=False)
     date_sent= models.DateField(default=django.utils.timezone.now)
+    
+
+class Room(models.Model):
+    room_name=models.CharField(max_length=20)
+
+    def __str__(self):
+        return str(self.room_name)
+
+
+class Messages(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    sender = models.CharField(max_length=255)
+    message = models.TextField()
+
+    def __str__(self):
+        return str(self.room)

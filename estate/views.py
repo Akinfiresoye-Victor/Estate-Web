@@ -1,7 +1,7 @@
 '''Handles Main Functionality of the Website'''
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import PropertyManagementSale, PropertyManagementRent, Feedback
+from .models import PropertyManagementSale, PropertyManagementRent, Feedback, Room, Messages
 from .forms import LeaseForm, SellForm, FeedbackForm
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -474,6 +474,19 @@ def general_search(request):
 #     else:
 #         return render(request, 'estate/search.html', {})
 
-
+def community(request):
+    user=request.user
+    username=user.username
+    try:
+        get_room= Room.objects.get(room_name='estatecommunity')
+    except Room.DoesNotExist:
+            get_room= Room(room_name='estatecommunity')
+            get_room.save()
+    community_room=Room.objects.get(room_name='estatecommunity')
+    get_messages=Messages.objects.filter(room=community_room)
+    return render(request, 'estate/community.html', {'text_messages':get_messages,
+                                                    "user":username,
+                                                    'room_name': community_room
+                                                    })
 
 
