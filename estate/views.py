@@ -59,6 +59,7 @@ def feedbacks(request):
     if request.user.is_authenticated:
         submitted = False
         if request.method == 'POST':
+            messages.success(request, 'Thanks For your feedback....')
             form = FeedbackForm(request.POST)
             if form.is_valid():
                 form.save()
