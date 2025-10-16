@@ -57,7 +57,6 @@ def articles(request):
 
 def feedbacks(request):
     if request.user.is_authenticated:
-        messages.success(request, "DON'T PRESS SUBMIT!!!, Error dey dey there for now")
         submitted = False
         if request.method == 'POST':
             form = FeedbackForm(request.POST)
