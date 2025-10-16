@@ -62,12 +62,6 @@ def feedbacks(request):
         if request.method == 'POST':
             form = FeedbackForm(request.POST)
             if form.is_valid():
-                feedback_instance = form.save(commit=False) 
-                subject = "New Feedback Received"
-                message = f"Feedback:\n{feedback_instance.feedback}"
-                recipient_list = [settings.EMAIL_HOST_USER]
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-                messages.success(request, 'Thanks for your feedback!')
                 form.save()
                 submitted=True
                 return redirect('feedback')
@@ -76,6 +70,30 @@ def feedbacks(request):
             if 'submitted' in request.GET:
                 submitted = True
         return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
+    else:
+        messages.success(request, ('You need to be logged in to accesss this page'))
+        return redirect('welcome-page')
+
+
+
+def view_feedbacks(request):
+    if request.user.id == 1:
+        feedbacks=Feedback.objects.all()
+        return render(request,'estate/views.html', {'feedback': feedbacks})
+
+def delete_feedback(request, feedback_id):
+    if request.user.is_authenticated:
+        #getting the property_id which will be used to handle the deletion
+        feedback= Feedback.objects.get(pk=feedback_id)
+        #keeps another user from deleting a users data 
+        if request.user.id == 1:
+            #what does the actual deleting based on the property_id
+            feedback.delete()
+            messages.success(request, ("Feedback deleted successfully"))
+            return redirect('view-feedbacks')
+        else:
+            messages.error(request, ('You Arent authorized to delete this feedback'))
+            return redirect('my-listings')
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')

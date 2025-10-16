@@ -31,7 +31,9 @@ urlpatterns = [
     path('latest_news', views.articles, name='articles'),
     path('about_us', views.about_us, name='about'),
     path('search-properties', views.general_search, name='general-search'),
-    path('community', views.community, name='community')
+    path('community', views.community, name='community'),
+    path('admin_side', views.view_feedbacks, name='view-feedbacks'),
+    path('delete/<feedback_id>', views.delete_feedback, name='delete-feedback'),
     
     # path('best_deals_rent', views.best_deals_on_lease, name="best-deals-rent"),
     # path('best_deals_sale', views.best_deals_on_sale, name="best-deals-sale"),
