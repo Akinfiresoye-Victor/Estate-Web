@@ -4,6 +4,7 @@ from django.db import models
 from datetime import datetime
 from .choices import STATES
 import django
+from django.contrib.auth.models import User
 
 
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
@@ -72,6 +73,26 @@ class PropertyManagementRent(models.Model):
 
 
 
+
+
+class WishlistForRent(models.Model):
+    property = models.ForeignKey('PropertyManagementRent', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('property', 'user')  # Prevent duplicates
+    def __str__(self):
+        return f"{self.user.username} → {self.property.summary}"
+
+
+class WishlistForSale(models.Model):
+    property = models.ForeignKey('PropertyManagementSale', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('property', 'user')
+    def __str__(self):
+        return f"{self.user.username} → {self.property.summary}"
 
 class Feedback(models.Model):
     email=models.EmailField('Your Email')

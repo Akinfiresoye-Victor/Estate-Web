@@ -667,3 +667,103 @@ body {
     font-size: 1.6rem;
   }
 }
+
+
+/* --- Responsive Tweaks for Wishlist --- */
+@media (max-width: 992px) {
+  .page-header {
+    padding: 3rem 1rem;
+    text-align: center;
+  }
+
+  .property-card {
+    margin-bottom: 1.5rem;
+  }
+
+  .property-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .property-title {
+    font-size: 1.4rem;
+  }
+
+  .property-description {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-bar {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .property-card {
+    margin: 0 auto;
+    max-width: 90%;
+  }
+
+  .btn-view-property {
+    font-size: 0.85rem;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .page-header p {
+    font-size: 0.9rem;
+  }
+
+  .property-card {
+    margin: 0.5rem auto;
+  }
+
+  .property-price {
+    font-size: 1.2rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.6rem;
+  }
+}
+
+
+/* Property Image Styling */
+.property-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 0.3s ease;
+}
+
+.property-card:hover .property-img {
+  transform: scale(1.1);
+}
+
+/* Ensure proper stacking */
+.property-image {
+  position: relative;
+}
+
+.property-image::before {
+  z-index: 0;
+}
+
+.property-status,
+.wishlist-btn {
+  z-index: 2;
+}

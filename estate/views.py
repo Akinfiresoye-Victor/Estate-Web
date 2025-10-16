@@ -1,7 +1,7 @@
 '''Handles Main Functionality of the Website'''
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import PropertyManagementSale, PropertyManagementRent, Feedback, Room, Messages
+from .models import PropertyManagementSale, PropertyManagementRent, Feedback, Room, Messages, WishlistForSale,WishlistForRent
 from .forms import LeaseForm, SellForm, FeedbackForm
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -300,56 +300,86 @@ def listed_properties(request):
         return redirect('welcome-page')
 
 
-#View/Function that does the adding of a particular property(Properties Lease) to ones favourite
 def toggle_wishlist_rent(request, property_id):
-    if request.user.is_authenticated:
-        lease = get_object_or_404(PropertyManagementRent, id=property_id)
-        #What handles the wishlist toggling
-        lease.whilist = not lease.whilist
-        lease.save()
-        return redirect('rent-prop')
-    else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+    if not request.user.is_authenticated:
+        messages.warning(request, "You need to be logged in to access this page.")
         return redirect('welcome-page')
 
+    property_obj = get_object_or_404(PropertyManagementRent, id=property_id)
+    lease = get_object_or_404(PropertyManagementRent, id=property_id)
+    #What handles the wishlist toggling
+    lease.whilist = not lease.whilist
+    lease.save()
+    wishlist_item, created = WishlistForRent.objects.get_or_create(property=property_obj, user=request.user)
 
-#View/Function that does the adding of a particular property(Properties on Sale) to ones favourite
-def toggle_wishlist_buy(request, property_id):
-    if request.user.is_authenticated:
-        buy=get_object_or_404(PropertyManagementSale, id=property_id)
-        #What handles the wishlist toggling
-        buy.whilist= not buy.whilist
-        buy.save()
-        return redirect('buy-property')
+    if not created:
+        wishlist_item.delete()
+        messages.success(request, "Property removed from your wishlist.")
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')    
+        messages.success(request, "Property added to your wishlist.")
+
+    return redirect('rent-prop')
+
+
+def toggle_wishlist_buy(request, property_id):
+    if not request.user.is_authenticated:
+        messages.warning(request, "You need to be logged in to access this page.")
+        return redirect('welcome-page')
+    buy = get_object_or_404(PropertyManagementSale, id=property_id)
+    #What handles the wishlist toggling
+    buy.whilist = not buy.whilist
+    buy.save()
+    property_obj = get_object_or_404(PropertyManagementSale, id=property_id)
+    wishlist_item, created = WishlistForSale.objects.get_or_create(property=property_obj, user=request.user)
+
+    if not created:
+        wishlist_item.delete()
+        messages.success(request, "Property removed from your wishlist.")
+    else:
+        messages.success(request, "Property added to your wishlist.")
+
+    return redirect('buy-property')  
 
 
 
 #View/Function That shows all property added to favourites
 def wishlist(request):
-    if request.user.is_authenticated:
-        #this 2 lines get all the objects the heavy lifting is done on the html side(wishlist.html)
-        wishlist_rent=PropertyManagementRent.objects.all()
-        wishlist_sale=PropertyManagementSale.objects.all()
-        return render(request, 'estate/wishlist.html', {'wishlist_rent':wishlist_rent, 'wishlist_sale': wishlist_sale})
-    else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+    if not request.user.is_authenticated:
+        messages.warning(request, "You need to be logged in to access this page.")
         return redirect('welcome-page')
+
+    wishlist_rent = WishlistForRent.objects.filter(user=request.user).select_related('property')
+    wishlist_sale = WishlistForSale.objects.filter(user=request.user).select_related('property')
+
+    total_saved = wishlist_rent.count() + wishlist_sale.count()
+
+    context = {
+        'wishlist_rent': wishlist_rent,
+        'wishlist_sale': wishlist_sale,
+        'total_saved': total_saved,
+    }
+    return render(request, 'estate/wishlist.html', context)
 
 
 #View/Function that handles the updating of a users profile
 def update_profile(request, user_id):
     if request.user.is_authenticated:
-        #The Users data is being pulled out from the database
-        profile= User.objects.get(pk=user_id)
-        #instance is used to fill the form with former data of the users
-        form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
-        if form.is_valid():
-            form.save()
+        formatted_user_id= int(user_id)
+        if formatted_user_id == request.user.id:
+            #The Users data is being pulled out from the database
+            profile= User.objects.get(pk=user_id)
+            #instance is used to fill the form with former data of the users
+            
+            form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
+            if form.is_valid():
+                form.save()
+                return redirect('user-profile')
+            else:
+                messages.error(request, 'check If you made any errors')
+            return render(request, 'estate/update_profile.html', {'profile': profile, 'form': form})
+        else:
+            messages.success(request, 'Youre not allowed to access this page')
             return redirect('user-profile')
-        return render(request, 'estate/update_profile.html', {'profile': profile, 'form': form})
     else:
         messages.success(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
