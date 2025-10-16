@@ -22,7 +22,7 @@
               <div class="property-image">
                 <div class="property-status">For Lease</div>
                 <a href="{% url 'toggle-wishlist-rent' lease.id %}" class="wishlist-btn">
-                  {% if not lease.whilist %}
+                  {% if lease.whilist %}
                     <i class="fas fa-bookmark"></i>
                   {% else %}
                     <i class="far fa-bookmark"></i>

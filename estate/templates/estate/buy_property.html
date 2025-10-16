@@ -22,7 +22,7 @@
               <div class="property-image">
                 <div class="property-status">For Sale</div>
                 <a href="{% url 'toggle-wishlist-buy' bought.id %}" class="wishlist-btn">
-                  {% if not bought.whilist %}
+                  {% if bought.whilist %}
                     <i class="fas fa-bookmark"></i>
                   {% else %}
                     <i class="far fa-bookmark"></i>
