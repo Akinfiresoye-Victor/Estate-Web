@@ -298,3 +298,124 @@
     font-size: 0.8rem;
   }
 }
+
+/* Pagination Wrapper */
+.pagination-wrapper {
+  margin: 3rem 0 2rem;
+  text-align: center;
+}
+
+.pagination {
+  display: inline-flex;
+  gap: 0.5rem;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination .page-item {
+  list-style: none;
+}
+
+.pagination .page-link {
+  padding: 0.75rem 1rem;
+  border: 2px solid #dee2e6;
+  background: #fff;
+  color: var(--text-dark);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 45px;
+  justify-content: center;
+}
+
+.pagination .page-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Green Theme for Rent */
+.pagination-lease .page-link {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.pagination-lease .page-link:hover {
+  background: #28a745;
+  color: #fff;
+  border-color: #28a745;
+}
+
+.pagination-lease .page-item.active .page-link {
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+  color: #fff;
+  border-color: #28a745;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* Blue Theme for Sale */
+.pagination-sale .page-link {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.pagination-sale .page-link:hover {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.pagination-sale .page-item.active .page-link {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: #fff;
+  border-color: #007bff;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Pagination Info */
+.pagination-info {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.pagination-info p {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+.pagination-info strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pagination {
+    gap: 0.3rem;
+  }
+
+  .pagination .page-link {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    min-width: 40px;
+  }
+
+  .pagination .page-link span {
+    display: none;
+  }
+
+  .pagination-info {
+    font-size: 0.85rem;
+  }
+}

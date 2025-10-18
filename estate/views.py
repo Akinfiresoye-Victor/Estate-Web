@@ -12,7 +12,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from django.conf import settings
 from . import news_scrape as ns
-
+from django.core.paginator import Paginator
 
 
 
@@ -148,11 +148,14 @@ def lease_property(request):
 #Function/View that queries and brings out all the property being leased
 def rent_property(request):
     if request.user.is_authenticated:
+        p=Paginator(PropertyManagementRent.objects.all(), 10)
+        page= request.GET.get('page')
+        on_lease= p.get_page(page)
+        nums= "a" * on_lease.paginator.num_pages
         #The line that does the actual querying and its organized by the date listed
-        leased_property_list= PropertyManagementRent.objects.order_by('-listed_date').all()
-        return render(request, 'estate/rent_property.html', {'leased': leased_property_list})
+        return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': on_lease})
     else:
-        messages.success(request, ('Join us Now to start'))
+        messages.success(request, ('Join Estate Web Now!!!'))
         return redirect('login')
 
 
@@ -160,8 +163,11 @@ def rent_property(request):
 def buy_property(request):
     if request.user.is_authenticated:
         #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
-        propery_sale_list=PropertyManagementSale.objects.order_by('-listed_date').all()
-        return render(request, 'estate/buy_property.html', {'buy': propery_sale_list})
+        p=Paginator(PropertyManagementSale.objects.all(), 10)
+        page=request.GET.get('page')
+        on_sale= p.get_page(page)
+        nums= "a" * on_sale.paginator.num_pages
+        return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums })
     else:
         messages.success(request, ('Join us Now to start'))
         return redirect('login')
@@ -494,7 +500,8 @@ def general_search(request):
 
 
 
-
+def deeper_search(request):
+    pass
 # location= request.POST['location']
 #         state= request.POST['state']
 #         bedrooms=request.POST['bedrooms']

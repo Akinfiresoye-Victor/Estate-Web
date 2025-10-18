@@ -84,4 +84,48 @@
     {% endif %}
   </div>
 </div>
+
+
+<div class="pagination-wrapper">
+  <nav aria-label="Property pagination">
+    <ul class="pagination pagination-sale">
+      {% if buy.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1" title="First page">
+            <i class="fas fa-angle-double-left"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ buy.previous_page_number }}" title="Previous page">
+            <i class="fas fa-angle-left"></i> Previous
+          </a>
+        </li>
+      {% endif %}
+
+      {% for i in nums %}
+        <li class="page-item {% if buy.number == forloop.counter %}active{% endif %}">
+          <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
+        </li>
+      {% endfor %}
+
+      {% if buy.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ buy.next_page_number }}" title="Next page">
+            Next <i class="fas fa-angle-right"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ buy.paginator.num_pages }}" title="Last page">
+            <i class="fas fa-angle-double-right"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <div class="pagination-info">
+    <p>Page <strong>{{ buy.number }}</strong> of <strong>{{ buy.paginator.num_pages }}</strong></p>
+  </div>
+</div>
+
 {% endblock %}
