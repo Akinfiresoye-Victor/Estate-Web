@@ -39,3 +39,31 @@ STATES=[
     ('ZA', 'Zamfara State'),
     ('FCT', 'Abuja State'),
 ]
+
+
+TYPE=[
+    ('Detached duplex','Detached Duplex'),
+    ('Terraced duplex','Terraced Duplexes'),
+    ('Semi detached duplex','Semi Detached Duplex'),
+    ('Conclusion','Conclusion'),
+    ('Townhouse','Townhouse'),
+    ('Bungalow','Bungalow'),
+    ('Detached bungalow','Detached Bungalow'),
+    ('Block of flats','Block of Flats'),
+    ('Semi detached bungalow','Semi Detached Bungalow'),
+    ('Terraced bungalow','Terraced Bungalow'),
+    ('Duplex','Duplex'),
+    ('Penthouse','Penthouse'),
+    ('Detached houses','Detached Houses'),
+    ('Terraced houses','Terraced houses'),
+    ('Apartment','Apartment'),
+    ('Traditional houses','Traditional Houses'),
+    ('Mansion','Mansion'),
+    ('Terrace','Terrace'),
+    ('Duplex Design','Duplex Design'),
+    ('Massionette', 'Masionette'),
+    ('Bungalow Design','Bungalow Design'),
+    ('Detached','Detached'),
+    ('Detached House','Detached House'),
+    
+]

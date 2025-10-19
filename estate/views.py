@@ -148,7 +148,7 @@ def lease_property(request):
 #Function/View that queries and brings out all the property being leased
 def rent_property(request):
     if request.user.is_authenticated:
-        p=Paginator(PropertyManagementRent.objects.all(), 10)
+        p=Paginator(PropertyManagementRent.objects.all(), 9)
         page= request.GET.get('page')
         on_lease= p.get_page(page)
         nums= "a" * on_lease.paginator.num_pages
@@ -163,7 +163,7 @@ def rent_property(request):
 def buy_property(request):
     if request.user.is_authenticated:
         #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
-        p=Paginator(PropertyManagementSale.objects.all(), 10)
+        p=Paginator(PropertyManagementSale.objects.all(), 9)
         page=request.GET.get('page')
         on_sale= p.get_page(page)
         nums= "a" * on_sale.paginator.num_pages
@@ -478,8 +478,8 @@ def general_search(request):
             if request.method== 'POST':
                 searched=request.POST['searched']
                 
-                properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
-                properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
+                properties_on_sale=PropertyManagementSale.objects.filter(house_type__icontains=searched)
+                properties_on_lease= PropertyManagementRent.objects.filter(house_type__icontains=searched)
                 context=  {'searched':searched,'on_sale':properties_on_sale,
                                                 'on_lease':properties_on_lease,}
                 

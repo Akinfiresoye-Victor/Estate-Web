@@ -28,7 +28,7 @@
                     <i class="fas fa-tag me-1"></i>
                     For Sale
                 </div>
-                <h1 class="property-title">{{ property.summary|default:"Beautiful Property for Sale" }}</h1>
+                <h1 class="property-title">{{ property.house_type|default:"Beautiful Property for Sale" }}</h1>
                 <div class="property-location">
                     <div class="location-item">
                         <i class="fas fa-map-marker-alt"></i>
@@ -117,6 +117,15 @@
                             <div class="feature-content">
                                 <span class="feature-label">Bathrooms</span>
                                 <span class="feature-value">{{ property.bathrooms|default:"N/A" }}</span>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-p-circle-fill"></i>
+                            </div>
+                            <div class="feature-content">
+                                <span class="feature-label">Parking Spaces</span>
+                                <span class="feature-value">{{ property.parking_spaces|default:"0" }}</span>
                             </div>
                         </li>
                     </ul>

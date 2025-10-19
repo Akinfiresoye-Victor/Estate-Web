@@ -38,7 +38,7 @@
                 {% endif %}
               </div>
               <div class="card-body d-flex flex-column">
-                <h5 class="property-title sale-title">{{ sale.summary }}</h5>
+                <h5 class="property-title sale-title">{{ sale.house_type }}</h5>
                 <div class="property-location sale-accent">
                   <i class="fas fa-map-marker-alt"></i>
                   <span>{{ sale.location }}</span>
@@ -74,13 +74,13 @@
                 {% endif %}
               </div>
               <div class="card-body d-flex flex-column">
-                <h5 class="property-title lease-title">{{ lease.summary }}</h5>
+                <h5 class="property-title lease-title">{{ lease.house_type }}</h5>
                 <div class="property-location lease-accent">
                   <i class="fas fa-map-marker-alt"></i>
                   <span>{{ lease.location }}</span>
                 </div>
                 <div class="property-price lease-price">₦{{ lease.price_range }}/month</div>
-                <p class="property-description">{{ lease.summary|truncatewords:10 }}</p>
+                <p class="property-description">{{ lease.house_type|truncatewords:10 }}</p>
                 <div class="mt-auto">
                   <a href="{% url 'view-property-r' lease.id %}" class="btn btn-view-property lease-btn">
                     View Details

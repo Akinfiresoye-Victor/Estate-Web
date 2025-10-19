@@ -24,6 +24,10 @@
                         <i class="bi bi-speedometer2 me-2"></i>
                         Back to Dashboard
                     </a>
+                    <a href="{% url 'lease-property' %}" class="btn-dashboard">
+                        <i class="bi bi-house-fill"></i>
+                        Lease another Property
+                    </a>
                 </div>
             </div>
 
@@ -123,19 +127,21 @@
                         {% for field in form %}
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="form-label">
-                                    {% if 'summary' in field.name or 'title' in field.name %}
+                                    {% if 'house_type' in field.name or 'title' in field.name %}
                                         <i class="bi bi-card-heading me-2"></i>
-                                    {% elif 'price' in field.name or 'rent' in field.name %}
+                                    {% elif 'price_range' in field.name or 'price' in field.name %}
                                         <i class="bi bi-currency-dollar me-2"></i>
                                     {% elif 'location' in field.name or 'address' in field.name %}
                                         <i class="bi bi-geo-alt-fill me-2"></i>
                                     {% elif 'description' in field.name %}
                                         <i class="bi bi-text-paragraph me-2"></i>
-                                    {% elif 'phone' in field.name or 'contact' in field.name %}
+                                    {% elif 'phone_number' in field.name or 'contact' in field.name %}
                                         <i class="bi bi-telephone-fill me-2"></i>
-                                    {% elif 'bedroom' in field.name %}
+                                    {% elif 'bedrooms' in field.name %}
                                         <i class="bi bi-door-closed-fill me-2"></i>
-                                    {% elif 'bathroom' in field.name %}
+                                    {% elif 'bathrooms' in field.name %}
+                                        <i class="bi bi-droplet-fill me-2"></i>
+                                    {% elif 'parking_spaces' in field.name %}
                                         <i class="bi bi-droplet-fill me-2"></i>
                                     {% elif 'size' in field.name or 'area' in field.name %}
                                         <i class="bi bi-rulers me-2"></i>
@@ -150,7 +156,6 @@
                                 {% else %}
                                     {{ field|add_class:"form-input" }}
                                 {% endif %}
-
                                 {% if field.help_text %}
                                     <div class="form-help-text">{{ field.help_text }}</div>
                                 {% endif %}

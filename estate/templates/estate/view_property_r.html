@@ -28,7 +28,7 @@
                     <i class="bi bi-key-fill me-1"></i>
                     For Rent
                 </div>
-                <h1 class="property-title">{{ property.summary|default:"Beautiful Rental Property" }}</h1>
+                <h1 class="property-title">{{ property.house_type|default:"Bungalow" }}</h1>
                 <div class="property-location">
                     <div class="location-item">
                         <i class="bi bi-geo-alt-fill"></i>
@@ -118,6 +118,14 @@
                             <div class="feature-content">
                                 <span class="feature-label">Bathrooms</span>
                                 <span class="feature-value">{{ property.bathrooms|default:"N/A" }}</span>
+                            </div>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-p-circle-fill"></i>
+                            </div>
+                            <div class="feature-content">
+                                <span class="feature-label">Parking Spaces</span>
+                                <span class="feature-value">{{ property.parking_spaces|default:"0" }}</span>
                             </div>
                         </li>
                     </ul>

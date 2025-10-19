@@ -66,11 +66,11 @@
                         {% else %}
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="form-label">
-                                    {% if 'title' in field.name or 'name' in field.name %}
+                                    {% if 'house_type' in field.name%}
                                         <i class="bi bi-card-heading me-2"></i>
-                                    {% elif 'price' in field.name or 'cost' in field.name %}
+                                    {% elif 'price' in field.name%}
                                         <i class="bi bi-currency-dollar me-2"></i>
-                                    {% elif 'location' in field.name or 'address' in field.name %}
+                                    {% elif 'location' in field.name or 'state' in field.name %}
                                         <i class="bi bi-geo-alt-fill me-2"></i>
                                     {% elif 'image' in field.name or 'photo' in field.name %}
                                         <i class="bi bi-image-fill me-2"></i>
@@ -80,6 +80,8 @@
                                         <i class="bi bi-door-closed-fill me-2"></i>
                                     {% elif 'bathroom' in field.name %}
                                         <i class="bi bi-droplet-fill me-2"></i>
+                                    {% elif 'parking_spaces' in field.name %}
+                                        <i class="bi bi-p-circle"></i>                                        
                                     {% else %}
                                         <i class="bi bi-pencil-fill me-2"></i>
                                     {% endif %}
