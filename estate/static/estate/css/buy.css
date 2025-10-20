@@ -114,6 +114,73 @@ body {
   padding-bottom: 4rem;
 }
 
+/* ============================================
+   FILTER SECTION
+   ============================================ */
+.filter-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 5px 25px rgba(25, 118, 210, 0.15);
+}
+
+.filter-section form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.filter-section label {
+  display: block;
+  font-weight: 600;
+  color: var(--buy-dark);
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.filter-section select,
+.filter-section input[type="text"],
+.filter-section input[type="number"],
+.filter-section input[type="date"] {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid #bbdefb;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  background: #e3f2fd;
+}
+
+.filter-section select:focus,
+.filter-section input:focus {
+  outline: none;
+  border-color: var(--buy-color);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1);
+}
+
+.filter-section button[type="submit"] {
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, var(--buy-color) 0%, var(--buy-light) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.filter-section button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+}
+
 .properties-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

@@ -7,17 +7,6 @@
     <a class="navbar-brand fw-bold" href="{%url 'articles'%}">
       <i class="bi bi-buildings me-2"></i>Estate Web
     </a>
-    <div class="d-flex ms-auto align-items-center gap-2">
-      <form class="d-flex search-form" role="search" method="POST" action="{% url 'general-search' %}">
-        {% csrf_token %}
-        <div class="search-container">
-          <i class="bi bi-search search-icon"></i>
-          <input class="form-control search-input" type="search" placeholder="Search Properties" aria-label="Search" name="searched">
-          <button class="btn btn-search" type="submit">
-            <i class="bi bi-arrow-right-circle-fill"></i>
-          </button>
-        </div>
-      </form>
       <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

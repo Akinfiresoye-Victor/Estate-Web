@@ -23,10 +23,24 @@
   </div>
 </div>
 
-<!-- Properties Grid -->
+<!-- Properties Container -->
 <div class="container properties-container">
-  <div class="properties-grid">
-    {% if buy %}
+  
+  {% if buy %}
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <form method="get">
+        {{ salefilter.form }}
+        {% csrf_token %}
+        <button class="btn-filter" type="submit">
+          <i class="bi bi-funnel-fill me-2"></i>
+          Filter
+        </button>
+      </form>
+    </div>
+
+    <!-- Properties Grid -->
+    <div class="properties-grid">
       {% for bought in buy %}
         {% if bought.available %}
           <div class="property-card-wrapper">
@@ -105,7 +119,21 @@
           </div>
         {% endif %}
       {% endfor %}
-    {% else %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="filter-section">
+      <form method="get">
+        {{ salefilter.form }}
+        {% csrf_token %}
+        <button class="btn-filter" type="submit">
+          <i class="bi bi-funnel-fill me-2"></i>
+          Filter
+        </button>
+      </form>
+    </div>
+
+    <div class="properties-grid">
       <div class="empty-state">
         <div class="empty-icon">
           <i class="bi bi-inbox"></i>
@@ -113,8 +141,8 @@
         <h3 class="empty-title">No Properties Available</h3>
         <p class="empty-message">Check back soon for new listings or contact us to list your property.</p>
       </div>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 </div>
 
 <!-- Pagination -->

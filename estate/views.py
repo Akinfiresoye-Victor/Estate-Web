@@ -1,8 +1,8 @@
 '''Handles Main Functionality of the Website'''
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import PropertyManagementSale, PropertyManagementRent, Feedback, Room, Messages, WishlistForSale,WishlistForRent
-from .forms import LeaseForm, SellForm, FeedbackForm
+from .models import *
+from .forms import *
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from members.forms import UpdateUserForm
@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from . import news_scrape as ns
 from django.core.paginator import Paginator
+from .filters import *
 
 
 
@@ -147,27 +148,37 @@ def lease_property(request):
 
 #Function/View that queries and brings out all the property being leased
 def rent_property(request):
-    if request.user.is_authenticated:
-        p=Paginator(PropertyManagementRent.objects.all(), 9)
-        page= request.GET.get('page')
-        on_lease= p.get_page(page)
-        nums= "a" * on_lease.paginator.num_pages
-        #The line that does the actual querying and its organized by the date listed
-        return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': on_lease})
-    else:
-        messages.success(request, ('Join Estate Web Now!!!'))
-        return redirect('login')
-
+    try:
+        if request.user.is_authenticated:
+            rent_qs=PropertyManagementRent.objects.all()
+            myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
+            rent_qs=myfilter.qs
+            p=Paginator(rent_qs, 9)
+            page= request.GET.get('page')
+            on_lease= p.get_page(page)
+            nums= "a" * on_lease.paginator.num_pages
+            #The line that does the actual querying and its organized by the date listed
+            return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': on_lease, 'rentfilter':myfilter})
+        else:
+            messages.success(request, ('Join Estate Web Now!!!'))
+            return redirect('login')
+    except Exception as e:
+        print(e)
 
 #Function/View that queries and brings out all the property on sale
 def buy_property(request):
     if request.user.is_authenticated:
+        sale_qs=PropertyManagementSale.objects.all()
+        myfilter=PropertySaleFilter(request.GET, queryset=sale_qs)
+        sale_qs=myfilter.qs
         #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
-        p=Paginator(PropertyManagementSale.objects.all(), 9)
+        p=Paginator(sale_qs, 9)
         page=request.GET.get('page')
         on_sale= p.get_page(page)
         nums= "a" * on_sale.paginator.num_pages
-        return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums })
+        
+
+        return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums, 'salefilter':myfilter })
     else:
         messages.success(request, ('Join us Now to start'))
         return redirect('login')
@@ -469,75 +480,40 @@ def delete_account(request):
         messages.success(request, 'Account has been deleted Successfully')
         return redirect('welcome-page')
 
-def general_search(request):
-    if request.user.is_authenticated:
-        try:
-            searched=''
 
+
+# def general_search(request):
+#     if request.user.is_authenticated:
+#         try:
+#             searched=''
+
+#             if request.method== 'POST':
+#                 searched=request.POST['searched']
+                
+#                 properties_on_sale=PropertyManagementSale.objects.filter(house_type__icontains=searched)
+#                 properties_on_lease= PropertyManagementRent.objects.filter(house_type__icontains=searched)
+#                 context=  {'searched':searched,'on_sale':properties_on_sale,
+#                                                 'on_lease':properties_on_lease,
+#                             }
+                
+                
+#                 return render(request, 'estate/search.html',context)
+#             else:
+#                 return render(request, 'estate/search.html', {})
             
-            if request.method== 'POST':
-                searched=request.POST['searched']
-                
-                properties_on_sale=PropertyManagementSale.objects.filter(house_type__icontains=searched)
-                properties_on_lease= PropertyManagementRent.objects.filter(house_type__icontains=searched)
-                context=  {'searched':searched,'on_sale':properties_on_sale,
-                                                'on_lease':properties_on_lease,}
-                
-                
-                return render(request, 'estate/search.html',context)
-            else:
-                return render(request, 'estate/search.html', {})
-        except Exception as e:
-            print(f"Error {e}")
-    else:
-        messages.success(request, 'You need to be logged in to access this page')
-        return redirect('welcome-page')
-
-
-
-
-
-
-
-
-def deeper_search(request):
-    pass
-# location= request.POST['location']
-#         state= request.POST['state']
-#         bedrooms=request.POST['bedrooms']
-#         bathrooms=request.POST['bathrooms']
-        
-#         properties_on_sale=PropertyManagementSale.objects.filter(summary__icontains=searched)
-#         properties_on_lease= PropertyManagementRent.objects.filter(summary__icontains=searched)
-        
-#         '''Deeper Search'''
-#         if location:
-#             location_sale=properties_on_sale.filter(location__icontains=location)
-#             location_rent=properties_on_lease.filter(location__icontains=location)
-#         if state:
-#             state_sale=properties_on_sale.filter(state__icontains=state)
-#             state_rent=properties_on_lease.filter(state__icontains=state)
-#         if bedrooms:
-#             bedroom_sale=properties_on_sale.filter(bedrooms__icontains=bedrooms)
-#             bedroom_rent=properties_on_lease.filter(bedrooms__icontains=bedrooms)
-#         if bathrooms:
-#             bathrooms_sale=properties_on_sale.filter(bathrooms__icontains=bathrooms)
-#             bathrooms_rent=properties_on_lease.filter(bathrooms__icontains=bathrooms)
-#         context=  {'searched':searched,'on_sale':properties_on_sale,
-#                                         'on_lease':properties_on_lease,
-#                                         'location_s':location_sale,
-#                                         'location_r':location_rent,
-#                                         'state_s': state_sale,
-#                                         'state_r': state_rent,
-#                                         'bedroom_s':bedroom_sale,
-#                                         'bedroom_r': bedroom_rent,
-#                                         'bathroom_s': bathrooms_sale,
-#                                         'bathroom_r':bathrooms_rent}
-        
-        
-#         return render(request, 'estate/search.html',context)
+            
+            
+            
+#         except Exception as e:
+#             print(f"Error {e}")
 #     else:
-#         return render(request, 'estate/search.html', {})
+#         messages.success(request, 'You need to be logged in to access this page')
+#         return redirect('welcome-page')
+
+
+
+
+
 
 def community(request):
     if request.user.is_authenticated:

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'members',
     'widget_tweaks',
     'channels',
+    'django_filters',
+    
 ]
 
 # Middleware
