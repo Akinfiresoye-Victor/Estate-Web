@@ -1,61 +1,94 @@
 {% extends 'estate/base.html' %}
-{% load static%}
+{% load static %}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/rent.css' %}">
 {% endblock %}
 {% block content %}
 
-<div class="page-header">
-  <div class="container">
-    <h1>Properties for Lease</h1>
-    <p>Find the perfect rental property from our available listings</p>
+<!-- Page Header -->
+<div class="page-header rent-header">
+  <div class="header-overlay"></div>
+  <div class="container header-content">
+    <div class="header-icon">
+      <i class="bi bi-building"></i>
+    </div>
+    <h1 class="header-title">Properties for Lease</h1>
+    <p class="header-subtitle">Find the perfect rental property from our available listings</p>
+    <div class="header-stats">
+      <div class="stat-item">
+        <i class="bi bi-house-door"></i>
+        <span>{{ on_lease.paginator.count|default:"0" }} Properties</span>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="container mb-5">
-  <div class="row g-4">
+<!-- Properties Grid -->
+<div class="container properties-container">
+  <div class="properties-grid">
     {% if on_lease %}
       {% for lease in on_lease %}
         {% if lease.available %}
-          <div class="col-md-6 col-lg-4">
-            <div class="card property-card h-100">
-              <div class="property-image">
-                <div class="property-status">For Lease</div>
-                <a href="{% url 'toggle-wishlist-rent' lease.id %}" class="wishlist-btn">
-                  {% if lease.whilist %}
-                    <i class="fas fa-bookmark"></i>
-                  {% else %}
-                    <i class="far fa-bookmark"></i>
-                  {% endif %}
-                </a>
+          <div class="property-card-wrapper">
+            <div class="property-card rent-card">
+              
+              <!-- Property Image -->
+              <div class="property-image-section">
+                {% if lease.base_image %}
+                  <img src="{{ lease.base_image.url }}" alt="{{ lease.house_type }}" class="property-img">
+                {% else %}
+                  <div class="placeholder-image">
+                    <i class="bi bi-image"></i>
+                    <span>No Image</span>
+                  </div>
+                {% endif %}
+                
+                <div class="image-overlay">
+                  <div class="property-badge rent-badge">
+                    <i class="bi bi-key-fill me-1"></i>
+                    For Lease
+                  </div>
+                  <a href="{% url 'toggle-wishlist-rent' lease.id %}" class="wishlist-icon">
+                    {% if lease.whilist %}
+                      <i class="bi bi-bookmark-fill"></i>
+                    {% else %}
+                      <i class="bi bi-bookmark"></i>
+                    {% endif %}
+                  </a>
+                </div>
               </div>
               
-              <div class="card-body d-flex flex-column">
-                <h5 class="property-title">{{ lease.house_type }}</h5>
+              <!-- Property Content -->
+              <div class="property-content">
+                <h3 class="property-title">{{ lease.house_type }}</h3>
                 
                 <div class="property-location">
-                  <i class="fas fa-map-marker-alt"></i>
+                  <i class="bi bi-geo-alt-fill"></i>
                   <span>{{ lease.location }}, {{ lease.state }}</span>
                 </div>
                 
-                <div class="property-price">₦{{ lease.price_range }}</div>
+                <div class="property-price rent-price">
+                  <span class="price-amount">₦{{ lease.price_range }}</span>
+                  <span class="price-period">/ month</span>
+                </div>
                 
-                <p class="property-description">{{ lease.description }}</p>
+                <p class="property-description">{{ lease.description|truncatewords:20 }}</p>
                 
-                <div class="property-details">
-                  <div class="detail-item">
-                    <span class="detail-label">Phone</span>
-                    <span class="detail-value">{{ lease.phone_number }}</span>
+                <div class="property-info">
+                  <div class="info-item">
+                    <i class="bi bi-telephone-fill"></i>
+                    <span>{{ lease.phone_number }}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>{{ lease.listed_date|date:"M d, Y" }}</span>
                   </div>
                 </div>
                 
-                <div class="date-listed mb-3">
-                  <i class="far fa-calendar-alt"></i> Listed {{ lease.listed_date|date:"M d, Y" }}
-                </div>
-                
-                <div class="mt-auto">
-                  <a href="{% url 'view-property-r' property_id=lease.id %}" class="btn btn-view-property">
-                    View Details
+                <div class="property-actions">
+                  <a href="{% url 'view-property-r' property_id=lease.id %}" class="btn-view-property rent-btn">
+                    <span>View Details</span>
+                    <i class="bi bi-arrow-right-circle"></i>
                   </a>
                 </div>
               </div>
@@ -64,56 +97,65 @@
         {% endif %}
       {% endfor %}
     {% else %}
-      <div class="col-12">
-        <div class="no-properties">
-          <i class="fas fa-home"></i>
-          <h3>No Properties Available for Lease</h3>
-          <p>Check back soon for new rental listings or contact us to list your property.</p>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="bi bi-inbox"></i>
         </div>
+        <h3 class="empty-title">No Properties Available for Lease</h3>
+        <p class="empty-message">Check back soon for new rental listings or contact us to list your property.</p>
       </div>
     {% endif %}
   </div>
 </div>
 
-<div class="pagination-wrapper">
-  <nav aria-label="Property pagination">
-    <ul class="pagination pagination-lease">
-      {% if on_lease.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page=1" title="First page">
-            <i class="fas fa-angle-double-left"></i>
-          </a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ on_lease.previous_page_number }}" title="Previous page">
-            <i class="fas fa-angle-left"></i> Previous
-          </a>
-        </li>
-      {% endif %}
+<!-- Pagination -->
+{% if on_lease.paginator.num_pages > 1 %}
+<div class="pagination-section">
+  <div class="container">
+    <nav class="pagination-nav">
+      <ul class="pagination rent-pagination">
+        {% if on_lease.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ on_lease.previous_page_number }}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
 
-      {% for i in nums %}
-        <li class="page-item {% if on_lease.number == forloop.counter %}active{% endif %}">
-          <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
-        </li>
-      {% endfor %}
+        {% for i in nums %}
+          <li class="page-item {% if on_lease.number == forloop.counter %}active{% endif %}">
+            <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
+          </li>
+        {% endfor %}
 
-      {% if on_lease.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ on_lease.next_page_number }}" title="Next page">
-            Next <i class="fas fa-angle-right"></i>
-          </a>
-        </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ on_lease.paginator.num_pages }}" title="Last page">
-            <i class="fas fa-angle-double-right"></i>
-          </a>
-        </li>
-      {% endif %}
-    </ul>
-  </nav>
-
-  <div class="pagination-info">
-    <p>Page <strong>{{ on_lease.number }}</strong> of <strong>{{ on_lease.paginator.num_pages }}</strong></p>
+        {% if on_lease.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ on_lease.next_page_number }}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ on_lease.paginator.num_pages }}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    
+    <div class="pagination-info">
+      <span>Page <strong>{{ on_lease.number }}</strong> of <strong>{{ on_lease.paginator.num_pages }}</strong></span>
+    </div>
   </div>
 </div>
+{% endif %}
+
+<!-- Include Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 {% endblock %}
