@@ -18,14 +18,40 @@
   
   <!-- Messages Container -->
   <div class="messages-container">
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-success alert-custom fade show" role="alert">
-          <i class="bi bi-check-circle-fill me-2"></i>
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            {% with 'danger' as alert_class %}
+                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endwith %}
+        {% elif message.tags == 'info' %}
+            {% with 'info' as alert_class %}
+                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endwith %}
+        {% elif message.tags == 'warning' %}
+            {% with 'warning' as alert_class %}
+                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endwith %}
+        {% else %}
+            {% with 'success' as alert_class %}
+                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
   </div>
 
   <!-- Login Card -->

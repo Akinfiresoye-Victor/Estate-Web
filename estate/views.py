@@ -49,32 +49,37 @@ def articles(request):
                                                         'article':article,
                                                         "full_article":full_article})
         except:
-            messages.success(request, ns.error)
+            messages.error(request, ns.error)
             return redirect('user-profile')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 def feedbacks(request):
     if request.user.is_authenticated:
-        submitted = False
-        if request.method == 'POST':
-            messages.success(request, 'Thanks For your feedback....')
-            form = FeedbackForm(request.POST)
-            if form.is_valid():
-                form.save()
-                submitted=True
-                return redirect('feedback')
-        else:
-            form = FeedbackForm()
-            if 'submitted' in request.GET:
-                submitted = True
-        return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
+        try:
+            submitted = False
+            if request.method == 'POST':
+                messages.success(request, 'Thanks For your feedback....')
+                form = FeedbackForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    submitted=True
+                    return redirect('feedback')
+            else:
+                form = FeedbackForm()
+                if 'submitted' in request.GET:
+                    submitted = True
+            return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
-
+    
+            
 
 
 def view_feedbacks(request):
@@ -96,91 +101,104 @@ def delete_feedback(request, feedback_id):
             messages.error(request, ('You Arent authorized to delete this feedback'))
             return redirect('my-listings')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 '''Property Management Function'''
 #Function/View which manages the uploading of properties for sale
 def sell_property(request):
     if request.user.is_authenticated:
-        submitted= False
-        #if the form is submitted do 👇
-        if request.method== 'POST':
-            form=SellForm(request.POST, request.FILES) #request.FILES helps deals with the picture management
-            if form.is_valid():
-                landlord= form.save(commit=False)
-                landlord.user_id= request.user.id
-                form.save()
-                return HttpResponseRedirect('/sell_property?submitted=True')#setting the form to true so we dont submit the form twice
-        #else just display the form and input required data
-        else:
-            form= SellForm
-            if 'submitted' in request.GET:
-                submitted=True
-        messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
-        return render(request, 'estate/sell_property.html', {'form': form, 'submitted':submitted})
+        try:
+            submitted= False
+            #if the form is submitted do 👇
+            if request.method== 'POST':
+                form=SellForm(request.POST, request.FILES) #request.FILES helps deals with the picture management
+                if form.is_valid():
+                    landlord= form.save(commit=False)
+                    landlord.user_id= request.user.id
+                    form.save()
+                    return HttpResponseRedirect('/sell_property?submitted=True')#setting the form to true so we dont submit the form twice
+            #else just display the form and input required data
+            else:
+                form= SellForm
+                if 'submitted' in request.GET:
+                    submitted=True
+            messages.info(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
+            return render(request, 'estate/sell_property.html', {'form': form, 'submitted':submitted})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('Join us Now to start'))
+        messages.info(request, ('Join us Now to start'))
         return redirect('login')
 
 
 #Function/View that manages the uploading of properties for Rent
 def lease_property(request):
     if request.user.is_authenticated:
-        submitted= False
-        if request.method== 'POST':
-            form=LeaseForm(request.POST, request.FILES) #request.FILES to handle the images 
-            if form.is_valid():
-                landlord= form.save(commit=False)
-                landlord.user_id= request.user.id
-                form.save()
-                return HttpResponseRedirect('/lease_property?submitted=True')
-        else:
-            form= LeaseForm
-            if 'submitted' in request.GET:
-                submitted=True
-        messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
-        return render(request, 'estate/lease_property.html', {'form': form, 'submitted':submitted})
+        try:
+            submitted= False
+            if request.method== 'POST':
+                form=LeaseForm(request.POST, request.FILES) #request.FILES to handle the images 
+                if form.is_valid():
+                    landlord= form.save(commit=False)
+                    landlord.user_id= request.user.id
+                    form.save()
+                    return HttpResponseRedirect('/lease_property?submitted=True')
+            else:
+                form= LeaseForm
+                if 'submitted' in request.GET:
+                    submitted=True
+            messages.success(request, 'Note That images wont show up due to some internal issues stay tuned for upcoming updates')
+            return render(request, 'estate/lease_property.html', {'form': form, 'submitted':submitted})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('Join us Now to start'))
+        messages.info(request, ('Join us Now to start'))
         return redirect('login')
 
 
 #Function/View that queries and brings out all the property being leased
 def rent_property(request):
-    try:
         if request.user.is_authenticated:
-            rent_qs=PropertyManagementRent.objects.all()
-            myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
-            rent_qs=myfilter.qs
-            p=Paginator(rent_qs, 9)
-            page= request.GET.get('page')
-            on_lease= p.get_page(page)
-            nums= "a" * on_lease.paginator.num_pages
-            #The line that does the actual querying and its organized by the date listed
-            return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': on_lease, 'rentfilter':myfilter})
+            try:
+                rent_qs=PropertyManagementRent.objects.all()
+                myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
+                rent_qs=myfilter.qs
+                p=Paginator(rent_qs, 9)
+                page= request.GET.get('page')
+                on_lease= p.get_page(page)
+                nums= "a" * on_lease.paginator.num_pages
+                #The line that does the actual querying and its organized by the date listed
+                return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': on_lease, 'rentfilter':myfilter})
+            except Exception as e:
+                print(f'ERROR IS{e}')
+                return render(request, 'estate/error_page.html')
         else:
-            messages.success(request, ('Join Estate Web Now!!!'))
+            messages.info(request, ('Join Estate Web Now!!!'))
             return redirect('login')
-    except Exception as e:
-        print(e)
 
 #Function/View that queries and brings out all the property on sale
 def buy_property(request):
     if request.user.is_authenticated:
-        sale_qs=PropertyManagementSale.objects.all()
-        myfilter=PropertySaleFilter(request.GET, queryset=sale_qs)
-        sale_qs=myfilter.qs
-        #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
-        p=Paginator(sale_qs, 9)
-        page=request.GET.get('page')
-        on_sale= p.get_page(page)
-        nums= "a" * on_sale.paginator.num_pages
-        
+        try:
+            sale_qs=PropertyManagementSale.objects.all()
+            myfilter=PropertySaleFilter(request.GET, queryset=sale_qs)
+            sale_qs=myfilter.qs
+            #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
+            p=Paginator(sale_qs, 9)
+            page=request.GET.get('page')
+            on_sale= p.get_page(page)
+            nums= "a" * on_sale.paginator.num_pages
+            
 
-        return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums, 'salefilter':myfilter })
+            return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums, 'salefilter':myfilter })
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('Join us Now to start'))
+        messages.info(request, ('Join us Now to start'))
         return redirect('login')
 
 
@@ -198,9 +216,10 @@ def update_property_rent(request, property_id):
                 return redirect('my-listings')
             return render(request, 'estate/update_property.html', {'property': property, 'form': form})
         except Exception as e:
-            print(f"Error is: {e}")
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.info(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
@@ -219,69 +238,86 @@ def update_property_sale(request, property_id):
                 return redirect('my-listings')
             return render(request, 'estate/update_property_s.html', {'property': property, 'form': form})
         except Exception as e:
-            print(f"Error is: {e}")
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 #View/Function that deletes unwanted lisings from a users listings
 def delete_property_on_lease(request, property_id):
     if request.user.is_authenticated:
-        #getting the property_id which will be used to handle the deletion
-        property1= PropertyManagementRent.objects.get(pk=property_id)
-        #keeps another user from deleting a users data 
-        if request.user.id == property1.user_id:
-            #what does the actual deleting based on the property_id
-            property1.delete()
-            messages.success(request, ("Property deleted successfully"))
-            return redirect('my-listings')
-        else:
-            messages.error(request, ('You Arent authorized to delete this property'))
-            return redirect('my-listings')
+        try:
+            #getting the property_id which will be used to handle the deletion
+            property1= PropertyManagementRent.objects.get(pk=property_id)
+            #keeps another user from deleting a users data 
+            if request.user.id == property1.user_id:
+                #what does the actual deleting based on the property_id
+                property1.delete()
+                messages.success(request, ("Property deleted successfully"))
+                return redirect('my-listings')
+            else:
+                messages.warning(request, ('You Arent authorized to delete this property'))
+                return redirect('my-listings')
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 #View/Function that deletes a property on sale using the property id
 def delete_property_on_sale(request, property_id):
     if request.user.is_authenticated:
-        property1= PropertyManagementSale.objects.get(pk=property_id)
-        #Additional layer of security
-        if request.user.id == property1.user_id:
-            property1.delete()
-            messages.success(request, ("Property deleted successfully"))
-            return redirect('my-listings')
-        else:
-            messages.success(request, ('You Arent authorized to delete this property'))
-            return redirect('my-listings')
+        try:
+            property1= PropertyManagementSale.objects.get(pk=property_id)
+            #Additional layer of security
+            if request.user.id == property1.user_id:
+                property1.delete()
+                messages.success(request, ("Property deleted successfully"))
+                return redirect('my-listings')
+            else:
+                messages.warning(request, ('You Arent authorized to delete this property'))
+                return redirect('my-listings')
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 #Views/Functions that pulls out all details of a property on sale
 def view_property_on_sale(request, property_id):
     if request.user.is_authenticated:
-        #actual line that does the heavy lifting
-        property= PropertyManagementSale.objects.get(pk=property_id)
-        messages.success(request, 'Image Problem will be fixed soon stay alert for future updates')
-        return render(request, 'estate/view_property_s.html', {'property':property})
+        try:
+            #actual line that does the heavy lifting
+            property= PropertyManagementSale.objects.get(pk=property_id)
+            messages.info(request, 'Image Problem will be fixed soon stay alert for future updates')
+            return render(request, 'estate/view_property_s.html', {'property':property})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 #Views/Functions that pulls out all details of a property on lease
 def view_property_on_lease(request, property_id):
     if request.user.is_authenticated:
-        #actual line that does the heavy lifting
-        property= PropertyManagementRent.objects.get(pk=property_id)
-        messages.success(request, 'Image Problem will be fixed soon stay alert for future updates')
-        return render(request, 'estate/view_property_r.html', {'property':property})
+        try:
+            #actual line that does the heavy lifting
+            property= PropertyManagementRent.objects.get(pk=property_id)
+            messages.info(request, 'Image Problem will be fixed soon stay alert for future updates')
+            return render(request, 'estate/view_property_r.html', {'property':property})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
@@ -314,67 +350,79 @@ def user_profile(request):
         try:
             return render(request, 'estate/user_profile.html', {'headline': ns.article_headline})
         except:
-            messages.success(request, ns.error)
-            return redirect('user-profile')
+            messages.error(request, ns.error)
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 #View That shows Properties the users listed 
 def listed_properties(request):
     if request.user.is_authenticated:
-        model1= request.user.id
-        model2= request.user.id
-        #filtering the listings using both the users id and the properties id 
-        property1= PropertyManagementRent.objects.filter(user_id=model1)
-        property2= PropertyManagementSale.objects.filter(user_id=model2)
-        return render(request, 'estate/my_listings.html', {'property1':property1, 'property2':property2})
+        try:
+            model1= request.user.id
+            model2= request.user.id
+            #filtering the listings using both the users id and the properties id 
+            property1= PropertyManagementRent.objects.filter(user_id=model1)
+            property2= PropertyManagementSale.objects.filter(user_id=model2)
+            return render(request, 'estate/my_listings.html', {'property1':property1, 'property2':property2})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 def toggle_wishlist_rent(request, property_id):
     if not request.user.is_authenticated:
+        
         messages.warning(request, "You need to be logged in to access this page.")
         return redirect('welcome-page')
+    try:
+        property_obj = get_object_or_404(PropertyManagementRent, id=property_id)
+        lease = get_object_or_404(PropertyManagementRent, id=property_id)
+        #What handles the wishlist toggling
+        lease.whilist = not lease.whilist
+        lease.save()
+        wishlist_item, created = WishlistForRent.objects.get_or_create(property=property_obj, user=request.user)
 
-    property_obj = get_object_or_404(PropertyManagementRent, id=property_id)
-    lease = get_object_or_404(PropertyManagementRent, id=property_id)
-    #What handles the wishlist toggling
-    lease.whilist = not lease.whilist
-    lease.save()
-    wishlist_item, created = WishlistForRent.objects.get_or_create(property=property_obj, user=request.user)
+        if not created:
+            wishlist_item.delete()
+            messages.success(request, "Property removed from your wishlist.")
+        else:
+            messages.success(request, "Property added to your wishlist.")
 
-    if not created:
-        wishlist_item.delete()
-        messages.success(request, "Property removed from your wishlist.")
-    else:
-        messages.success(request, "Property added to your wishlist.")
-
-    return redirect('rent-prop')
+        return redirect('rent-prop')
+    except Exception as e:
+        print(f'ERROR IS{e}')
+        return render(request, 'estate/error_page.html')
 
 
 def toggle_wishlist_buy(request, property_id):
     if not request.user.is_authenticated:
+        
         messages.warning(request, "You need to be logged in to access this page.")
         return redirect('welcome-page')
-    buy = get_object_or_404(PropertyManagementSale, id=property_id)
-    #What handles the wishlist toggling
-    buy.whilist = not buy.whilist
-    buy.save()
-    property_obj = get_object_or_404(PropertyManagementSale, id=property_id)
-    wishlist_item, created = WishlistForSale.objects.get_or_create(property=property_obj, user=request.user)
+    try:
+        buy = get_object_or_404(PropertyManagementSale, id=property_id)
+        #What handles the wishlist toggling
+        buy.whilist = not buy.whilist
+        buy.save()
+        property_obj = get_object_or_404(PropertyManagementSale, id=property_id)
+        wishlist_item, created = WishlistForSale.objects.get_or_create(property=property_obj, user=request.user)
 
-    if not created:
-        wishlist_item.delete()
-        messages.success(request, "Property removed from your wishlist.")
-    else:
-        messages.success(request, "Property added to your wishlist.")
+        if not created:
+            wishlist_item.delete()
+            messages.success(request, "Property removed from your wishlist.")
+        else:
+            messages.success(request, "Property added to your wishlist.")
 
-    return redirect('buy-property')  
-
+        return redirect('buy-property')  
+    except Exception as e:
+        print(f'ERROR IS{e}')
+        return render(request, 'estate/error_page.html')
 
 
 #View/Function That shows all property added to favourites
@@ -382,70 +430,86 @@ def wishlist(request):
     if not request.user.is_authenticated:
         messages.warning(request, "You need to be logged in to access this page.")
         return redirect('welcome-page')
+    try:
+        wishlist_rent = WishlistForRent.objects.filter(user=request.user).select_related('property')
+        wishlist_sale = WishlistForSale.objects.filter(user=request.user).select_related('property')
 
-    wishlist_rent = WishlistForRent.objects.filter(user=request.user).select_related('property')
-    wishlist_sale = WishlistForSale.objects.filter(user=request.user).select_related('property')
+        total_saved = wishlist_rent.count() + wishlist_sale.count()
 
-    total_saved = wishlist_rent.count() + wishlist_sale.count()
-
-    context = {
-        'wishlist_rent': wishlist_rent,
-        'wishlist_sale': wishlist_sale,
-        'total_saved': total_saved,
-    }
-    return render(request, 'estate/wishlist.html', context)
-
+        context = {
+            'wishlist_rent': wishlist_rent,
+            'wishlist_sale': wishlist_sale,
+            'total_saved': total_saved,
+        }
+        return render(request, 'estate/wishlist.html', context)
+    except Exception as e:
+        print(f'ERROR IS{e}')
+        return render(request, 'estate/error_page.html')
 
 #View/Function that handles the updating of a users profile
 def update_profile(request, user_id):
     if request.user.is_authenticated:
-        formatted_user_id= int(user_id)
-        if formatted_user_id == request.user.id:
-            #The Users data is being pulled out from the database
-            profile= User.objects.get(pk=user_id)
-            #instance is used to fill the form with former data of the users
-            
-            form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
-            if form.is_valid():
-                form.save()
-                return redirect('user-profile')
+        try:
+            formatted_user_id= int(user_id)
+            if formatted_user_id == request.user.id:
+                #The Users data is being pulled out from the database
+                profile= User.objects.get(pk=user_id)
+                #instance is used to fill the form with former data of the users
+                
+                form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
+                if form.is_valid():
+                    form.save()
+                    return redirect('user-profile')
+                else:
+                    messages.error(request, 'check If you made any errors')
+                return render(request, 'estate/update_profile.html', {'profile': profile, 'form': form})
             else:
-                messages.error(request, 'check If you made any errors')
-            return render(request, 'estate/update_profile.html', {'profile': profile, 'form': form})
-        else:
-            messages.success(request, 'Youre not allowed to access this page')
-            return redirect('user-profile')
+                messages.warning(request, 'Youre not allowed to access this page')
+                return redirect('user-profile')
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, ('You need to be logged in to accesss this page'))
+        messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('welcome-page')
 
 
 #View Or function that uses django PasswordChangeForm to change the users password using old password to set the new password
 def change_password(request):
     if request.user.is_authenticated:
-        #if the form has been submtted it would check if it met the requirements (.valid) and then save it 
-        if request.method == 'POST':
-            form= PasswordChangeForm(request.user, request.POST)
-            if form.is_valid():
-                new_pass=form.save()
-                #the new password set is then encrypted and saved 
-                update_session_auth_hash(request, new_pass)
-                messages.success(request, 'Password has been Changed successfully')
-                return redirect('password-success')
+        try:
+            #if the form has been submtted it would check if it met the requirements (.valid) and then save it 
+            if request.method == 'POST':
+                form= PasswordChangeForm(request.user, request.POST)
+                if form.is_valid():
+                    new_pass=form.save()
+                    #the new password set is then encrypted and saved 
+                    update_session_auth_hash(request, new_pass)
+                    messages.success(request, 'Password has been Changed successfully')
+                    return redirect('password-success')
+                else:
+                    messages.error(request, 'There was an error changing your password.... please try again..')
+                    return redirect('change-password')
             else:
-                messages.error(request, 'There was an error changing your password.... please try again..')
-                return redirect('change-password')
-        else:
-            form= PasswordChangeForm(request.user)
-            return render(request, 'estate/change_passw.html', {'form': form})
-
+                form= PasswordChangeForm(request.user)
+                return render(request, 'estate/change_passw.html', {'form': form})
+        except Exception as e:
+            print(f'ERROR IS{e}')
+            return render(request, 'estate/error_page.html')
+    else:
+        messages.info(request, 'You have to be logged in to access this page')
+        return redirect('welcome-page')
 
 #Just a basic view to handle the url pointing to where the site will go after the password has been changed
 def change_password_success(request):
     if request.user.is_authenticated:
-        return render(request, 'estate/succ_pass.html')
+        try:
+            return render(request, 'estate/succ_pass.html')
+        except Exception as e:
+            print(f'ERROR IS {e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, 'You need to be logged in to access this page')
+        messages.warning(request, 'You need to be logged in to access this page')
         return redirect('welcome-page')
 
 
@@ -453,10 +517,14 @@ def change_password_success(request):
 #Users Settings(More feautures will be added in future updates)
 def profile_settings(request):
     if request.user.is_authenticated:
-        messages.success(request, 'Communication Prefrences and privacy will come in future Updates Stayed Tuned😊')
-        return render(request, 'estate/settings.html', {})
+        try:
+            messages.info(request, 'Communication Prefrences and privacy will come in future Updates Stayed Tuned😊')
+            return render(request, 'estate/settings.html', {})
+        except Exception as e:
+            print(f'ERROR IS {e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, 'You need to be logged in to access this page')
+        messages.warning(request, 'You need to be logged in to access this page')
         return redirect('welcome-page')
 
 
@@ -464,20 +532,27 @@ def profile_settings(request):
 #View/Function that deletes a users account from the User datatbase and all the properties related to the user so it basically clears all the users datat from the site
 def delete_account(request):
     if request.user.is_authenticated:
-        #getting all that needs to be deleted if a users account was actually deleted
-        property1= PropertyManagementRent.objects.filter(user_id=request.user.id)
-        property2= PropertyManagementSale.objects.filter(user_id=request.user.id)
-        user_id=User.objects.get(pk=request.user.id)
-        #A try block to et any error while deleting the account if not delete account
         try:
-            property1.delete()
-            property2.delete()
-            user_id.delete()
+            #getting all that needs to be deleted if a users account was actually deleted
+            property1= PropertyManagementRent.objects.filter(user_id=request.user.id)
+            property2= PropertyManagementSale.objects.filter(user_id=request.user.id)
+            user_id=User.objects.get(pk=request.user.id)
+            #A try block to et any error while deleting the account if not delete account
+            try:
+                property1.delete()
+                property2.delete()
+                user_id.delete()
+            except Exception as e:
+                messages.error(request, 'There was an error, Try again later.....')
+                print(e)
+                return redirect('user-profile')
+            messages.success(request, 'Account has been deleted Successfully')
+            return redirect('welcome-page')
         except Exception as e:
-            messages.success(request, 'There was an error, Try again later.....')
-            print(e)
-            return redirect('user-profile')
-        messages.success(request, 'Account has been deleted Successfully')
+            print(f'ERROR IS {e}')
+            return render(request, 'estate/error_page.html')
+    else:
+        messages.info(request, 'You have to be logged in to access this page')
         return redirect('welcome-page')
 
 
@@ -517,21 +592,33 @@ def delete_account(request):
 
 def community(request):
     if request.user.is_authenticated:
-        user=request.user
-        username=user.username
         try:
-            get_room= Room.objects.get(room_name='estatecommunity')
-        except Room.DoesNotExist:
-                get_room= Room(room_name='estatecommunity')
-                get_room.save()
-        community_room=Room.objects.get(room_name='estatecommunity')
-        get_messages=Messages.objects.filter(room=community_room)
-        return render(request, 'estate/community.html', {'text_messages':get_messages,
-                                                        "user":username,
-                                                        'room_name': community_room
-                                                        })
+            user=request.user
+            username=user.username
+            try:
+                get_room= Room.objects.get(room_name='estatecommunity')
+            except Room.DoesNotExist:
+                    get_room= Room(room_name='estatecommunity')
+                    get_room.save()
+            community_room=Room.objects.get(room_name='estatecommunity')
+            get_messages=Messages.objects.filter(room=community_room)
+            return render(request, 'estate/community.html', {'text_messages':get_messages,
+                                                            "user":username,
+                                                            'room_name': community_room
+                                                            })
+        except Exception as e:
+            print(f'ERROR IS {e}')
+            return render(request, 'estate/error_page.html')
     else:
-        messages.success(request, 'You need to be logged in to access this page')
+        messages.warning(request, 'You need to be logged in to access this page')
         return redirect('welcome-page')
 
 
+def estate_agent_profile(request):
+    if request.user.is_authenticated:
+        try:
+            messages.info(request, 'Set up your Profile to gain customers Trust')
+            pass
+        except Exception as e:
+            print(f'ERROR IS {e}')
+            return render(request, 'estate/error_page.html')

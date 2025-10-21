@@ -4,7 +4,6 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
 from .forms import RegistrationForm
 
 
@@ -20,10 +19,10 @@ def login_user(request):
         if user is not None:
             #logins user if the variable user is true
             login(request, user)
-            messages.success(request, ('Welcome Back there are properties you can find at the best prices💪'))
-            return redirect('rent-prop')
+            messages.success(request, (f'Welcome Back {request.user.username}'))
+            return redirect('user-profile')
         else:
-            messages.success(request, ('Incorrect Credentials'))
+            messages.error(request, ('Incorrect Credentials'))
             return redirect('login')
     else:
         return render(request, 'registration/login.html', {})
@@ -48,10 +47,10 @@ def register_user(request):
             #The user is then logged in after registration
             user= authenticate(username= username, password= password)
             login(request, user)
-            messages.success(request, ('Welcome, and Thanks for joining Estate Web, Feel free to look around'))
+            messages.success(request, (f'Welcome {request.user.username}, and Thanks for joining Estate Web, Feel free to look around'))
             return redirect('user-profile')
         else:
-            messages.success(request, ('Make Sure You filled all forms correctly'))
+            messages.error(request, ('Make Sure You filled all input boxes correctly'))
             return render(request, 'registration/register_user.html', {'form': form})
     else:
         #the form that needs to be filled
