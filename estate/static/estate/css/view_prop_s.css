@@ -108,9 +108,9 @@ body {
 }
 
 .main-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 275px;
+    height: 183px;
+    object-fit: contain;
 }
 
 /* Gallery Section */
@@ -144,6 +144,9 @@ body {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    width: 100%;
+    height: 250px;
+    position: relative;
 }
 
 .gallery-item:hover {
@@ -152,9 +155,10 @@ body {
 }
 
 .gallery-item img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
+    width: 275px;
+    height: 183px;
+    object-fit: contain;
+    object-position: center;
     display: block;
 }
 
@@ -439,6 +443,16 @@ body {
     }
 
     .price-section {
-        padding: 2rem 1.5rem
-            }
+        padding: 2rem 1.5rem;
+    }
+    
+    .contact-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-contact {
+        width: 100%;
+        justify-content: center;
+    }
 }

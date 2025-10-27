@@ -2,8 +2,10 @@
 
 from django import forms
 from django.forms import ModelForm
-from .models import PropertyManagementRent, PropertyManagementSale, Feedback
+from .models import *
 from .choices import STATES
+from django.forms import formset_factory, inlineformset_factory
+from django.core.exceptions import ValidationError
 
 
 
@@ -14,13 +16,15 @@ YES_NO_CHOICES=(
 
 
 
+
+
 #Form for putting properties up for sale
 class LeaseForm(ModelForm):
     class Meta:
         model=PropertyManagementRent
         fields=(
                 'house_type','description', 'state','location', 'bedrooms','bathrooms','parking_spaces', 
-                'phone_number','price_range','base_image', 'image1', 'image2', 'image3', 'image4', 'image5', 'image6',  'available', 
+                'phone_number','price_range','base_image'
                 )
         labels={
                 'house_type':'House Type',
@@ -31,14 +35,6 @@ class LeaseForm(ModelForm):
                 'state': 'State',
                 'available': 'Visible To Public',
                 'base_image': 'Add Overview image Of Property ',
-                'image1': 'Add more images',
-                'image2': '',
-                'image3': '',
-                'image4': '',
-                'image5':'',
-                'image6': ''
-                # 'available': 'Is Property Available?'
-                
 }
         widgets= {
                     'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Property Description'}),
@@ -54,14 +50,12 @@ class LeaseForm(ModelForm):
 
 
 
-
-
 #Form for putting properties up for sale
 class SellForm(ModelForm):
     class Meta:
         model=PropertyManagementSale
         fields=('house_type','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces','owner','phone_number', 'price','negotiate',
-                'available', 'base_image', 'image1', 'image2', 'image3', 'image4', 'image5', 'image6' )
+                'available', 'base_image')
         labels={
                 'house_type':'House Type',
                 'property_description': 'Property Description',
@@ -73,12 +67,6 @@ class SellForm(ModelForm):
                 'negotiate': 'Is it Negotiatable?',
                 'available': 'Visible To Public',
                 'base_image': 'Add Overview image Of Property ',
-                'image1': 'Add more images',
-                'image2': '',
-                'image3': '',   
-                'image4': '',
-                'image5':'',
-                'image6': ''
 }
         widgets= {
                     'property_description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'E.g Spacious Family home with modern amenities'}),
@@ -93,9 +81,115 @@ class SellForm(ModelForm):
 }
 
 
+
 class FeedbackForm(ModelForm):
     class Meta:
         model=Feedback
         fields=('feedback',)
         labels={'feedback': '',}
         widgets={'feedback': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'Please enter your feedback'}),}
+
+
+
+class UserInformationForm(forms.ModelForm):
+    class Meta:
+        model = UserInformation
+        fields = ['first_name', 'last_name', 'phone_number', 'email']
+        labels={
+            'first_name': '',
+            'last_name': '',
+            'phone_number': 'Company/Personal Contact Number',
+            'email': 'Company/Personal Email'
+        }
+        widgets={'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Adeola'}),
+                'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Victor'}),
+                }
+
+
+class AgentInformationForm(forms.ModelForm):
+    class Meta:
+        model = Agent_Information
+        fields = ['professional_title', 'professional_introduction', 'call_to_action']
+        labels={
+            'professional_title': '',
+            'professional_Introduction': 'Quick Summary potential client will read',
+            'call_to_action': ''
+        }
+        widgets={'professional_title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Realtor, Property Consultant'}),
+                'professional_introduction': forms.Textarea(attrs={'class': 'form-control'}),
+                'call_to_action': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Lets Discuss your home-buying goals'})}
+
+
+
+
+
+class ExperienceForm(forms.ModelForm):
+    class Meta:
+        model = Experience
+        fields = ['company','title', 'start_date', 'end_date']
+        label={
+            'company': '',
+            'title': '',
+        }
+        widgets = {
+            'company': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Estate Web Inc.'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Real Estate Agent'}),
+            'start_date': forms.DateInput(attrs={'type': 'date','class': 'form-control','placeholder': 'Select start date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date','class': 'form-control','placeholder': 'Select end date'}),
+        }
+
+
+class RentImageForm(forms.ModelForm):
+    class Meta:
+        model= PropertyRentImage
+        fields=('more_images', 'caption')
+        widgets={
+            'caption': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Image Description e.g Swimming Pool'})
+        }
+
+
+class SaleImageForm(forms.ModelForm):
+    class Meta:
+        model= PropertySaleImage
+        fields=('more_images', 'caption')
+        widgets={
+            'caption': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Image Description e.g Swimming Pool'})
+        }
+
+        
+'''formset'''
+ExperienceFormSet = inlineformset_factory(
+    Agent_Information, 
+    Experience,        
+    form= ExperienceForm,
+    extra=1,
+    can_delete=True,
+    
+)
+
+SocialLinksFormSet= inlineformset_factory(
+    Agent_Information,
+    SocialLinks,
+    fields=('social_platform', 'link_to_social'),
+    extra=1,
+    can_delete=True
+)
+
+SaleImageFormSet= inlineformset_factory(
+    PropertyManagementSale,
+    PropertySaleImage,
+    fields=('more_images', 'caption'),
+    extra=3,
+    max_num=3,
+    can_delete=True,
+
+)
+
+RentImageFormSet= inlineformset_factory(
+    PropertyManagementRent,
+    PropertyRentImage,
+    fields=('more_images', 'caption'),
+    extra=3,
+    max_num=3,
+    can_delete=True,
+)

@@ -361,18 +361,204 @@ body {
 }
 
 /* Responsive Design */
+/* ========================================
+   COMPACT RENT PROPERTIES CSS
+   ======================================== */
+
+@media (max-width: 992px) {
+  .properties-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .filter-section form {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header.rent-header {
+    padding: 3rem 0 2.5rem;
+    margin-top: 70px;
+  }
+
+  .header-icon {
+    width: 65px;
+    height: 65px;
+    font-size: 2rem;
+  }
+
+  .header-title {
+    font-size: 2rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .header-stats {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .stat-item {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .filter-section {
+    padding: 1.2rem;
+  }
+
+  .filter-section form {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .properties-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Compact Property Cards */
+  .property-card {
+    border-radius: 10px;
+  }
+
+  .property-image-section {
+    height: 180px;
+  }
+
+  .property-badge {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.7rem;
+    border-radius: 12px;
+  }
+
+  .image-count {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    gap: 0.3rem;
+  }
+
+  .property-content {
+    padding: 1rem;
+  }
+
+  .property-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .property-location {
+    font-size: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .property-location i {
+    font-size: 0.85rem;
+  }
+
+  /* Compact Price Section */
+  .rent-price {
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .rent-price .price-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .rent-price .price-amount {
+    font-size: 1.4rem;
+  }
+
+  /* Compact Features */
+  .property-features {
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .feature-item {
+    padding: 0.5rem 0.7rem;
+    gap: 0.4rem;
+  }
+
+  .feature-item i {
+    font-size: 1rem;
+  }
+
+  .feature-item span {
+    font-size: 0.8rem;
+  }
+
+  /* Compact Meta Info */
+  .property-meta {
+    padding: 0.7rem 0;
+    margin-bottom: 0.8rem;
+  }
+
+  .meta-item {
+    font-size: 0.75rem;
+  }
+
+  .meta-item i {
+    font-size: 0.85rem;
+  }
+
+  /* Compact Action Footer */
+  .property-actions {
+    gap: 0.6rem;
+  }
+
+  .btn-view-property {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-view-property i {
+    font-size: 1rem;
+  }
+
+  .wishlist-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+
+  /* Compact Pagination */
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .page-link {
+    min-width: 38px;
+    height: 38px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
+  }
+}
+
+
+/* ========================================
+   COMPACT MY LISTINGS CSS
+   ======================================== */
+
 @media (max-width: 992px) {
     .listings-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.2rem;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
     }
 
     .listings-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .section-title {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
 }
 
@@ -382,57 +568,118 @@ body {
     }
 
     .listings-container {
-        padding: 2rem 1.5rem;
+        padding: 1.8rem 1.3rem;
     }
 
     .header-icon {
-        width: 70px;
-        height: 70px;
-        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
     }
 
     .listings-title {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
 
     .listings-subtitle {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
     .section-header {
-        gap: 1rem;
+        gap: 0.8rem;
     }
 
     .section-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
     }
 
     .section-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+    }
+
+    .section-count {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
     }
 
     .listings-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Compact Listing Cards */
+    .listing-card {
+        border-radius: 10px;
+    }
+
+    .card-image {
+        height: 160px;
+    }
+
+    .card-content {
+        padding: 1rem;
+        padding-top: 2.2rem;
+    }
+
+    .card-badge {
+        top: 0.7rem;
+        right: 0.7rem;
+        padding: 0.35rem 0.7rem;
+        font-size: 0.7rem;
     }
 
     .property-title {
-        font-size: 1.2rem;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .property-location {
+        font-size: 0.8rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .property-location i {
+        font-size: 0.85rem;
+    }
+
+    .property-details {
+        gap: 0.7rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .detail-item {
+        font-size: 0.8rem;
+        gap: 0.3rem;
+    }
+
+    .detail-item i {
+        font-size: 0.9rem;
+    }
+
+    .card-actions {
+        gap: 0.6rem;
+    }
+
+    .btn-update,
+    .btn-delete {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
     }
 
     .empty-icon {
-        width: 100px;
-        height: 100px;
-        font-size: 3.5rem;
+        width: 90px;
+        height: 90px;
+        font-size: 3rem;
     }
 
     .empty-title {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
     }
 
     .empty-message {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 }
 
@@ -446,99 +693,30 @@ body {
     }
 
     .header-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.7rem;
+        margin-bottom: 0.8rem;
     }
 
     .listings-title {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
 
     .listings-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .section-header {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 0.8rem;
-    }
-
-    .section-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-    }
-
-    .section-title {
-        font-size: 1.2rem;
-    }
-
-    .section-count {
-        font-size: 0.85rem;
-    }
-
-    .card-content {
-        padding: 1.2rem;
-        padding-top: 2.5rem;
-    }
-
-    .card-badge {
-        top: 0.8rem;
-        right: 0.8rem;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-    }
-
-    .property-title {
-        font-size: 1.1rem;
-    }
-
-    .property-location {
-        font-size: 0.9rem;
-    }
-
-    .detail-item {
-        font-size: 0.85rem;
-    }
-
-    .card-actions {
-        flex-direction: column;
         gap: 0.6rem;
     }
 
-    .btn-update,
-    .btn-delete {
-        width: 100%;
-        padding: 0.8rem;
-        font-size: 0.85rem;
-    }
-
-    .empty-icon {
-        width: 80px;
-        height: 80px;
-        font-size: 3rem;
-    }
-
-    .empty-title {
-        font-size: 1.4rem;
-    }
-
-    .empty-message {
-        font-size: 0.95rem;
-    }
-
-    .btn-dashboard {
-        padding: 0.9rem 1.8rem;
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 400px) {
-    .listings-title {
+    .section-icon {
+        width: 45px;
+        height: 45px;
         font-size: 1.3rem;
     }
 
@@ -546,11 +724,126 @@ body {
         font-size: 1.1rem;
     }
 
+    .section-count {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+    }
+
+    /* Extra Compact Listing Cards */
+    .listing-card {
+        border-radius: 8px;
+    }
+
+    .card-image {
+        height: 140px;
+    }
+
+    .card-content {
+        padding: 0.9rem;
+        padding-top: 2rem;
+    }
+
+    .card-badge {
+        top: 0.6rem;
+        right: 0.6rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.65rem;
+    }
+
     .property-title {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .property-location {
+        font-size: 0.75rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .property-details {
+        gap: 0.6rem;
+        margin-bottom: 0.7rem;
     }
 
     .detail-item {
+        font-size: 0.75rem;
+        gap: 0.25rem;
+    }
+
+    .detail-item i {
+        font-size: 0.85rem;
+    }
+
+    .card-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btn-update,
+    .btn-delete {
+        width: 100%;
+        padding: 0.65rem;
         font-size: 0.8rem;
+    }
+
+    .empty-icon {
+        width: 75px;
+        height: 75px;
+        font-size: 2.5rem;
+    }
+
+    .empty-title {
+        font-size: 1.3rem;
+    }
+
+    .empty-message {
+        font-size: 0.85rem;
+    }
+
+    .btn-dashboard {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .listings-title {
+        font-size: 1.2rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    .property-title {
+        font-size: 0.9rem;
+    }
+
+    .detail-item {
+        font-size: 0.7rem;
+    }
+
+    .card-image {
+        height: 130px;
+    }
+
+    .btn-update,
+    .btn-delete {
+        font-size: 0.75rem;
+        padding: 0.6rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .card-image {
+        height: 120px;
+    }
+
+    .property-title {
+        font-size: 0.85rem;
+    }
+
+    .detail-item {
+        font-size: 0.65rem;
     }
 }

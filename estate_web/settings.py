@@ -35,7 +35,6 @@ TEMPLATES = [
 
 # Applications
 INSTALLED_APPS = [
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,7 +44,6 @@ INSTALLED_APPS = [
     'estate',
     'members',
     'widget_tweaks',
-    'channels',
     'django_filters',
     
 ]
@@ -112,24 +110,44 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # For collectstatic
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cloudinary credentials via environment variables
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')  # cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
+
+# If you use CLOUDINARY_URL, the library understands it. We still set these individually for clarity.
+
+# Only use Cloudinary storage in production (recommended)
+USE_CLOUDINARY = os.getenv('USE_CLOUDINARY', 'True').lower() in ('true', '1', 'yes')
+
+if USE_CLOUDINARY:
+    INSTALLED_APPS += [
+        'cloudinary',
+        'cloudinary_storage',
+    ]
+    # Media files go to Cloudinary
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+    # Optional parameters for the storage (folder, allowed formats)
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+        'DEFAULT_FOLDER': 'estate_web',         # optional: where files are stored in your cloud
+        'STATIC_IMAGES': True,
+    }
+
+else:
+    # Local dev fallback (your existing media settings)
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-ASGI_APPLICATION= "estate_web.asgi.application"
-
-# CHANNEL_LAYERS = {
-#     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
-# }
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL")],
-        },
-    },
-}

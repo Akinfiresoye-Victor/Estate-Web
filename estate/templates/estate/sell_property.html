@@ -20,8 +20,8 @@
                 <h2 class="success-title">Property Listed Successfully!</h2>
                 <p class="success-message">Your property has been submitted for sale and will be reviewed shortly.</p>
                 <div class="success-actions">
-                    <a href="{% url 'user-profile' %}" class="btn-dashboard me-2">
-                        <i class="bi bi-speedometer2 me-2"></i>
+                    <a href="{% url 'my-listings' %}" class="btn-dashboard me-2">
+                        <i class="bi bi-card-list"></i>
                         Back to Dashboard
                     </a>
                     <a href="{% url 'sell-property' %}" class="btn-dashboard">
@@ -29,20 +29,6 @@
                         Sell another Property
                     </a>
                 </div>
-            </div>
-
-        {% elif not user.is_authenticated %}
-            <!-- Access Denied -->
-            <div class="access-denied">
-                <div class="denied-icon">
-                    <i class="bi bi-lock-fill"></i>
-                </div>
-                <h2 class="denied-title">Access Denied</h2>
-                <p class="denied-message">You need to be logged in to list properties for sale.</p>
-                <a href="{% url 'login' %}" class="btn-login">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>
-                    Log In Here
-                </a>
             </div>
 
         {% else %}
@@ -62,61 +48,6 @@
                 <form method="post" enctype="multipart/form-data" class="sell-form">
                     {% csrf_token %}
 
-                    <!-- Image Upload Section -->
-                    <div class="form-section">
-                        <div class="section-header">
-                            <i class="bi bi-images"></i>
-                            <h3>Property Images</h3>
-                        </div>
-
-                        <div class="image-formset-container">
-                            {{ formset.management_form }}
-                            {% for image_form in formset %}
-                                <div class="image-form-row">
-                                    {{ image_form.id }}
-                                    
-                                    <div class="image-upload-box">
-                                        <label for="{{ image_form.image.id_for_label }}" class="image-label">
-                                            <i class="bi bi-camera-fill"></i>
-                                            <span>Image {{ forloop.counter }}</span>
-                                        </label>
-                                        {{ image_form.image|add_class:"form-input-file" }}
-                                        
-                                        {% if image_form.image.errors %}
-                                            <div class="field-error">
-                                                {% for error in image_form.image.errors %}
-                                                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-
-                                        {% if image_form.instance.image %}
-                                            <div class="current-image-preview">
-                                                <p class="preview-label">Current image:</p>
-                                                <img src="{{ image_form.instance.image.url }}" alt="Current Image">
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    {% if formset.can_delete %}
-                                        <div class="delete-checkbox">
-                                            {{ image_form.DELETE|add_class:"form-check-input" }}
-                                            <label for="{{ image_form.DELETE.id_for_label }}">Delete this image</label>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if image_form.non_field_errors %}
-                                        <div class="field-error">
-                                            {% for error in image_form.non_field_errors %}
-                                                <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
                     <!-- Property Details Section -->
                     <div class="form-section">
                         <div class="section-header">
@@ -127,22 +58,22 @@
                         {% for field in form %}
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="form-label">
-                                    {% if 'house_type' in field.name%}
+                                    {% if 'house_type' in field.name or 'type' in field.name %}
                                         <i class="bi bi-card-heading me-2"></i>
                                     {% elif 'price' in field.name or 'cost' in field.name %}
                                         <i class="bi bi-currency-dollar me-2"></i>
                                     {% elif 'location' in field.name or 'address' in field.name %}
                                         <i class="bi bi-geo-alt-fill me-2"></i>
-                                    {% elif 'property_description' in field.name %}
+                                    {% elif 'property_description' in field.name or 'description' in field.name %}
                                         <i class="bi bi-text-paragraph me-2"></i>
-                                    {% elif 'phone_number' in field.name%}
+                                    {% elif 'phone_number' in field.name or 'phone' in field.name or 'contact' in field.name %}
                                         <i class="bi bi-telephone-fill me-2"></i>
-                                    {% elif 'bedrooms' in field.name %}
+                                    {% elif 'bedrooms' in field.name or 'bedroom' in field.name %}
                                         <i class="bi bi-door-closed-fill me-2"></i>
-                                    {% elif 'bathrooms' in field.name %}
+                                    {% elif 'bathrooms' in field.name or 'bathroom' in field.name %}
                                         <i class="bi bi-droplet-fill me-2"></i>
-                                    {% elif 'parking_spaces' in field.name %}
-                                        <i class="bi bi-droplet-fill me-2"></i>
+                                    {% elif 'parking' in field.name %}
+                                        <i class="bi bi-car-front-fill me-2"></i>
                                     {% elif 'size' in field.name or 'area' in field.name %}
                                         <i class="bi bi-rulers me-2"></i>
                                     {% elif 'negotiate' in field.name %}
@@ -187,6 +118,117 @@
                             </div>
                         {% endif %}
                     </div>
+                    <!-- Image Upload Section -->
+                    <div class="form-section">
+                        <div class="section-header">
+                            <i class="bi bi-images"></i>
+                            <h3>Property Images</h3>
+                        </div>
+
+                        <div class="image-formset-container">
+                            {{ image_form.management_form }}
+                            {% for img_form in image_form %}
+                                <div class="image-form-row">
+                                    {{ img_form.id }}
+                                    
+                                    <div class="image-upload-box">
+                                        <label for="{{ img_form.more_images.id_for_label }}" class="image-label">
+                                            <i class="bi bi-camera-fill"></i>
+                                            <span>Image {{ forloop.counter }}</span>
+                                        </label>
+                                        {{ img_form.more_images|add_class:"form-input-file" }}
+                                        
+                                        {% if img_form.more_images.errors %}
+                                            <div class="field-error">
+                                                {% for error in img_form.more_images.errors %}
+                                                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+
+                                        {% if img_form.instance.more_images %}
+                                            <div class="current-image-preview">
+                                                <p class="preview-label">Current image:</p>
+                                                <img src="{{ img_form.instance.more_images.url }}" alt="Current Image">
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Caption Field -->
+                                    <div class="caption-field">
+                                        <label for="{{ img_form.caption.id_for_label }}" class="caption-label">
+                                            <i class="bi bi-chat-left-text"></i>
+                                            Caption (Optional)
+                                        </label>
+                                        {{ img_form.caption|add_class:"form-input" }}
+                                        {% if img_form.caption.errors %}
+                                            <div class="field-error">
+                                                {% for error in img_form.caption.errors %}
+                                                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if image_form.can_delete %}
+                                        <div class="delete-checkbox">
+                                            {{ img_form.DELETE|add_class:"form-check-input" }}
+                                            <label for="{{ img_form.DELETE.id_for_label }}">Delete this image</label>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if img_form.non_field_errors %}
+                                        <div class="field-error">
+                                            {% for error in img_form.non_field_errors %}
+                                                <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                <!-- Professional Crop Modal -->
+                <div id="cropContainer" class="crop-modal-overlay" style="display:none;">
+                    <div class="crop-modal-container">
+                        <!-- Modal Header -->
+                        <div class="crop-modal-header">
+                            <h3 class="crop-modal-title">
+                                <i class="bi bi-crop"></i>
+                                Crop Your Image
+                            </h3>
+                            <button id="cropCancel" type="button" class="crop-close-btn">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="crop-modal-body">
+                            <div class="crop-info-banner">
+                                <i class="bi bi-info-circle-fill"></i>
+                                <p class="crop-info-text">
+                                    Drag to reposition and use the corners to resize your image. The image will be optimized to 1600×833 pixels for best display quality.
+                                </p>
+                            </div>
+                            
+                            <div class="crop-preview-container">
+                                <img id="cropPreview" alt="Image to crop">
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="crop-modal-footer">
+                            <button id="cropCancelBtn" type="button" class="crop-btn crop-btn-secondary">
+                                <i class="bi bi-x-circle"></i>
+                                Cancel
+                            </button>
+                            <button id="cropConfirm" type="button" class="crop-btn crop-btn-primary">
+                                <i class="bi bi-check-circle"></i>
+                                Crop & Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                     <!-- Submit Button -->
                     <div class="form-actions">
@@ -205,5 +247,173 @@
 
 <!-- Include Bootstrap Icons if not already in base.html -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css">
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+
+<script>
+// Complete JavaScript for Sell Property Form
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    const maxMB = 5;
+    const cropContainer = document.getElementById('cropContainer');
+    const cropPreview = document.getElementById('cropPreview');
+    const cropConfirm = document.getElementById('cropConfirm');
+    const cropCancel = document.getElementById('cropCancel');
+    const cropCancelTop = document.getElementById('cropCancelTop');
+    let cropper;
+    let currentInput;
+    let formSubmitted = false;
+
+    // Disable browser confirmation when leaving page
+    window.onbeforeunload = function() {
+        if (!formSubmitted) {
+            return undefined; // Don't show confirmation
+        }
+    };
+
+    // Mark form as submitted
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            formSubmitted = true;
+        });
+    }
+
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function(e) {
+            if (!input.files.length) return;
+
+            const file = input.files[0];
+            
+            // Validate file size
+            if (file.size > maxMB * 1024 * 1024) {
+                alert(`File "${file.name}" is too large! Max size is ${maxMB} MB.`);
+                input.value = "";
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert(`File "${file.name}" is not an image.`);
+                input.value = "";
+                return;
+            }
+
+            // Determine if this is base_image or gallery image
+            const isBaseImage = input.name.includes('base_image');
+            const aspectRatio = isBaseImage ? 1600 / 833 : 1200 / 900;
+            const cropWidth = isBaseImage ? 1600 : 1200;
+            const cropHeight = isBaseImage ? 833 : 900;
+
+            // Show preview for cropping
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                cropPreview.src = e.target.result;
+                cropContainer.style.display = 'flex';
+                
+                // Destroy previous cropper if exists
+                if (cropper) {
+                    cropper.destroy();
+                }
+                
+                // Initialize new cropper
+                cropper = new Cropper(cropPreview, {
+                    aspectRatio: aspectRatio,
+                    viewMode: 2,
+                    autoCropArea: 1,
+                    responsive: true,
+                    dragMode: 'move',
+                    guides: true,
+                    background: true,
+                    center: true,
+                    highlight: true,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                });
+
+                currentInput = input;
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // Confirm crop button
+    cropConfirm.addEventListener('click', function() {
+        if (!cropper || !currentInput) return;
+        
+        // Determine dimensions based on input type
+        const isBaseImage = currentInput.name.includes('base_image');
+        const cropWidth = isBaseImage ? 1600 : 1200;
+        const cropHeight = isBaseImage ? 833 : 900;
+        
+        const canvas = cropper.getCroppedCanvas({ 
+            width: cropWidth, 
+            height: cropHeight,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+        
+        canvas.toBlob(function(blob) {
+            const newFile = new File([blob], currentInput.files[0].name, { 
+                type: 'image/jpeg',
+                lastModified: Date.now()
+            });
+            
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(newFile);
+            currentInput.files = dataTransfer.files;
+
+            // Close modal
+            cropContainer.style.display = 'none';
+            cropper.destroy();
+            cropper = null;
+            currentInput = null;
+        }, 'image/jpeg', 0.9);
+    });
+
+    // Cancel crop button (footer)
+    cropCancel.addEventListener('click', function() {
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        cropContainer.style.display = 'none';
+        if (currentInput) {
+            currentInput.value = "";
+            currentInput = null;
+        }
+    });
+
+    // Cancel crop button (header X)
+    if (cropCancelTop) {
+        cropCancelTop.addEventListener('click', function() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            cropContainer.style.display = 'none';
+            if (currentInput) {
+                currentInput.value = "";
+                currentInput = null;
+            }
+        });
+    }
+
+    // Close modal when clicking outside
+    cropContainer.addEventListener('click', function(e) {
+        if (e.target === cropContainer) {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            cropContainer.style.display = 'none';
+            if (currentInput) {
+                currentInput.value = "";
+                currentInput = null;
+            }
+        }
+    });
+});
 
 {% endblock %}

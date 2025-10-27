@@ -105,12 +105,14 @@ body {
     width: 100%;
     height: 500px;
     overflow: hidden;
+    background: #f8f9fa;
 }
 
 .main-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
 
 /* Gallery Section */
@@ -144,6 +146,8 @@ body {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    background: #fff;
+    height: 250px;
 }
 
 .gallery-item:hover {
@@ -153,7 +157,7 @@ body {
 
 .gallery-item img {
     width: 100%;
-    height: 250px;
+    height: 100%;
     object-fit: cover;
     display: block;
 }
@@ -313,6 +317,7 @@ body {
     font-size: 0.95rem;
     color: #2e7d32;
     font-weight: 600;
+    text-align: right;
 }
 
 /* Contact Section */
@@ -324,6 +329,7 @@ body {
     display: flex;
     gap: 1.2rem;
     justify-content: center;
+    flex-wrap: wrap;
     margin-top: 1.5rem;
 }
 
@@ -399,6 +405,34 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Current Image Preview (for forms) */
+.current-image-preview {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.current-image-preview img {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin: 0 auto;
+}
+
+/* Property Images in listings */
+.property-image,
+.listing-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    background-color: #f8f9fa;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
     .info-grid {
@@ -416,6 +450,10 @@ body {
 
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .gallery-item {
+        height: 220px;
     }
 }
 
@@ -460,13 +498,13 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .gallery-item img {
-        height: 220px;
+    .gallery-item {
+        height: 250px;
     }
 
     .contact-buttons {
         flex-direction: column;
-        width: 100%;
+        align-items: stretch;
     }
 
     .btn-contact {
@@ -570,3 +608,6 @@ body {
         font-size: 0.95rem;
     }
 }
+
+
+

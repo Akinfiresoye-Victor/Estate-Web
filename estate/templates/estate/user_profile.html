@@ -97,11 +97,15 @@
         <span class="card-icon">📋</span>
         <div class="card-body d-flex flex-column">
           <h5>
-            My Applications
-            <span class="coming-soon-badge">Coming Soon</span>
+            Grow your career
+            <span class="coming-soon-badge">New</span>
           </h5>
-          <p class="card-text flex-grow-1">Follow up on rental or purchase applications you submitted.</p>
-          <a href="#" class="btn btn-outline-custom mt-auto" style="opacity: 0.6; cursor: not-allowed;">Review Applications</a>
+          <p class="card-text flex-grow-1">Set up Your work Profile to boost your career</p>
+          {% if info %}
+            <a href="{%url 'estate-agent-form'%}" class="btn btn-outline-custom mt-auto">Update Work Profile</a>
+          {% else %}
+            <a href="{%url 'estate-agent-form'%}" class="btn btn-outline-custom mt-auto">Set Work Profile</a>
+          {%endif%}
         </div>
       </div>
     </div>

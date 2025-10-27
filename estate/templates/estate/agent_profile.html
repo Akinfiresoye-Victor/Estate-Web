@@ -1,0 +1,247 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+{% load property_extras %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/view_agent_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="agent-view-wrapper">
+  <div class="agent-view-container">
+
+    {% if information %}
+    <!-- Agent Header -->
+    <div class="agent-header">
+      <div class="header-background"></div>
+      <div class="header-content">
+        <div class="agent-avatar">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div class="agent-basic-info">
+          <h1 class="agent-name">
+            {{ information.personal_info.first_name }} {{ information.personal_info.last_name }}
+          </h1>
+          <p class="agent-title">{{ information.professional_title }}</p>
+          <div class="agent-badges">
+            <span class="badge-item">
+              <i class="bi bi-shield-check"></i>
+              Verified Agent
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Contact Bar -->
+    <div class="quick-contact-bar">
+      <a href="tel:{{ information.personal_info.phone_number }}" class="contact-item">
+        <i class="bi bi-telephone-fill"></i>
+        <span>{{ information.personal_info.phone_number }}</span>
+      </a>
+      <a href="mailto:{{ information.personal_info.email }}" class="contact-item">
+        <i class="bi bi-envelope-fill"></i>
+        <span>{{ information.personal_info.email }}</span>
+      </a>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      
+      <!-- Left Column -->
+      <div class="left-column">
+        
+        <!-- About Section -->
+        <div class="info-card">
+          <div class="card-header">
+            <i class="bi bi-person-lines-fill"></i>
+            <h2>About Me</h2>
+          </div>
+          <div class="card-body">
+            <p class="intro-text">{{ information.professional_introduction }}</p>
+          </div>
+        </div>
+
+        <!-- Call to Action -->
+        {% if information.call_to_action %}
+        <div class="cta-card">
+          <div class="cta-icon">
+            <i class="bi bi-chat-dots-fill"></i>
+          </div>
+          <p class="cta-text">{{ information.call_to_action }}</p>
+          <a href="tel:{{ information.personal_info.phone_number }}" class="btn-cta">
+            <i class="bi bi-telephone-fill me-2"></i>
+            Contact Now
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Experience Section -->
+        {% if experience %}
+        <div class="info-card">
+          <div class="card-header">
+            <i class="bi bi-briefcase-fill"></i>
+            <h2>Work Experience</h2>
+          </div>
+          <div class="card-body">
+            <div class="experience-timeline">
+              {% for exp in experience %}
+              <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                  <h3 class="experience-title">{{ exp.title }}</h3>
+                  <p class="experience-company">
+                    <i class="bi bi-building me-2"></i>
+                    {{ exp.company }}
+                  </p>
+                  {% if exp.past_experence %}
+                  <p class="experience-milestone">
+                    <i class="bi bi-trophy me-2"></i>
+                    {{ exp.past_experence }}
+                  </p>
+                  {% endif %}
+                  <p class="experience-dates">
+                    <i class="bi bi-calendar-range me-2"></i>
+                    {{ exp.start_date|date:"M Y" }} - 
+                    {% if exp.end_date %}
+                      {{ exp.end_date|date:"M Y" }}
+                    {% else %}
+                      Present
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        
+        <!-- Contact Card -->
+        <div class="info-card sticky-card">
+          <div class="card-header">
+            <i class="bi bi-telephone-inbound-fill"></i>
+            <h2>Contact Information</h2>
+          </div>
+          <div class="card-body">
+            <div class="contact-info-list">
+              <div class="contact-info-item">
+                <div class="contact-icon">
+                  <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <span class="contact-label">Full Name</span>
+                  <span class="contact-value">
+                    {{ information.personal_info.first_name }} {{ information.personal_info.last_name }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="contact-info-item">
+                <div class="contact-icon">
+                  <i class="bi bi-telephone-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <span class="contact-label">Phone Number</span>
+                  <span class="contact-value">{{ information.personal_info.phone_number }}</span>
+                </div>
+              </div>
+
+              <div class="contact-info-item">
+                <div class="contact-icon">
+                  <i class="bi bi-envelope-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <span class="contact-label">Email Address</span>
+                  <span class="contact-value">{{ information.personal_info.email }}</span>
+                </div>
+              </div>
+
+              <div class="contact-info-item">
+                <div class="contact-icon">
+                  <i class="bi bi-briefcase-fill"></i>
+                </div>
+                <div class="contact-details">
+                  <span class="contact-label">Position</span>
+                  <span class="contact-value">{{ information.professional_title }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-actions">
+              <a href="tel:{{ information.personal_info.phone_number }}" class="btn-contact primary">
+                <i class="bi bi-telephone-fill me-2"></i>
+                Call Now
+              </a>
+              <a href="mailto:{{ information.personal_info.email }}" class="btn-contact secondary">
+                <i class="bi bi-envelope-fill me-2"></i>
+                Send Email
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        {% if network %}
+        <div class="info-card">
+          <div class="card-header">
+            <i class="bi bi-share-fill"></i>
+            <h2>Connect With Me</h2>
+          </div>
+          <div class="card-body">
+            <div class="social-links">
+              {% for social in network %}
+              <a href="{{ social.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
+                <div class="social-icon">
+                  {% if 'facebook' in social.social_platform|lower %}
+                    <i class="bi bi-facebook"></i>
+                  {% elif 'twitter' in social.social_platform|lower or 'x' in social.social_platform|lower %}
+                    <i class="bi bi-twitter-x"></i>
+                  {% elif 'instagram' in social.social_platform|lower %}
+                    <i class="bi bi-instagram"></i>
+                  {% elif 'linkedin' in social.social_platform|lower %}
+                    <i class="bi bi-linkedin"></i>
+                  {% elif 'youtube' in social.social_platform|lower %}
+                    <i class="bi bi-youtube"></i>
+                  {% elif 'whatsapp' in social.social_platform|lower %}
+                    <i class="bi bi-whatsapp"></i>
+                  {% else %}
+                    <i class="bi bi-link-45deg"></i>
+                  {% endif %}
+                </div>
+                <span class="social-name">{{ social.social_platform }}</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+    {% else %}
+    <!-- No Agent Information -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-person-x"></i>
+      </div>
+      <h2 class="empty-title">Agent Profile Not Found</h2>
+      <p class="empty-message">The agent profile you're looking for doesn't exist or has been removed.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+{% endblock %}

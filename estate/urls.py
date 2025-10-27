@@ -1,8 +1,7 @@
 '''Handles the Wesite routing'''
-
-
 from django.urls import path
 from . import views
+
 
 
 urlpatterns = [
@@ -30,11 +29,13 @@ urlpatterns = [
     path('feedback', views.feedbacks, name='feedback'),
     path('latest_news', views.articles, name='articles'),
     path('about_us', views.about_us, name='about'),
-    path('community', views.community, name='community'),
-    path('admin_side', views.view_feedbacks, name='view-feedbacks'),
+    path('superior/feedbacks', views.view_feedbacks, name='view-feedbacks'),
     path('delete/<feedback_id>', views.delete_feedback, name='delete-feedback'),
-    path('myprofile', views.estate_agent_profile, name='estate-agent')
-    
-    # path('best_deals_rent', views.best_deals_on_lease, name="best-deals-rent"),
-    # path('best_deals_sale', views.best_deals_on_sale, name="best-deals-sale"),
+    path('agent_form', views.estate_agent_form, name='estate-agent-form'),
+    path('agent_profile/<agent_id>', views.estate_agent_profile, name='estate-agent-profile'),
+    path('superior/dashboard', views.admin_dashboard, name='admin-dashboard')
 ]
+
+
+
+# TNWbnvPVynkn-yrkIY3UcjKNp0g

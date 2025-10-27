@@ -67,3 +67,10 @@ TYPE=[
     ('Detached House','Detached House'),
     
 ]
+
+SOCIAL_LINKS=[
+    ('X', 'X'),
+    ('Linkdin', 'Linkdin'),
+    ('Instagram', 'Instagram'),
+    ('Other', 'Other')
+]

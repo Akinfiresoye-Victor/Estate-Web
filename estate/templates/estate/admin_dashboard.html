@@ -1,0 +1,368 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estate/css/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="admin-dashboard-wrapper">
+  <div class="admin-dashboard-container">
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="bi bi-speedometer2"></i>
+        </div>
+        <div class="header-text">
+          <h1 class="dashboard-title">Admin Dashboard</h1>
+          <p class="dashboard-subtitle">Real-time analytics and system overview</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-header" onclick="window.location.reload()">
+          <i class="bi bi-arrow-clockwise me-2"></i>
+          Refresh
+        </button>
+        <button class="btn-header primary">
+          <i class="bi bi-download me-2"></i>
+          Export Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <!-- Total Users -->
+      <div class="stat-card users-card">
+        <div class="stat-icon">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Total Users</h3>
+          <p class="stat-value">{{ users|default:"0" }}</p>
+          <div class="stat-footer">
+            <span class="stat-trend positive">
+              <i class="bi bi-arrow-up"></i> {{users_inc_perc|floatformat:3}}%
+            </span>
+          </div>
+        </div>
+        <div class="stat-action">
+          <a href="#" class="btn-stat">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Properties on Sale -->
+      <div class="stat-card sale-card">
+        <div class="stat-icon">
+          <i class="bi bi-tag-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Properties on Sale</h3>
+          <p class="stat-value">{{ on_sale_count|default:"0" }}</p>
+          <div class="stat-footer">
+            <span class="stat-trend positive">
+              {%if sale_perc < 0%}
+              <i class="bi bi-arrow-down"></i> {{sale_perc|floatformat:3}}%
+              {%else%}
+              <i class="bi bi-arrow-up"></i> {{sale_perc|floatformat:3}}%
+              {%endif%}
+            </span>
+          </div>
+        </div>
+        <div class="stat-action">
+          <a href="#" class="btn-stat">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Properties on Rent -->
+      <div class="stat-card rent-card">
+        <div class="stat-icon">
+          <i class="bi bi-key-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Properties on Rent</h3>
+          <p class="stat-value">{{ on_lease_count|default:"0" }}</p>
+          <div class="stat-footer">
+            <span class="stat-trend positive">
+              {%if rent_perc < 0 %}
+              <i class="bi bi-arrow-down"></i> {{rent_perc|floatformat:3}}%
+              {%else%}
+              <i class="bi bi-arrow-up"></i> {{rent_perc|floatformat:3}}%
+              {%endif%}
+            </span>
+          </div>
+        </div>
+        <div class="stat-action">
+          <a href="#" class="btn-stat">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Total Listings -->
+      <div class="stat-card total-card">
+        <div class="stat-icon">
+          <i class="bi bi-house-door-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Total Listings</h3>
+          <p class="stat-value">{{ total_listings|default:"0" }}</p>
+          <div class="stat-footer">
+            <span class="stat-trend positive">
+              <i class="bi bi-arrow-up"></i> {{total_perc|floatformat:3 }}%
+            </span>
+          </div>
+        </div>
+        <div class="stat-action">
+          <a href="#" class="btn-stat">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+
+      <div class="stat-card total-card">
+        <div class="stat-icon">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Daily Active users</h3>
+          <p class="stat-value">{{ dau|default:"0" }}</p>
+        </div>
+        <div class="stat-action">
+          <a href="#" class="btn-stat">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+
+      <!-- Quick Actions -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-lightning-fill"></i>
+            <h2>Quick Actions</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="quick-actions-grid">
+            <a href="{%url 'register-user'%}" class="action-item">
+              <div class="action-icon blue">
+                <i class="bi bi-person-plus-fill"></i>
+              </div>
+              <span class="action-text">Add User</span>
+            </a>
+            <a href="{%url 'sell-property'%}" class="action-item">
+              <div class="action-icon green">
+                <i class="bi bi-house-add-fill"></i>
+              </div>
+              <span class="action-text">Add Property</span>
+            </a>
+            <a href="#" class="action-item">
+              <div class="action-icon purple">
+                <i class="bi bi-gear-fill"></i>
+              </div>
+              <span class="action-text">Settings</span>
+            </a>
+            <a href="#" class="action-item">
+              <div class="action-icon orange">
+                <i class="bi bi-file-earmark-text-fill"></i>
+              </div>
+              <span class="action-text">Reports</span>
+            </a>
+            <a href="#" class="action-item">
+              <div class="action-icon red">
+                <i class="bi bi-flag-fill"></i>
+              </div>
+              <span class="action-text">Flagged Items</span>
+            </a>
+            <a href="{%url 'view-feedbacks'%}" class="action-item">
+              <div class="action-icon teal">
+                <i class="bi bi-chat-dots-fill"></i>
+              </div>
+              <span class="action-text">Feedbacks</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-clock-history"></i>
+            <h2>Recent Activity</h2>
+          </div>
+          <a href="#" class="card-header-link">View All</a>
+        </div>
+        <div class="card-body">
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon blue">
+                <i class="bi bi-person-check"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-text">New user registered</p>
+                <span class="activity-time">{{user_reg_time}}</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon green">
+                <i class="bi bi-house-check"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-text">Property listed for sale</p>
+                <span class="activity-time">{{sale_time}}</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon purple">
+                <i class="bi bi-key"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-text">Rental property added</p>
+                <span class="activity-time">{{rent_time}}</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon orange">
+                <i class="bi bi-pencil-square"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-text">Property details updated</p>
+                <span class="activity-time">{{final_update_time}}</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon green">
+                <i class="bi bi-arrow-down-up"></i>
+              </div>
+              <div class="activity-content">
+                <p class="activity-text">Properties Listed Today</p>
+                <span class="activity-time">{{today_property}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-hdd-fill"></i>
+            <h2>System Status</h2>
+          </div>
+          <span class="status-badge online">
+            <i class="bi bi-circle-fill"></i> Online
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="status-list">
+            <div class="status-item">
+              <div class="status-info">
+                <span class="status-label">Database</span>
+                <span class="status-value">Operational</span>
+              </div>
+              <div class="status-bar">
+                <div class="status-progress" style="width: 95%;"></div>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-info">
+                <span class="status-label">Server Load</span>
+                <span class="status-value">42% Used</span>
+              </div>
+              <div class="status-bar">
+                <div class="status-progress" style="width: 42%;"></div>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-info">
+                <span class="status-label">Storage</span>
+                <span class="status-value">68% Used</span>
+              </div>
+              <div class="status-bar warning">
+                <div class="status-progress" style="width: 68%;"></div>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-info">
+                <span class="status-label">API Response Time</span>
+                <span class="status-value">145ms</span>
+              </div>
+              <div class="status-bar">
+                <div class="status-progress" style="width: 85%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Management Links -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+            <h2>Management</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="management-grid">
+            <a href="#" class="management-item">
+              <i class="bi bi-people"></i>
+              <span>User Management</span>
+              <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="{% url 'my-listings'%} " class="management-item">
+              <i class="bi bi-house"></i>
+              <span>Property Management</span>
+              <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="#" class="management-item">
+              <i class="bi bi-cash-stack"></i>
+              <span>Transactions</span>
+              <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="#" class="management-item">
+              <i class="bi bi-star"></i>
+              <span>Reviews & Ratings</span>
+              <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="#" class="management-item">
+              <i class="bi bi-envelope"></i>
+              <span>Messages</span>
+              <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="#" class="management-item">
+              <i class="bi bi-shield-check"></i>
+              <span>Security Settings</span>
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+{% endblock %}
