@@ -20,7 +20,7 @@ class PropertyManagementSale(models.Model):
     price = models.DecimalField(max_digits=100,null=True, blank=True, decimal_places=2)
     bedrooms = models.IntegerField(default=1, blank=True, null=True)
     bathrooms = models.IntegerField(default=1, blank=True, null=True)
-    parking_spaces=models.IntegerField(default=0, blank=True, null=True)
+    parking_spaces=models.IntegerField(default=0)
     available= models.BooleanField('Available', default=True)
     last_updated = models.DateTimeField(auto_now=True)#To pull out the last time the particular model was actually updated 
     whilist=models.BooleanField('Add to Whilist', default=False)
@@ -51,7 +51,7 @@ class PropertyManagementRent(models.Model):
     available=models.BooleanField('Availble', default=True)
     bedrooms = models.IntegerField(default=1, blank=True, null=True)
     bathrooms = models.IntegerField(default=1, blank=True, null=True)
-    parking_spaces=models.IntegerField(default=0, blank=True, null=True)
+    parking_spaces=models.IntegerField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
     whilist=models.BooleanField('Add to Whilist', default=False)
     compare=models.BooleanField('Compare', default=False)

@@ -391,7 +391,6 @@ def view_property_on_sale(request, property_id):
             
             #if the owner of listing is an home owner
             except Agent_Information.DoesNotExist:
-                messages.info(request, 'Image Problem will be fixed soon stay alert for future updates')
                 messages.info(request, 'Listing Is handled by the home owner')
                 return render(request, 'estate/view_property_s.html', {'property':property, 'email':email})
             
@@ -418,13 +417,11 @@ def view_property_on_lease(request, property_id):
                 
                 if info:
                     info=info.personal_info
-                messages.info(request, 'Image Problem will be fixed soon stay alert for future updates')
                 messages.info(request, 'Listing Is handled by an agent')
                 return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 'info':info, 'email':email})
             
             #if not
             except Agent_Information.DoesNotExist:
-                messages.info(request, 'Image Problem will be fixed soon stay alert for future updates')
                 messages.info(request, 'Listing Is handled by the home owner')
                 return render(request, 'estate/view_property_r.html', {'property':property, 'email':email})
             

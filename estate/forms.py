@@ -45,7 +45,7 @@ class LeaseForm(ModelForm):
                     'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
                     'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-                    'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+                    'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
 }
 
 
@@ -77,7 +77,7 @@ class SellForm(ModelForm):
                     # 'state': forms.ChoiceField(attrs={'class': 'form-control'}),
                     'negotiate': forms.Select(attrs={'class': 'form-control'}),
                     'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
-                    'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+                    'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
 }
 
 

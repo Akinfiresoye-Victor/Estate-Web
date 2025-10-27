@@ -124,8 +124,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Only use Cloudinary storage in production (recommended)
-USE_CLOUDINARY = config('USE_CLOUDINARY', cast=bool, default=False)
-
+USE_CLOUDINARY = config('USE_CLOUDINARY', cast=bool)
+print(f'Cloud media active?> {USE_CLOUDINARY}')
 # Default primary key field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -154,7 +154,3 @@ else:
 # Local dev fallback (your existing media settings)
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    STORAGES = {
-        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
-    }

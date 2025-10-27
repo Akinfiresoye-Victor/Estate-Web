@@ -110,7 +110,7 @@ body {
 .main-image {
     width: 275px;
     height: 183px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 /* Gallery Section */
@@ -157,7 +157,7 @@ body {
 .gallery-item img {
     width: 275px;
     height: 183px;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
     display: block;
 }
