@@ -2,6 +2,9 @@ from pathlib import Path
 import os
 from decouple import config, Csv
 import dj_database_url
+import cloudinary_storage
+
+
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +48,8 @@ INSTALLED_APPS = [
     'members',
     'widget_tweaks',
     'django_filters',
-    
+    'cloudinary',
+    'cloudinary_storage'
 ]
 
 # Middleware
@@ -112,42 +116,45 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Cloudinary credentials via environment variables
-CLOUDINARY_URL = config('CLOUDINARY_URL')  # cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME')
-CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY')
-CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET')
 
-# If you use CLOUDINARY_URL, the library understands it. We still set these individually for clarity.
+
+
+
 
 # Only use Cloudinary storage in production (recommended)
-USE_CLOUDINARY = config('USE_CLOUDINARY')
-
-if USE_CLOUDINARY:
-    INSTALLED_APPS += [
-        'cloudinary',
-        'cloudinary_storage',
-    ]
-    # Media files go to Cloudinary
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-
-    # Optional parameters for the storage (folder, allowed formats)
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
-        'API_KEY': CLOUDINARY_API_KEY,
-        'API_SECRET': CLOUDINARY_API_SECRET,
-        'DEFAULT_FOLDER': 'estate_web',         # optional: where files are stored in your cloud
-        'STATIC_IMAGES': True,
-    }
-
-else:
-    # Local dev fallback (your existing media settings)
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+USE_CLOUDINARY = config('USE_CLOUDINARY', cast=bool, default=False)
 
 # Default primary key field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
+if USE_CLOUDINARY:
+    CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME')
+    CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY')
+    CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET')
+
+    CLOUDINARY_STORAGE={
+        'CLOUD_NAME':CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+    }
+
+    STORAGES = {
+        "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }
+
+
+
+else:
+
+# Local dev fallback (your existing media settings)
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    }

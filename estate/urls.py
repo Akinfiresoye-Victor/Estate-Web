@@ -37,5 +37,3 @@ urlpatterns = [
 ]
 
 
-
-# TNWbnvPVynkn-yrkIY3UcjKNp0g

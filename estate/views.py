@@ -169,6 +169,7 @@ def lease_property(request):
                     image_form=RentImageFormSet(request.POST or None, request.FILES or None)
                     with transaction.atomic():
                         if prop_form.is_valid() and image_form.is_valid():
+                            print(prop_form.errors)
                             landlord= prop_form.save(commit=False)
                             landlord.user_id= request.user.id
                             landlord.save()
@@ -266,6 +267,7 @@ def update_property_rent(request, property_id):
                     prop_form.save()
                     image_form.save()
                     messages.success(request, "Property Updated Successfully")
+                    print(property.base_image.url)
                     return redirect('my-listings')
                 return render(request, 'estate/update_property.html', {'property': property, 'form': prop_form, 'images': image_form})
             
