@@ -115,15 +115,15 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Cloudinary credentials via environment variables
-CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')  # cloudinary://API_KEY:API_SECRET@CLOUD_NAME
-CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
-CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY')
-CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
+CLOUDINARY_URL = config('CLOUDINARY_URL')  # cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET')
 
 # If you use CLOUDINARY_URL, the library understands it. We still set these individually for clarity.
 
 # Only use Cloudinary storage in production (recommended)
-USE_CLOUDINARY = os.getenv('USE_CLOUDINARY', 'True').lower() in ('true', '1', 'yes')
+USE_CLOUDINARY = config('USE_CLOUDINARY')
 
 if USE_CLOUDINARY:
     INSTALLED_APPS += [
