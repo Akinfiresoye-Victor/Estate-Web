@@ -28,7 +28,8 @@ Estate-Web is a simple Django-based website that helps users find properties wit
 
 ## 🚀 Getting Started
 
-1. Clone the repo  
+1. Clone the repo(Navigate to the directory of your choice on the system before you run this commands)
+
    ```bash
    git clone https://github.com/Akinfiresoye-Victor/Estate-Web.git
    cd Estate-Web
