@@ -38,4 +38,12 @@ Estate-Web is a simple Django-based website that helps users find properties wit
    python -m venv env
    env/Scripts/activate
    pip install -r requirements
-   python manage.py runserver
+
+3. Set Up your env environment
+* create a .env file
+* Look in the env.text file and write it exactly in that format, (ill provide the variables personally)
+* run 
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+```
