@@ -45,4 +45,5 @@ Estate-Web is a simple Django-based website that helps users find properties wit
 * run 
    ```bash
    python manage.py migrate
-```
+   python manage.py runserver
+* Type localhost:8000 in your browser to see result
