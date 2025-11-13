@@ -44,6 +44,5 @@ Estate-Web is a simple Django-based website that helps users find properties wit
 * Look in the env.text file and write it exactly in that format, (ill provide the variables personally)
 * run 
    ```bash
-   python manage.py makemigrations
    python manage.py migrate
 ```
