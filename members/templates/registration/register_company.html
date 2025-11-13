@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
   {%load static%}
   <link rel="stylesheet" href="{% static 'members/css/register.css' %}">
 </head>
@@ -62,11 +63,11 @@
         <!-- Brand Header -->
         <div class="register-header">
           <div class="brand-logo">
-            <i class="bi bi-house-door-fill"></i>
+            <i class="bi bi-building"></i>
           </div>
           <h1 class="brand-name">Estate Web</h1>
           <h2 class="register-title">Create Account</h2>
-          <p class="register-subtitle">Join us to discover your dream property</p>
+          <p class="register-subtitle">Manage your Organization seamlessly</p>
         </div>
 
         <!-- Error Alert -->
@@ -86,63 +87,60 @@
           </div>
         {% endif %}
 
-        <!-- Register Form -->
-        <form method="POST" action="{% url 'register-user' %}" class="register-form">
-          {% csrf_token %}
 
-          <!-- First Name & Last Name Row -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                <i class="bi bi-person-fill me-2"></i>First Name
-              </label>
-              {{ form.first_name }}
-            </div>
-            <div class="form-group">
-              <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                <i class="bi bi-person-fill me-2"></i>Last Name
-              </label>
-              {{ form.last_name }}
-            </div>
-          </div>
+<!-- Register Form -->
+        <form method="POST" action="{% url 'register-company' %}" class="register-form">
+        {% csrf_token %}
 
-          <!-- Username & Email Row -->
-          <div class="form-row">
+        <!-- Company Name -->
+        <div class="form-group mb-3">
+            <label for="{{ form.first_name.id_for_label }}" class="form-label">
+            <i class="bbi bi-person-fill me-2"></i>First Name
+            </label>
+            {{ form.first_name }}
+            <label for="{{ form.last_name.id_for_label }}" class="form-label">
+            <i class="bi bi-person-fill me-2"></i>Last Name
+            </label>
+            {{ form.last_name }}
+        </div>
+
+        <!-- Username Row -->
+        <div class="form-row">
             <div class="form-group">
-              <label for="{{ form.username.id_for_label }}" class="form-label">
+            <label for="{{ form.username.id_for_label }}" class="form-label">
                 <i class="bi bi-at me-2"></i>Username
-              </label>
-              {{ form.username }}
+            </label>
+            {{ form.username }}
             </div>
-          </div>
+        </div>
 
-          <!-- Password & Confirm Password Row -->
-          <div class="form-row">
+        <!-- Password & Confirm Password Row -->
+        <div class="form-row">
             <div class="form-group">
-              <label for="{{ form.password1.id_for_label }}" class="form-label">
+            <label for="{{ form.password1.id_for_label }}" class="form-label">
                 <i class="bi bi-lock-fill me-2"></i>Password
-              </label>
-              {{ form.password1 }}
+            </label>
+            {{ form.password1 }}
             </div>
             <div class="form-group">
-              <label for="{{ form.password2.id_for_label }}" class="form-label">
+            <label for="{{ form.password2.id_for_label }}" class="form-label">
                 <i class="bi bi-shield-lock-fill me-2"></i>Confirm Password
-              </label>
-              {{ form.password2 }}
+            </label>
+            {{ form.password2 }}
             </div>
-          </div>
+        </div>
 
-          <button type="submit" class="btn-submit">
-            <span>Create Account</span>
+        <button type="submit" class="btn-submit">
+            <span>Create Company Account</span>
             <i class="bi bi-arrow-right-circle-fill"></i>
-          </button>
+        </button>
 
-          <div class="login-section">
+        <div class="login-section">
             <p class="login-text">Already have an account?</p>
             <a href="{% url 'login' %}" class="btn-login">
-              Sign In
+            Sign In
             </a>
-          </div>
+        </div>
         </form>
 
       </div>
@@ -152,19 +150,19 @@
         <div class="side-content">
           <i class="bi bi-building-fill-check"></i>
           <h3>Start Your Journey</h3>
-          <p>Create an account to access exclusive listings and personalized recommendations</p>
+          <p>Create an account to access exclusive tools needed for running your organization without any effort </p>
           <div class="features">
             <div class="feature-item">
               <i class="bi bi-check-circle-fill"></i>
-              <span>Verified Properties</span>
+              <span>Agents Up for hire</span>
             </div>
             <div class="feature-item">
               <i class="bi bi-check-circle-fill"></i>
-              <span>Instant Notifications</span>
+              <span>Real Estate Insights</span>
             </div>
             <div class="feature-item">
               <i class="bi bi-check-circle-fill"></i>
-              <span>Save Favorites</span>
+              <span>Daily listings Analytics</span>
             </div>
           </div>
         </div>

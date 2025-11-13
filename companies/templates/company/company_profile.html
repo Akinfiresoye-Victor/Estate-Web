@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load static %}
+{%load humanize%}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/company_profile.css' %}">
+<link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+{% endblock %}
+
+{% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
+
+<!-- Company Header -->
+<div class="company-header">
+  <div class="header-background">
+    <div class="header-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="company-header-content">
+      <div class="company-logo-section">
+        {% if company.company_logo %}
+          <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}" class="company-logo">
+        {% else %}
+          <div class="company-logo-placeholder">
+            <i class="bi bi-building"></i>
+          </div>
+        {% endif %}
+      </div>
+      <div class="company-main-info">
+        <div class="company-title-row">
+          <h1 class="company-name">{{ company.company_name }}</h1>
+          <span class="verified-badge">
+            <i class="bi bi-patch-check-fill"></i>Verified Company
+          </span>
+        </div>
+        <p class="company-tagline">{{ company.area_specialization }}</p>
+        <div class="company-meta">
+          <div class="meta-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ company.service_areas }}</span>
+          </div>
+          <div class="meta-item">
+            <i class="bi bi-calendar-check"></i>
+            <span>Established {{ company.year_established }}</span>
+          </div>
+          <div class="meta-item">
+            <i class="bi bi-briefcase"></i>
+            <span>{{ total_properties }} Properties</span>
+          </div>
+        </div>
+      </div>
+      <div class="company-actions">
+        <button class="btn-contact" data-bs-toggle="modal" data-bs-target="#contactModal">
+          <i class="bi bi-envelope-fill me-2"></i>Contact Company
+        </button>
+        <button class="btn-share" onclick="shareCompany()">
+          <i class="bi bi-share-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Company Stats Bar -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="bi bi-house-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ total_properties }}</h3>
+          <p>Total Listings</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="bi bi-tag-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ properties_for_sale }}</h3>
+          <p>For Sale</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="bi bi-key-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ properties_for_rent }}</h3>
+          <p>For Rent</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ average_rating|floatformat:1 }}</h3>
+          <p>Average Rating</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="company-content">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Left Sidebar -->
+      <div class="col-lg-4">
+        
+        <!-- About Section -->
+        <div class="profile-card">
+          <div class="card-header">
+            <i class="bi bi-info-circle-fill"></i>
+            <h3>About Company</h3>
+          </div>
+          <div class="card-body">
+            <p class="company-description">{{ company.company_bio }}</p>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="info-content">
+                  <span class="info-label">Principal Broker</span>
+                  <span class="info-value">{{ company.principal_broker }}</span>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="profile-card">
+          <div class="card-header">
+            <i class="bi bi-telephone-fill"></i>
+            <h3>Contact Information</h3>
+          </div>
+          <div class="card-body">
+            <div class="contact-list">
+              <a href="tel:{{ company.phone_number }}" class="contact-link">
+                <div class="contact-icon">
+                  <i class="bi bi-phone"></i>
+                </div>
+                <div class="contact-info">
+                  <span class="contact-label">Phone</span>
+                  <span class="contact-value">{{ company.phone_number }}</span>
+                </div>
+              </a>
+              
+              <a href="mailto:{{ company.email }}" class="contact-link">
+                <div class="contact-icon">
+                  <i class="bi bi-envelope"></i>
+                </div>
+                <div class="contact-info">
+                  <span class="contact-label">Email</span>
+                  <span class="contact-value">{{ company.email }}</span>
+                </div>
+              </a>
+              
+              <div class="contact-link">
+                <div class="contact-icon">
+                  <i class="bi bi-geo-alt"></i>
+                </div>
+                <div class="contact-info">
+                  <span class="contact-label">Office Address</span>
+                  <span class="contact-value">{{ company.address }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <button class="btn-contact-full" data-bs-toggle="modal" data-bs-target="#contactModal">
+              <i class="bi bi-send-fill me-2"></i>Send Message
+            </button>
+          </div>
+        </div>
+
+        <!-- Social Media -->
+        {% if social_links %}
+        <div class="profile-card">
+          <div class="card-header">
+            <i class="bi bi-share-fill"></i>
+            <h3>Follow Us</h3>
+          </div>
+          <div class="card-body">
+            <div class="social-grid">
+              {% for link in social_links %}
+                <a href="{{ link.link_to_social }}" target="_blank" class="social-btn" title="{{ link.social_platform }}">
+                  <i class="bi bi-{{ link.social_platform|lower }}"></i>
+                  <span>{{ link.social_platform }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Right Content -->
+      <div class="col-lg-8">
+
+<!-- Properties Section -->
+
+<div class="properties-section">
+  <div class="section-header">
+    <h2 class="section-title">
+      <i class="bi bi-houses-fill me-2"></i>Recent Listings by {{company.company_name}}
+    </h2>
+  </div>
+
+  {% if on_lease or on_sale %}
+  <div class="properties-grid">
+    
+    <!-- Properties for Sale -->
+    {% for property in on_sale %}
+    <div class="property-card" data-type="sale">
+      <div class="property-image">
+        {% if property.base_image %}
+          <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
+        {% else %}
+          <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
+        {% endif %}
+        <div class="property-badge sale-badge">For Sale</div>
+      </div>
+      
+      <div class="property-details">
+        <h3 class="property-title">{{ property.title }}</h3>
+        <p class="property-location">
+          <i class="bi bi-geo-alt"></i>{{ property.location }}
+        </p>
+        
+        <div class="property-features">
+          <span class="feature">
+            <i class="bi bi-house"></i>{{ property.house_type }}
+          </span>
+          <span class="feature">
+            <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
+          </span>
+          <span class="feature">
+            <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
+          </span>
+        </div>
+        
+        <div class="property-footer">
+          <div class="property-price">
+            <span class="price">₦{{ property.price|floatformat:0|intcomma }}</span>
+          </div>
+          <a href="{% url 'customer:view-property-s' property.id %}" class="btn-view-property">
+            View Details <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Properties for Rent -->
+    {% for property in on_lease %}
+    <div class="property-card" data-type="rent">
+      <div class="property-image">
+        {% if property.base_image %}
+          <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
+        {% else %}
+          <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
+        {% endif %}
+        <div class="property-badge rent-badge">For Rent</div>
+      </div>
+      
+      <div class="property-details">
+        <h3 class="property-title">{{ property.title }}</h3>
+        <p class="property-location">
+          <i class="bi bi-geo-alt"></i>{{ property.location }}
+        </p>
+        
+        <div class="property-features">
+          <span class="feature">
+            <i class="bi bi-house"></i>{{ property.house_type }}
+          </span>
+          <span class="feature">
+            <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
+          </span>
+          <span class="feature">
+            <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
+          </span>
+        </div>
+        
+        <div class="property-footer">
+          <div class="property-price">
+            <span class="price">₦{{ property.price_range|floatformat:0|intcomma }}</span>
+            <span class="price-period">/month</span>
+          </div>
+          <a href="{% url 'customer:view-property-r' property.id %}" class="btn-view-property">
+            View Details <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+            <a href="{%url 'company:company-properties' company_uuid=company.unique_company_id%}" class="btn-view-property">
+            View All <i class="bi bi-arrow-right"></i>
+            </a>
+
+
+    <!-- Rent Pagination -->
+    {% if on_lease.has_other_pages %}
+    <div class="pagination-container" id="rentPagination" style="display: none;">
+      <div class="pagination-info">
+        <span class="page-text">Page {{ on_lease.number }} of {{ on_lease.paginator.num_pages }}</span>
+      </div>
+      <ul class="pagination">
+        {% if on_lease.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page_rent={{ on_lease.previous_page_number }}{% if request.GET.page_sale %}&page_sale={{ request.GET.page_sale }}{% endif %}#properties" aria-label="Previous">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+          </li>
+        {% endif %}
+
+        {% for i in nums_r %}
+          {% if on_lease.number == forloop.counter %}
+            <li class="page-item active">
+              <span class="page-link">{{ forloop.counter }}</span>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?page_rent={{ forloop.counter }}{% if request.GET.page_sale %}&page_sale={{ request.GET.page_sale }}{% endif %}#properties">{{ forloop.counter }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if on_lease.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page_rent={{ on_lease.next_page_number }}{% if request.GET.page_sale %}&page_sale={{ request.GET.page_sale }}{% endif %}#properties" aria-label="Next">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+
+  {% else %}
+  <div class="no-properties">
+    <i class="bi bi-house-x"></i>
+    <h4>No Properties Available</h4>
+    <p>This company hasn't listed any properties yet</p>
+  </div>
+  {% endif %}
+</div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="bi bi-chat-quote-fill me-2"></i>Client Reviews
+            </h2>
+            <button class="btn-write-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+              <i class="bi bi-pencil-square me-2"></i>Write a Review
+            </button>
+          </div>
+
+          {% if reviews %}
+          <div class="reviews-list">
+            {% for review in reviews %}
+            <div class="review-card">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar">
+                    {{ review.user.first_name.0|upper }}
+                  </div>
+                  <div>
+                    <h4 class="reviewer-name">{{ review.user.get_full_name }}</h4>
+                    <p class="review-date">{{ review.created_at|date:"M d, Y" }}</p>
+                  </div>
+                </div>
+                <div class="review-rating">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}
+                      <i class="bi bi-star-fill"></i>
+                    {% else %}
+                      <i class="bi bi-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <p class="review-text">{{ review.comment }}</p>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="no-reviews">
+            <i class="bi bi-chat-left-text"></i>
+            <p>No reviews yet. Be the first to review this company!</p>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-envelope-fill me-2"></i>Contact {{ company.company_name }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="contactForm" method="post" action="#">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Your Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Your Email</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Message</label>
+            <textarea name="message" class="form-control" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn-submit-contact">
+            <i class="bi bi-send-fill me-2"></i>Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-star-fill me-2"></i>Write a Review
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm" method="post" action="#">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Your Rating</label>
+            <div class="rating-input">
+              <input type="radio" name="rating" value="5" id="star5" required>
+              <label for="star5"><i class="bi bi-star-fill"></i></label>
+              <input type="radio" name="rating" value="4" id="star4">
+              <label for="star4"><i class="bi bi-star-fill"></i></label>
+              <input type="radio" name="rating" value="3" id="star3">
+              <label for="star3"><i class="bi bi-star-fill"></i></label>
+              <input type="radio" name="rating" value="2" id="star2">
+              <label for="star2"><i class="bi bi-star-fill"></i></label>
+              <input type="radio" name="rating" value="1" id="star1">
+              <label for="star1"><i class="bi bi-star-fill"></i></label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Your Review</label>
+            <textarea name="comment" class="form-control" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn-submit-contact">
+            <i class="bi bi-check-circle-fill me-2"></i>Submit Review
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

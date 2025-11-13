@@ -5,20 +5,48 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/view_prop_s.css' %}">
 {% endblock %}
-
+{%load humanize%}
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
 
 <div class="detail-wrapper">
     <div class="detail-container">
-
-        <!-- Back Button -->
-        <div class="back-button-section">
-            <a href="{% url 'buy-property' %}" class="btn-back">
-                <i class="fas fa-arrow-left me-2"></i>
-                Back to Sales Listings
-            </a>
-        </div>
-
         <!-- Property Card -->
         <div class="property-card">
 
@@ -80,7 +108,7 @@
             <div class="price-section">
                 <div class="price-box">
                     <span class="price-label">Sale Price</span>
-                    <span class="price-amount">₦{{ property.price|default:"N/A" }}</span>
+                    <span class="price-amount">₦{{ property.price|default:"N/A"|floatformat:0|intcomma }}</span>
                 </div>
             </div>
 
@@ -128,11 +156,20 @@
                                 <span class="feature-value">{{ property.parking_spaces|default:"0" }}</span>
                             </div>
                         </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-rulers"></i>
+                            </div>
+                            <div class="feature-content">
+                                <span class="feature-label">Size</span>
+                                <span class="feature-value">{{ property.size|default:"N/A" }} sqft</span>
+                            </div>
+                        </li>
                     </ul>
                 </div>
 
                 <!-- Agent Details -->
-            {%if info%}
+            {%if agent_info%}
                 <div class="info-card agent-card">
                     <h4 class="info-card-title">
                         <i class="fas fa-user-tie me-2"></i>
@@ -146,6 +183,37 @@
                         <li class="agent-item">
                             <span class="agent-label">Phone Number</span>
                             <span class="agent-value">{{ info.phone_number|default:"N/A" }}</span>
+                        </li>
+                        <li class="agent-item">
+                            <span class="agent-label">Negotiable</span>
+                            <span class="agent-value">{{ property.get_negotiate_display|default:"N/A" }}</span>
+                        </li>
+                        <li class="agent-item">
+                            <span class="agent-label">Last Updated</span>
+                            <span class="agent-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
+                        </li>
+                        <li class="agent-item">
+                            <span class="agent-label">Listed On</span>
+                            <span class="agent-value">{{ property.listed_date|date:"M d, Y"|default:"N/A" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            {%elif company_info%}
+                <div class="info-card agent-card">
+                    <h4 class="info-card-title">
+                        <i class="fas fa-user-tie me-2"></i>
+                        Company Details 
+                    </h4>
+                    <ul class="agent-list">
+                        <li class="agent-item">
+                            <span class="agent-label">Listed By</span>
+                            <span class="agent-value">{{ company_info.company_name|default:"" }} {{ info.last_name|default:"" }}</span>
+                        </li>
+                        <li class="agent-item">
+                            <span class="agent-label">Phone Number</span>
+                            <span class="agent-value">{{ company_info.phone_number|default:"N/A" }}</span>
                         </li>
                         <li class="agent-item">
                             <span class="agent-label">Negotiable</span>
@@ -196,7 +264,7 @@
             {%endif%}
 
 
-        {%if info %}
+        {%if agent_info %}
                 <!-- Contact Buttons -->
                 <div class="contact-section">
                     <h3 class="section-title text-center">
@@ -209,13 +277,44 @@
                             Call Agent
                         </a>
                         
-                        <a href="{%url 'estate-agent-profile' agent_id=property.user_id%}" class="btn-contact secondary">
+                        <a href="{%url 'customer:estate-agent-profile' agent_id=property.user_id%}" class="btn-contact secondary">
                             <i class="fas fa-user-circle me-2"></i>
                             View Agents Profile
                         </a>
                         <a href="mailto:{{ email|default:'' }}" class="btn-contact primary">
                             <i class="bi bi-envelope me-2"></i>
                             Email Agent
+                        </a>
+                    </div>
+                </div>
+
+        {%elif company_info %}
+                <!-- Contact Buttons -->
+                <div class="contact-section">
+                    <h3 class="section-title text-center">
+                        <i class="fas fa-phone me-2"></i>
+                        Contact Agent in charge
+                    </h3>
+                    <div class="contact-buttons">
+                        <a href="tel:{{ property.phone_number|default:'' }}" class="btn-contact primary">
+                            <i class="fas fa-phone-alt me-2"></i>
+                            Call Agent
+                        </a>
+                        {%if agent_info%}
+                        <a href="{%url 'customer:estate-agent-profile' agent_id=property.user_id%}" class="btn-contact secondary">
+                            <i class="fas fa-user-circle me-2"></i>
+                            View Agents Profile
+                        </a>
+                        {%endif%}
+                        {%if company_info%}
+                        <a href="{%url 'company:company_profile' company_uuid=property.company_uuid%}" class="btn-contact secondary">
+                            <i class="fas fa-user-circle me-2"></i>
+                            View Companies Profile
+                        </a>
+                        {%endif%}
+                        <a href="{%url 'customer:inquiry-form-s' property.id%}" class="btn-contact primary">
+                            <i class="bi bi-person-lines-fill me-2"></i>
+                            Book Property Now
                         </a>
                     </div>
                 </div>

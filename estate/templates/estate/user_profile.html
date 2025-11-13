@@ -7,6 +7,43 @@
 {% endblock %}
 
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
 
 <div class="dashboard-header">
   <div class="container">
@@ -22,7 +59,7 @@
       <p class="card-text">
         <strong>{{ headline }}</strong>
       </p>
-      <a href="{% url 'articles' %}" class="btn">Read Full Article</a>
+      <a href="{%url 'customer:articles'%}" class="btn">Read Full Article</a>
     </div>
   </div>
 
@@ -50,8 +87,8 @@
         {% endif %}
         <p class="email">{{ user.email }}</p>
         <div class="d-flex flex-wrap gap-2">
-          <a href="{% url 'update-profile' user.id %}" class="btn btn-primary-custom">Update Profile</a>
-          <a href="{% url 'change-password' %}" class="btn btn-outline-danger-custom">Change Password</a>
+          <a href="{% url 'customer:update-profile' user.id %}" class="btn btn-primary-custom">Update Profile</a>
+          <a href="{% url 'customer:change-password' %}" class="btn btn-outline-danger-custom">Change Password</a>
         </div>
       </div>
     </div>
@@ -66,14 +103,14 @@
           <h5>My Property Listings</h5>
           <p class="card-text flex-grow-1">View, edit, or add new properties to showcase your listings.</p>
           <div class="d-flex flex-wrap gap-2 mt-auto">
-            <a href="{% url 'my-listings' %}" class="btn btn-primary-custom">Manage Listings</a>
+            <a href="{% url 'customer:my-listings' %}" class="btn btn-primary-custom">Manage Listings</a>
             <div class="dropdown">
               <button class="btn btn-success-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 Add New Property
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'sell-property' %}">List for Sale</a></li>
-                <li><a class="dropdown-item" href="{% url 'lease-property' %}">List for Lease</a></li>
+                <li><a class="dropdown-item" href="{% url 'customer:sell-property' %}">List for Sale</a></li>
+                <li><a class="dropdown-item" href="{% url 'customer:lease-property' %}">List for Lease</a></li>
               </ul>
             </div>
           </div>
@@ -87,7 +124,7 @@
         <div class="card-body d-flex flex-column">
           <h5>My Saved Properties</h5>
           <p class="card-text flex-grow-1">Track properties you favorited and revisit them anytime.</p>
-          <a href="{% url 'wishlist' %}" class="btn btn-primary-custom mt-auto">View Wishlist</a>
+          <a href="{% url 'customer:wishlist' %}" class="btn btn-primary-custom mt-auto">View Wishlist</a>
         </div>
       </div>
     </div>
@@ -102,9 +139,9 @@
           </h5>
           <p class="card-text flex-grow-1">Set up Your work Profile to boost your career</p>
           {% if info %}
-            <a href="{%url 'estate-agent-form'%}" class="btn btn-outline-custom mt-auto">Update Work Profile</a>
+            <a href="#" class="btn btn-outline-custom mt-auto">Update Work Profile</a>
           {% else %}
-            <a href="{%url 'estate-agent-form'%}" class="btn btn-outline-custom mt-auto">Set Work Profile</a>
+            <a href="#" class="btn btn-outline-custom mt-auto">Set Work Profile</a>
           {%endif%}
         </div>
       </div>
@@ -116,7 +153,7 @@
         <div class="card-body d-flex flex-column">
           <h5>Account & Privacy</h5>
           <p class="card-text flex-grow-1">Adjust your personal details, visibility, and privacy settings.</p>
-          <a href="{% url 'settings' %}" class="btn btn-outline-custom mt-auto">Manage Account</a>
+          <a href="{% url 'customer:settings' %}" class="btn btn-outline-custom mt-auto">Manage Account</a>
         </div>
       </div>
     </div>

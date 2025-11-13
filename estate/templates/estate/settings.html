@@ -4,6 +4,43 @@
   <link rel="stylesheet" href="{% static 'estate/css/settings.css' %}">
 {% endblock %}
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
 
 <div class="page-header">
   <div class="container">
@@ -121,13 +158,13 @@
 
           <!-- Action Buttons -->
           <div class="action-buttons">
-            <a href="{% url 'update-profile' user.id %}" class="btn btn-primary">
+            <a href="{% url 'customer:update-profile' user.id %}" class="btn btn-primary">
               <i class="fas fa-user-edit"></i> Update Profile
             </a>
-            <a href="{% url 'user-profile' %}" class="btn btn-outline">
+            <a href="{% url 'customer:user-profile' %}" class="btn btn-outline">
               <i class="fas fa-home"></i> Dashboard
             </a>
-            <a href="{% url 'change-password' %}" class="btn btn-outline">
+            <a href="{% url 'customer:change-password' %}" class="btn btn-outline">
               <i class="fas fa-key"></i> Change Password
             </a>
           </div>
@@ -145,7 +182,7 @@
             <h4>Delete Account</h4>
             <p>This action is <strong>permanent and irreversible</strong>. All your listings, saved properties, and profile data will be permanently deleted.</p>
           </div>
-          <a href="{% url 'delete-account' %}" class="btn btn-danger">
+          <a href="{% url 'customer:delete-account' %}" class="btn btn-danger">
             <i class="fas fa-trash-alt"></i> Delete My Account
           </a>
         </div>

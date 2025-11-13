@@ -4,7 +4,6 @@ from .forms import *
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from members.forms import UpdateUserForm
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
@@ -13,28 +12,16 @@ from . import news_scrape as ns
 from django.core.paginator import Paginator
 from .filters import *
 from django.db import transaction
-from datetime import datetime, date
-from django.contrib.auth.models import User
+from admin_panel.views import admin
+from members.models import User
+from companies.models import CompanyInformation, CompanyAnalytics
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 
-ADMIN='PY.PRO'
 
 
-'''Landing Page Views'''
-def welcome_page(request):
-    if request.user.is_authenticated:
-        messages.success(request, 'Welcome Back')
-        return redirect('user-profile')
-    else:
-        return render(request, 'estate/welcome_page.html')
-
-
-def about_us(request):
-    return render(request, 'estate/about_me.html')
-
-
-'''News Views'''
+'''News Blog Automation'''
 def articles(request):
     if request.user.is_authenticated:
         try:
@@ -50,10 +37,10 @@ def articles(request):
                                                         "full_article":full_article})
         except:
             messages.error(request, ns.error)
-            return redirect('user-profile')
+            return redirect('customer:user-profile')
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 '''Users Feedbacks'''
@@ -67,7 +54,7 @@ def feedbacks(request):
                 if form.is_valid():
                     form.save()
                     submitted=True
-                    return redirect('feedback')
+                    return redirect('customer:feedback')
             else:
                 form = FeedbackForm()
                 if 'submitted' in request.GET:
@@ -75,35 +62,12 @@ def feedbacks(request):
             return render(request, 'estate/feedback.html', {'form': form, 'submitted': submitted})
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {e})
+            return render(request, 'estate/error_page.html', {'e': e}, {e})
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
-#for admins only
-def view_feedbacks(request):
-    if request.user.id == 1:
-        feedbacks=Feedback.objects.all()
-        return render(request,'estate/views.html', {'feedback': feedbacks})
-
-#for admins only
-def delete_feedback(request, feedback_id):
-    if request.user.is_authenticated:
-        #getting the property_id which will be used to handle the deletion
-        feedback= Feedback.objects.get(pk=feedback_id)
-        #keeps another user from deleting a users data 
-        if request.user.id == 1:
-            #what does the actual deleting based on the property_id
-            feedback.delete()
-            messages.success(request, ("Feedback deleted successfully"))
-            return redirect('view-feedbacks')
-        else:
-            messages.error(request, ('You Arent authorized to delete this feedback'))
-            return redirect('my-listings')
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
 
 
 
@@ -114,7 +78,7 @@ def sell_property(request):
     if request.user.is_authenticated:
         
         #user must have an email before he/she can list a property
-        if request.user.email:
+        if (request.user.role == 'customer' and request.user.email) or (request.user.role == 'company' or request.user.role == 'agent'):
             
             try:
                 
@@ -127,11 +91,21 @@ def sell_property(request):
                         
                         with transaction.atomic():
                             landlord= prop_form.save(commit=False)
-                            landlord.user_id= request.user.id
-                            landlord.save()
-                            image_form.instance= landlord
-                            image_form.save()
-                        return HttpResponseRedirect('/sell_property?submitted=True')
+                            try:
+                                company= CompanyInformation.objects.get(user_id= request.user.id)
+                                landlord.company_uuid= company.unique_company_id
+                                landlord.user_id= request.user.id
+                                landlord.time_stamp=timezone.now()
+                                landlord.save()
+                                image_form.instance=landlord
+                                image_form.save()
+                            except CompanyInformation.DoesNotExist:
+                                landlord.user_id= request.user.id
+                                landlord.time_stamp= 0
+                                landlord.save()
+                                image_form.instance=landlord
+                                image_form.save()
+                        return HttpResponseRedirect('?submitted=True')
                     
                 else:
                     prop_form= SellForm()
@@ -144,11 +118,11 @@ def sell_property(request):
             
             except Exception as e:
                 print(f'ERROR IS{e}')
-                return render(request, 'estate/error_page.html', {e})
+                return render(request, 'estate/error_page.html', {'e': e}, {e})
         
         else:
                 messages.info(request, 'Verify your email to start listing with us')
-                return redirect('update-profile', user_id=request.user.id)
+                return redirect('customer:update-profile', user_id=request.user.id)
     else:
         messages.info(request, ('Join us Now to start'))
         return redirect('login')
@@ -159,7 +133,7 @@ def lease_property(request):
     if request.user.is_authenticated:
         
         #user must have an email befre he/she can list with us
-        if request.user.email:
+        if (request.user.role == 'customer' and request.user.email) or (request.user.role == 'company' or request.user.role == 'agent'):
             
             try:
                 submitted= False
@@ -171,12 +145,22 @@ def lease_property(request):
                         if prop_form.is_valid() and image_form.is_valid():
                             print(prop_form.errors)
                             landlord= prop_form.save(commit=False)
-                            landlord.user_id= request.user.id
-                            landlord.save()
-                            image_form.instance=landlord
-                            image_form.save()
+                            try:
+                                company= CompanyInformation.objects.get(user_id= request.user.id)
+                                landlord.company_uuid= company.unique_company_id
+                                landlord.user_id= request.user.id
+                                landlord.time_stamp= timezone.now()
+                                landlord.save()
+                                image_form.instance=landlord
+                                image_form.save()
+                            except CompanyInformation.DoesNotExist:
+                                landlord.user_id= request.user.id
+                                landlord.time_stamp= 0
+                                landlord.save()
+                                image_form.instance=landlord
+                                image_form.save()
                             #making sure form is submitted once
-                        return HttpResponseRedirect('/lease_property?submitted=True')
+                        return HttpResponseRedirect('?submitted=True')
                     
                 else:
                     prop_form= LeaseForm()
@@ -188,11 +172,11 @@ def lease_property(request):
             
             except Exception as e:
                 print(f'ERROR IS{e}')
-                return render(request, 'estate/error_page.html')
+                return render(request, 'estate/error_page.html', {'e': e})
             
         else:
             messages.info(request, 'Verify email to start listing with us')
-            return redirect('update-profile', user_id=request.user.id)
+            return redirect('customer:update-profile', user_id=request.user.id)
 
     else:
         messages.info(request, ('Join us Now to start'))
@@ -215,11 +199,13 @@ def buy_property(request):
             page=request.GET.get('page')
             on_sale= p.get_page(page)
             nums= "a" * on_sale.paginator.num_pages
-            return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums, 'salefilter':myfilter })
+            
+            
+            return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums, 'salefilter':myfilter})
         
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.info(request, ('Join us Now to start'))
@@ -244,7 +230,7 @@ def rent_property(request):
             
             except Exception as e:
                 print(f'ERROR IS{e}')
-                return render(request, 'estate/error_page.html')
+                return render(request, 'estate/error_page.html', {'e': e})
             
         else:
             messages.info(request, ('Join Estate Web Now!!!'))
@@ -268,20 +254,20 @@ def update_property_rent(request, property_id):
                     image_form.save()
                     messages.success(request, "Property Updated Successfully")
                     print(property.base_image.url)
-                    return redirect('my-listings')
+                    return redirect('customer:my-listings')
                 return render(request, 'estate/update_property.html', {'property': property, 'form': prop_form, 'images': image_form})
             
             else:
                 messages.warning(request, 'You do not have access to this page')
-                return redirect('user-profile')
+                return redirect('customer:user-profile')
             
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.info(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #view to update listed property on rent
@@ -296,25 +282,25 @@ def update_property_sale(request, property_id):
             if property.user_id == request.user.id:
                 prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
                 image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
-
+                
                 if prop_form.is_valid() and image_form.is_valid():
                     prop_form.save()
                     image_form.save()
                     messages.success(request, "Property Updated Successfully")
-                    return redirect('my-listings')
+                    return redirect('customer:my-listings')
                 return render(request, 'estate/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form})
             
             else:
                 messages.warning(request, 'You do not have access to this page')
-                return redirect('user-profile')
+                return redirect('customer:user-profile')
             
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #view to delete listings
@@ -330,19 +316,19 @@ def delete_property_on_lease(request, property_id):
                 #what does the actual deleting based on the property_id
                 property1.delete()
                 messages.success(request, ("Property deleted successfully"))
-                return redirect('my-listings')
+                return redirect('customer:my-listings')
             
             else:
                 messages.warning(request, ('You Arent authorized to delete this property'))
-                return redirect('my-listings')
+                return redirect('customer:my-listings')
             
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #view to delete listings
@@ -356,19 +342,19 @@ def delete_property_on_sale(request, property_id):
             if request.user.id == property1.user_id:
                 property1.delete()
                 messages.success(request, ("Property deleted successfully"))
-                return redirect('my-listings')
+                return redirect('customer:my-listings')
             
             else:
                 messages.warning(request, ('You Arent authorized to delete this property'))
-                return redirect('my-listings')
+                return redirect('customer:my-listings')
             
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #full details of listed property
@@ -379,28 +365,63 @@ def view_property_on_sale(request, property_id):
             property= PropertyManagementSale.objects.get(pk=property_id)
             property_image=property.images.all()
             email=request.user.email #contact information
+            user=User.objects.get(pk=request.user.id)
+            #checking if owner of listing is an estate agent
+            if property.company_uuid != 'None':
+                company_handled=CompanyInformation.objects.get(unique_company_id=property.company_uuid)
             
-            try:
-                #checking if owner of listing is an estate agent
-                info=Agent_Information.objects.get(user_id=property.user_id)
-                
-                if info:
-                    info=info.personal_info
-                messages.info(request, 'Listing Is handled by an agent')
-                return render(request, 'estate/view_property_s.html', {'property':property,'images':property_image, 'info':info, 'email':email})
-            
-            #if the owner of listing is an home owner
-            except Agent_Information.DoesNotExist:
+                try:
+                    analytics=company_handled.analytics.get()
+                except ObjectDoesNotExist:
+                    analytics = CompanyAnalytics.objects.create(
+                        company=company_handled,
+                        profile_views=0, 
+                        property_views_l=0,
+                        property_views_s=0,
+                        last_month_profile_views=0,
+                        last_month_lease_views=0,
+                        last_month_sale_views=0,
+                    )
+                time_since_reset= abs(timezone.now() - property.last_reset_date)
+                final_property_time= time_since_reset.days
+                if final_property_time > 30:
+                    analytics.last_month_sale_views= analytics.property_views_s
+                    analytics.property_views_s = 0
+                    property.last_reset_date=timezone.now()
+                    analytics.save()
+                    property.save()
+                try:
+                    prop_analytics=property.prop_analytics.get(session_id=request.user.id)
+                except ObjectDoesNotExist:
+                    prop_analytics=PropertyManagementSaleAnalytics.objects.create(
+                        on_sale= property,
+                        session_id=request.user.id,
+                        inquires_check=0
+                    )
+                    analytics.property_views_s +=1
+                    analytics.save()
+                company_info=company_handled
+                messages.info(request, f'Listing Is handled by {company_handled.company_name}')
+                return render(request, 'estate/view_property_s.html', {'property':property,'images':property_image, 
+                                                                'email':email, 'user':user, 'company_info':company_info})
+            elif property.agent_uuid != 'None':
+                agent_handled=Agent_Information.objects.get(user_id=property.user_id)
+                agent_info=agent_handled.personal_info
+                messages.info(request, f'Listing Is handled by a universal agent')
+                return render(request, 'estate/view_property_s.html', {'property':property,'images':property_image, 
+                                                                'agent_info':agent_info, 'email':email, 'user':user})
+        
+            else:
                 messages.info(request, 'Listing Is handled by the home owner')
                 return render(request, 'estate/view_property_s.html', {'property':property, 'email':email})
-            
+        
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #Full details of listing
@@ -411,27 +432,60 @@ def view_property_on_lease(request, property_id):
             email=request.user.email#contact information
             property= PropertyManagementRent.objects.get(pk=property_id)
             property_images= property.images.all()
-            try:
-                #checking of property lister is an agent
-                info=Agent_Information.objects.get(user_id=property.user_id)
-                
-                if info:
-                    info=info.personal_info
-                messages.info(request, 'Listing Is handled by an agent')
-                return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 'info':info, 'email':email})
-            
-            #if not
-            except Agent_Information.DoesNotExist:
+            user=User.objects.get(pk=request.user.id)
+            if property.company_uuid != 'None':
+                company_handled=CompanyInformation.objects.get(unique_company_id=property.company_uuid)
+                try:
+                    analytics=company_handled.analytics.get()
+                except ObjectDoesNotExist:
+                    analytics = CompanyAnalytics.objects.create(
+                        company=company_handled,
+                        profile_views=0, 
+                        property_views_l=0,
+                        property_views_s=0,
+                        last_month_profile_views=0,
+                        last_month_lease_views=0,
+                        last_month_sale_views=0,
+                    )
+                time_since_reset= abs(timezone.now() - property.last_reset_date)
+                final_property_time= time_since_reset.days
+                if final_property_time > 30:
+                    analytics.last_month_lease_views= analytics.property_views_l
+                    analytics.property_views_l = 0
+                    property.last_reset_date=timezone.now()
+                    analytics.save()
+                    property.save()
+                try:
+                    prop_analytics=property.prop_analytics.get(session_id=request.user.id)
+                except ObjectDoesNotExist:
+                    prop_analytics=PropertyManagementRentAnalytics.objects.create(
+                        on_lease= property,
+                        session_id=request.user.id,
+                        inquires_check=0
+                    )
+                    analytics.property_views_l +=1
+                    analytics.save()
+                company_info=company_handled
+                messages.info(request, f'Listing Is handled by {company_handled.company_name}')
+                return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 
+                                                                'email':email, 'user':user, 'company_info':company_info})
+            elif property.agent_uuid != 'None':
+                agent_handled=Agent_Information.objects.get(user_id=property.user_id)
+                agent_info=agent_handled.personal_info
+                messages.info(request, f'Listing Is handled by a universal agent')
+                return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 
+                                                                'agent_info':agent_info, 'email':email, 'user':user})
+        
+            else:
                 messages.info(request, 'Listing Is handled by the home owner')
                 return render(request, 'estate/view_property_r.html', {'property':property, 'email':email})
-            
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 
@@ -441,6 +495,7 @@ def view_property_on_lease(request, property_id):
 
 #view handling the users profile settings
 def user_profile(request):
+    print(request.user.role)
     try:
         if request.user.is_authenticated:
             
@@ -453,7 +508,7 @@ def user_profile(request):
                     
         else:
             messages.warning(request, ('You need to be logged in to accesss this page'))
-            return redirect('welcome-page')
+            return redirect('landing')
         
     except Exception as e:
         print(e)
@@ -467,7 +522,7 @@ def listed_properties(request):
             
             model= request.user.id
             #filtering the listings using both the users id and the properties id(Hacked my way through this🤡)
-            if request.user.username == ADMIN:
+            if request.user.username == admin:
                 property1= PropertyManagementRent.objects.order_by('-listed_date')
                 property2= PropertyManagementSale.objects.order_by('-listed_date')
                 return render(request, 'estate/my_listings.html', {'property1':property1, 'property2':property2})
@@ -477,18 +532,18 @@ def listed_properties(request):
                 return render(request, 'estate/my_listings.html', {'property1':property1, 'property2':property2})
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #view for toggling the on and off of my wishlist
 def toggle_wishlist_rent(request, property_id):
     if not request.user.is_authenticated:
         messages.warning(request, "You need to be logged in to access this page.")
-        return redirect('welcome-page')
+        return redirect('landing')
     
     try:
         property_obj = get_object_or_404(PropertyManagementRent, id=property_id)
@@ -504,10 +559,10 @@ def toggle_wishlist_rent(request, property_id):
         else:
             messages.success(request, "Property added to your wishlist.")
 
-        return redirect('rent-prop')
+        return redirect('customer:rent-prop')
     except Exception as e:
         print(f'ERROR IS{e}')
-        return render(request, 'estate/error_page.html')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 #view for toggling the on and off of my wishlist
@@ -515,7 +570,7 @@ def toggle_wishlist_buy(request, property_id):
     if not request.user.is_authenticated:
         
         messages.warning(request, "You need to be logged in to access this page.")
-        return redirect('welcome-page')
+        return redirect('landing')
     
     try:
         buy = get_object_or_404(PropertyManagementSale, id=property_id)
@@ -531,18 +586,18 @@ def toggle_wishlist_buy(request, property_id):
             
         else:
             messages.success(request, "Property added to your wishlist.")
-        return redirect('buy-property')  
+        return redirect('customer:buy-property')  
     
     except Exception as e:
         print(f'ERROR IS{e}')
-        return render(request, 'estate/error_page.html')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 #View listing all the users wishlist
 def wishlist(request):
     if not request.user.is_authenticated:
         messages.warning(request, "You need to be logged in to access this page.")
-        return redirect('welcome-page')
+        return redirect('landing')
     
     try:
         #fetching the related forign key object in a single query
@@ -561,7 +616,7 @@ def wishlist(request):
     
     except Exception as e:
         print(f'ERROR IS{e}')
-        return render(request, 'estate/error_page.html')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 #view handling update of user profile
@@ -579,7 +634,7 @@ def update_profile(request, user_id):
                 
                 if form.is_valid():
                     form.save()
-                    return redirect('user-profile')
+                    return redirect('customer:user-profile')
                 
                 else:
                     messages.error(request, 'check If you made any errors')
@@ -587,15 +642,15 @@ def update_profile(request, user_id):
             
             else:
                 messages.warning(request, 'Youre not allowed to access this page')
-                return redirect('user-profile')
+                return redirect('customer:user-profile')
             
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #view to change passoword
@@ -612,11 +667,11 @@ def change_password(request):
                     #the new password set is then encrypted, updated and saved 
                     update_session_auth_hash(request, new_pass)
                     messages.success(request, 'Password has been Changed successfully')
-                    return redirect('password-success')
+                    return redirect('customer:password-success')
                 
                 else:
                     messages.error(request, 'There was an error changing your password.... please try again..')
-                    return redirect('change-password')
+                    return redirect('customer:change-password')
                 
             else:
                 form= PasswordChangeForm(request.user)
@@ -624,11 +679,11 @@ def change_password(request):
             
         except Exception as e:
             print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.info(request, 'You have to be logged in to access this page')
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #success page after password change
@@ -640,11 +695,11 @@ def change_password_success(request):
         
         except Exception as e:
             print(f'ERROR IS {e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, 'You need to be logged in to access this page')
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #Users Settings
@@ -657,11 +712,11 @@ def profile_settings(request):
         
         except Exception as e:
             print(f'ERROR IS {e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.warning(request, 'You need to be logged in to access this page')
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 
@@ -687,17 +742,17 @@ def delete_account(request):
             except Exception as e:
                 messages.error(request, 'There was an error, Try again later.....')
                 print(e)
-                return redirect('user-profile')
+                return redirect('customer:user-profile')
             messages.success(request, 'Account has been deleted Successfully')
-            return redirect('welcome-page')
+            return redirect('landing')
         
         except Exception as e:
             print(f'ERROR IS {e}')
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.info(request, 'You have to be logged in to access this page')
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #form for estate agents to fill
@@ -728,7 +783,7 @@ def estate_agent_form(request):
                             soc_formset.instance = agent_info
                             soc_formset.save()
                         messages.success(request, 'Profile Set Successfully')
-                        return redirect('user-profile')
+                        return redirect('customer:user-profile')
                     return render(
                         request,
                         'estate/agent_form.html',
@@ -763,7 +818,7 @@ def estate_agent_form(request):
                             soc_formset.instance = agent_info
                             soc_formset.save()
                             messages.success(request, 'Profile Updated successfully')
-                            return redirect('user-profile')
+                            return redirect('customer:user-profile')
                 return render(request, 'estate/update_agent_form.html', 
                         {
                             'agent_form': agent_form,
@@ -775,13 +830,13 @@ def estate_agent_form(request):
                 
         except Exception as e:
             print(f'ERROR IS {e}')
-            return render(request, 'estate/error_page.html', {e})
+            return render(request, 'estate/error_page.html', {'e': e}, {e})
 
 
 
     else:
         messages.error(request, 'You must be logged in to access this page')
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
 #estate aget profile view
@@ -797,174 +852,90 @@ def estate_agent_profile(request, agent_id):
                                                                 'network': agent_social})
         except Exception as e:
             print(e)
-            return render(request, 'estate/error_page.html')
+            return render(request, 'estate/error_page.html', {'e': e})
         
     else:
         messages.info('You have to be logged in to access this page')
-        return redirect('welcome-page')
+        return redirect('landing')
 
 
-'''Analytics For admin'''
-
-#Total Listings and sign uo
-def admin_dashboard(request):
-    if request.user.username == ADMIN:
-        
-        '''Property Tracking'''
-        on_lease=PropertyManagementRent.objects.all()
-        on_sale= PropertyManagementSale.objects.all()
-        
-        # Listings Calculation
-        x_initial=PropertyManagementRent.objects.count() #where x is property on lease
-        y_initial=PropertyManagementSale.objects.count() #where y is property on lease
-
-        prop_calc=property_tracking(on_lease, on_sale, x_initial, y_initial)
-        user_track=user_tracking()
-        
-        #properties calc
-        total_listings=prop_calc[0]
-        total_perc=prop_calc[1]
-        percentage_rent= prop_calc[2]
-        percentage_sale=prop_calc[3]
-        final_rent_time= prop_calc[4]
-        final_sale_time=prop_calc[5]
-        final_update_time= prop_calc[6]
-        todays_property=prop_calc[7]
-        
-        '''User Tranking'''
-        user_count=user_track[0]
-        user_increase_percentage= user_track[1]
-        daily_active_users= user_track[2]
-        final_time=user_track[3]
-
-        
-        context = {'users':user_count,
-                    'users_inc_perc': user_increase_percentage,
-                    'dau':daily_active_users,
-                    'user_reg_time':final_time,
-                    'on_lease_count': x_initial,
-                    'on_sale_count':y_initial,
-                    'total_listings': total_listings,
-                    'rent_perc': percentage_rent,
-                    'sale_perc': percentage_sale,
-                    'total_perc': total_perc,
-                    'rent_time':final_rent_time,
-                    'sale_time':final_sale_time,
-                    'final_update_time': final_update_time,
-                    'today_property':todays_property}
-        return render(request, 'estate/admin_dashboard.html',context)
-        
 
 
-def property_tracking(on_lease, on_sale, x_initial, y_initial):
-        
-        x=0
-        x_prev=0
-        y=0
-        y_prev=0
-        
-        '''Property count '''
-        for prop in on_lease:
-            if prop.listed_date.date() == date.today():
-                x+=1
-            else:
-                x_prev += 1
-        
-        for prop in on_sale:
-            if prop.listed_date.date() == date.today():
-                y+=1
-            else:
-                y_prev += 1
-        initial_time_listed_r=PropertyManagementRent.objects.order_by('-listed_date').first()
-        initial_time_listed_s=PropertyManagementSale.objects.order_by('-listed_date').first()
-        
-        "Recent history"
-        raw_rent_time=timezone.now() - initial_time_listed_r.listed_date
-        formatted_rent_time=abs(raw_rent_time.total_seconds() / 60)
-        final_rent_time=time_formatting(formatted_rent_time)
-        
-        raw_sale_time=abs(timezone.now() - initial_time_listed_s.listed_date)
-        formatted_sale_time=raw_sale_time.total_seconds() / 60
-        final_sale_time=time_formatting(formatted_sale_time)
-        
-        
-        raw_rent_update_time= timezone.now() - initial_time_listed_r.last_updated
-        formatted_rent_update_time=abs(raw_rent_update_time.total_seconds() / 60)
-        final_rent_update_time=time_formatting(formatted_rent_update_time)
-        
-        raw_sale_update_time= timezone.now() - initial_time_listed_s.last_updated
-        formatted_sale_update_time=abs(raw_sale_update_time.total_seconds() / 60)
-        
-        if formatted_sale_update_time > formatted_rent_update_time:
-            formatted_update_time=formatted_sale_update_time
-        elif formatted_sale_update_time < formatted_rent_update_time:
-            formatted_update_time=formatted_rent_update_time
-        else:
-            formatted_update_time= (formatted_rent_update_time + formatted_sale_update_time) /2
-        final_update_time= time_formatting(formatted_update_time)
-        
-        percentage_sale= (y/y_prev) * 100
-        percentage_rent= (x/x_prev) * 100   
-        
-        total_perc= percentage_rent + percentage_sale
-        total_listings= x_initial + y_initial
-        
-        property_listed_today=x + y
-        
-        calculated_percentages_list= [total_listings, total_perc, percentage_rent, percentage_sale, final_rent_time,
-                                    final_sale_time, final_update_time, property_listed_today]
-        return calculated_percentages_list
 
-def user_tracking():
-    user=User.objects.all()
-    user_count=User.objects.count()
+def inquiry_form_rent(request, property_id):
+    if not request.user.is_authenticated:
+        messages.error(request, 'Log in to send inquires')
+        return redirect('landing')
     
+    if not request.user.role == 'customer':
+        messages.success(request, 'Only customer account can send Inquiries')
+        return redirect('landing')
     
-    users_today=0
-    prev_users=0
-    for users in user:
-        if users.date_joined.date() == date.today():
-            users_today += 1
-        else:
-            prev_users += 1
+    try:
+        submitted=False
+        on_rent=PropertyManagementRent.objects.get(pk=property_id)
+        if request.method=='POST':
+            inq_form=InquiryForm(request.POST or None)
+            if inq_form.is_valid():
+                if on_rent.company_uuid:
+                    inq_form=inq_form.save(commit=False)
+                    inq_form.company_uuid=on_rent.company_uuid
+                    inq_form.property_intrested=on_rent.id
+                    inq_form.agent_id='None'
+                    inq_form.property_type='Rent'
+                    inq_form.property_name=on_rent.house_type
+                    inq_form.save()
+                    return HttpResponseRedirect('?submitted=True')
+                else:
+                    inq_form.save()
             
+        else:
+            inq_form= InquiryForm()
             
-    daily_active_users=0
-    for users in user:
-        if users.last_login.date() == date.today():
-            daily_active_users += 1
-    
-    user_increase_percentage= (users_today / prev_users) * 100
-    
-    
-    
-    # "%Y-%m-%d %H:%M:%S"
-    lates_user=User.objects.order_by('-date_joined').first()
-    user_reg_time= timezone.now() - lates_user.date_joined
-    formatted_time=user_reg_time.total_seconds()/60
-    final_time=time_formatting(formatted_time)
-    user_tracking_list= [user_count,user_increase_percentage, daily_active_users, final_time]
-    return user_tracking_list
+            if 'submitted' in request.GET:
+                submitted=True
+                
+        return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted': submitted})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {e})
 
 
 
-def time_formatting(formatted_time):
-    if formatted_time >= 60 and formatted_time <= 1439:
-        formatted_time/=60
-        if formatted_time == 1:
-            final_time=f'{int(formatted_time)} Hours ago'
+
+
+def inquiry_form_sale(request, property_id):
+    if not request.user.is_authenticated:
+        messages.error(request, 'Log in to send inquires')
+        return redirect('landing')
+    
+    if not request.user.role == 'customer':
+        messages.success(request, 'Only customer account can send Inquiries')
+        return redirect('landing')
+    
+    try:
+        submitted=False
+        on_sale=PropertyManagementSale.objects.get(pk=property_id)
+        if request.method=='POST':
+            inq_form=InquiryForm(request.POST or None)
+            if inq_form.is_valid():
+                if on_sale.company_uuid:
+                    inq_form=inq_form.save(commit=False)
+                    inq_form.company_uuid=on_sale.company_uuid
+                    inq_form.property_intrested=on_sale.id
+                    inq_form.agent_id='None'
+                    inq_form.property_type='Sale'
+                    inq_form.property_name=on_sale.house_type
+                    inq_form.save()
+                    return HttpResponseRedirect('?submitted=True')
+                else:
+                    inq_form.save()
+            
         else:
-            final_time=f'{int(formatted_time)} Hours ago'
-    elif formatted_time >= 1440:
-        formatted_time/=1400
-        if formatted_time == 1:
-            final_time=f'{int(formatted_time)} Day Ago'
-        else:
-            final_time=f'{int(formatted_time)} Days Ago'
-        
-    else:
-        if formatted_time <= 1:
-            final_time=f'{int(formatted_time)} minute ago'
-        else:
-            final_time=f'{int(formatted_time)} minutes ago'
-    return final_time
+            inq_form= InquiryForm()
+            
+            if 'submitted' in request.GET:
+                submitted=True
+                
+        return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted': submitted})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {e})

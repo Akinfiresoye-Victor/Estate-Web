@@ -1,0 +1,636 @@
+{% extends 'company/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/documents.css' %}">
+{% endblock %}
+
+{% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
+
+<!-- Page Header -->
+<div class="documents-header">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="page-title">
+          <i class="bi bi-folder2-open me-3"></i>Document Management
+        </h1>
+        <p class="page-subtitle">Store and manage your legal documents securely</p>
+      </div>
+      <div class="col-lg-6 text-lg-end">
+        <div class="header-actions">
+          <button class="btn-upload" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="bi bi-cloud-upload me-2"></i>Upload Document
+          </button>
+          <button class="btn-create-folder" data-bs-toggle="modal" data-bs-target="#createFolderModal">
+            <i class="bi bi-folder-plus me-2"></i>New Folder
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid mt-4">
+  <div class="row g-4">
+    
+    <!-- Sidebar - Document Categories -->
+    <div class="col-xl-3 col-lg-4">
+      <div class="sidebar-card">
+        <div class="sidebar-header">
+          <h3><i class="bi bi-funnel me-2"></i>Categories</h3>
+        </div>
+        <div class="sidebar-body">
+          <ul class="category-list">
+            <li class="category-item active" data-category="all">
+              <i class="bi bi-files"></i>
+              <span>All Documents</span>
+              <span class="category-count">24</span>
+            </li>
+            <li class="category-item" data-category="property">
+              <i class="bi bi-house-door"></i>
+              <span>Property Documents</span>
+              <span class="category-count">8</span>
+            </li>
+            <li class="category-item" data-category="legal">
+              <i class="bi bi-file-earmark-text"></i>
+              <span>Legal Contracts</span>
+              <span class="category-count">6</span>
+            </li>
+            <li class="category-item" data-category="financial">
+              <i class="bi bi-currency-dollar"></i>
+              <span>Financial Records</span>
+              <span class="category-count">5</span>
+            </li>
+            <li class="category-item" data-category="company">
+              <i class="bi bi-building"></i>
+              <span>Company Documents</span>
+              <span class="category-count">3</span>
+            </li>
+            <li class="category-item" data-category="certificates">
+              <i class="bi bi-patch-check"></i>
+              <span>Certificates</span>
+              <span class="category-count">2</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Storage Info -->
+        <div class="storage-info">
+          <h4><i class="bi bi-hdd me-2"></i>Storage</h4>
+          <div class="storage-bar">
+            <div class="storage-used" style="width: 45%"></div>
+          </div>
+          <p class="storage-text">4.5 GB of 10 GB used</p>
+          <a href="#" class="btn-upgrade">
+            <i class="bi bi-arrow-up-circle me-2"></i>Upgrade Storage
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Document Area -->
+    <div class="col-xl-9 col-lg-8">
+      
+      <!-- Toolbar -->
+      <div class="documents-toolbar">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input type="text" id="searchDocuments" placeholder="Search documents...">
+        </div>
+        <div class="toolbar-actions">
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="grid">
+              <i class="bi bi-grid-3x3"></i>
+            </button>
+            <button class="view-btn" data-view="list">
+              <i class="bi bi-list-ul"></i>
+            </button>
+          </div>
+          <select class="sort-select" id="sortDocuments">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="name-az">Name (A-Z)</option>
+            <option value="name-za">Name (Z-A)</option>
+            <option value="size-large">Size (Largest)</option>
+            <option value="size-small">Size (Smallest)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb-nav">
+        <a href="#" class="breadcrumb-item active">
+          <i class="bi bi-house-door"></i> Home
+        </a>
+      </div>
+
+      <!-- Documents Grid -->
+      <div class="documents-container">
+        <div class="documents-grid" id="documentsGrid">
+          
+          <!-- Sample Document Card 1 - PDF -->
+          <div class="document-card" data-category="property" data-name="Property Title Deed">
+            <div class="document-preview">
+              <i class="bi bi-file-pdf file-icon pdf"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Property Title Deed - Lekki Phase 1">Property Title Deed - Lekki</h4>
+              <div class="document-meta">
+                <span class="doc-size">2.4 MB</span>
+                <span class="doc-date">Nov 05, 2024</span>
+              </div>
+              <div class="document-category-badge property">
+                <i class="bi bi-tag"></i> Property
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 2 - Word -->
+          <div class="document-card" data-category="legal" data-name="Sale Agreement">
+            <div class="document-preview">
+              <i class="bi bi-file-word file-icon word"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Sale Agreement Contract">Sale Agreement Contract</h4>
+              <div class="document-meta">
+                <span class="doc-size">156 KB</span>
+                <span class="doc-date">Nov 03, 2024</span>
+              </div>
+              <div class="document-category-badge legal">
+                <i class="bi bi-tag"></i> Legal
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 3 - Excel -->
+          <div class="document-card" data-category="financial" data-name="Financial Report">
+            <div class="document-preview">
+              <i class="bi bi-file-excel file-icon excel"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Q4 Financial Report 2024">Q4 Financial Report 2024</h4>
+              <div class="document-meta">
+                <span class="doc-size">890 KB</span>
+                <span class="doc-date">Nov 01, 2024</span>
+              </div>
+              <div class="document-category-badge financial">
+                <i class="bi bi-tag"></i> Financial
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 4 - Image -->
+          <div class="document-card" data-category="certificates" data-name="Business License">
+            <div class="document-preview">
+              <i class="bi bi-file-image file-icon image"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Business License Certificate">Business License Certificate</h4>
+              <div class="document-meta">
+                <span class="doc-size">3.2 MB</span>
+                <span class="doc-date">Oct 28, 2024</span>
+              </div>
+              <div class="document-category-badge certificates">
+                <i class="bi bi-tag"></i> Certificate
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 5 - PDF -->
+          <div class="document-card" data-category="company" data-name="CAC Certificate">
+            <div class="document-preview">
+              <i class="bi bi-file-pdf file-icon pdf"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="CAC Registration Certificate">CAC Registration Certificate</h4>
+              <div class="document-meta">
+                <span class="doc-size">1.8 MB</span>
+                <span class="doc-date">Oct 25, 2024</span>
+              </div>
+              <div class="document-category-badge company">
+                <i class="bi bi-tag"></i> Company
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 6 - PDF -->
+          <div class="document-card" data-category="legal" data-name="Lease Agreement">
+            <div class="document-preview">
+              <i class="bi bi-file-pdf file-icon pdf"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Lease Agreement Template">Lease Agreement Template</h4>
+              <div class="document-meta">
+                <span class="doc-size">450 KB</span>
+                <span class="doc-date">Oct 20, 2024</span>
+              </div>
+              <div class="document-category-badge legal">
+                <i class="bi bi-tag"></i> Legal
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 7 - Word -->
+          <div class="document-card" data-category="property" data-name="Survey Plan">
+            <div class="document-preview">
+              <i class="bi bi-file-word file-icon word"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Property Survey Plan">Property Survey Plan</h4>
+              <div class="document-meta">
+                <span class="doc-size">780 KB</span>
+                <span class="doc-date">Oct 18, 2024</span>
+              </div>
+              <div class="document-category-badge property">
+                <i class="bi bi-tag"></i> Property
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample Document Card 8 - PDF -->
+          <div class="document-card" data-category="financial" data-name="Tax Receipt">
+            <div class="document-preview">
+              <i class="bi bi-file-pdf file-icon pdf"></i>
+              <div class="document-overlay">
+                <button class="overlay-btn" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="overlay-btn" title="Download">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button class="overlay-btn" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name" title="Annual Tax Receipt 2024">Annual Tax Receipt 2024</h4>
+              <div class="document-meta">
+                <span class="doc-size">320 KB</span>
+                <span class="doc-date">Oct 15, 2024</span>
+              </div>
+              <div class="document-category-badge financial">
+                <i class="bi bi-tag"></i> Financial
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-container">
+        <nav>
+          <ul class="pagination">
+            <li class="page-item disabled">
+              <a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#"><i class="bi bi-chevron-right"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Upload Document Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-cloud-upload me-2"></i>Upload Document
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm">
+          
+          <div class="upload-area" id="uploadArea">
+            <i class="bi bi-cloud-arrow-up"></i>
+            <h4>Drag & Drop files here</h4>
+            <p>or click to browse</p>
+            <input type="file" id="fileInput" name="document" multiple hidden>
+          </div>
+
+          <div class="form-group mt-4">
+            <label for="documentName">Document Name</label>
+            <input type="text" class="form-control" id="documentName" placeholder="Enter document name" required>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="documentCategory">Category</label>
+            <select class="form-control" id="documentCategory" required>
+              <option value="">Select category</option>
+              <option value="property">Property Documents</option>
+              <option value="legal">Legal Contracts</option>
+              <option value="financial">Financial Records</option>
+              <option value="company">Company Documents</option>
+              <option value="certificates">Certificates</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="documentDescription">Description (Optional)</label>
+            <textarea class="form-control" id="documentDescription" rows="3" placeholder="Add a description..."></textarea>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="expiryDate">Expiry Date (Optional)</label>
+            <input type="date" class="form-control" id="expiryDate">
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">
+          <i class="bi bi-upload me-2"></i>Upload
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Folder Modal -->
+<div class="modal fade" id="createFolderModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-folder-plus me-2"></i>New Folder
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createFolderForm">
+          <div class="form-group">
+            <label for="folderName">Folder Name</label>
+            <input type="text" class="form-control" id="folderName" placeholder="Enter folder name" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">
+          <i class="bi bi-folder-plus me-2"></i>Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+
+    // Category Filter
+    const categoryItems = document.querySelectorAll('.category-item');
+    const documentCards = document.querySelectorAll('.document-card');
+
+    categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const category = this.dataset.category;
+
+            // Update active state
+            categoryItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter documents
+            documentCards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Search Functionality
+    const searchInput = document.getElementById('searchDocuments');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+
+            documentCards.forEach(card => {
+                const docName = card.dataset.name.toLowerCase();
+                if (docName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // View Toggle
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const documentsGrid = document.getElementById('documentsGrid');
+
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const view = this.dataset.view;
+
+            viewBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            if (view === 'list') {
+                documentsGrid.classList.add('list-view');
+            } else {
+                documentsGrid.classList.remove('list-view');
+            }
+        });
+    });
+
+    // Upload Area Drag & Drop
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+
+    if (uploadArea && fileInput) {
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                console.log('Files dropped:', files);
+            }
+        });
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                console.log('Files selected:', this.files);
+            }
+        });
+    }
+
+    // Sort Functionality
+    const sortSelect = document.getElementById('sortDocuments');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            const sortType = this.value;
+            const cardsArray = Array.from(documentCards);
+
+            cardsArray.sort((a, b) => {
+                switch(sortType) {
+                    case 'name-az':
+                        return a.dataset.name.localeCompare(b.dataset.name);
+                    case 'name-za':
+                        return b.dataset.name.localeCompare(a.dataset.name);
+                    case 'newest':
+                        return new Date(b.dataset.date) - new Date(a.dataset.date);
+                    case 'oldest':
+                        return new Date(a.dataset.date) - new Date(b.dataset.date);
+                    default:
+                        return 0;
+                }
+            });
+
+            cardsArray.forEach(card => documentsGrid.appendChild(card));
+        });
+    }
+
+})();
+</script>
+{% endblock %}

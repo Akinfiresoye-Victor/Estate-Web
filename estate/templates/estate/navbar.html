@@ -4,8 +4,9 @@
 
 <nav class="navbar navbar-custom fixed-top" data-bs-theme="dark">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="{%url 'articles'%}">
-      <i class="bi bi-buildings me-2"></i>Estate Web
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'landing' %}">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" height="40" class="me-2">
+      <strong>Estate Web</strong>
     </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -25,30 +26,23 @@
           
           <!-- Latest News -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'articles' %}">
+            <a class="nav-link" href="{%url 'customer:articles'%}">
               <i class="bi bi-newspaper me-2"></i>Latest News
             </a>
           </li>
-{% if request.user.id == 1%}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'view-feedbacks' %}">
-              <i class="bi bi-newspaper me-2"></i>Feedback
-            </a>
-          </li>
-{%endif%}
           <!-- Find Home Dropdown -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-house-heart me-2"></i>Find Home
             </a>
             <ul class="dropdown-menu dropdown-menu-dark dropdown-custom">
-              <li><a class="dropdown-item" href="{% url 'rent-prop' %}">
+              <li><a class="dropdown-item" href="{% url 'customer:rent-prop' %}">
                 <i class="bi bi-key me-2"></i>Rent Home
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'buy-property' %}">
+              <li><a class="dropdown-item" href="{% url 'customer:buy-property' %}">
                 <i class="bi bi-cart-check me-2"></i>Buy Home
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'wishlist' %}">
+              <li><a class="dropdown-item" href="{% url 'customer:wishlist' %}">
                 <i class="bi bi-heart me-2"></i>Wishlist
               </a></li>
             </ul>
@@ -60,13 +54,13 @@
               <i class="bi bi-building-gear me-2"></i>Property Management
             </a>
             <ul class="dropdown-menu dropdown-menu-dark dropdown-custom">
-              <li><a class="dropdown-item" href="{% url 'lease-property' %}">
+              <li><a class="dropdown-item" href="{% url 'customer:lease-property' %}">
                 <i class="bi bi-file-text me-2"></i>Lease Property
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'sell-property' %}">
+              <li><a class="dropdown-item" href="{% url 'customer:sell-property' %}">
                 <i class="bi bi-cash-coin me-2"></i>Sell Property
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'my-listings' %}">
+              <li><a class="dropdown-item" href="{% url 'customer:my-listings' %}">
                 <i class="bi bi-list-ul me-2"></i>My Listings
               </a></li>
             </ul>
@@ -81,26 +75,11 @@
 
           <!-- User Profile -->
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'user-profile' %}">
+            <a class="nav-link" href="{% url 'customer:user-profile' %}">
               <i class="bi bi-person-circle me-2"></i>User Profile
             </a>
           </li>
 
-          {%if request.user.id == 1%}  
-            <li class="nav-item">
-            <a class="nav-link" href="{% url 'admin-dashboard' %}">
-              <i class="bi bi-person-circle me-2"></i>Admin 
-            </a>
-          </li>
-          {%endif%}
-
-
-          <!-- Feedback -->
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'feedback' %}">
-              <i class="bi bi-chat-left-quote me-2"></i>Feedback/Review
-            </a>
-          </li>
 
           <li class="nav-divider"></li>
 

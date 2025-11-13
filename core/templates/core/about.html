@@ -1,13 +1,16 @@
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>About Us - Estate Web</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --primary-color: #1a3c4e;
@@ -28,6 +31,7 @@
     font-family: 'Poppins', sans-serif;
     color: var(--text-dark);
     line-height: 1.6;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -37,9 +41,11 @@
 
   /* Navigation */
   .navbar {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.98);
     padding: 1.2rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
   }
 
   .navbar-brand {
@@ -48,73 +54,112 @@
     font-weight: 700;
     color: var(--primary-color) !important;
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .logo {
+    height: 65px;
+    width: auto;
+    object-fit: contain;
   }
 
   .nav-link {
-    color: var(--text-dark) !important;
+    color: var(--text-dark);
     font-weight: 500;
-    margin: 0 1rem;
+    padding: 0.5rem 1rem;
     transition: color 0.3s ease;
-    position: relative;
   }
 
   .nav-link:hover {
-    color: var(--secondary-color) !important;
+    color: var(--secondary-color);
   }
 
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -5px;
-    left: 50%;
+  .btn-nav {
     background: var(--secondary-color);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-  }
-
-  .nav-link:hover::after {
-    width: 100%;
-  }
-
-  .btn-primary-custom {
-    background: var(--primary-color);
     color: #fff;
     border: none;
-    padding: 0.75rem 2rem;
-    font-weight: 500;
+    padding: 0.7rem 1.8rem;
+    font-weight: 600;
     transition: all 0.3s ease;
-    border-radius: 0;
+    border-radius: 8px;
+    margin-left: 1rem;
   }
 
-  .btn-primary-custom:hover {
-    background: var(--secondary-color);
+  .btn-nav:hover {
+    background: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    color: #fff;
+  }
+
+  .dropdown-menu {
+    border: none;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .dropdown-item {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .dropdown-item:hover {
+    background: var(--secondary-color);
+    color: #fff;
+    transform: translateX(5px);
+  }
+
+  .dropdown-item i {
+    font-size: 1.2rem;
   }
 
   /* Hero Section */
   .page-hero {
-    background: linear-gradient(rgba(26, 60, 78, 0.85), rgba(26, 60, 78, 0.85)), 
+    background: linear-gradient(rgba(26, 60, 78, 0.9), rgba(26, 60, 78, 0.9)), 
                 url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center/cover;
-    padding: 8rem 0 5rem;
+    padding: 10rem 0 6rem;
     color: #fff;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(193, 155, 118, 0.15) 0%, transparent 70%);
+  }
+
+  .page-hero-content {
+    position: relative;
+    z-index: 2;
   }
 
   .page-hero h1 {
-    font-size: 3.5rem;
-    margin-bottom: 1rem;
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
     animation: fadeInUp 0.8s ease;
   }
 
   .page-hero p {
-    font-size: 1.3rem;
-    max-width: 700px;
+    font-size: 1.4rem;
+    max-width: 800px;
     margin: 0 auto;
     opacity: 0.95;
     animation: fadeInUp 0.8s ease 0.2s backwards;
+    line-height: 1.8;
   }
 
   @keyframes fadeInUp {
@@ -130,224 +175,380 @@
 
   /* Story Section */
   .story-section {
-    padding: 6rem 0;
+    padding: 8rem 0;
     background: #fff;
   }
 
   .section-title {
-    font-size: 2.5rem;
+    font-size: 3rem;
     margin-bottom: 1.5rem;
     color: var(--primary-color);
   }
 
   .section-subtitle {
     color: var(--secondary-color);
-    font-size: 1.2rem;
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
     margin-bottom: 1rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
   }
 
   .story-content {
-    font-size: 1.1rem;
-    line-height: 1.9;
+    font-size: 1.15rem;
+    line-height: 2;
     color: var(--text-dark);
   }
 
   .story-content p {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .highlight-box {
-    background: var(--bg-light);
-    border-left: 4px solid var(--secondary-color);
-    padding: 2rem;
-    margin: 2rem 0;
-    border-radius: 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: #fff;
+    padding: 3rem;
+    margin: 3rem 0;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .highlight-box::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
   }
 
   .highlight-box h4 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .highlight-box p {
+    position: relative;
+    z-index: 2;
+    opacity: 0.95;
+    line-height: 1.9;
   }
 
   /* Developer Profile */
   .developer-section {
-    padding: 6rem 0;
+    padding: 8rem 0;
     background: var(--bg-light);
   }
 
   .profile-card {
     background: #fff;
-    padding: 3rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    border-radius: 0;
+    padding: 4rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    border: 2px solid rgba(193, 155, 118, 0.1);
   }
 
   .profile-header {
     text-align: center;
-    margin-bottom: 2.5rem;
-    padding-bottom: 2rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
     border-bottom: 2px solid var(--bg-light);
   }
 
   .profile-avatar {
-    width: 150px;
-    height: 150px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1.5rem;
-    font-size: 4rem;
+    margin: 0 auto 2rem;
+    font-size: 5rem;
     color: #fff;
-    border: 5px solid #fff;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border: 6px solid #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+  }
+
+  .profile-avatar:hover {
+    transform: scale(1.05);
   }
 
   .profile-name {
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: var(--primary-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
   }
 
   .profile-title {
     color: var(--secondary-color);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 500;
+  }
+
+  .profile-section-title {
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 1rem;
+  }
+
+  .profile-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--secondary-color);
+  }
+
+  .profile-text {
+    line-height: 2;
+    font-size: 1.05rem;
+    color: var(--text-dark);
   }
 
   .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
-    margin: 2rem 0;
+    margin-top: 2rem;
   }
 
   .skill-badge {
     background: var(--primary-color);
     color: #fff;
-    padding: 0.75rem 1rem;
+    padding: 1rem;
     text-align: center;
     font-size: 0.95rem;
     font-weight: 500;
     transition: all 0.3s ease;
+    border-radius: 8px;
   }
 
   .skill-badge:hover {
     background: var(--secondary-color);
-    transform: translateY(-3px);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   }
 
   /* Vision Section */
   .vision-section {
-    padding: 6rem 0;
+    padding: 8rem 0;
     background: #fff;
   }
 
   .vision-card {
-    padding: 2.5rem;
-    background: var(--bg-light);
+    padding: 3rem;
+    background: #fff;
     margin-bottom: 2rem;
-    transition: all 0.3s ease;
-    border-left: 4px solid var(--secondary-color);
+    transition: all 0.4s ease;
+    border-radius: 16px;
+    border: 2px solid var(--bg-light);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vision-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--secondary-color);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
   }
 
   .vision-card:hover {
-    transform: translateX(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    border-color: var(--secondary-color);
+  }
+
+  .vision-card:hover::before {
+    transform: scaleY(1);
   }
 
   .vision-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .vision-card:hover .vision-icon {
+    transform: scale(1.2) rotate(5deg);
   }
 
   .vision-card h3 {
     color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.8rem;
+  }
+
+  .vision-card p {
+    color: var(--text-dark);
+    line-height: 1.9;
+    font-size: 1.05rem;
   }
 
   /* Projects Section */
   .projects-section {
-    padding: 6rem 0;
+    padding: 8rem 0;
     background: var(--bg-light);
   }
 
   .project-card {
     background: #fff;
-    padding: 2rem;
+    padding: 2.5rem;
     height: 100%;
-    transition: all 0.3s ease;
-    border: 1px solid #eee;
+    transition: all 0.4s ease;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
   }
 
   .project-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    transform: translateY(-15px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    border-color: var(--secondary-color);
+  }
+
+  .project-card:hover::before {
+    transform: scaleX(1);
   }
 
   .project-number {
-    font-size: 3rem;
+    font-size: 3.5rem;
     color: var(--secondary-color);
     font-weight: 700;
     font-family: 'Playfair Display', serif;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1;
+    opacity: 0.9;
   }
 
   .project-card h4 {
     color: var(--primary-color);
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.5rem;
+  }
+
+  .project-card p {
+    color: var(--text-dark);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
   }
 
   .project-tech {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
   }
 
   .tech-tag {
     background: var(--primary-color);
     color: #fff;
-    padding: 0.3rem 0.8rem;
+    padding: 0.5rem 1rem;
     font-size: 0.85rem;
-    border-radius: 3px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .tech-tag:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
   }
 
   /* CTA Section */
   .cta-section {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
     color: #fff;
-    padding: 5rem 0;
+    padding: 7rem 0;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>');
+    opacity: 0.3;
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 2;
   }
 
   .cta-section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
+    font-size: 3.5rem;
+    margin-bottom: 2rem;
   }
 
   .cta-section p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-size: 1.3rem;
+    margin-bottom: 3rem;
     opacity: 0.95;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .contact-info-box {
     background: rgba(255,255,255,0.1);
-    padding: 2rem;
-    margin-top: 2rem;
+    padding: 3rem;
+    margin-top: 3rem;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contact-info-box h4 {
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
   }
 
   .contact-item {
-    margin: 1rem 0;
-    font-size: 1.1rem;
+    margin: 1.5rem 0;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
   }
 
   .contact-item a {
@@ -355,41 +556,87 @@
     text-decoration: none;
     border-bottom: 2px solid var(--secondary-color);
     transition: all 0.3s ease;
+    padding-bottom: 2px;
   }
 
   .contact-item a:hover {
     color: var(--secondary-color);
+    border-bottom-color: #fff;
+  }
+
+  .btn-cta {
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 1.2rem 3rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .btn-cta:hover {
+    background: var(--secondary-color);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   }
 
   /* Footer */
   footer {
     background: #1a1a1a;
     color: #fff;
-    padding: 3rem 0 1.5rem;
+    padding: 4rem 0 2rem;
     text-align: center;
   }
 
   .footer-brand {
     font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--secondary-color);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .footer-text {
     color: #888;
     margin-top: 1rem;
+    line-height: 1.8;
   }
 
   /* Responsive */
+  @media (max-width: 992px) {
+    .btn-nav {
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+  }
+
   @media (max-width: 768px) {
+    .page-hero {
+      padding: 6rem 0 4rem;
+    }
+
     .page-hero h1 {
       font-size: 2.5rem;
     }
 
+    .page-hero p {
+      font-size: 1.1rem;
+    }
+
     .section-title {
       font-size: 2rem;
+    }
+
+    .story-section,
+    .developer-section,
+    .vision-section,
+    .projects-section {
+      padding: 4rem 0;
     }
 
     .profile-card {
@@ -400,8 +647,56 @@
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     }
 
-    .nav-link {
-      margin: 0.5rem 0;
+    .vision-card {
+      padding: 2rem;
+    }
+
+    .cta-section {
+      padding: 4rem 1rem;
+    }
+
+    .cta-section h2 {
+      font-size: 2rem;
+    }
+
+    .contact-info-box {
+      padding: 2rem 1.5rem;
+    }
+
+    .logo {
+      height: 35px;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .page-hero h1 {
+      font-size: 2rem;
+    }
+
+    .story-content {
+      font-size: 1rem;
+    }
+
+    .profile-name {
+      font-size: 2rem;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      font-size: 4rem;
+    }
+
+    .vision-icon {
+      font-size: 2.5rem;
+    }
+
+    .project-number {
+      font-size: 2.5rem;
     }
   }
 </style>
@@ -411,19 +706,60 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light sticky-top">
   <div class="container">
-    <a class="navbar-brand" href="/">Estate Web</a>
+    <a class="navbar-brand" href="/">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
+      Estate Web
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
         <li class="nav-item">
           <a class="nav-link" href="/">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="tel:091385489855">Contact</a>
+          <a class="nav-link" href="{% url 'about' %}">About Us</a>
         </li>
-
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Register
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
+            <li>
+              <a class="dropdown-item" href="{% url 'register-customer' %}">
+                <i class="bi bi-person"></i>
+                <div>
+                  <strong>Customer</strong>
+                  <small class="d-block text-muted">Find your dream property</small>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'register-agent' %}">
+                <i class="bi bi-award"></i>
+                <div>
+                  <strong>Agent</strong>
+                  <small class="d-block text-muted">List and manage properties</small>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'register-company' %}">
+                <i class="bi bi-building"></i>
+                <div>
+                  <strong>Company</strong>
+                  <small class="d-block text-muted">Corporate solutions</small>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'login' %}" class="btn-nav">Sign In</a>
+        </li>
       </ul>
     </div>
   </div>
@@ -432,8 +768,10 @@
 <!-- Hero Section -->
 <section class="page-hero">
   <div class="container">
-    <h1>About Estate Web</h1>
-    <p>Built with passion, powered by technology, designed for the future of real estate in Nigeria</p>
+    <div class="page-hero-content">
+      <h1>About Estate Web</h1>
+      <p>Built with passion, powered by technology, designed for the future of real estate in Nigeria</p>
+    </div>
   </div>
 </section>
 
@@ -442,7 +780,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-10 mx-auto">
-        <p class="section-subtitle text-center">The Story</p>
+        <p class="section-subtitle text-center">THE STORY</p>
         <h2 class="section-title text-center">How Estate Web Came to Life</h2>
         
         <div class="story-content mt-5">
@@ -479,7 +817,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-10 mx-auto">
-        <p class="section-subtitle text-center">Meet the Developer</p>
+        <p class="section-subtitle text-center">MEET THE DEVELOPER</p>
         <h2 class="section-title text-center mb-5">The Person Behind the Platform</h2>
 
         <div class="profile-card">
@@ -491,16 +829,16 @@
 
           <div class="row">
             <div class="col-md-6">
-              <h4 style="color: var(--primary-color); margin-bottom: 1.5rem;">Background</h4>
-              <p style="line-height: 1.8;">
+              <h4 class="profile-section-title">Background</h4>
+              <p class="profile-text">
                 I'm currently pursuing a 5-year Computer Science degree with a clear goal: becoming an AI Engineer. But I'm not waiting until graduation to build. I'm actively developing real-world applications that solve problems I see around me.
               </p>
-              <p style="line-height: 1.8;">
+              <p class="profile-text">
                 My journey into web development started with Python, and I've since mastered frameworks like Django and Flask to build robust, scalable applications. Estate Web represents the culmination of countless hours of learning, coding, debugging, and iterating.
               </p>
             </div>
             <div class="col-md-6">
-              <h4 style="color: var(--primary-color); margin-bottom: 1.5rem;">Technical Arsenal</h4>
+              <h4 class="profile-section-title">Technical Arsenal</h4>
               <div class="skills-grid">
                 <div class="skill-badge">Python</div>
                 <div class="skill-badge">Django</div>
@@ -528,7 +866,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-10 mx-auto">
-        <p class="section-subtitle text-center">The Vision</p>
+        <p class="section-subtitle text-center">THE VISION</p>
         <h2 class="section-title text-center mb-5">Where Estate Web is Heading</h2>
 
         <div class="row">
@@ -577,7 +915,7 @@
 <!-- Projects Section -->
 <section class="projects-section">
   <div class="container">
-    <p class="section-subtitle text-center">Portfolio Highlights</p>
+    <p class="section-subtitle text-center">PORTFOLIO HIGHLIGHTS</p>
     <h2 class="section-title text-center mb-5">Other Projects & Experiments</h2>
 
     <div class="row g-4">
@@ -589,7 +927,7 @@
           <div class="project-tech">
             <span class="tech-tag">Django</span>
             <span class="tech-tag">HTML/CSS</span>
-            <span class="tech-tag">postgreSQL</span>
+            <span class="tech-tag">PostgreSQL</span>
           </div>
         </div>
       </div>
@@ -635,21 +973,25 @@
 <!-- CTA Section -->
 <section class="cta-section">
   <div class="container">
-    <h2>Let's Build the Future Together</h2>
-    <p>Estate Web is growing every day. Join the platform, explore properties, or reach out to discuss collaborations and ideas.</p>
-    
-    <div class="row justify-content-center mt-5">
-      <div class="col-md-8">
-        <div class="contact-info-box">
-          <h4 style="margin-bottom: 1.5rem;">Get In Touch</h4>
-          <div class="contact-item">
-            📧 Email: <a href="mailto:eninlavictor30@gmail.com">eninlavictor30@gmail.com</a>
-          </div>
-          <div class="contact-item">
-            📞 Phone: <a href="tel:091385489855">091385489855</a>
-          </div>
-          <div class="contact-item" style="margin-top: 2rem;">
-            <a href="{%url 'register-user'%}" class="btn btn-primary-custom" style="background: #fff; color: var(--primary-color);">Start Using Estate Web</a>
+    <div class="cta-content">
+      <h2>Let's Build the Future Together</h2>
+      <p>Estate Web is growing every day. Join the platform, explore properties, or reach out to discuss collaborations and ideas.</p>
+      
+      <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+          <div class="contact-info-box">
+            <h4>Get In Touch</h4>
+            <div class="contact-item">
+              <i class="bi bi-envelope-fill"></i>
+              <a href="mailto:eninlavictor031@gmail.com">eninlavictor031@gmail.com</a>
+            </div>
+            <div class="contact-item">
+              <i class="bi bi-telephone-fill"></i>
+              <a href="tel:09138549855">09138549855</a>
+            </div>
+            <div class="contact-item" style="margin-top: 2.5rem;">
+              <a href="{% url 'login' %}" class="btn-cta">Join Estate Web</a>
+            </div>
           </div>
         </div>
       </div>
@@ -661,7 +1003,7 @@
 <footer>
   <div class="container">
     <div class="footer-brand">Estate Web</div>
-    <p class="footer-text">Built solo by Akinfiresoye Victor & a sprinkle of AI | &copy; 2025 Estate Web. All rights reserved.</p>
+    <p class="footer-text">Built solely by Akinfiresoye Victor & a sprinkle of AI<br>&copy; 2025 Estate Web. All rights reserved.</p>
   </div>
 </footer>
 

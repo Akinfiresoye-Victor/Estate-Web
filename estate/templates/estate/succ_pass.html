@@ -23,10 +23,10 @@
             Your password has been updated successfully. You can now use your new password to log in.
           </p>
           <div class="d-grid gap-2">
-            <a href="{% url 'user-profile' %}" class="btn btn-primary btn-lg">
+            <a href="{% url 'customer:user-profile' %}" class="btn btn-primary btn-lg">
               <i class="fas fa-home me-2"></i>Go to Dashboard
             </a>
-            <a href="{% url 'change-password' %}" class="btn btn-outline-secondary">
+            <a href="{% url 'customer:change-password' %}" class="btn btn-outline-secondary">
               <i class="fas fa-key me-2"></i>Change Password Again
             </a>
           </div>

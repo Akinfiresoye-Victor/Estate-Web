@@ -1,0 +1,593 @@
+{% extends 'company/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/company_settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
+
+<!-- Page Header -->
+<div class="settings-header">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="page-title">
+          <i class="bi bi-gear me-3"></i>Settings
+        </h1>
+        <p class="page-subtitle">Manage your company profile and platform preferences</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <button class="btn-save-all">
+          <i class="bi bi-check-circle me-2"></i>Save All Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid mt-4">
+  <div class="row g-4">
+    
+    <!-- Sidebar Navigation -->
+    <div class="col-xl-3 col-lg-4">
+      <div class="settings-sidebar">
+        <ul class="settings-nav">
+          <li class="nav-item active" data-section="profile">
+            <i class="bi bi-person-circle"></i>
+            <span>Public Profile</span>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+          <li class="nav-item" data-section="account">
+            <i class="bi bi-shield-lock"></i>
+            <span>Account Security</span>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+          <li class="nav-item" data-section="notifications">
+            <i class="bi bi-bell"></i>
+            <span>Notifications</span>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+          <li class="nav-item" data-section="preferences">
+            <i class="bi bi-sliders"></i>
+            <span>Preferences</span>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+          <li class="nav-item" data-section="billing">
+            <i class="bi bi-credit-card"></i>
+            <span>Billing & Plans</span>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+          <li class="nav-item danger" data-section="danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>Danger Zone</span>
+            <i class="bi bi-chevron-right"></i>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="col-xl-9 col-lg-8">
+      
+      <!-- Public Profile Section -->
+      <div class="settings-section active" id="profile">
+        <div class="settings-card">
+          <div class="card-header-settings">
+            <div>
+              <h3><i class="bi bi-person-circle me-2"></i>Public Profile</h3>
+              <p>This information will be displayed publicly on your company profile</p>
+            </div>
+          </div>
+          <div class="card-body-settings">
+            
+            <!-- Company Logo -->
+            <div class="form-group">
+              <label>Company Logo</label>
+              <div class="logo-upload-section">
+                <div class="current-logo">
+                  <img src="{% static 'estate/images/logo.png' %}" alt="Company Logo" id="logoPreview">
+                </div>
+                <div class="logo-upload-controls">
+                  <button class="btn-upload-logo" type="button">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload New Logo
+                  </button>
+                  <input type="file" id="logoInput" accept="image/*" hidden>
+                  <button class="btn-remove-logo" type="button">
+                    <i class="bi bi-trash me-2"></i>Remove
+                  </button>
+                  <p class="upload-hint">JPG, PNG or GIF. Max size 2MB. Recommended 500x500px</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Company Name -->
+            <div class="form-group">
+              <label for="companyName">Company Name</label>
+              <input type="text" class="form-control" id="companyName" placeholder="Enter company name" value="Estate Solutions Ltd">
+            </div>
+
+            <!-- Company Bio -->
+            <div class="form-group">
+              <label for="companyBio">Company Bio</label>
+              <textarea class="form-control" id="companyBio" rows="4" placeholder="Tell us about your company...">Leading real estate company specializing in luxury properties across Lagos and surrounding areas.</textarea>
+              <span class="char-count">120 / 500 characters</span>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phoneNumber">Phone Number</label>
+                  <input type="tel" class="form-control" id="phoneNumber" placeholder="+234" value="+234 801 234 5678">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="emailAddress">Email Address</label>
+                  <input type="email" class="form-control" id="emailAddress" placeholder="email@company.com" value="info@estatesolutions.com">
+                </div>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+              <label for="address">Office Address</label>
+              <input type="text" class="form-control" id="address" placeholder="Enter full address" value="45 Admiralty Way, Lekki Phase 1, Lagos">
+            </div>
+
+            <!-- Service Areas -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="serviceAreas">Service Areas</label>
+                  <select class="form-control" id="serviceAreas">
+                    <option>Lagos</option>
+                    <option>Abuja</option>
+                    <option>Port Harcourt</option>
+                    <option>Ibadan</option>
+                    <option>Kano</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="specialization">Specialization</label>
+                  <input type="text" class="form-control" id="specialization" placeholder="e.g., Residential, Commercial" value="Luxury Residential">
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="form-group">
+              <label>Social Media Links</label>
+              <div class="social-links-inputs">
+                <div class="social-input-group">
+                  <i class="bi bi-facebook"></i>
+                  <input type="url" class="form-control" placeholder="Facebook URL" value="https://facebook.com/estatesolutions">
+                </div>
+                <div class="social-input-group">
+                  <i class="bi bi-twitter"></i>
+                  <input type="url" class="form-control" placeholder="Twitter URL" value="https://twitter.com/estatesolutions">
+                </div>
+                <div class="social-input-group">
+                  <i class="bi bi-instagram"></i>
+                  <input type="url" class="form-control" placeholder="Instagram URL" value="https://instagram.com/estatesolutions">
+                </div>
+                <div class="social-input-group">
+                  <i class="bi bi-linkedin"></i>
+                  <input type="url" class="form-control" placeholder="LinkedIn URL">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-cancel" type="button">Cancel</button>
+              <button class="btn-save" type="button">
+                <i class="bi bi-check-circle me-2"></i>Save Changes
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Security Section -->
+      <div class="settings-section" id="account">
+        <div class="settings-card">
+          <div class="card-header-settings">
+            <div>
+              <h3><i class="bi bi-shield-lock me-2"></i>Account Security</h3>
+              <p>Manage your password and security settings</p>
+            </div>
+          </div>
+          <div class="card-body-settings">
+            
+            <!-- Email Verification -->
+            <div class="security-item verified">
+              <div class="security-icon">
+                <i class="bi bi-envelope-check"></i>
+              </div>
+              <div class="security-content">
+                <h4>Email Verification</h4>
+                <p>Your email address is verified</p>
+              </div>
+              <div class="security-status">
+                <span class="status-badge verified">
+                  <i class="bi bi-check-circle"></i> Verified
+                </span>
+              </div>
+            </div>
+
+            <!-- Two-Factor Authentication -->
+            <div class="security-item">
+              <div class="security-icon">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div class="security-content">
+                <h4>Two-Factor Authentication</h4>
+                <p>Add an extra layer of security to your account</p>
+              </div>
+              <div class="security-status">
+                <label class="toggle-switch">
+                  <input type="checkbox">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="form-section">
+              <h4 class="section-title">Change Password</h4>
+              <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+              </div>
+              <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+              </div>
+              <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+              </div>
+              <div class="password-requirements">
+                <p><strong>Password must contain:</strong></p>
+                <ul>
+                  <li class="requirement" data-requirement="length">
+                    <i class="bi bi-x-circle"></i> At least 8 characters
+                  </li>
+                  <li class="requirement" data-requirement="uppercase">
+                    <i class="bi bi-x-circle"></i> One uppercase letter
+                  </li>
+                  <li class="requirement" data-requirement="lowercase">
+                    <i class="bi bi-x-circle"></i> One lowercase letter
+                  </li>
+                  <li class="requirement" data-requirement="number">
+                    <i class="bi bi-x-circle"></i> One number
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-cancel" type="button">Cancel</button>
+              <button class="btn-save" type="button">
+                <i class="bi bi-check-circle me-2"></i>Update Security
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Section -->
+      <div class="settings-section" id="notifications">
+        <div class="settings-card">
+          <div class="card-header-settings">
+            <div>
+              <h3><i class="bi bi-bell me-2"></i>Notification Preferences</h3>
+              <p>Choose what notifications you want to receive</p>
+            </div>
+          </div>
+          <div class="card-body-settings">
+            
+            <!-- Email Notifications -->
+            <div class="notification-section">
+              <h4 class="section-title">
+                <i class="bi bi-envelope me-2"></i>Email Notifications
+              </h4>
+              
+              <div class="notification-item">
+                <div class="notification-info">
+                  <h5>Property Inquiries</h5>
+                  <p>Get notified when someone inquires about your properties</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="notification-item">
+                <div class="notification-info">
+                  <h5>New Property Views</h5>
+                  <p>Receive updates when your properties are viewed</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="notification-item">
+                <div class="notification-info">
+                  <h5>Weekly Reports</h5>
+                  <p>Get weekly performance summaries and analytics</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Push Notifications -->
+            <div class="notification-section">
+              <h4 class="section-title">
+                <i class="bi bi-phone me-2"></i>Push Notifications
+              </h4>
+              
+              <div class="notification-item">
+                <div class="notification-info">
+                  <h5>Instant Inquiries</h5>
+                  <p>Get instant push notifications for new inquiries</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="notification-item">
+                <div class="notification-info">
+                  <h5>System Updates</h5>
+                  <p>Important platform updates and announcements</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-cancel" type="button">Cancel</button>
+              <button class="btn-save" type="button">
+                <i class="bi bi-check-circle me-2"></i>Save Preferences
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences Section -->
+      <div class="settings-section" id="preferences">
+        <div class="settings-card">
+          <div class="card-header-settings">
+            <div>
+              <h3><i class="bi bi-sliders me-2"></i>Platform Preferences</h3>
+              <p>Customize your experience on Estate Web</p>
+            </div>
+          </div>
+          <div class="card-body-settings">
+            
+            <!-- Language & Region -->
+            <div class="form-section">
+              <h4 class="section-title">Language & Region</h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="language">Language</label>
+                    <select class="form-control" id="language">
+                      <option>English</option>
+                      <option>Yoruba</option>
+                      <option>Hausa</option>
+                      <option>Igbo</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="timezone">Timezone</label>
+                    <select class="form-control" id="timezone">
+                      <option>West Africa Time (WAT)</option>
+                      <option>GMT</option>
+                      <option>EST</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Display Preferences -->
+            <div class="form-section">
+              <h4 class="section-title">Display Preferences</h4>
+              
+              <div class="preference-item">
+                <div class="preference-info">
+                  <h5>Dark Mode</h5>
+                  <p>Switch to dark theme for better viewing at night</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div class="preference-item">
+                <div class="preference-info">
+                  <h5>Public Profile</h5>
+                  <p>Make your profile visible to everyone on Estate Web</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-cancel" type="button">Cancel</button>
+              <button class="btn-save" type="button">
+                <i class="bi bi-check-circle me-2"></i>Save Preferences
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing Section -->
+      <div class="settings-section" id="billing">
+        <div class="settings-card">
+          <div class="card-header-settings">
+            <div>
+              <h3><i class="bi bi-credit-card me-2"></i>Billing & Subscription</h3>
+              <p>Manage your subscription and payment methods</p>
+            </div>
+          </div>
+          <div class="card-body-settings">
+            
+            <!-- Current Plan -->
+            <div class="current-plan">
+              <div class="plan-info">
+                <h4>Professional Plan</h4>
+                <p>Unlimited listings • Team collaboration • Priority support</p>
+                <div class="plan-price">
+                  <span class="price">₦25,000</span>
+                  <span class="period">/month</span>
+                </div>
+              </div>
+              <button class="btn-upgrade" type="button">
+                <i class="bi bi-arrow-up-circle me-2"></i>Upgrade Plan
+              </button>
+            </div>
+
+            <!-- Billing History -->
+            <div class="form-section">
+              <h4 class="section-title">Billing History</h4>
+              <div class="billing-history">
+                <div class="billing-item">
+                  <div class="billing-info">
+                    <h5>Professional Plan</h5>
+                    <p>Invoice #INV-2024-001</p>
+                  </div>
+                  <div class="billing-details">
+                    <span class="billing-date">Jan 15, 2024</span>
+                    <span class="billing-amount">₦25,000</span>
+                    <span class="billing-status paid">Paid</span>
+                  </div>
+                </div>
+                <div class="billing-item">
+                  <div class="billing-info">
+                    <h5>Professional Plan</h5>
+                    <p>Invoice #INV-2023-012</p>
+                  </div>
+                  <div class="billing-details">
+                    <span class="billing-date">Dec 15, 2023</span>
+                    <span class="billing-amount">₦25,000</span>
+                    <span class="billing-status paid">Paid</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone Section -->
+      <div class="settings-section" id="danger">
+        <div class="settings-card danger-card">
+          <div class="card-header-settings danger">
+            <div>
+              <h3><i class="bi bi-exclamation-triangle me-2"></i>Danger Zone</h3>
+              <p>Irreversible actions that affect your account</p>
+            </div>
+          </div>
+          <div class="card-body-settings">
+            
+            <div class="danger-item">
+              <div class="danger-info">
+                <h4>Deactivate Account</h4>
+                <p>Temporarily disable your account. You can reactivate anytime.</p>
+              </div>
+              <button class="btn-danger-action" type="button">
+                <i class="bi bi-pause-circle me-2"></i>Deactivate
+              </button>
+            </div>
+
+            <div class="danger-item">
+              <div class="danger-info">
+                <h4>Delete Account</h4>
+                <p>Permanently delete your account and all associated data. This cannot be undone.</p>
+              </div>
+              <button class="btn-danger-action critical" type="button">
+                <i class="bi bi-trash me-2"></i>Delete Account
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+{% endblock %}

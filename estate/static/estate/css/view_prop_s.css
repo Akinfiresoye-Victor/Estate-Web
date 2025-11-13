@@ -101,12 +101,11 @@ body {
 }
 
 /* Main Image */
-.main-image-section {
+.main-image {
     width: 100%;
-    height: 500px;
-    overflow: hidden;
+    height: 100%;
+    object-fit: cover;
 }
-
 .main-image {
     width: 275px;
     height: 183px;
@@ -117,7 +116,7 @@ body {
 .gallery-section {
     padding: 2.5rem;
     background: #f8f9fa;
-    border-bottom: 2px solid #e7f3ff;
+    border-bottom: 2px solid #e8f5e9;
 }
 
 .section-title {
@@ -144,9 +143,8 @@ body {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    width: 100%;
+    background: #fff;
     height: 250px;
-    position: relative;
 }
 
 .gallery-item:hover {
@@ -155,13 +153,11 @@ body {
 }
 
 .gallery-item img {
-    width: 275px;
-    height: 183px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: center;
     display: block;
 }
-
 /* Price Section */
 .price-section {
     padding: 2.5rem;

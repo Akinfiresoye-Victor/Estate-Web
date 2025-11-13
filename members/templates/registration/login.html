@@ -1,6 +1,9 @@
+{%load static%}
+
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login - Estate Web</title>
@@ -18,45 +21,38 @@
   
   <!-- Messages Container -->
   <div class="messages-container">
-{% if messages %}
-    {% for message in messages %}
+    {% if messages %}
+      {% for message in messages %}
         {% if message.tags == 'error' %}
-            {% with 'danger' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         {% elif message.tags == 'info' %}
-            {% with 'info' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         {% elif message.tags == 'warning' %}
-            {% with 'warning' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         {% else %}
-            {% with 'success' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
         {% endif %}
-    {% endfor %}
-{% endif %}
-
+      {% endfor %}
+    {% endif %}
   </div>
 
-  <!-- Login Card -->
+  <!-- Login Wrapper -->
   <div class="login-wrapper">
     <div class="login-container">
+      
+      <!-- Login Card -->
       <div class="login-card">
         
         <!-- Brand Header -->
@@ -113,12 +109,51 @@
           </div>
         </form>
 
-        <!-- Register Link -->
+        <!-- Register Section -->
         <div class="register-section">
           <p class="register-text">Don't have an account?</p>
-          <a href="{% url 'register-user' %}" class="btn-register">
-            Create Account
-          </a>
+          
+          <div class="dropdown">
+            <button class="btn-register dropdown-toggle" 
+                    type="button" 
+                    id="registerDropdown" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+              Create Free Account
+            </button>
+            
+            <ul class="dropdown-menu" aria-labelledby="registerDropdown">
+              <li>
+                <a class="dropdown-item" href="{% url 'register-customer' %}">
+                  <i class="bi bi-person"></i>
+                  <div>
+                    <strong>Customer</strong>
+                    <small class="d-block text-muted">Find your dream property</small>
+                  </div>
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'register-agent' %}">
+                  <i class="bi bi-award"></i>
+                  <div>
+                    <strong>Agent</strong>
+                    <small class="d-block text-muted">List and manage properties</small>
+                  </div>
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'register-company' %}">
+                  <i class="bi bi-building"></i>
+                  <div>
+                    <strong>Company</strong>
+                    <small class="d-block text-muted">Corporate solutions</small>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
       </div>
@@ -131,6 +166,7 @@
           <p>Access thousands of listings and connect with trusted sellers</p>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -140,7 +176,7 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const flashMessages = document.querySelectorAll('.alert-custom');
+      const flashMessages = document.querySelectorAll('.alert');
       const delay = 5000;
 
       flashMessages.forEach(function(alertElement) {

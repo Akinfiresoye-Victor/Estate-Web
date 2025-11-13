@@ -1,0 +1,601 @@
+{% extends 'company/base.html' %}
+{%load humanize%}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/lead_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="lead-detail-header">
+  <div class="container-fluid">
+    <div class="header-navigation">
+      <a href="{% url 'company:lead-management' %}" class="back-link">
+        <i class="bi bi-arrow-left-circle me-2"></i>Back to Leads
+      </a>
+      <div class="lead-status-badge {{ lead.status|lower }}">
+        {{ lead.status }}
+      </div>
+    </div>
+    <div class="header-content">
+      <div class="lead-avatar-large">
+        {{ lead.name|slice:":1"|upper }}
+      </div>
+      <div class="lead-header-info">
+        <h1 class="lead-name">{{ lead.name }}</h1>
+        <div class="lead-meta">
+          <span class="meta-item">
+            <i class="bi bi-calendar-check me-2"></i>Inquired on {{ lead.date_created|date:"M d, Y" }}
+          </span>
+          <span class="meta-item">
+            <i class="bi bi-clock-history me-2"></i>Last updated {{ lead.date_created|timesince }} ago
+          </span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a class="btn-action-header" onclick="openEmailModal()" href="mailto:{{ lead.email }}">
+          <i class="bi bi-envelope me-2"></i>Send Email
+        </a>
+        <button class="btn-action-header" onclick="callLead('{{ lead.phone_no }}')">
+          <i class="bi bi-telephone me-2"></i>Call
+        </button>
+        <button class="btn-action-header primary" onclick="openWhatsApp('{{ lead.phone_no }}')">
+          <i class="bi bi-whatsapp me-2"></i>WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid mt-4">
+  <div class="row g-4">
+    
+    <!-- Left Column - Lead Details -->
+    <div class="col-xl-8">
+      
+      <!-- Contact Information Card -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-person-circle me-2"></i>Contact Information</h3>
+          <button class="btn-edit-small" onclick="editContactInfo()">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </div>
+        <div class="card-body-detail">
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-person me-2"></i>Full Name
+              </div>
+              <div class="info-value">{{ lead.name }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-envelope me-2"></i>Email Address
+              </div>
+              <div class="info-value">
+                <a href="mailto:{{ lead.email }}">{{ lead.email|default:"Not provided" }}</a>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-phone me-2"></i>Phone Number
+              </div>
+              <div class="info-value">
+                <a href="tel:{{ lead.phone_no }}">{{ lead.phone_no }}</a>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <i class="bi bi-chat-dots me-2"></i>Preferred Contact
+              </div>
+              <div class="info-value">
+                <span class="contact-badge">
+                  <i class="bi bi-{{ lead.contact_type|lower }} me-1"></i>
+                  {{ lead.contact_type }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property Interest Card -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-house-heart me-2"></i>Property of Interest</h3>
+        </div>
+        <div class="card-body-detail">
+          <div class="property-interest-card">
+            <div class="property-image-small">
+              {% if property.base_image %}
+                <img src="{{ property.base_image.url }}" alt="{{ property.house_type }}">
+              {% else %}
+                <div class="property-placeholder">
+                  <i class="bi bi-house"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div class="property-info-small">
+              <h4>{{ property.house_type }}</h4>
+              <p class="property-location">
+                <i class="bi bi-geo-alt me-1"></i>{{ property.location }}
+              </p>
+              <div class="property-details-small">
+                <span><i class="bi bi-house-door me-1"></i>{{ property.house_type }}</span>
+                <span><i class="bi bi-door-open me-1"></i>{{ property.bedrooms }} Beds</span>
+                <span><i class="bi bi-droplet me-1"></i>{{ property.bathrooms }} Baths</span>
+              </div>
+              <div class="property-price-small">
+                {%if property.price_range%}
+                ₦{{ property.price_range|floatformat:0|intcomma}}
+                {%else%}
+                ₦{{ property.price|floatformat:0|intcomma }}
+                {%endif%}
+                {% if property.price_range %}
+                  <span class="period">/month</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="property-actions-small">
+              {%if property.price_range%}
+              <a href="{%url 'customer:view-property-r' property.id%}" class="btn-view-property" target="_blank">
+                <i class="bi bi-eye me-2"></i>View Property
+              </a>
+              {%else%}
+              <a href="{%url 'customer:view-property-s' property.id%}" class="btn-view-property" target="_blank">
+                <i class="bi bi-eye me-2"></i>View Property
+              </a>
+              {%endif%}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inquiry Message Card -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-chat-text me-2"></i>Inquiry Message</h3>
+        </div>
+        <div class="card-body-detail">
+          <div class="inquiry-message">
+            <p>{{ lead.inquiry_message }}</p>
+          </div>
+          <div class="inquiry-meta">
+            <span class="meta-badge">
+              <i class="bi bi-calendar-event me-2"></i>
+              Tour Scheduled: {{ lead.schedule_tour|date:"M d, Y" }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Timeline -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-clock-history me-2"></i>Activity Timeline</h3>
+        </div>
+        <div class="card-body-detail">
+          <div class="timeline">
+            
+            <div class="timeline-item">
+              <div class="timeline-marker new"></div>
+              <div class="timeline-content">
+                <h5>Lead Created</h5>
+                <p>Initial inquiry received from {{ lead.name }}</p>
+                <span class="timeline-time">{{ lead.date_created|date:"M d, Y" }}</span>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h5>Status Changed</h5>
+                <p>Lead marked as <strong>{{ lead.status }}</strong></p>
+                <span class="timeline-time">{{ lead.date_created|date:"M d, Y " }}</span>
+              </div>
+            </div>
+
+            <!-- Add more timeline items as activities occur -->
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-sticky me-2"></i>Notes</h3>
+          <button class="btn-add-note" onclick="toggleNoteForm()">
+            <i class="bi bi-plus-circle me-2"></i>Add Note
+          </button>
+        </div>
+        <div class="card-body-detail">
+          
+          <!-- Add Note Form (Hidden by default) -->
+          <div class="note-form" id="noteForm" style="display: none;">
+            <textarea class="form-control" placeholder="Add a note about this lead..." rows="3"></textarea>
+            <div class="note-form-actions">
+              <button class="btn-cancel" onclick="toggleNoteForm()">Cancel</button>
+              <button class="btn-save" onclick="saveNote()">
+                <i class="bi bi-check-circle me-2"></i>Save Note
+              </button>
+            </div>
+          </div>
+
+          <!-- Notes List -->
+          <div class="notes-list">
+            <div class="note-item">
+              <div class="note-author">
+                <div class="author-avatar">JD</div>
+                <div class="author-info">
+                  <h5>John Doe</h5>
+                  <span class="note-time">2 hours ago</span>
+                </div>
+              </div>
+              <div class="note-content">
+                Called the client. Very interested in the property. Will schedule viewing for next week.
+              </div>
+            </div>
+
+            <div class="note-item">
+              <div class="note-author">
+                <div class="author-avatar">SJ</div>
+                <div class="author-info">
+                  <h5>Sarah Johnson</h5>
+                  <span class="note-time">1 day ago</span>
+                </div>
+              </div>
+              <div class="note-content">
+                Sent property details via WhatsApp. Client requested payment plan information.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column - Status & Tags -->
+    <div class="col-xl-4">
+      
+      <!-- Lead Status Card -->
+      <div class="detail-card sidebar">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-flag me-2"></i>Lead Status</h3>
+        </div>
+        <div class="card-body-detail">
+          <div class="status-selector">
+            <label class="status-label">Update Status</label>
+            <select class="status-select" id="leadStatus" onchange="updateLeadStatus(this.value)">
+              <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
+              <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Contacted</option>
+              <option value="qualified" {% if lead.status == 'qualified' %}selected{% endif %}>Qualified</option>
+              <option value="negotiating" {% if lead.status == 'negotiating' %}selected{% endif %}>Negotiating</option>
+              <option value="agreed_price" {% if lead.status == 'agreed_price' %}selected{% endif %}>Agreed Price</option>
+              <option value="viewing_scheduled" {% if lead.status == 'viewing_scheduled' %}selected{% endif %}>Viewing Scheduled</option>
+              <option value="closed_won" {% if lead.status == 'closed_won' %}selected{% endif %}>Closed - Won</option>
+              <option value="closed_lost" {% if lead.status == 'closed_lost' %}selected{% endif %}>Closed - Lost</option>
+            </select>
+          </div>
+
+          <!-- Lead Score -->
+          <div class="lead-score-section">
+            <label class="status-label">Lead Score</label>
+            <div class="score-display">
+              <div class="score-circle">
+                <div class="score-value">75</div>
+                <div class="score-label">Hot Lead</div>
+              </div>
+              <div class="score-indicators">
+                <div class="indicator hot">
+                  <i class="bi bi-thermometer-sun"></i>
+                  <span>High Interest</span>
+                </div>
+                <div class="indicator">
+                  <i class="bi bi-clock"></i>
+                  <span>Responded Quickly</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Priority -->
+          <div class="priority-section">
+            <label class="status-label">Priority Level</label>
+            <div class="priority-buttons">
+              <button class="priority-btn low" onclick="setPriority('low')">
+                <i class="bi bi-flag"></i> Low
+              </button>
+              <button class="priority-btn medium" onclick="setPriority('medium')">
+                <i class="bi bi-flag-fill"></i> Medium
+              </button>
+              <button class="priority-btn high active" onclick="setPriority('high')">
+                <i class="bi bi-flag-fill"></i> High
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags Card -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-tags me-2"></i>Tags</h3>
+        </div>
+        <div class="card-body-detail">
+          
+          <!-- Tag Input -->
+          <div class="tag-input-section">
+            <input 
+              type="text" 
+              class="tag-input" 
+              id="tagInput" 
+              placeholder="Add tags..."
+              onkeypress="handleTagInput(event)"
+            >
+            <button class="btn-add-tag" onclick="addTag()">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+
+          <!-- Current Tags -->
+          <div class="tags-container">
+            <span class="tag-pill">
+              First Time Buyer
+              <i class="bi bi-x" onclick="removeTag(this)"></i>
+            </span>
+            <span class="tag-pill">
+              Budget: High
+              <i class="bi bi-x" onclick="removeTag(this)"></i>
+            </span>
+            <span class="tag-pill">
+              Urgent
+              <i class="bi bi-x" onclick="removeTag(this)"></i>
+            </span>
+            <span class="tag-pill">
+              Cash Buyer
+              <i class="bi bi-x" onclick="removeTag(this)"></i>
+            </span>
+          </div>
+
+          <!-- Suggested Tags -->
+          <div class="suggested-tags">
+            <label class="tag-label">Suggested Tags</label>
+            <div class="suggested-tags-list">
+              <button class="suggested-tag" onclick="addSuggestedTag('Investor')">
+                <i class="bi bi-plus-circle me-1"></i>Investor
+              </button>
+              <button class="suggested-tag" onclick="addSuggestedTag('Returning Client')">
+                <i class="bi bi-plus-circle me-1"></i>Returning Client
+              </button>
+              <button class="suggested-tag" onclick="addSuggestedTag('Family')">
+                <i class="bi bi-plus-circle me-1"></i>Family
+              </button>
+              <button class="suggested-tag" onclick="addSuggestedTag('Relocating')">
+                <i class="bi bi-plus-circle me-1"></i>Relocating
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Assigned To Card -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-person-check me-2"></i>Assigned To</h3>
+        </div>
+        <div class="card-body-detail">
+          <div class="assigned-agent">
+            <div class="agent-avatar">
+              <img src="https://ui-avatars.com/api/?name=John+Doe&background=1a3c4e&color=fff" alt="Agent">
+            </div>
+            <div class="agent-info">
+              <h5>John Doe</h5>
+              <p>Senior Agent</p>
+            </div>
+            <button class="btn-reassign" onclick="openReassignModal()">
+              <i class="bi bi-arrow-left-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Card -->
+      <div class="detail-card">
+        <div class="card-header-detail">
+          <h3><i class="bi bi-lightning me-2"></i>Quick Actions</h3>
+        </div>
+        <div class="card-body-detail">
+          <div class="quick-actions-list">
+            <button class="quick-action-btn" onclick="scheduleFollowUp()">
+              <i class="bi bi-calendar-plus"></i>
+              <span>Schedule Follow-up</span>
+            </button>
+            <button class="quick-action-btn" onclick="createTask()">
+              <i class="bi bi-check-square"></i>
+              <span>Create Task</span>
+            </button>
+            <button class="quick-action-btn" onclick="sendDocument()">
+              <i class="bi bi-file-earmark-pdf"></i>
+              <span>Send Document</span>
+            </button>
+            <button class="quick-action-btn" onclick="logCall()">
+              <i class="bi bi-telephone-plus"></i>
+              <span>Log Call</span>
+            </button>
+            <button class="quick-action-btn danger" onclick="deleteLead()">
+              <i class="bi bi-trash"></i>
+              <span>Delete Lead</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+
+    // Update Lead Status
+    window.updateLeadStatus = function(status) {
+        console.log('Updating status to:', status);
+        // TODO: Add AJAX call to update status in backend
+        showNotification('Status updated successfully', 'success');
+    };
+
+    // Tag Management
+    window.handleTagInput = function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addTag();
+        }
+    };
+
+    window.addTag = function() {
+        const input = document.getElementById('tagInput');
+        const tagText = input.value.trim();
+        
+        if (tagText === '') return;
+        
+        const tagsContainer = document.querySelector('.tags-container');
+        const tagPill = document.createElement('span');
+        tagPill.className = 'tag-pill';
+        tagPill.innerHTML = `
+            ${tagText}
+            <i class="bi bi-x" onclick="removeTag(this)"></i>
+        `;
+        
+        tagsContainer.appendChild(tagPill);
+        input.value = '';
+        
+        // TODO: Save tag to backend
+        console.log('Tag added:', tagText);
+    };
+
+    window.addSuggestedTag = function(tagText) {
+        const tagsContainer = document.querySelector('.tags-container');
+        const tagPill = document.createElement('span');
+        tagPill.className = 'tag-pill';
+        tagPill.innerHTML = `
+            ${tagText}
+            <i class="bi bi-x" onclick="removeTag(this)"></i>
+        `;
+        
+        tagsContainer.appendChild(tagPill);
+        // TODO: Save tag to backend
+        console.log('Suggested tag added:', tagText);
+    };
+
+    window.removeTag = function(element) {
+        const tagPill = element.closest('.tag-pill');
+        const tagText = tagPill.textContent.trim();
+        tagPill.remove();
+        // TODO: Remove tag from backend
+        console.log('Tag removed:', tagText);
+    };
+
+    // Priority Management
+    window.setPriority = function(priority) {
+        document.querySelectorAll('.priority-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.closest('.priority-btn').classList.add('active');
+        // TODO: Save priority to backend
+        console.log('Priority set to:', priority);
+        showNotification('Priority updated', 'success');
+    };
+
+    // Notes
+    window.toggleNoteForm = function() {
+        const noteForm = document.getElementById('noteForm');
+        noteForm.style.display = noteForm.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.saveNote = function() {
+        const textarea = document.querySelector('#noteForm textarea');
+        const noteText = textarea.value.trim();
+        
+        if (noteText === '') return;
+        
+        // TODO: Save note to backend
+        console.log('Note saved:', noteText);
+        textarea.value = '';
+        toggleNoteForm();
+        showNotification('Note saved successfully', 'success');
+    };
+
+    // Contact Actions
+    window.openWhatsApp = function(phone) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        window.open(`https://wa.me/${cleanPhone}`, '_blank');
+    };
+
+    window.callLead = function(phone) {
+        window.location.href = `tel:${phone}`;
+    };
+
+    window.openEmailModal = function() {
+        // TODO: Implement email modal
+        console.log('Opening email modal');
+    };
+
+    // Quick Actions
+    window.scheduleFollowUp = function() {
+        console.log('Schedule follow-up');
+        // TODO: Implement follow-up scheduling
+    };
+
+    window.createTask = function() {
+        console.log('Create task');
+        // TODO: Implement task creation
+    };
+
+    window.sendDocument = function() {
+        console.log('Send document');
+        // TODO: Implement document sending
+    };
+
+    window.logCall = function() {
+        console.log('Log call');
+        // TODO: Implement call logging
+    };
+
+    window.deleteLead = function() {
+        if (confirm('Are you sure you want to delete this lead?')) {
+            console.log('Deleting lead');
+            // TODO: Implement lead deletion
+        }
+    };
+
+    window.openReassignModal = function() {
+        console.log('Reassign lead');
+        // TODO: Implement reassignment modal
+    };
+
+    window.editContactInfo = function() {
+        console.log('Edit contact info');
+        // TODO: Implement contact info editing
+    };
+
+    // Notification Helper
+    function showNotification(message, type) {
+        // Simple notification (can be enhanced)
+        alert(message);
+    }
+
+})();
+</script>
+{% endblock %}

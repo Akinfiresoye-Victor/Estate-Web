@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/company_properties.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Back Button -->
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
+
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="bi bi-buildings me-3"></i>{{company.company_name}} Properties
+      </h1>
+      <p class="page-subtitle">Browse all available properties from {{company.company_name}}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-icon">
+          <i class="bi bi-house-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ on_sale.count|add:on_lease.count }}</h3>
+          <p>Total Properties</p>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon sale">
+          <i class="bi bi-tag-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ on_sale.count }}</h3>
+          <p>For Sale</p>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon rent">
+          <i class="bi bi-key-fill"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ on_lease.count }}</h3>
+          <p>For Rent</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+  <div class="container">
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">
+          <i class="bi bi-grid-3x3-gap me-2"></i>All Properties
+          <span class="tab-badge">{{ on_sale.count|add:on_lease.count }}</span>
+        </button>
+        <button class="filter-tab" data-filter="sale">
+          <i class="bi bi-cash-coin me-2"></i>For Sale
+          <span class="tab-badge">{{ on_sale.count }}</span>
+        </button>
+        <button class="filter-tab" data-filter="rent">
+          <i class="bi bi-house-door me-2"></i>For Rent
+          <span class="tab-badge">{{ on_lease.count }}</span>
+        </button>
+      </div>
+      
+      <div class="filter-controls">
+        <select class="sort-select" id="sortSelect">
+          <option value="newest">Newest First</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Properties Grid -->
+<div class="properties-container">
+  <div class="container">
+    
+    {% if on_sale or on_lease %}
+    <div class="properties-grid" id="propertiesGrid">
+      
+      <!-- Properties for Sale -->
+      {% for property in on_sale %}
+      <div class="property-card" data-type="sale" data-price="{{ property.price }}">
+        <div class="property-image-wrapper">
+          {% if property.base_image %}
+            <img src="{{ property.base_image.url }}" alt="{{ property.title }}" class="property-image">
+          {% else %}
+            <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property" class="property-image">
+          {% endif %}
+          <div class="property-type-badge sale-badge">
+            <i class="bi bi-tag-fill me-1"></i>For Sale
+          </div>
+          {% if property.available %}
+            <div class="availability-badge available">Available</div>
+          {% else %}
+            <div class="availability-badge sold">Sold</div>
+          {% endif %}
+        </div>
+        
+        <div class="property-content">
+          <h3 class="property-title">{{ property.title }}</h3>
+          
+          <div class="property-location">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ property.location }}</span>
+          </div>
+          
+          <div class="property-specs">
+            <div class="spec-item">
+              <i class="bi bi-house-door"></i>
+              <span>{{ property.house_type }}</span>
+            </div>
+            <div class="spec-item">
+              <i class="bi bi-door-open"></i>
+              <span>{{ property.bedrooms }} Beds</span>
+            </div>
+            <div class="spec-item">
+              <i class="bi bi-droplet"></i>
+              <span>{{ property.bathrooms }} Baths</span>
+            </div>
+            <div class="spec-item">
+              <i class="bi bi-rulers"></i>
+              <span>{{ property.size }} sqft</span>
+            </div>
+          </div>
+          
+          <div class="property-footer">
+            <div class="property-price-section">
+              <span class="price-label">Price</span>
+              <span class="property-price">₦{{ property.price|floatformat:0|intcomma }}</span>
+            </div>
+            <a href="{% url 'customer:view-property-s' property.id %}" class="btn-view-details">
+              View Details
+              <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      
+      <!-- Properties for Rent -->
+      {% for property in on_lease %}
+      <div class="property-card" data-type="rent" data-price="{{ property.price_range }}">
+        <div class="property-image-wrapper">
+          {% if property.base_image %}
+            <img src="{{ property.base_image.url }}" alt="{{ property.title }}" class="property-image">
+          {% else %}
+            <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property" class="property-image">
+          {% endif %}
+          <div class="property-type-badge rent-badge">
+            <i class="bi bi-key-fill me-1"></i>For Rent
+          </div>
+          {% if property.available %}
+            <div class="availability-badge available">Available</div>
+          {% else %}
+            <div class="availability-badge rented">Rented</div>
+          {% endif %}
+        </div>
+        
+        <div class="property-content">
+          <h3 class="property-title">{{ property.title }}</h3>
+          
+          <div class="property-location">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ property.location }}</span>
+          </div>
+          
+          <div class="property-specs">
+            <div class="spec-item">
+              <i class="bi bi-house-door"></i>
+              <span>{{ property.house_type }}</span>
+            </div>
+            <div class="spec-item">
+              <i class="bi bi-door-open"></i>
+              <span>{{ property.bedrooms }} Beds</span>
+            </div>
+            <div class="spec-item">
+              <i class="bi bi-droplet"></i>
+              <span>{{ property.bathrooms }} Baths</span>
+            </div>
+            <div class="spec-item">
+              <i class="bi bi-rulers"></i>
+              <span>{{ property.size }} sqft</span>
+            </div>
+          </div>
+          
+          <div class="property-footer">
+            <div class="property-price-section">
+              <span class="price-label">Rent</span>
+              <span class="property-price">
+                ₦{{ property.price_range|floatformat:0|intcomma }}
+                <span class="price-period">/month</span>
+              </span>
+            </div>
+            <a href="{% url 'customer:view-property-r' property.id %}" class="btn-view-details">
+              View Details
+              <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-house-x"></i>
+      </div>
+      <h3>No Properties Available</h3>
+      <p>This company hasn't listed any properties yet. Check back later for new listings.</p>
+      <a href="javascript:history.back()" class="btn-back-home">
+        <i class="bi bi-arrow-left me-2"></i>Go Back
+      </a>
+    </div>
+    {% endif %}
+    
+  </div>
+</div>
+
+
+
+<script>
+(function() {
+    'use strict';
+
+    console.log('Script loaded'); // Debug log
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Filter functionality
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const propertyCards = document.querySelectorAll('.property-card');
+
+        console.log('Filter tabs found:', filterTabs.length); // Debug
+        console.log('Property cards found:', propertyCards.length); // Debug
+
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent any default behavior
+                
+                const filterType = this.dataset.filter;
+                console.log('Filter clicked:', filterType); // Debug
+
+                // Update active tab
+                filterTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Filter properties with proper grid display
+                let visibleCount = 0;
+                propertyCards.forEach(card => {
+                    const cardType = card.dataset.type;
+                    
+                    if (filterType === 'all' || cardType === filterType) {
+                        card.style.display = ''; // Reset to default (grid item)
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        
+                        // Trigger animation
+                        setTimeout(() => {
+                            card.style.transition = 'all 0.5s ease';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, visibleCount * 50); // Stagger animation
+                        
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                console.log('Visible cards:', visibleCount); // Debug
+            });
+        });
+
+        // Sort functionality
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                const sortType = this.value;
+                const grid = document.getElementById('propertiesGrid');
+                const cards = Array.from(propertyCards);
+
+                // Only sort visible cards
+                const visibleCards = cards.filter(card => card.style.display !== 'none');
+
+                visibleCards.sort((a, b) => {
+                    const priceA = parseFloat(a.dataset.price) || 0;
+                    const priceB = parseFloat(b.dataset.price) || 0;
+
+                    switch(sortType) {
+                        case 'price-low':
+                            return priceA - priceB;
+                        case 'price-high':
+                            return priceB - priceA;
+                        case 'newest':
+                        default:
+                            return 0;
+                    }
+                });
+
+                // Re-append sorted cards
+                visibleCards.forEach(card => grid.appendChild(card));
+            });
+        }
+
+    }); // End DOMContentLoaded
+
+})();
+</script>
+{% endblock %}

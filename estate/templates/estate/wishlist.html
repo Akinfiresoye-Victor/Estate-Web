@@ -6,6 +6,43 @@
 {% endblock %}
 
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
 
 <div class="page-header">
   <div class="container">
@@ -56,7 +93,7 @@
         <div class="card property-card lease-card h-100">
           <div class="property-image lease-image">
             <div class="property-status lease-status"><i class="fas fa-key me-1"></i> For Lease</div>
-            <a href="{% url 'toggle-wishlist-rent' wishlist_item.property.id %}" class="wishlist-btn lease-btn" title="Remove from wishlist">
+            <a href="{% url 'customer:toggle-wishlist-rent' wishlist_item.property.id %}" class="wishlist-btn lease-btn" title="Remove from wishlist">
               <i class="fas fa-heart"></i>
             </a>
             {% if wishlist_item.property.base_image %}
@@ -69,7 +106,7 @@
             <p class="property-price lease-price">₦{{ wishlist_item.property.price_range }} <span class="price-period">/month</span></p>
             <p class="property-description">{{ wishlist_item.property.description|truncatewords:20 }}</p>
             <div class="mt-auto">
-              <a href="{% url 'view-property-r' property_id=wishlist_item.property.id %}" class="btn btn-view-property lease-btn-primary">
+              <a href="{% url 'customer:view-property-r' property_id=wishlist_item.property.id %}" class="btn btn-view-property lease-btn-primary">
                 <i class="fas fa-eye me-2"></i> View Details
               </a>
             </div>
@@ -91,7 +128,7 @@
         <div class="card property-card sale-card h-100">
           <div class="property-image sale-image">
             <div class="property-status sale-status"><i class="fas fa-tag me-1"></i> For Sale</div>
-            <a href="{% url 'toggle-wishlist-buy' wishlist_item.property.id %}" class="wishlist-btn sale-btn" title="Remove from wishlist">
+            <a href="{% url 'customer:toggle-wishlist-buy' wishlist_item.property.id %}" class="wishlist-btn sale-btn" title="Remove from wishlist">
               <i class="fas fa-heart"></i>
             </a>
             {% if wishlist_item.property.base_image %}
@@ -104,7 +141,7 @@
             <p class="property-price sale-price">₦{{ wishlist_item.property.price }}</p>
             <p class="property-description">{{ wishlist_item.property.property_description|truncatewords:20 }}</p>
             <div class="mt-auto">
-              <a href="{% url 'view-property-s' property_id=wishlist_item.property.id %}" class="btn btn-view-property sale-btn-primary">
+              <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property.id %}" class="btn btn-view-property sale-btn-primary">
                 <i class="fas fa-eye me-2"></i> View Details
               </a>
             </div>
@@ -122,8 +159,8 @@
     <h3>No Saved Properties Yet</h3>
     <p>Browse through listings and save properties you love!</p>
     <div class="empty-actions">
-      <a href="{% url 'rent-prop' %}" class="btn btn-empty lease-btn-primary"><i class="fas fa-key me-2"></i> Browse Lease</a>
-      <a href="{% url 'buy-property' %}" class="btn btn-empty sale-btn-primary"><i class="fas fa-home me-2"></i> Browse Sale</a>
+      <a href="{% url 'customer:rent-prop' %}" class="btn btn-empty lease-btn-primary"><i class="fas fa-key me-2"></i> Browse Lease</a>
+      <a href="{% url 'customer:buy-property' %}" class="btn btn-empty sale-btn-primary"><i class="fas fa-home me-2"></i> Browse Sale</a>
     </div>
   </div>
   {% endif %}

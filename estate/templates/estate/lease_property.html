@@ -7,6 +7,43 @@
 {% endblock %}
 
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
 
 <div class="lease-wrapper">
     <div class="lease-container">
@@ -20,11 +57,11 @@
                 <h2 class="success-title">Property Listed Successfully!</h2>
                 <p class="success-message">Your rental property has been submitted and will be reviewed shortly.</p>
                 <div class="success-actions">
-                    <a href="{% url 'my-listings' %}" class="btn-dashboard me-2">
+                    <a href="{% url 'customer:my-listings' %}" class="btn-dashboard me-2">
                         <i class="bi bi-card-list"></i>
                         My Listings
                     </a>
-                    <a href="{% url 'lease-property' %}" class="btn-dashboard">
+                    <a href="{% url 'customer:lease-property' %}" class="btn-dashboard">
                         <i class="bi bi-house-fill me-2"></i>
                         Lease another Property
                     </a>

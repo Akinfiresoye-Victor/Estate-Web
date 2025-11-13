@@ -1,14 +1,13 @@
 '''Contains all the forms used for authentication'''
-
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from .models import User
 from django import forms
 from django.core.exceptions import ValidationError
 
 
 
 #form for registering users 
-class RegistrationForm(UserCreationForm):
+class CustomerSignUpForm(UserCreationForm):
     first_name= forms.CharField(max_length=50, widget=forms.TextInput(
         attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
     
@@ -17,6 +16,48 @@ class RegistrationForm(UserCreationForm):
     
     username= forms.CharField(max_length=20, widget=forms.TextInput(
         attrs= {'class': 'form-control', 'placeholder': 'Username'}), label='', help_text='')
+    
+    password1= forms.CharField(max_length=50, widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'Enter Password'}), help_text='', label='')
+    
+    password2= forms.CharField(max_length=50, widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),help_text='', label='')
+    
+    class Meta:
+        model=User
+        fields=('username', 'first_name', 'last_name', 'password1', 'password2') 
+
+
+class AgentSignUpForm(UserCreationForm):
+    first_name= forms.CharField(max_length=50, widget=forms.TextInput(
+        attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
+    
+    last_name= forms.CharField(max_length=50, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Last Name'}), label='')
+    
+    username= forms.CharField(max_length=20, widget=forms.TextInput(
+        attrs= {'class': 'form-control', 'placeholder': 'Username'}), label='', help_text='')
+    
+    password1= forms.CharField(max_length=50, widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'Enter Password'}), help_text='', label='')
+    
+    password2= forms.CharField(max_length=50, widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),help_text='', label='')
+    
+    class Meta:
+        model=User
+        fields=('username', 'first_name', 'last_name', 'password1', 'password2') 
+
+
+class CompanySignUpForm(UserCreationForm):
+    first_name= forms.CharField(max_length=50, widget=forms.TextInput(
+        attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
+    
+    last_name= forms.CharField(max_length=50, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Last Name'}), label='')
+    
+    username= forms.CharField(max_length=20, widget=forms.TextInput(
+        attrs= {'class': 'form-control', 'placeholder': 'CEO/Username'}), label='', help_text='')
     
     password1= forms.CharField(max_length=50, widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'placeholder': 'Enter Password'}), help_text='', label='')

@@ -1,0 +1,418 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Profile Setup - Estate Web</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{% static 'company/css/company_form.css' %}">
+</head>
+<body>
+
+  <!-- Messages Container -->
+  <div class="messages-container">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'error' or message.tags == 'danger' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'warning' %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'info' %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% else %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
+
+        {% if submitted %}
+            <!-- Success State -->
+            <div class="success-card">
+                <div class="success-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h2 class="success-title">Profile Set Successfully!</h2>
+                <p class="success-message">You can now access other tools, make sure to complete verification to gain clients trust</p>
+                <div class="success-actions">
+                    <a href="{% url 'company:dashboard' %}" class="btn-dashboard">
+                        <i class="bi bi-house-fill me-2"></i>
+                        View Dashboard
+                    </a>
+                </div>
+            </div>
+
+{%else%}
+
+  <!-- Navigation Header -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
+        <span class="brand-text">Estate Web</span>
+      </a>
+      <div class="ms-auto">
+        <a href="{% url 'company:dashboard' %}" class="btn btn-outline-primary">
+          <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Form Container -->
+  <div class="form-wrapper">
+    <div class="container">
+      
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-icon">
+          <i class="bi bi-building"></i>
+        </div>
+        <h1 class="page-title">Company Profile Setup</h1>
+        <p class="page-subtitle">Complete your company profile to start listing properties and managing your business on Estate Web</p>
+      </div>
+
+      <!-- Progress Steps -->
+      <div class="progress-steps">
+        <div class="step active">
+          <div class="step-number">1</div>
+          <div class="step-label">Company Info</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-label">Contact Details</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-label">Social Links</div>
+        </div>
+      </div>
+
+      <!-- Main Form -->
+      <form method="post" enctype="multipart/form-data" class="company-form" id="companyForm">
+        {% csrf_token %}
+        
+        <!-- Company Information Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="bi bi-building-fill"></i>
+            <h2>Company Information</h2>
+          </div>
+          
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.company_name.id_for_label }}" class="form-label">
+                  {{ form.company_name.label }}
+                </label>
+                {{ form.company_name }}
+                {% if form.company_name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.company_name.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.year_established.id_for_label }}" class="form-label">
+                  {{ form.year_established.label }}
+                </label>
+                {{ form.year_established }}
+                {% if form.year_established.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.year_established.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="{{ form.company_bio.id_for_label }}" class="form-label">
+                  {{ form.company_bio.label }}
+                </label>
+                {{ form.company_bio }}
+                {% if form.company_bio.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.company_bio.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.area_specialization.id_for_label }}" class="form-label">
+                  {{ form.area_specialization.label }}
+                </label>
+                {{ form.area_specialization }}
+                {% if form.area_specialization.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.area_specialization.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.service_areas.id_for_label }}" class="form-label">
+                  {{ form.service_areas.label }}
+                </label>
+                {{ form.service_areas }}
+                {% if form.service_areas.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.service_areas.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.principal_broker.id_for_label }}" class="form-label">
+                  {{ form.principal_broker.label }}
+                </label>
+                {{ form.principal_broker }}
+                {% if form.principal_broker.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.principal_broker.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.company_logo.id_for_label }}" class="form-label">
+                  {{ form.company_logo.label }}
+                  <span class="optional-badge">Optional</span>
+                </label>
+                <div class="file-upload-wrapper">
+                  <input type="file" 
+                         name="{{ form.company_logo.name }}" 
+                         id="{{ form.company_logo.id_for_label }}"
+                         class="file-input"
+                         accept="image/*">
+                  <label for="{{ form.company_logo.id_for_label }}" class="file-label">
+                    <i class="bi bi-cloud-upload me-2"></i>
+                    <span class="file-text">Choose company logo</span>
+                  </label>
+                  <div class="file-preview" id="logoPreview"></div>
+                </div>
+                {% if form.company_logo.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.company_logo.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="bi bi-telephone-fill"></i>
+            <h2>Contact Information</h2>
+          </div>
+          
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                  {{ form.phone_number.label }}
+                </label>
+                <div class="input-with-icon">
+                  <i class="bi bi-telephone"></i>
+                  {{ form.phone_number }}
+                </div>
+                {% if form.phone_number.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.phone_number.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="{{ form.email.id_for_label }}" class="form-label">
+                  {{ form.email.label }}
+                </label>
+                <div class="input-with-icon">
+                  <i class="bi bi-envelope"></i>
+                  {{ form.email }}
+                </div>
+                {% if form.email.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.email.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-group">
+                <label for="{{ form.address.id_for_label }}" class="form-label">
+                  {{ form.address.label }}
+                </label>
+                <div class="input-with-icon">
+                  <i class="bi bi-geo-alt"></i>
+                  {{ form.address }}
+                </div>
+                {% if form.address.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.address.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal Documentation Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <i class="bi bi-file-earmark-text-fill"></i>
+            <h2>Legal Documentation</h2>
+          </div>
+          
+          <div class="row g-4">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="{{ form.legal_certificate.id_for_label }}" class="form-label">
+                  {{ form.legal_certificate.label }}
+                  <span class="optional-badge">Optional</span>
+                </label>
+                <div class="file-upload-wrapper">
+                  <input type="file" 
+                         name="{{ form.legal_certificate.name }}" 
+                         id="{{ form.legal_certificate.id_for_label }}"
+                         class="file-input"
+                         accept=".pdf,.doc,.docx,image/*">
+                  <label for="{{ form.legal_certificate.id_for_label }}" class="file-label">
+                    <i class="bi bi-cloud-upload me-2"></i>
+                    <span class="file-text">Upload legal certificate (PDF, JPG and PNG)</span>
+                  </label>
+                  <div class="file-preview" id="certPreview"></div>
+                </div>
+                <small class="form-text">Upload your company's legal registration certificate for verification purposes</small>
+                {% if form.legal_certificate.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.legal_certificate.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+<!-- Social Links Section - REPLACE THE ENTIRE SECTION -->
+<div class="form-section">
+  <div class="section-header">
+    <i class="bi bi-share-fill"></i>
+    <h2>Companies Links Links</h2>
+  </div>
+  <p class="section-subtitle">Add your company's social media profiles (optional)</p>
+  
+  <div id="socialLinksContainer">
+    {{ social.management_form }}
+    
+    {% for form in social %}
+      <div class="social-link-item">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-5">
+            <div class="form-group">
+              <label class="form-label">Platform</label>
+              {{ form.social_platform }}
+              {% if form.social_platform.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.social_platform.errors }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label">Profile URL</label>
+              {{ form.link_to_social }}
+              {% if form.link_to_social.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.link_to_social.errors }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="button" class="btn-remove-social">
+              <i class="bi bi-trash"></i>
+            </button>
+            {{ form.DELETE }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <button type="button" class="btn-add-social">
+    <i class="bi bi-plus-circle me-2"></i>Add Another Social Link
+  </button>
+</div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <a href="{% url 'company:dashboard' %}" class="btn-secondary">
+            <i class="bi bi-x-circle me-2"></i>Cancel
+          </a>
+          <button type="submit" class="btn-primary">
+            <i class="bi bi-check-circle me-2"></i>Complete Profile Setup
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="form-footer">
+    <div class="container">
+      <p>&copy; 2025 Estate Web. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+<script src="{% static 'company/js/company_form.js' %}"></script>
+{%endif%}
+</body>
+</html>

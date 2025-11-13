@@ -1,9 +1,47 @@
 {% extends 'estate/base.html' %}
 {% load static %}
+{%load humanize%}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/rent.css' %}">
 {% endblock %}
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
 
 <!-- Page Header -->
 <div class="page-header rent-header">
@@ -62,7 +100,7 @@
                     <i class="bi bi-key-fill me-1"></i>
                     For Lease
                   </div>
-                  <a href="{% url 'toggle-wishlist-rent' lease.id %}" class="wishlist-icon">
+                  <a href="{% url 'customer:toggle-wishlist-rent' lease.id %}" class="wishlist-icon">
                     {% if lease.whilist %}
                       <i class="bi bi-bookmark-fill"></i>
                     {% else %}
@@ -82,7 +120,7 @@
                 </div>
                 
                 <div class="property-price rent-price">
-                  <span class="price-amount">₦{{ lease.price_range }}</span>
+                  <span class="price-amount">₦{{ lease.price_range|floatformat:0|intcomma }}</span>
                   <span class="price-period">/ month</span>
                 </div>
                 
@@ -100,7 +138,7 @@
                 </div>
                 
                 <div class="property-actions">
-                  <a href="{% url 'view-property-r' property_id=lease.id %}" class="btn-view-property rent-btn">
+                  <a href="{% url 'customer:view-property-r' property_id=lease.id %}" class="btn-view-property rent-btn">
                     <span>View Details</span>
                     <i class="bi bi-arrow-right-circle"></i>
                   </a>

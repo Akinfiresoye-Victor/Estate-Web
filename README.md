@@ -34,7 +34,7 @@ Estate-Web is a simple Django-based website that helps users find properties wit
    cd Estate-Web
 2. Install Requirement
    ```bash
-   python -m venv <virt env>
-   env/Source/activate
+   python -m venv <env>
+   env/Scripts/activate
    pip install -r requirements
    python manage.py runserver

@@ -1,7 +1,128 @@
 {% extends 'estate/base.html' %}
 {% load static %}
 {% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
 
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
 
-<h1> This is a custom made error page please whatever brought you here means the error is from our side feel free to share it in the feedbacks so I can fix it or you contact us at estateweb101@gmail.com, Sorry for the inconvinence </h1>
-{%endblock%}
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
+
+<style>
+    .error-container {
+        max-width: 800px;
+        margin: 4rem auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        text-align: center;
+    }
+    .error-title {
+        color: #dc3545;
+        font-weight: 700;
+    }
+    .error-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: left;
+        word-wrap: break-word;
+        margin-top: 1rem;
+        position: relative;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        border: none;
+        background: #007bff;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+    .copy-btn:hover {
+        background: #0056b3;
+    }
+    .feedback-link {
+        font-weight: 600;
+        color: #007bff;
+        text-decoration: none;
+    }
+    .feedback-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="error-container">
+    <h1 class="error-title">Oops! Something went wrong on our end.</h1>
+    <p class="mt-3">
+        We're sorry for the inconvenience. Please copy the error message below and send it to us so we can fix it quickly.
+    </p>
+
+    <div class="error-box" id="errorBox">
+        <button class="copy-btn" onclick="copyError()">Copy</button>
+        <strong>Error details:</strong>
+        <pre id="errorText">{{ e }}</pre>
+    </div>
+
+    <p class="mt-4">
+        Report this issue through our 
+        <a href="{% url 'customer:feedback' %}" class="feedback-link">feedback page</a>
+        or contact us directly at 
+        <a href="mailto:estateweb101@gmail.com" class="feedback-link">estateweb101@gmail.com</a>.
+    </p>
+
+    <p class="text-muted mt-4">Thank you for helping us improve Estate Web.</p>
+</div>
+
+<script>
+    function copyError() {
+        const text = document.getElementById('errorText').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            btn.style.backgroundColor = '#28a745';
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.style.backgroundColor = '#007bff';
+            }, 2000);
+        });
+    }
+</script>
+
+{% endblock %}

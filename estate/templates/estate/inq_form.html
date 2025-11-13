@@ -1,0 +1,357 @@
+{% extends 'estate/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/inq_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect: Changes appearance on mouse over */
+.attractive-back-button:hover {
+    background-color: #1a3c4e; /* Darker color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
+    transform: translateY(-2px); /* Lifts the button */
+}
+
+/* Active Effect: Simulates a press */
+.attractive-back-button:active {
+    background-color: #0a0a0aff; /* Even darker color */
+    transform: translateY(0); /* Pushes the button down */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+}
+</style>
+
+{% if submitted %}
+  <!-- Success State -->
+  <div class="inquiry-success-wrapper">
+    <div class="success-card">
+      <div class="success-animation">
+        <div class="success-icon">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="success-confetti">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      
+      <h2 class="success-title">Inquiry Sent Successfully!</h2>
+      <p class="success-message">
+        Thank you for your interest! The property owner has been notified and will contact you shortly through your preferred communication method.
+      </p>
+      
+      <div class="success-info">
+        <div class="info-item">
+          <i class="bi bi-clock-history"></i>
+          <div>
+            <strong>Response Time</strong>
+            <span>Usually within 24 hours</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="bi bi-shield-check"></i>
+          <div>
+            <strong>Your Information</strong>
+            <span>Safely shared with property owner</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <a href="{% url 'landing' %}" class="btn-primary">
+          <i class="bi bi-house-fill me-2"></i>
+          Back to Home
+        </a>
+        <a href="{% url 'customer:buy-property' %}" class="btn-secondary">
+          <i class="bi bi-search me-2"></i>
+          Browse More Properties on sale
+        </a>
+        <a href="{% url 'customer:rent-prop' %}" class="btn-secondary">
+          <i class="bi bi-search me-2"></i>
+          Browse More Properties on Lease
+        </a>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+
+  <!-- Inquiry Form -->
+  <div class="inquiry-form-wrapper">
+    <div class="container">
+      
+      <!-- Form Header -->
+      <div class="form-header">
+        <div class="header-icon">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <h1 class="form-title">Property Inquiry</h1>
+        <p class="form-subtitle">
+          Fill out the form below to express your interest in this property. The owner will get back to you as soon as possible.
+        </p>
+      </div>
+
+      <!-- Benefits Section -->
+      <div class="benefits-section">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </div>
+          <h3>Quick Response</h3>
+          <p>Get replies within 24 hours</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-calendar-check-fill"></i>
+          </div>
+          <h3>Schedule Tours</h3>
+          <p>Book property viewings instantly</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-shield-check-fill"></i>
+          </div>
+          <h3>Secure & Private</h3>
+          <p>Your information is protected</p>
+        </div>
+      </div>
+
+      <!-- Main Form Card -->
+      <div class="inquiry-form-card">
+        <form method="POST" id="inquiryForm" novalidate>
+          {% csrf_token %}
+          
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <i class="bi bi-person-fill"></i>
+              <h2>Your Information</h2>
+            </div>
+            
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="{{ form.name.id_for_label }}" class="form-label">
+                    <i class="bi bi-person-badge me-2"></i>
+                    {{ form.name.label }}
+                    <span class="required">*</span>
+                  </label>
+                  <input type="text" 
+                         name="{{ form.name.name }}" 
+                         id="{{ form.name.id_for_label }}"
+                         class="form-control"
+                         placeholder="e.g. John Doe"
+                         required>
+                  {% if form.name.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.name.errors }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="{{ form.email.id_for_label }}" class="form-label">
+                    <i class="bi bi-envelope me-2"></i>
+                    {{ form.email.label }}
+                    <span class="optional-badge">Optional</span>
+                  </label>
+                  {{ form.email }}
+                  {% if form.email.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.email.errors }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="{{ form.phone_no.id_for_label }}" class="form-label">
+                    <i class="bi bi-whatsapp me-2"></i>
+                    {{ form.phone_no.label }}
+                    <span class="required">*</span>
+                  </label>
+                  <div class="input-with-icon">
+                    <i class="bi bi-telephone-fill"></i>
+                    <input type="tel" 
+                           name="{{ form.phone_no.name }}" 
+                           id="{{ form.phone_no.id_for_label }}"
+                           class="form-control"
+                           placeholder="e.g. +234 800 123 4567"
+                           required>
+                  </div>
+                  <small class="form-text">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Enter a valid WhatsApp number for quick communication
+                  </small>
+                  {% if form.phone_no.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.phone_no.errors }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inquiry Details Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <i class="bi bi-chat-text-fill"></i>
+              <h2>Inquiry Details</h2>
+            </div>
+            
+            <div class="row g-4">
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="{{ form.inquiry_message.id_for_label }}" class="form-label">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    {{ form.inquiry_message.label }}
+                    <span class="required">*</span>
+                  </label>
+                  <textarea name="{{ form.inquiry_message.name }}" 
+                            id="{{ form.inquiry_message.id_for_label }}"
+                            class="form-control"
+                            rows="5"
+                            placeholder="e.g. I'm interested in viewing this property. Could you provide more details about the amenities and neighborhood?"
+                            required></textarea>
+                  <small class="form-text">
+                    <i class="bi bi-lightbulb me-1"></i>
+                    Tip: Mention specific questions or requirements to get a better response
+                  </small>
+                  {% if form.inquiry_message.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.inquiry_message.errors }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="{{ form.contact_type.id_for_label }}" class="form-label">
+                    <i class="bi bi-chat-dots me-2"></i>
+                    {{ form.contact_type.label }}
+                    <span class="required">*</span>
+                  </label>
+                  <select name="{{ form.contact_type.name }}" 
+                          id="{{ form.contact_type.id_for_label }}"
+                          class="form-control">
+                    <option value="">Select contact method</option>
+                    <option value="Whatsapp" selected>WhatsApp</option>
+                    <option value="Email">Email</option>
+                    <option value="Phone Call">Phone Call</option>
+                  </select>
+                  <small class="form-text">
+                    <i class="bi bi-info-circle me-1"></i>
+                    In-app chat coming soon!
+                  </small>
+                  {% if form.contact_type.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.contact_type.errors }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="{{ form.schedule_tour.id_for_label }}" class="form-label">
+                    <i class="bi bi-calendar-event me-2"></i>
+                    {{ form.schedule_tour.label }}
+                    <span class="optional-badge">Optional</span>
+                  </label>
+                  <input type="date" 
+                         name="{{ form.schedule_tour.name }}" 
+                         id="{{ form.schedule_tour.id_for_label }}"
+                         class="form-control"
+                         min="{{ today }}">
+                  <small class="form-text">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Choose a convenient date for property viewing
+                  </small>
+                  {% if form.schedule_tour.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.schedule_tour.errors }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Privacy Notice -->
+          <div class="privacy-notice">
+            <i class="bi bi-shield-lock-fill"></i>
+            <div>
+              <strong>Privacy Notice:</strong>
+              <p>Your information will only be shared with the property owner/agent. We respect your privacy and will not share your details with third parties.</p>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn-back" onclick="history.back()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Go Back
+            </button>
+            <button type="submit" class="btn-submit">
+              <i class="bi bi-send-fill me-2"></i>
+              Send Inquiry
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Help Section -->
+      <div class="help-section">
+        <div class="help-card">
+          <i class="bi bi-question-circle-fill"></i>
+          <h4>Need Help?</h4>
+          <p>If you have any questions about the inquiry process, feel free to contact our support team.</p>
+          <a href="#" class="help-link">
+            Contact Support <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'estate/js/inq_form.js' %}"></script>
+{% endblock %}

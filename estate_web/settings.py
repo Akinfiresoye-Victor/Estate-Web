@@ -18,7 +18,7 @@ CSRF_TRUSTED_ORIGINS = ["https://estate-web-sufx.onrender.com"]
 
 
 
-
+AUTH_USER_MODEL = 'members.User'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',  # REQUIRED
@@ -46,10 +46,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'estate',
     'members',
+    'admin_panel',
+    'agents',
+    'companies',
+    'core',
     'widget_tweaks',
     'django_filters',
     'cloudinary',
-    'cloudinary_storage'
+    'cloudinary_storage',
+    'django.contrib.humanize'
 ]
 
 # Middleware

@@ -7,9 +7,13 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('estate.urls')),
+    path('', include('core.urls')),
+    path('customer/', include('estate.urls', namespace='customer')),
     path('members/', include('django.contrib.auth.urls')),
     path('members/', include('members.urls')),
+    path('executive/',include('admin_panel.urls')),
+    path('agent/', include('agents.urls', namespace='agent')),
+    path('company/', include('companies.urls', namespace='company')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

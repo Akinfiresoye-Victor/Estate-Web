@@ -33,18 +33,12 @@ body {
   max-width: 400px;
 }
 
-.alert-custom {
-  background: #fff;
-  color: var(--success-color);
-  border: none;
-  border-left: 4px solid var(--success-color);
+.alert {
   border-radius: 8px;
   padding: 1rem 1.5rem;
   box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-  display: flex;
-  align-items: center;
-  font-weight: 500;
   animation: slideInRight 0.5s ease;
+  margin-bottom: 1rem;
 }
 
 @keyframes slideInRight {
@@ -74,6 +68,7 @@ body {
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   width: 100%;
+  min-height: 600px;
 }
 
 /* Login Card */
@@ -81,6 +76,9 @@ body {
   flex: 1;
   padding: 3rem 2.5rem;
   max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .login-header {
@@ -224,6 +222,7 @@ body {
   text-align: center;
   padding-top: 2rem;
   border-top: 1px solid #e1e8ed;
+  position: relative;
 }
 
 .register-text {
@@ -245,6 +244,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.9rem;
+  cursor: pointer;
 }
 
 .btn-register:hover {
@@ -252,6 +252,65 @@ body {
   color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(26, 60, 78, 0.2);
+}
+
+/* Dropdown Menu Styles */
+.register-section .dropdown {
+  display: inline-block;
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  min-width: 280px;
+}
+
+.dropdown-item {
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: var(--secondary-color);
+  color: #fff;
+  transform: translateX(5px);
+}
+
+.dropdown-item i {
+  font-size: 1.5rem;
+  margin-top: 0.2rem;
+  color: var(--primary-color);
+}
+
+.dropdown-item:hover i {
+  color: #fff;
+}
+
+.dropdown-item strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.dropdown-item small {
+  font-size: 0.85rem;
+}
+
+.dropdown-item:hover .text-muted {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  opacity: 0.1;
 }
 
 /* Side Panel */
@@ -265,6 +324,7 @@ body {
   color: #fff;
   position: relative;
   overflow: hidden;
+  min-width: 400px;
 }
 
 .side-panel::before {
@@ -324,6 +384,10 @@ body {
     max-width: 500px;
     margin: 0 auto;
   }
+
+  .login-card {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -351,6 +415,10 @@ body {
     left: 1rem;
     max-width: none;
   }
+
+  .dropdown-menu {
+    min-width: 250px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -365,5 +433,14 @@ body {
   .form-input,
   .btn-submit {
     padding: 0.9rem 1rem;
+  }
+
+  .btn-register {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .dropdown-menu {
+    min-width: 100%;
   }
 }

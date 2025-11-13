@@ -23,13 +23,14 @@ class LeaseForm(ModelForm):
     class Meta:
         model=PropertyManagementRent
         fields=(
-                'house_type','description', 'state','location', 'bedrooms','bathrooms','parking_spaces', 
+                'house_type','description', 'state','location', 'owner', 'bedrooms','bathrooms','parking_spaces','size' ,
                 'phone_number','price_range','base_image'
                 )
         labels={
                 'house_type':'House Type',
                 'description': 'Property Description',
                 'location': 'Precise Location',
+                'owner': 'Listed by?',
                 'price_range': 'Price',
                 'phone_number': 'Phone Number',
                 'state': 'State',
@@ -39,6 +40,7 @@ class LeaseForm(ModelForm):
         widgets= {
                     'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Property Description'}),
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Oda Road, Kagola, Plot2,3'}),
+                    'owner': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Company/Personal Name'}),
                     'price_range': forms.TextInput(attrs={'class': 'form-control'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
                     # 'state': forms.ChoiceField(choices=[('', 'Any State')]+STATES, attrs={'class': 'form-control'}),
@@ -46,6 +48,7 @@ class LeaseForm(ModelForm):
                     'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+                    'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
 }
 
 
@@ -54,8 +57,8 @@ class LeaseForm(ModelForm):
 class SellForm(ModelForm):
     class Meta:
         model=PropertyManagementSale
-        fields=('house_type','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces','owner','phone_number', 'price','negotiate',
-                'available', 'base_image')
+        fields=('house_type','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
+                'owner','phone_number','size', 'price','negotiate','available', 'base_image')
         labels={
                 'house_type':'House Type',
                 'property_description': 'Property Description',
@@ -78,6 +81,7 @@ class SellForm(ModelForm):
                     'negotiate': forms.Select(attrs={'class': 'form-control'}),
                     'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+                    'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
 }
 
 
@@ -91,7 +95,7 @@ class FeedbackForm(ModelForm):
 
 
 
-class UserInformationForm(forms.ModelForm):
+class UserInformationForm(ModelForm):
     class Meta:
         model = UserInformation
         fields = ['first_name', 'last_name', 'phone_number', 'email']
@@ -106,7 +110,7 @@ class UserInformationForm(forms.ModelForm):
                 }
 
 
-class AgentInformationForm(forms.ModelForm):
+class AgentInformationForm(ModelForm):
     class Meta:
         model = Agent_Information
         fields = ['professional_title', 'professional_introduction', 'call_to_action']
@@ -123,7 +127,27 @@ class AgentInformationForm(forms.ModelForm):
 
 
 
-class ExperienceForm(forms.ModelForm):
+
+class InquiryForm(ModelForm):
+    class Meta:
+        model= LeadInfo
+        fields=['name', 'email', 'phone_no','inquiry_message', 'contact_type','schedule_tour']
+        labels={
+            'name': 'Name',
+            'email': 'Email',
+            'phone_no': 'Whatsapp Phone Number',
+            'inquiry_message': 'Book this property(send an inquiry message)',
+            'schedule_tour': 'Schedule a date to view property Physically(optional)',
+            'contact_type': 'Contact Media(How Should we contact you)'
+        }
+        widgets={
+        'email': forms.EmailInput(attrs={'class':'form-control', 'placeholder': 'e.g johndoe@gmail.com'}),
+        'inquiry_message': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Intrested/Id like to know more about this'}),
+        }
+
+
+
+class ExperienceForm(ModelForm):
     class Meta:
         model = Experience
         fields = ['company','title', 'start_date', 'end_date']
@@ -139,7 +163,7 @@ class ExperienceForm(forms.ModelForm):
         }
 
 
-class RentImageForm(forms.ModelForm):
+class RentImageForm(ModelForm):
     class Meta:
         model= PropertyRentImage
         fields=('more_images', 'caption')
@@ -148,7 +172,7 @@ class RentImageForm(forms.ModelForm):
         }
 
 
-class SaleImageForm(forms.ModelForm):
+class SaleImageForm(ModelForm):
     class Meta:
         model= PropertySaleImage
         fields=('more_images', 'caption')

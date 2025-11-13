@@ -3,37 +3,34 @@ from django.urls import path
 from . import views
 
 
-
+app_name='customer'
 urlpatterns = [
-    path('', views.welcome_page, name="welcome-page"),
     path('rent_prop', views.rent_property, name="rent-prop"),
-    path('user_profile', views.user_profile, name="user-profile"),
-    path('sell_property', views.sell_property, name="sell-property"),
-    path('lease_property', views.lease_property, name="lease-property"),
-    path('buy_property', views.buy_property, name="buy-property"),
-    path('update_property/<property_id>', views.update_property_rent, name="update-property"),
-    path('update_property_s/<property_id>', views.update_property_sale, name="update-property-s"),
-    path('my_listings', views.listed_properties, name="my-listings"),
-    path('view-property_s/<property_id>', views.view_property_on_sale, name="view-property-s"),
-    path('view-property_r/<property_id>', views.view_property_on_lease, name="view-property-r"),
-    path('delete-property_r/<property_id>', views.delete_property_on_lease, name="delete-property-r"),
-    path('delete-property_s/<property_id>', views.delete_property_on_sale, name="delete-property-s"),
-    path('update-profile/<user_id>', views.update_profile, name="update-profile"),
-    path('whilist_rent/<property_id>', views.toggle_wishlist_rent, name="toggle-wishlist-rent"),
-    path('whilist_buy/<property_id>', views.toggle_wishlist_buy, name="toggle-wishlist-buy"),
-    path('whilist', views.wishlist, name="wishlist"),
-    path('edit_password', views.change_password, name="change-password"),
-    path('edit_password_success', views.change_password_success, name="password-success"),
-    path('settings', views.profile_settings, name="settings"),
-    path('delete_account', views.delete_account, name="delete-account"),
-    path('feedback', views.feedbacks, name='feedback'),
-    path('latest_news', views.articles, name='articles'),
-    path('about_us', views.about_us, name='about'),
-    path('superior/feedbacks', views.view_feedbacks, name='view-feedbacks'),
-    path('delete/<feedback_id>', views.delete_feedback, name='delete-feedback'),
-    path('agent_form', views.estate_agent_form, name='estate-agent-form'),
-    path('agent_profile/<agent_id>', views.estate_agent_profile, name='estate-agent-profile'),
-    path('superior/dashboard', views.admin_dashboard, name='admin-dashboard')
+    path('user_profile/', views.user_profile, name="user-profile"),
+    path('sell_property/', views.sell_property, name="sell-property"),
+    path('lease_property/', views.lease_property, name="lease-property"),
+    path('buy_property/', views.buy_property, name="buy-property"),
+    path('update_property/<property_id>/', views.update_property_rent, name="update-property"),
+    path('update_property_s/<property_id>/', views.update_property_sale, name="update-property-s"),
+    path('my_listings/', views.listed_properties, name="my-listings"),
+    path('view-property_s/<property_id>/', views.view_property_on_sale, name="view-property-s"),
+    path('view-property_r/<property_id>/', views.view_property_on_lease, name="view-property-r"),
+    path('delete-property_r/<property_id>/', views.delete_property_on_lease, name="delete-property-r"),
+    path('delete-property_s/<property_id>/', views.delete_property_on_sale, name="delete-property-s"),
+    path('update-profile/<user_id>/', views.update_profile, name="update-profile"),
+    path('whilist_rent/<property_id>/', views.toggle_wishlist_rent, name="toggle-wishlist-rent"),
+    path('whilist_buy/<property_id>/', views.toggle_wishlist_buy, name="toggle-wishlist-buy"),
+    path('whilist/', views.wishlist, name="wishlist"),
+    path('edit_password/', views.change_password, name="change-password"),
+    path('edit_password_success/', views.change_password_success, name="password-success"),
+    path('settings/', views.profile_settings, name="settings"),
+    path('delete_account/', views.delete_account, name="delete-account"),
+    path('feedback/', views.feedbacks, name='feedback'),
+    path('latest_news/', views.articles, name='articles'),
+    path('agent_form/', views.estate_agent_form, name='estate-agent-form'),
+    path('agent_profile/<agent_id>/', views.estate_agent_profile, name='estate-agent-profile'),
+    path('inquiry_form_r/<property_id>', views.inquiry_form_rent, name='inquiry-form-r'),
+    path('inquiry_form_s/<property_id>', views.inquiry_form_sale, name='inquiry-form-s')
 ]
 
 
