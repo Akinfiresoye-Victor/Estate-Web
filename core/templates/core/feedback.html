@@ -1,10 +1,12 @@
-{% extends 'estate/base.html' %}
+{% extends base_template %}
 {% load static %}
-{% load widget_tweaks %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'estate/css/news.css' %}">
+  <link rel="stylesheet" href="{% static 'estate/css/feedback.css' %}">
 {% endblock %}
+
 {% block content %}
+
 <a href="javascript:history.back()" class="attractive-back-button">
     &larr; Go Back to the Previous Page
 </a>
@@ -43,36 +45,20 @@
 }
 </style>
 
-<div class="page-header">
-  <div class="container">
-    <h1><i class="fas fa-newspaper"></i> Real Estate News</h1>
-    <p>Stay updated with the latest trends and insights in Nigeria's property market</p>
-  </div>
+<div class="feedback-container">
+    <div class="feedback-card">
+        <h2 class="text-center">💬 We Value Your Feedback</h2>
+        <p class="text-center text-muted">Your thoughts help us improve and grow.</p>
+        <!-- Feedback Form -->
+        <form method="POST" class="feedback-form shadow-sm p-3 rounded">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.feedback }}
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary px-4 py-2"> Submit Feedback</button>
+            </div>
+        </form>
+    </div>
 </div>
-
-<div class="container mb-5">
-  <div class="news-card">
-    <div class="news-header">
-      <span class="news-badge">Today's Headline</span>
-      <h2 class="news-headline">{{ headline }}</h2>
-    </div>
-    
-    <div class="news-content">
-      <div class="news-icon">📰</div>
-      <p class="news-article">{{ article }}</p>
-    </div>
-    
-    <div class="news-footer">
-      <a href="{{ full_article }}" target="_blank" class="btn-read-more">
-        <span>Read More </span>
-        <i class="fas fa-arrow-right"></i>
-      </a>
-      <div class="news-source">
-        <i class="fas fa-link"></i>
-        <span>Source: <strong>nigeriahousingmarket.com</strong></span>
-      </div>
-    </div>
-  </div>
-</div>
-
 {% endblock %}

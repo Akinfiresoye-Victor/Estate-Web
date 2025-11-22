@@ -13,9 +13,6 @@
 <style>
 .attractive-back-button {
     margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
     display: inline-flex;
     align-items: center;
     padding: 0.7rem 1.5rem;
@@ -29,20 +26,148 @@
     transition: all 0.3s ease;
 }
 
-/* Hover Effect: Changes appearance on mouse over */
 .attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
+    background-color: #1a3c4e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
 }
 
-/* Active Effect: Simulates a press */
 .attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+    background-color: #0a0a0aff;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete Confirmation Modal */
+.delete-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.delete-modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.delete-modal-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.delete-modal-icon i {
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.delete-modal h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.delete-modal p {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn-cancel {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.modal-btn-cancel:hover {
+    background: #dee2e6;
+}
+
+.modal-btn-delete {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #fff;
+}
+
+.modal-btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
 }
 </style>
+
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="delete-modal-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this lead? This action cannot be undone and all associated data will be permanently removed.</p>
+        <div class="delete-modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+            </button>
+            <a href="#" id="confirmDeleteBtn" class="modal-btn modal-btn-delete" style="text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-trash me-2"></i>Yes, Delete
+            </a>
+        </div>
+    </div>
+</div>
 
 <!-- Page Header -->
 <div class="leads-header">
@@ -93,8 +218,8 @@
           <i class="bi bi-fire"></i>
         </div>
         <div class="stat-info">
-          <h3>{{ hot_leads|default:"0" }}</h3>
-          <p>Hot Leads</p>
+          <h3>{{ potential_count|default:"0" }}</h3>
+          <p>Potential Friends</p>
         </div>
         <div class="stat-badge priority">High Priority</div>
       </div>
@@ -104,8 +229,8 @@
           <i class="bi bi-check-circle-fill"></i>
         </div>
         <div class="stat-info">
-          <h3>{{ converted_leads|default:"0" }}</h3>
-          <p>Converted</p>
+          <h3>{{ closed_count|default:"0" }}</h3>
+          <p>Closed/Won</p>
         </div>
       </div>
     </div>
@@ -124,22 +249,19 @@
       <div class="filter-controls">
         <select class="filter-select" id="statusFilter">
           <option value="all">All Status</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="contacted">Not Contacted</option>
-          <option value="qualified">Qualified</option>
-          <option value="hot">Cold Leads</option>
-          <option value="hot">Hot Leads</option>
-          <option value="viewing">Viewing Scheduled</option>
-          <option value="negotiation">Negotiation</option>
-          <option value="converted">Completed</option>
-          <option value="lost">Lost</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Not Contacted">Not Contacted</option>
+          <option value="Cold Lead">Cold Lead</option>
+          <option value="Hot Lead">Hot Lead</option>
+          <option value="Warm Lead">Warm Lead</option>
+          <option value="Qualified">Qualified</option>
+          <option value="Unqualified">Unqualified</option>
         </select>
 
         <select class="filter-select" id="propertyFilter">
           <option value="all">All Properties</option>
-          <option value="sale">For Sale</option>
-          <option value="rent">For Rent</option>
+          <option value="Sale">For Sale</option>
+          <option value="Rent">For Rent</option>
         </select>
 
         <select class="filter-select" id="dateFilter">
@@ -151,22 +273,28 @@
       </div>
     </div>
 
-    <!-- Status Tabs -->
+    <!-- Status Tabs (Based on Stages) -->
     <div class="status-tabs">
-      <button class="status-tab active" data-status="all">
-        All Leads <span class="tab-count">{{ lead_count|default:"0" }}</span>
+      <button class="status-tab active" data-stage="all">
+        All Stages <span class="tab-count">{{ lead_count|default:"0" }}</span>
       </button>
-      <button class="status-tab" data-status="new">
-        New <span class="tab-count">{{ new_leads|default:"0" }}</span>
+      <button class="status-tab" data-stage="New">
+        New Leads <span class="tab-count">{{ new_stage|default:"0" }}</span>
       </button>
-      <button class="status-tab" data-status="hot">
-        Hot <span class="tab-count">{{ hot_leads|default:"0" }}</span>
+      <button class="status-tab" data-stage="Potential Friend">
+        Potential Friend <span class="tab-count">{{ potential_count|default:"0" }}</span>
       </button>
-      <button class="status-tab" data-status="qualified">
-        Not Contacted <span class="tab-count">{{ qualified_leads|default:"0" }}</span>
+      <button class="status-tab" data-stage="True Friend">
+        True Friend <span class="tab-count">{{ true_friend_count|default:"0" }}</span>
       </button>
-      <button class="status-tab" data-status="converted">
-        Agreed Prices <span class="tab-count">{{ converted_leads|default:"0" }}</span>
+      <button class="status-tab" data-stage="Contracted">
+        Contracted <span class="tab-count">{{ contracted_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="Closed/Won">
+        Closed/Won <span class="tab-count">{{ closed_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="Disposition">
+        Disposition <span class="tab-count">{{ disposition_count|default:"0" }}</span>
       </button>
     </div>
   </div>
@@ -194,7 +322,11 @@
         </thead>
         <tbody>
           {% for lead in leads %}
-          <tr class="lead-row" data-status="{{ lead.status }}">
+          <tr class="lead-row" 
+              data-stage="{{ lead.stages }}" 
+              data-status="{{ lead.status }}"
+              data-property-type="{{ lead.property_type }}" 
+              data-date="{{ lead.date_created|date:'Y-m-d' }}">
             <td>
               <input type="checkbox" class="lead-checkbox" value="{{ lead.id }}">
             </td>
@@ -214,18 +346,18 @@
             <td>
               <div class="property-info">
                 {% if lead.property_type == 'Sale' %}
-                <span class="property-title">Market id: {{ lead.property_intrested|truncatewords:5 }}</span>
+                <span class="property-title">Market id: {{ lead.property_intrested }}</span>
                 <span class="property-title">{{ lead.property_name|truncatewords:5 }}</span>
-                <span class="property-type {{ lead.property_name }}">
-                  
-                    <i class="bi bi-tag"></i> For Sale
-                  {% else %}
-                  <span class="property-title">Market id: {{ lead.property_intrested|truncatewords:5 }}</span>
-                  <span class="property-title">{{ lead.property_name|truncatewords:5 }}</span>
-                  <span class="property-type {{ lead.property_name }}">
-                    <i class="bi bi-key"></i> For Rent
-                  {% endif %}
+                <span class="property-type sale">
+                  <i class="bi bi-tag"></i> For Sale
                 </span>
+                {% else %}
+                <span class="property-title">Market id: {{ lead.property_intrested }}</span>
+                <span class="property-title">{{ lead.property_name|truncatewords:5 }}</span>
+                <span class="property-type rent">
+                  <i class="bi bi-key"></i> For Rent
+                </span>
+                {% endif %}
               </div>
             </td>
             <td>
@@ -239,16 +371,9 @@
               </div>
             </td>
             <td>
-              <select class="status-badge status-{{ lead.status }}" onchange="updateLeadStatus({{ lead.id }}, this.value)">
-                <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
-                <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Contacted</option>
-                <option value="qualified" {% if lead.status == 'qualified' %}selected{% endif %}>Qualified</option>
-                <option value="hot" {% if lead.status == 'hot' %}selected{% endif %}>Hot Lead</option>
-                <option value="viewing" {% if lead.status == 'viewing' %}selected{% endif %}>Viewing</option>
-                <option value="negotiation" {% if lead.status == 'negotiation' %}selected{% endif %}>Negotiation</option>
-                <option value="converted" {% if lead.status == 'converted' %}selected{% endif %}>Converted</option>
-                <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Lost</option>
-              </select>
+              <span class="status-badge status-{{ lead.status|lower|cut:' ' }}">
+                {{ lead.status }}
+              </span>
             </td>
             <td>
               <span class="lead-date">{{ lead.date_created|date:"M d, Y" }}</span>
@@ -256,15 +381,12 @@
             </td>
             <td>
               <div class="action-buttons">
-                <a href="{% url 'company:lead-detail' lead.id %}" class="action-btn view"  title="View Details">
+                <a href="{% url 'company:lead-detail' lead.id %}" class="action-btn view" title="View/Edit Details">
                   <i class="bi bi-eye"></i>
                 </a>
-                <button class="action-btn edit" onclick="editLead({{ lead.id }})" title="Edit">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <a href="{% url 'company:delete-lead' lead.id %}" class="action-btn delete" title="Delete">
+                <button class="action-btn delete" onclick="showDeleteModal('{% url 'company:delete-lead' lead.id %}')" title="Delete">
                   <i class="bi bi-trash"></i>
-                </a>
+                </button>
               </div>
             </td>
           </tr>
@@ -273,20 +395,79 @@
       </table>
     </div>
 
-    <!-- Pagination -->
-    <div class="pagination">
-      <button class="page-btn" disabled>
-        <i class="bi bi-chevron-left"></i>
-      </button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
-      <span class="page-dots">...</span>
-      <button class="page-btn">10</button>
-      <button class="page-btn">
-        <i class="bi bi-chevron-right"></i>
-      </button>
+<!--Pagination-->
+{% if leads.paginator.num_pages > 1 %}
+<div class="pagination-section">
+  <div class="container">
+    <nav class="pagination-nav" aria-label="Page navigation">
+      <ul class="pagination">
+        <!-- First Page -->
+        {% if leads.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" title="First Page">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ leads.previous_page_number }}" title="Previous Page">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-double-left"></i>
+            </span>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-left"></i>
+            </span>
+          </li>
+        {% endif %}
+
+        <!-- Page Numbers -->
+        {% for i in nums %}
+          <li class="page-item {% if leads.number == forloop.counter %}active{% endif %}">
+            <a class="page-link" href="?page={{ forloop.counter }}">
+              {{ forloop.counter }}
+            </a>
+          </li>
+        {% endfor %}
+
+        <!-- Next Page -->
+        {% if leads.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ leads.next_page_number }}" title="Next Page">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ leads.paginator.num_pages }}" title="Last Page">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-right"></i>
+            </span>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-double-right"></i>
+            </span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    
+    <div class="pagination-info">
+      <span>Page <strong>{{ leads.number }}</strong> of <strong>{{ leads.paginator.num_pages }}</strong></span>
     </div>
+  </div>
+</div>
+{% endif %}
 
     {% else %}
     <!-- Empty State -->
@@ -302,65 +483,6 @@
   </div>
 </div>
 
-<!-- Lead Detail Modal -->
-<div class="modal fade" id="leadDetailModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-person-circle me-2"></i>Lead Details
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Lead details will be loaded here dynamically -->
-        <div class="lead-detail-content">
-          <div class="detail-section">
-            <h6>Contact Information</h6>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <label>Name:</label>
-                <span id="detailName">John Doe</span>
-              </div>
-              <div class="detail-item">
-                <label>Email:</label>
-                <span id="detailEmail">john@example.com</span>
-              </div>
-              <div class="detail-item">
-                <label>Phone:</label>
-                <span id="detailPhone">+234 123 456 7890</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="detail-section">
-            <h6>Property Interest</h6>
-            <p id="detailProperty">Luxury 3 Bedroom Apartment in Victoria Island</p>
-          </div>
-
-          <div class="detail-section">
-            <h6>Message</h6>
-            <p id="detailMessage">I'm interested in viewing this property. Please contact me to schedule a visit.</p>
-          </div>
-
-          <div class="detail-section">
-            <h6>Follow-up Notes</h6>
-            <div class="notes-list" id="notesList">
-              <!-- Notes will be added here -->
-            </div>
-            <div class="add-note-form">
-              <textarea class="form-control" placeholder="Add a follow-up note..." rows="3"></textarea>
-              <button class="btn-add-note">
-                <i class="bi bi-plus-circle me-2"></i>Add Note
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -371,72 +493,147 @@
     // Search functionality
     const searchInput = document.getElementById('searchLeads');
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('.lead-row');
-
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
+        searchInput.addEventListener('input', filterLeads);
     }
 
-    // Status tabs
+    // Stage tabs
     const statusTabs = document.querySelectorAll('.status-tab');
     statusTabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            const status = this.dataset.status;
-            
             statusTabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-
-            const rows = document.querySelectorAll('.lead-row');
-            rows.forEach(row => {
-                if (status === 'all' || row.dataset.status === status) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            filterLeads();
         });
     });
+
+    // Filter dropdowns
+    const statusFilter = document.getElementById('statusFilter');
+    const propertyFilter = document.getElementById('propertyFilter');
+    const dateFilter = document.getElementById('dateFilter');
+
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterLeads);
+    }
+    if (propertyFilter) {
+        propertyFilter.addEventListener('change', filterLeads);
+    }
+    if (dateFilter) {
+        dateFilter.addEventListener('change', filterLeads);
+    }
+
+    // IMPROVED FILTER FUNCTION - Works with BOTH Stage and Status
+    function filterLeads() {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const activeTab = document.querySelector('.status-tab.active');
+        const selectedStage = activeTab ? activeTab.dataset.stage : 'all';
+        const selectedStatus = statusFilter ? statusFilter.value : 'all';
+        const selectedPropertyType = propertyFilter ? propertyFilter.value : 'all';
+        const selectedDateFilter = dateFilter ? dateFilter.value : 'all';
+
+        const rows = document.querySelectorAll('.lead-row');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const rowStage = row.dataset.stage;
+            const rowStatus = row.dataset.status;
+            const rowPropertyType = row.dataset.propertyType;
+            const rowDate = new Date(row.dataset.date);
+            rowDate.setHours(0, 0, 0, 0);
+
+            // Search filter
+            const matchesSearch = text.includes(searchTerm);
+
+            // Stage filter (from tabs)
+            const matchesStage = selectedStage === 'all' || rowStage === selectedStage;
+
+            // Status filter (from dropdown) - NEW!
+            const matchesStatus = selectedStatus === 'all' || rowStatus === selectedStatus;
+
+            // Property type filter
+            const matchesPropertyType = selectedPropertyType === 'all' || rowPropertyType === selectedPropertyType;
+
+            // Date filter
+            let matchesDate = true;
+            if (selectedDateFilter === 'today') {
+                matchesDate = rowDate.getTime() === today.getTime();
+            } else if (selectedDateFilter === 'week') {
+                const weekAgo = new Date(today);
+                weekAgo.setDate(today.getDate() - 7);
+                matchesDate = rowDate >= weekAgo && rowDate <= today;
+            } else if (selectedDateFilter === 'month') {
+                const monthAgo = new Date(today);
+                monthAgo.setMonth(today.getMonth() - 1);
+                matchesDate = rowDate >= monthAgo && rowDate <= today;
+            }
+
+            // Show/hide row - ALL filters must match
+            if (matchesSearch && matchesStage && matchesStatus && matchesPropertyType && matchesDate) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show count of visible leads
+        console.log(`Showing ${visibleCount} of ${rows.length} leads`);
+    }
 
     // Select all checkbox
     const selectAll = document.getElementById('selectAll');
     if (selectAll) {
         selectAll.addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.lead-checkbox');
-            checkboxes.forEach(cb => cb.checked = this.checked);
+            const checkboxes = document.querySelectorAll('.lead-checkbox:not([style*="display: none"])');
+            checkboxes.forEach(cb => {
+                if (cb.closest('.lead-row').style.display !== 'none') {
+                    cb.checked = this.checked;
+                }
+            });
         });
     }
 
 })();
 
-// Global functions for actions
-function viewLead(leadId) {
-    // Open modal with lead details
-    const modal = new bootstrap.Modal(document.getElementById('leadDetailModal'));
-    modal.show();
-    // Fetch and populate lead details
-    console.log('Viewing lead:', leadId);
-}
-
-function editLead(leadId) {
-    // Redirect to edit page or open edit modal
-    console.log('Editing lead:', leadId);
-}
-
-function deleteLead(leadId) {
-    if (confirm('Are you sure you want to delete this lead?')) {
-        // Send delete request
-        console.log('Deleting lead:', leadId);
+// Delete Modal Functions
+function showDeleteModal(deleteUrl) {
+    const modal = document.getElementById('deleteModal');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    if (modal && confirmBtn) {
+        confirmBtn.href = deleteUrl;
+        modal.classList.add('active');
     }
 }
 
-function updateLeadStatus(leadId, newStatus) {
-    // Send AJAX request to update status
-    console.log('Updating lead', leadId, 'to status:', newStatus);
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('deleteModal');
+    if (e.target === modal) {
+        closeDeleteModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeDeleteModal();
+    }
+});
+
+function editLead(leadId) {
+    console.log('Editing lead:', leadId);
+    // Redirect to edit page or implement edit functionality
 }
 </script>
 {% endblock %}

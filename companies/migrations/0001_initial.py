@@ -2,7 +2,7 @@
 
 import companies.models
 import django.db.models.deletion
-import estate.validators
+import core.validators
 from django.db import migrations, models
 
 
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('service_areas', models.CharField(choices=[('AB', 'Abia State'), ('AD', 'Adamawa State'), ('AK', 'Akwa Ibom State'), ('AN', 'Anambra State'), ('BA', 'Bauchi State'), ('BY', 'Bayelsa State'), ('BE', 'Benue State'), ('BO', 'Borno State'), ('CR', 'Cross River State'), ('DE', 'Delta State'), ('EB', 'Ebonyi State'), ('ED', 'Edo State'), ('EK', 'Ekiti State'), ('EN', 'Enugu State'), ('GO', 'Gombe State'), ('IM', 'Imo State'), ('JI', 'Jigawa State'), ('KD', 'Kaduna State'), ('KN', 'Kano State'), ('KT', 'Kastina State'), ('KE', 'Kebbi State'), ('KG', 'Kogi State'), ('KW', 'Kwara State'), ('LA', 'Lagos State'), ('NA', 'Nasarawa State'), ('NI', 'Niger State'), ('OG', 'Ogun State'), ('ON', 'Ondo State'), ('OS', 'Osun State'), ('OY', 'Oyo State'), ('PL', 'Plateau State'), ('RI', 'Rivers State'), ('SO', 'Sokoto State'), ('TA', 'Taraba State'), ('YO', 'Yobe State'), ('ZA', 'Zamfara State'), ('FCT', 'Abuja State')], default='Lagos', max_length=20)),
                 ('area_specialization', models.CharField(max_length=50, verbose_name='Area of specialization')),
                 ('company_bio', models.TextField(max_length=2000, unique=True, verbose_name='Brief Company Overview')),
-                ('company_logo', models.ImageField(blank=True, null=True, upload_to=companies.models.company_logo_path, validators=[estate.validators.validate_image], verbose_name='Company Logo')),
+                ('company_logo', models.ImageField(blank=True, null=True, upload_to=companies.models.company_logo_path, validators=[core.validators.validate_image], verbose_name='Company Logo')),
                 ('principal_broker', models.CharField(max_length=100, verbose_name='Registered Owner of Company')),
             ],
         ),

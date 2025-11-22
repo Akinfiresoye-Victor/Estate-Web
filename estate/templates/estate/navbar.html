@@ -26,45 +26,23 @@
           
           <!-- Latest News -->
           <li class="nav-item">
-            <a class="nav-link" href="{%url 'customer:articles'%}">
-              <i class="bi bi-newspaper me-2"></i>Latest News
+            <a class="nav-link" href="{%url 'articles'%}">
+              <i class="bi bi-newspaper me-2"></i>Blog
             </a>
           </li>
-          <!-- Find Home Dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-house-heart me-2"></i>Find Home
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark dropdown-custom">
-              <li><a class="dropdown-item" href="{% url 'customer:rent-prop' %}">
+            {% comment %} Main Customer Section {% endcomment %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'customer:rent-prop' %}">
                 <i class="bi bi-key me-2"></i>Rent Home
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'customer:buy-property' %}">
+              <li class="nav-item"><a class="nav-link" href="{% url 'customer:buy-property' %}">
                 <i class="bi bi-cart-check me-2"></i>Buy Home
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'customer:wishlist' %}">
+              <li class="nav-item"><a class="nav-link" href="{% url 'customer:wishlist' %}">
                 <i class="bi bi-heart me-2"></i>Wishlist
               </a></li>
             </ul>
           </li>
 
-          <!-- Property Management Dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-building-gear me-2"></i>Property Management
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark dropdown-custom">
-              <li><a class="dropdown-item" href="{% url 'customer:lease-property' %}">
-                <i class="bi bi-file-text me-2"></i>Lease Property
-              </a></li>
-              <li><a class="dropdown-item" href="{% url 'customer:sell-property' %}">
-                <i class="bi bi-cash-coin me-2"></i>Sell Property
-              </a></li>
-              <li><a class="dropdown-item" href="{% url 'customer:my-listings' %}">
-                <i class="bi bi-list-ul me-2"></i>My Listings
-              </a></li>
-            </ul>
-          </li>
 
 
 
@@ -111,9 +89,10 @@
                 <i class="bi bi-envelope me-2"></i>Contact Us
               </a>
             </li>
+            </li>
             <li class="mb-2">
               <a href="#" class="footer-link">
-                <i class="bi bi-question-circle me-2"></i>FAQs
+                <i class="bi bi-question-circle me-2"></i>Help Section  
               </a>
             </li>
             <li class="mb-3">
@@ -129,7 +108,7 @@
             </a>
           </div>
           
-          <p class="text-center small text-muted mb-0 mt-3">&copy; 2024 Estate Web. All rights reserved.</p>
+          <p class="text-center small text-muted mb-0 mt-3">&copy; 2026 Estate Web. All rights reserved.</p>
         </div>
       </div>
     </div>

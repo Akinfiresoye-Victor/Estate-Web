@@ -18,4 +18,6 @@ urlpatterns = [
     path('settings', views.company_settings, name='company-settings'),
     path('lead/delete/<lead_id>', views.delete_lead, name='delete-lead'),
     path('lead/detail/<lead_id>', views.lead_detail, name='lead-detail'),
+    path('lead/update/<int:lead_id>', views.update_lead_status, name='update-lead-status'),
+    path('lead/update_stage/<int:lead_id>', views.update_lead_stage, name='update-lead-stage'),
 ]

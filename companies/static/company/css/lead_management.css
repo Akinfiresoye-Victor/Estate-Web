@@ -491,63 +491,106 @@
   color: var(--secondary-color);
 }
 
-/* Status Badge */
+/* ====================================
+   ADD THESE STYLES TO YOUR lead_management.css
+   Replace the existing .status-badge section
+   ==================================== */
+
+/* Status Badge - Read Only Display */
 .status-badge {
-  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 700;
-  border: 2px solid transparent;
-  cursor: pointer;
+  border: 2px solid;
+  white-space: nowrap;
   transition: all 0.3s ease;
-  appearance: none;
-  background-position: right 0.8rem center;
-  background-repeat: no-repeat;
-  background-size: 10px;
-  padding-right: 2.5rem;
 }
 
-.status-badge.status-new {
-  background-color: rgba(23, 162, 184, 0.1);
-  color: var(--info-color);
-  border-color: var(--info-color);
-}
-
+/* Individual Status Colors */
 .status-badge.status-contacted {
-  background-color: rgba(255, 193, 7, 0.1);
-  color: var(--warning-color);
-  border-color: var(--warning-color);
+  background-color: rgba(30, 144, 255, 0.2);
+  color: #1E90FF;
+  border-color: rgba(23, 162, 184, 0.3);
+}
+
+.status-badge.status-notcontacted {
+  background-color: rgba(108, 117, 125, 0.15);
+  color: #495057;
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.status-badge.status-coldlead {
+  background-color: rgba(23, 162, 184, 0.15);
+  color: #0c7489;
+  border-color: rgba(23, 162, 184, 0.3);
+}
+
+.status-badge.status-warmlead {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: #e65100;
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.status-badge.status-hotlead {
+  background-color: rgba(255, 107, 107, 0.15);
+  color: #dc3545;
+  border-color: rgba(255, 107, 107, 0.3);
+  animation: pulse-hot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-hot {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 107, 107, 0);
+  }
 }
 
 .status-badge.status-qualified {
-  background-color: rgba(111, 66, 193, 0.1);
-  color: #6f42c1;
-  border-color: #6f42c1;
+  background-color: rgba(40, 167, 69, 0.15);
+  color: #1e7e34;
+  border-color: rgba(40, 167, 69, 0.3);
 }
 
-.status-badge.status-hot {
-  background-color: rgba(255, 107, 107, 0.1);
-  color: #ff6b6b;
-  border-color: #ff6b6b;
+.status-badge.status-unqualified {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #bd2130;
+  border-color: rgba(220, 53, 69, 0.3);
 }
 
-.status-badge.status-viewing,
-.status-badge.status-negotiation {
-  background-color: rgba(255, 193, 7, 0.1);
-  color: #ff9800;
-  border-color: #ff9800;
+/* Add icon before status text (optional but looks nice) */
+.status-badge::before {
+  content: '●';
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+  animation: blink 2s ease-in-out infinite;
 }
 
-.status-badge.status-converted {
-  background-color: rgba(40, 167, 69, 0.1);
-  color: var(--success-color);
-  border-color: var(--success-color);
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-.status-badge.status-lost {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: var(--danger-color);
-  border-color: var(--danger-color);
+/* Hover effect for read-only badge */
+.status-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .status-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
 }
 
 /* Lead Date */
@@ -617,50 +660,180 @@
   transform: translateY(-2px);
 }
 
-/* Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+/* Modern Pagination Styling */
+.pagination-section {
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
   margin-top: 2rem;
 }
 
-.page-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  border: 2px solid #e1e8ed;
-  background: #fff;
-  color: var(--text-dark);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.pagination-nav {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.page-item {
+  display: inline-block;
+}
+
+.page-link {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 2px solid #e1e8ed;
+  background: #fff;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.page-btn:hover:not(:disabled) {
-  background: var(--secondary-color);
+.page-link:hover {
+  background: linear-gradient(135deg, #c19b76 0%, #d4af8a 100%);
   color: #fff;
-  border-color: var(--secondary-color);
+  border-color: #c19b76;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(193, 155, 118, 0.3);
 }
 
-.page-btn.active {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+.page-item.active .page-link {
+  background: linear-gradient(135deg, #1a3c4e 0%, #2d5568 100%);
   color: #fff;
-  border-color: var(--primary-color);
+  border-color: #1a3c4e;
+  box-shadow: 0 4px 12px rgba(26, 60, 78, 0.4);
+  font-weight: 700;
 }
 
-.page-btn:disabled {
-  opacity: 0.5;
+.page-item.disabled .page-link {
+  opacity: 0.4;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
-.page-dots {
-  padding: 0 0.5rem;
-  color: var(--text-light);
+/* First/Last page buttons */
+.page-item:first-child .page-link,
+.page-item:last-child .page-link {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-color: #dee2e6;
+}
+
+.page-item:first-child .page-link:hover,
+.page-item:last-child .page-link:hover {
+  background: linear-gradient(135deg, #1a3c4e 0%, #2d5568 100%);
+  border-color: #1a3c4e;
+}
+
+/* Previous/Next buttons - special styling */
+.page-item:nth-child(2) .page-link,
+.page-item:nth-last-child(2) .page-link {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  font-weight: 700;
+}
+
+.page-item:nth-child(2) .page-link:hover,
+.page-item:nth-last-child(2) .page-link:hover {
+  background: linear-gradient(135deg, #c19b76 0%, #d4af8a 100%);
+  border-color: #c19b76;
+}
+
+/* Icons */
+.page-link i {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Pagination Info */
+.pagination-info {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 25px;
+  display: inline-block;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.pagination-info span {
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pagination-info strong {
+  color: #1a3c4e;
+  font-weight: 700;
+  padding: 0 0.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pagination {
+    gap: 0.3rem;
+  }
+  
+  .page-link {
+    min-width: 36px;
+    height: 36px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    border-width: 1.5px;
+  }
+  
+  .page-link i {
+    font-size: 0.9rem;
+  }
+  
+  .pagination-info {
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .pagination-section {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  .pagination {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+  
+  .page-link {
+    min-width: 32px;
+    height: 32px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Hide some page numbers on very small screens */
+  .page-item:not(.active):not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
+    display: none;
+  }
+  
+  .page-item.active {
+    display: inline-block !important;
+  }
 }
 
 /* Empty State */

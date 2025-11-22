@@ -74,6 +74,12 @@ SOCIAL_LINKS=[
     ('Company Website', 'Company Website'),
     ('Other', 'Other')
 ]
+AGENT_SOCIAL_LINKS=[
+    ('X', 'X'),
+    ('linkedin', 'linkedin'),
+    ('Instagram', 'Instagram'),
+    ('Other', 'Other')
+]
 
 
 CONTACT_TYPE=[
@@ -85,11 +91,29 @@ CONTACT_TYPE=[
 LEAD_STATUS=[
     ('Contacted', 'Contacted'),
     ('Not Contacted', 'Not Contacted'),
+    ('Contact Attempt', 'Contact Attempt'),
     ('Cold Lead', 'Cold Lead'),
+    ('Warm Lead', 'Warm Lead'),
     ('Hot Lead', 'Hot Lead'),
     ('Qualified', 'Qualified'),
-    ('Negotiation', 'Negotiation'),
-    ('Agreed Prices', 'Agreed Prices'),
-    ('Converted', 'Converted'),
-    ('Lost', 'Lost')
+    ('Unqualified', 'Unqualified'),
+]
+
+
+LEAD_STAGES=[
+    ('New', 'New Lead'),
+    ('Potential Friend', 'Potential Friend'),
+    ('True Friend', 'True Friend'),
+    ('Contracted', 'Contracted'),
+    ('Closed/Won', 'Closed/Won'),
+    ('Disposition', 'Disposition')
+]
+
+
+YEARS_OF_EXPERINCE=[
+    ('0-1', '0-1'),
+    ('1-3', '1-3'),
+    ('3-5', '3-5'),
+    ('5-10', '5-10'),
+    ('10+', '10+')
 ]

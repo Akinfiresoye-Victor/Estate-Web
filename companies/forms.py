@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import CompanyInformation, CompanySocialLinks
-from estate.choices import STATES
+from core.choices import STATES
 from django.forms import formset_factory, inlineformset_factory
 from django.core.exceptions import ValidationError
 

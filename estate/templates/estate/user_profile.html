@@ -7,43 +7,6 @@
 {% endblock %}
 
 {% block content %}
-<a href="javascript:history.back()" class="attractive-back-button">
-    &larr; Go Back to the Previous Page
-</a>
-
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
-
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
 
 <div class="dashboard-header">
   <div class="container">
@@ -59,7 +22,7 @@
       <p class="card-text">
         <strong>{{ headline }}</strong>
       </p>
-      <a href="{%url 'customer:articles'%}" class="btn">Read Full Article</a>
+      <a href="{%url 'articles'%}" class="btn">Read Full Article</a>
     </div>
   </div>
 
@@ -86,10 +49,6 @@
           <div class="username">@{{ user.username }}</div>
         {% endif %}
         <p class="email">{{ user.email }}</p>
-        <div class="d-flex flex-wrap gap-2">
-          <a href="{% url 'customer:update-profile' user.id %}" class="btn btn-primary-custom">Update Profile</a>
-          <a href="{% url 'customer:change-password' %}" class="btn btn-outline-danger-custom">Change Password</a>
-        </div>
       </div>
     </div>
   </div>
@@ -100,17 +59,19 @@
       <div class="card dashboard-card">
         <span class="card-icon">🏘️</span>
         <div class="card-body d-flex flex-column">
-          <h5>My Property Listings</h5>
+          <h5>My Property Listings (Landlords Section)
+            <span class="coming-soon-badge">Coming Soon</span>
+          </h5>
           <p class="card-text flex-grow-1">View, edit, or add new properties to showcase your listings.</p>
           <div class="d-flex flex-wrap gap-2 mt-auto">
-            <a href="{% url 'customer:my-listings' %}" class="btn btn-primary-custom">Manage Listings</a>
+            <a href="#" class="btn btn-primary-custom">Manage Listings</a>
             <div class="dropdown">
               <button class="btn btn-success-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                Add New Property
+              Add New Property
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'customer:sell-property' %}">List for Sale</a></li>
-                <li><a class="dropdown-item" href="{% url 'customer:lease-property' %}">List for Lease</a></li>
+                <li><a class="dropdown-item" href="#">List for Sale</a></li>
+                <li><a class="dropdown-item" href="#">List for Lease</a></li>
               </ul>
             </div>
           </div>
@@ -134,15 +95,10 @@
         <span class="card-icon">📋</span>
         <div class="card-body d-flex flex-column">
           <h5>
-            Grow your career
-            <span class="coming-soon-badge">New</span>
+            Send feedback/Complaint
           </h5>
-          <p class="card-text flex-grow-1">Set up Your work Profile to boost your career</p>
-          {% if info %}
-            <a href="#" class="btn btn-outline-custom mt-auto">Update Work Profile</a>
-          {% else %}
-            <a href="#" class="btn btn-outline-custom mt-auto">Set Work Profile</a>
-          {%endif%}
+          <p class="card-text flex-grow-1">Your feedback will make Estate Web better</p>
+            <a href="{%url 'feedback'%}" class="btn btn-outline-custom mt-auto">Help Us Improve</a>
         </div>
       </div>
     </div>

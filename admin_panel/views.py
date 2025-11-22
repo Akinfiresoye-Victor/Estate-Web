@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from datetime import date
 from estate.models import *
+from core.models import *
 from decouple import config
 from django.contrib import messages
 from datetime import datetime, date

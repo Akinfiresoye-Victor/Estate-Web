@@ -391,11 +391,11 @@
                 <div class="metric-header">
                   <h4>Inquiry Conversion Rate</h4>
                   <span class="metric-badge positive">
-                    <i class="bi bi-arrow-up"></i>12.5%
+                    <i class="bi bi-arrow-up"></i>{{inq_rate|floatformat:2}}%
                   </span>
                 </div>
                 <div class="metric-bar">
-                  <div class="metric-bar-fill" style="width: 82%"></div>
+                  <div class="metric-bar-fill" style="width: {{inq_rate}}%"></div>
                 </div>
                 <p class="metric-subtext">Strong conversion from views to inquiries</p>
               </div>

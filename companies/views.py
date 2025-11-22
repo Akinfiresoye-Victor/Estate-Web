@@ -5,20 +5,27 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .models import CompanyInformation, CompanyAnalytics, SessionId
 from members.views import logout_user
-from estate.models import PropertyManagementRent, PropertyManagementSale, LeadInfo
+from core.models import PropertyManagementRent, PropertyManagementSale
+from estate.models import LeadInfo
 from members.models import User
-from django.core.paginator import Paginator
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
 
 
-# Create your views here.
+
+#Companies dashboard
 def dashboard(request):
     try:
         if not request.user.is_authenticated:
-            return redirect('login')
-        
+            messages.info(request, 'You must be authenticated to access this page')
+            return redirect('landing')
+        if not request.user.role == 'company':
+            messages.info(request, 'Account must be a company account')
+            return redirect('landing')
         try:
             company = CompanyInformation.objects.get(user_id=request.user.id) 
             social_links = company.social.all()
@@ -27,13 +34,13 @@ def dashboard(request):
                 profile_views=views.profile_views
             
             total_prop= PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).count() + PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).count()
-            
+            total_inq=LeadInfo.objects.filter(company_uuid=company.unique_company_id).count()
             context = {
                 'company': company,
                 'social_links': social_links,
                 'total_properties': total_prop,
                 'total_views': profile_views,
-                'total_inquiries': 0,
+                'total_inquiries': total_inq,
                 'average_rating': 0.0,
                 'recent_activities': 'None',
                 'recent_activities': 'None' 
@@ -48,52 +55,50 @@ def dashboard(request):
         return render(request, 'estate/error_page.html', {'e':e})
 
 
+
+#form all companies must fill before they access the dashboard
 def company_form(request):
     if request.user.is_authenticated:
-        if request.user.role == 'company':
-            try:
-                submitted=False
-                if request.method == 'POST':
-                    try:
-                        if CompanyInformation.objects.get(user_id=request.user.id):
-                            return redirect('company:dashboard')
-
-                    except CompanyInformation.DoesNotExist:
-                        comp_form=CompanyForm(request.POST or None, request.FILES or None)
-                        link_form=SocialLinksFormset(request.POST or None)
-                        with transaction.atomic():
-                            if comp_form.is_valid() and link_form.is_valid():
-                                company_form=comp_form.save(commit=False)
-                                company_form.user_id= request.user.id
-                                User.email= company_form.email
-                                company_form.save()
-                                link_form.instance=company_form
-                                link_form.save()
-                                messages.success(request, 'Company Profile Successfully Set')
-                                return HttpResponseRedirect('/company_form?submitted=True')
-
-                else:
-                    comp_form= CompanyForm()
-                    link_form= SocialLinksFormset()
-                    if 'submitted' in request.GET:
-                        submitted=True
-                return render(request, 'company/company_form.html', {
-                                                                        'form': comp_form,
-                                                                        'social': link_form,
-                                                                        'submitted': submitted
-                            })
-                
-                
-            except Exception as e:
-                print(f'Error is {e}')
-                return render(request, 'estate/error_page.html', {'e': e}, {'e':e})
-        else:
-            messages.info(request, 'open a company account to perform this action')
-            return redirect('customer:articles')
+        if not request.user.role == 'company':
+            messages.info(request, 'Account must be a company account')
+            return redirect('landing')
+        try:
+            submitted=False
+            if request.method == 'POST':
+                try:
+                    if CompanyInformation.objects.get(user_id=request.user.id):
+                        return redirect('company:dashboard')
+                except CompanyInformation.DoesNotExist:
+                    comp_form=CompanyForm(request.POST or None, request.FILES or None)
+                    link_form=SocialLinksFormset(request.POST or None)
+                    with transaction.atomic():
+                        if comp_form.is_valid() and link_form.is_valid():
+                            company_form=comp_form.save(commit=False)
+                            company_form.user_id= request.user.id
+                            User.email= company_form.email
+                            company_form.save()
+                            link_form.instance=company_form
+                            link_form.save()
+                            messages.success(request, 'Company Profile Successfully Set')
+                            return HttpResponseRedirect('/company_form?submitted=True')
+            else:
+                comp_form= CompanyForm()
+                link_form= SocialLinksFormset()
+                if 'submitted' in request.GET:
+                    submitted=True
+            return render(request, 'company/company_form.html', {
+                                                                    'form': comp_form,
+                                                                    'social': link_form,
+                                                                    'submitted': submitted
+                        })
+            
+            
+        except Exception as e:
+            print(f'Error is {e}')
+            return render(request, 'estate/error_page.html', {'e': e}, {'e':e})
     else:
-        messages.info(request, 'You have to be authenticated to access this page')
-        return redirect('login')
-
+        messages.info(request, 'open a company account to perform this action')
+        return redirect('articles')
 
 def update_company_profile(request, company_id):
     if request.user.is_authenticated:
@@ -153,6 +158,7 @@ def company_analytics(request):
         return redirect('landing')
 
     try:
+        messages.info(request, 'Numbers might seem low since we just launched')
         company = CompanyInformation.objects.get(user_id=request.user.id)
 
         try:
@@ -293,6 +299,9 @@ def company_analytics(request):
             total_companies_eng.append(eng_rate)
         competition=(analytics.competition/sum(total_companies_eng)) * 100
         
+        total_inq=LeadInfo.objects.filter(company_uuid=company.unique_company_id).count()
+        inq_conv_rate=(total_inq/total_prop_views) *100
+        
         # 3. Render the correct template
         return render(request, 'company/company_analytics.html', {
             'profile_views': profile_views,
@@ -304,7 +313,8 @@ def company_analytics(request):
             'sale_incr_perc': monthly_sale_view_incr,
             'total_prop_incr_perc': total_prop_incr_perc,
             'engagement_rate': analytics.competition,
-            'competition':competition
+            'competition':competition,
+            'inq_rate':inq_conv_rate
         })
         
     except CompanyInformation.DoesNotExist:
@@ -340,12 +350,42 @@ def lead_management(request):
             return redirect('landing')
         company_uuid=CompanyInformation.objects.get(user_id=request.user.id).unique_company_id    
         general_leads=LeadInfo.objects.filter(company_uuid=company_uuid)
+        p=Paginator(general_leads.order_by('-date_created'), 10)
+        page=request.GET.get('page')
+        leads=p.get_page(page)
+        nums="a" * leads.paginator.num_pages
         lead_count=general_leads.count()
         new_leads=general_leads.filter(date_created=date.today()).count()
+        
+        
+        '''Lead Stages'''
+        potential_friend=general_leads.filter(stages='Potential Friend')
+        true_friend=general_leads.filter(stages='True Friend')
+        contracted=general_leads.filter(stages='Contracted')
+        closed=general_leads.filter(stages='Closed/Won')
+        disposition=general_leads.filter(stages='Disposition')
+        new_lead_stage=general_leads.filter(stages='New')
+        
+        '''Lead Status'''
+        contacted=general_leads.filter(status='Contacted')
+        not_contacted=general_leads.filter(status= 'Not Contacted')
+        attempt_contact=general_leads.filter(status= 'Contact Attempt')
+        cold_lead= general_leads.filter(status= 'Cold Lead')
+        warm_lead=general_leads.filter(status= 'Warm Lead')
+        hot_lead=general_leads.filter(status= 'Hot Lead')
+        qualified=general_leads.filter(status= 'Qualified')
+        unqualified=general_leads.filter(status= 'Unqualified')
 
 
-        return render(request, 'company/lead_management.html', {'lead_count':lead_count, 'new_leads': new_leads, 'leads':general_leads,
-                                                                })
+
+
+        context= {'lead_count':lead_count, 'new_leads': new_leads, 'leads':leads,'potential':potential_friend,
+                    'potential_count': potential_friend.count(),'true_friend': true_friend,'true_friend_count':true_friend.count(),
+                    'contracted':contracted,'contracted_count':contracted.count(),'closed':closed,'closed_count':closed.count(),
+                    'disposition': disposition, 'disposition_count':disposition.count(), 'contacted':contacted, 'not_contacted':not_contacted,
+                    'attempt':attempt_contact, 'cold_lead':cold_lead, 'warm_lead':warm_lead, 'hot_lead':hot_lead,
+                    'qulified':qualified, 'unqualified':unqualified, 'nums': nums, 'new_stage':new_lead_stage.count()}
+        return render(request, 'company/lead_management.html', context)
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
@@ -368,16 +408,70 @@ def delete_lead(request, lead_id):
         company= CompanyInformation.objects.get(user_id=request.user.id)
         lead_to_delete=LeadInfo.objects.get(pk=lead_id)
         if company.unique_company_id == lead_to_delete.company_uuid:
-            print('He')
             lead_to_delete.delete()
             messages.success(request, "Client's Data Deleted Successfully")
             return redirect('company:lead-management')
         else:
-            print('Wagawan')
             messages.warning(request, "You aren't authorized to perform that action")
             return redirect('landing')
     except Exception as e:
         return render(request, 'estate/error_page', {e})
+
+
+
+@require_POST
+def update_lead_status(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'You have to be authenticated to perform this action')
+        return redirect('landing')
+    if request.user.role !='company':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        try:
+            lead=LeadInfo.objects.get(pk=lead_id)
+            new_status= request.POST.get('new_status')
+            if not new_status:
+                messages.error(request, 'Status Missing')
+                return redirect('company:lead-management')
+            lead.status=new_status
+            lead.date_updated=timezone.now()
+            lead.save()
+            messages.success(request, 'Status Updated Successfully')
+            return redirect('company:lead-detail', lead_id=lead_id)
+        except ObjectDoesNotExist:
+            messages.error(request, 'Lead Not found <404>')
+            return redirect('company:lead-management')
+    except Exception as e:
+        return render(request, 'estate/error_page.html')
+
+
+
+@require_POST
+def update_lead_stage(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'You have to be authenticated to perform this action')
+        return redirect('landing')
+    if request.user.role != 'company':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        try:
+            lead = LeadInfo.objects.get(pk=lead_id)
+            new_stage = request.POST.get('new_stage')
+            if not new_stage:
+                messages.error(request, 'Stage Missing')
+                return redirect('company:lead-management')
+            lead.stages = new_stage
+            lead.date_updated=timezone.now()
+            lead.save()
+            messages.success(request, 'Stage Updated Successfully')
+            return redirect('company:lead-detail', lead_id=lead_id)
+        except ObjectDoesNotExist:
+            messages.error(request, 'Lead Not found <404>')
+            return redirect('company:lead-management')
+    except Exception as e:
+        return render(request, 'estate/error_page.html')
 
 
 def company_profile(request, company_uuid):

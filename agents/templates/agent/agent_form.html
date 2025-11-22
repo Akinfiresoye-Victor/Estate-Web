@@ -1,0 +1,435 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Registration - Estate Web</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'agent/css/agent_form.css' %}">
+</head>
+<body>
+
+    {% if submitted %}
+    <!-- Success Modal -->
+    <div class="success-overlay active" id="successModal">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h2>Registration Successful!</h2>
+            <p>Your agent profile has been created successfully. You can now access your dashboard.</p>
+            <a href="{% url 'agent:dashboard' %}" class="btn-dashboard">Go to Dashboard</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="form-wrapper">
+        
+        <!-- Left Side - Branding -->
+        <div class="form-left">
+            <div class="branding-content">
+                <div class="logo-section">
+                    <i class="bi bi-buildings"></i>
+                    <h1>Estate Web</h1>
+                </div>
+                <h2>Join Our Network of Professional Agents</h2>
+                <p>Complete your profile to start managing properties and connecting with clients.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Manage unlimited property listings</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Track leads and appointments</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Access analytics and reports</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Professional verification badge</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div class="form-right">
+            <div class="form-container">
+                
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <span>Basic Info</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <span>Experience</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <span>Social Links</span>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="agentForm">
+                    {% csrf_token %}
+
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" data-step="1">
+                        <h3 class="step-title">Basic Information</h3>
+                        <p class="step-description">Tell us about yourself and your professional background</p>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="{{ form.profile_name.id_for_label }}">
+                                    {{ form.profile_name.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="{{ form.profile_name.name }}" 
+                                       id="{{ form.profile_name.id_for_label }}" 
+                                       class="form-control" 
+                                       placeholder="Enter your full name" 
+                                       required>
+                                {% if form.profile_name.errors %}
+                                    <span class="error-text">{{ form.profile_name.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.phone_number.id_for_label }}">
+                                    {{ form.phone_number.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="tel" name="{{ form.phone_number.name }}" 
+                                       id="{{ form.phone_number.id_for_label }}" 
+                                       class="form-control" 
+                                       placeholder="Enter phone number" 
+                                       required>
+                                {% if form.phone_number.errors %}
+                                    <span class="error-text">{{ form.phone_number.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}">
+                                    {{ form.email.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="email" name="{{ form.email.name }}" 
+                                       id="{{ form.email.id_for_label }}" 
+                                       class="form-control" 
+                                       placeholder="Enter email address" 
+                                       required>
+                                {% if form.email.errors %}
+                                    <span class="error-text">{{ form.email.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.location.id_for_label }}">
+                                    {{ form.location.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <select name="{{ form.location.name }}" 
+                                        id="{{ form.location.id_for_label }}" 
+                                        class="form-control" 
+                                        required>
+                                    <option value="">Select your base city</option>
+                                    {% for value, label in form.location.field.choices %}
+                                        {% if value %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                {% if form.location.errors %}
+                                    <span class="error-text">{{ form.location.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.language.id_for_label }}">
+                                    {{ form.language.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="{{ form.language.name }}" 
+                                       id="{{ form.language.id_for_label }}" 
+                                       class="form-control" 
+                                       placeholder="e.g English, French" 
+                                       required>
+                                {% if form.language.errors %}
+                                    <span class="error-text">{{ form.language.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="{{ form.work_type.id_for_label }}">
+                                    {{ form.work_type.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="{{ form.work_type.name }}" 
+                                       id="{{ form.work_type.id_for_label }}" 
+                                       class="form-control" 
+                                       placeholder="e.g Realtor, Consultant" 
+                                       required>
+                                {% if form.work_type.errors %}
+                                    <span class="error-text">{{ form.work_type.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="{{ form.bio.id_for_label }}">
+                                    {{ form.bio.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea name="{{ form.bio.name }}" 
+                                          id="{{ form.bio.id_for_label }}" 
+                                          class="form-control" 
+                                          placeholder="Tell us about your professional experience..." 
+                                          rows="4" 
+                                          required></textarea>
+                                {% if form.bio.errors %}
+                                    <span class="error-text">{{ form.bio.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="{{ form.profile_picture.id_for_label }}">
+                                    Profile Picture
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" id="{{ form.profile_picture.id_for_label }}" 
+                                           name="{{ form.profile_picture.name }}" 
+                                           accept="image/*" class="file-input">
+                                    <label for="{{ form.profile_picture.id_for_label }}" class="file-label">
+                                        <i class="bi bi-cloud-upload"></i>
+                                        <span>Choose profile picture</span>
+                                    </label>
+                                    <span class="file-name"></span>
+                                </div>
+                                {% if form.profile_picture.errors %}
+                                    <span class="error-text">{{ form.profile_picture.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="{{ form.government_id.id_for_label }}">
+                                    {{ form.government_id.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" id="{{ form.government_id.id_for_label }}" 
+                                           name="{{ form.government_id.name }}" 
+                                           accept=".pdf,.jpg,.jpeg,.png" class="file-input">
+                                    <label for="{{ form.government_id.id_for_label }}" class="file-label">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        <span>Upload government ID</span>
+                                    </label>
+                                    <span class="file-name"></span>
+                                </div>
+                                {% if form.government_id.errors %}
+                                    <span class="error-text">{{ form.government_id.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="{{ form.certificate.id_for_label }}">
+                                    {{ form.certificate.label }}
+                                </label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" id="{{ form.certificate.id_for_label }}" 
+                                           name="{{ form.certificate.name }}" 
+                                           accept=".pdf,.jpg,.jpeg,.png" class="file-input">
+                                    <label for="{{ form.certificate.id_for_label }}" class="file-label">
+                                        <i class="bi bi-award"></i>
+                                        <span>Upload certificate</span>
+                                    </label>
+                                    <span class="file-name"></span>
+                                </div>
+                                {% if form.certificate.errors %}
+                                    <span class="error-text">{{ form.certificate.errors }}</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Universal Agent Checkbox -->
+                            <div class="form-group full-width">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="{{ form.universal_agent.id_for_label }}" 
+                                           name="{{ form.universal_agent.name }}" 
+                                           class="checkbox-input">
+                                    <label for="{{ form.universal_agent.id_for_label }}" class="checkbox-label">
+                                        {{ form.universal_agent.label }}
+                                        <span class="checkbox-hint">Check this if you're working independently without a company</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Universal Agent Additional Fields (Hidden by default) -->
+                            <div id="universalAgentFields" class="universal-fields" style="display: none;">
+                                <div class="form-group">
+                                    <label>Years of Experience</label>
+                                    <select name="years_experience" class="form-control">
+                                        <option value="">Select years</option>
+                                        <option value="0-1">0-1 years</option>
+                                        <option value="2-3">2-3 years</option>
+                                        <option value="4-5">4-5 years</option>
+                                        <option value="6-10">6-10 years</option>
+                                        <option value="10+">10+ years</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="id_agency" name="agency" class="checkbox-input">
+                                        <label for="id_agency" class="checkbox-label">
+                                            Affiliated with an Agency?
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="agencyNameField" style="display: none;">
+                                    <label>Agency Name</label>
+                                    <input type="text" name="agency_name" class="form-control" placeholder="Enter agency name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-next">
+                                Next Step
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Experience -->
+                    <div class="form-step" data-step="2">
+                        <h3 class="step-title">Professional Experience</h3>
+                        <p class="step-description">Add your work history and experience</p>
+
+                        <div id="experienceSection">
+                            {{ exp_form.management_form }}
+                            <div class="experience-forms">
+                                {% for form in exp_form %}
+                                    <div class="experience-item">
+                                        <div class="experience-header">
+                                            <h4>Experience #<span class="exp-number">{{ forloop.counter }}</span></h4>
+                                            {% if not forloop.first %}
+                                                <button type="button" class="btn-remove-exp">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label>Company Name</label>
+                                                {{ form.company }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Position/Title</label>
+                                                {{ form.title }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Start Date</label>
+                                                {{ form.start_date }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>End Date</label>
+                                                {{ form.end_date }}
+                                            </div>
+                                        </div>
+                                        {{ form.DELETE }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-add-more" id="addExperience">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Another Experience
+                        </button>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-prev">
+                                <i class="bi bi-arrow-left"></i>
+                                Previous
+                            </button>
+                            <button type="button" class="btn-next">
+                                Next Step
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Social Links -->
+                    <div class="form-step" data-step="3">
+                        <h3 class="step-title">Social Media Links</h3>
+                        <p class="step-description">Connect your professional social media profiles</p>
+
+                        <div id="socialSection">
+                            {{ social.management_form }}
+                            <div class="social-forms">
+                                {% for form in social %}
+                                    <div class="social-item">
+                                        <div class="social-header">
+                                            <h4>Social Link #<span class="social-number">{{ forloop.counter }}</span></h4>
+                                            {% if not forloop.first %}
+                                                <button type="button" class="btn-remove-social">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label>Platform</label>
+                                                {{ form.social_platform }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Profile URL</label>
+                                                {{ form.link_to_social }}
+                                            </div>
+                                        </div>
+                                        {{ form.DELETE }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-add-more" id="addSocial">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Another Link
+                        </button>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-prev">
+                                <i class="bi bi-arrow-left"></i>
+                                Previous
+                            </button>
+                            <button type="submit" class="btn-submit">
+                                <i class="bi bi-check-circle"></i>
+                                Complete Registration
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'agent/js/agent_form.js' %}"></script>
+</body>
+</html>

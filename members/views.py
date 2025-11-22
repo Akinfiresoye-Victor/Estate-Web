@@ -103,7 +103,7 @@ def register_agent(request):
                 user= authenticate(username= username, password= password)
                 login(request, user)
                 messages.success(request, (f'Welcome {request.user.username}, and Thanks for joining Estate Web, Feel free to look around'))
-                return redirect('agent:agent_dashboard')
+                return redirect('agent:dashboard')
             else:
                 messages.error(request, ('Make Sure You filled all input boxes correctly'))
                 return render(request, 'registration/register_agent.html', {'form': form, 'role':'Agent'})

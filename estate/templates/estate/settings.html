@@ -133,29 +133,7 @@
             </div>
           </div>
 
-          <!-- Privacy Section -->
-          <div class="settings-section">
-            <div class="section-header">
-              <i class="fas fa-shield-alt"></i>
-              <div>
-                <h3>Privacy Settings</h3>
-              </div>
-            </div>
-
-            <div class="switch-group">
-              <div class="custom-switch">
-                <input class="switch-input" type="checkbox" id="accountVisibility" checked>
-                <label class="switch-label" for="accountVisibility">
-                  <div class="switch-content">
-                    <span class="switch-title">Profile Visibility</span>
-                    <span class="switch-desc">Allow property owners to view your profile</span>
-                  </div>
-                  <div class="switch-toggle"></div>
-                </label>
-              </div>
-            </div>
-          </div>
-
+          
           <!-- Action Buttons -->
           <div class="action-buttons">
             <a href="{% url 'customer:update-profile' user.id %}" class="btn btn-primary">
@@ -182,14 +160,87 @@
             <h4>Delete Account</h4>
             <p>This action is <strong>permanent and irreversible</strong>. All your listings, saved properties, and profile data will be permanently deleted.</p>
           </div>
-          <a href="{% url 'customer:delete-account' %}" class="btn btn-danger">
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
             <i class="fas fa-trash-alt"></i> Delete My Account
-          </a>
+          </button>
         </div>
       </div>
 
     </div>
   </div>
 </div>
+
+<!-- Delete Account Confirmation Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white border-0">
+        <h5 class="modal-title" id="deleteAccountModalLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>Delete Account Confirmation
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-exclamation-circle text-danger" style="font-size: 4rem;"></i>
+        </div>
+        <h5 class="text-center fw-bold mb-3">Are you absolutely sure?</h5>
+        <p class="text-center mb-4">This action <strong class="text-danger">cannot be undone</strong>. This will permanently delete your account.</p>
+        
+        <div class="alert alert-danger">
+          <h6 class="alert-heading"><i class="fas fa-trash me-2"></i>The following will be permanently deleted:</h6>
+          <ul class="mb-0">
+            <li>Your profile and personal information</li>
+            <li>All saved properties and wishlist items</li>
+            <li>Your property listings (if any)</li>
+            <li>Communication preferences and settings</li>
+            <li>All account history and data</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-warning">
+          <i class="fas fa-info-circle me-2"></i>
+          <strong>Important:</strong> You will be immediately logged out and cannot recover this account.
+        </div>
+
+        <p class="text-muted small text-center mb-0">
+          Please type <strong>DELETE</strong> to confirm this action:
+        </p>
+        <input type="text" class="form-control text-center mt-2 mb-3" id="deleteConfirmInput" placeholder="Type DELETE here">
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <form method="post" action="{% url 'customer:delete-account' %}" id="deleteAccountForm" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+            <i class="fas fa-trash-alt me-2"></i>Yes, Delete My Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Enable delete button only when user types "DELETE"
+document.getElementById('deleteConfirmInput').addEventListener('input', function(e) {
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  if (e.target.value === 'DELETE') {
+    confirmBtn.disabled = false;
+    confirmBtn.classList.remove('btn-danger');
+    confirmBtn.classList.add('btn-danger');
+  } else {
+    confirmBtn.disabled = true;
+  }
+});
+
+// Reset input when modal is closed
+document.getElementById('deleteAccountModal').addEventListener('hidden.bs.modal', function() {
+  document.getElementById('deleteConfirmInput').value = '';
+  document.getElementById('confirmDeleteBtn').disabled = true;
+});
+</script>
 
 {% endblock %}

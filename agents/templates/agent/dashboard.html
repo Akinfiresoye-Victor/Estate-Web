@@ -1,17 +1,483 @@
 {% extends 'agent/base.html' %}
 
-{% load static%}
+{% load static %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'agent/css/dashboard.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 
+<div class="dashboard-wrapper">
+  
+  <!-- Top Stats Bar -->
+  <div class="top-stats-bar">
+    <div class="stat-item">
+      <div class="stat-icon-wrapper blue">
+        <i class="bi bi-clipboard-check"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-number">12</span>
+        <span class="stat-label">Active Listings</span>
+      </div>
+    </div>
 
+    <div class="stat-item">
+      <div class="stat-icon-wrapper green">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-number">8</span>
+        <span class="stat-label">New Leads</span>
+      </div>
+    </div>
 
+    <div class="stat-item">
+      <div class="stat-icon-wrapper orange">
+        <i class="bi bi-calendar-week"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Appointments</span>
+      </div>
+    </div>
 
-<h1> Hello </h1>
+    <div class="stat-item">
+      <div class="stat-icon-wrapper purple">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-number">3</span>
+        <span class="stat-label">Closed Deals</span>
+      </div>
+    </div>
+  </div>
 
+  <!-- Main Dashboard Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Left Column -->
+    <aside class="sidebar-column">
+      
+      <!-- Agent Profile Widget -->
+      <div class="profile-widget">
+        <div class="profile-header-bg"></div>
+        <div class="profile-content">
+          <div class="avatar-container">
+            <img src="{{ agent_info.profile_picture.url }}" alt="https://ui-avatars.com/api/?name=Agent+Name&size=120&background=1a3c4e&color=fff&bold=true" class="profile-avatar">
+            <span class="online-badge"></span>
+          </div>
+          
+          <h3 class="profile-name">{{name}}</h3>
+          <p class="profile-role">{{work_type}}</p>
+          {%if agent_info.verified%}
+            <div class="profile-badge">
+              <i class="bi bi-patch-check-fill"></i>
+              <span>Verified Agent</span>
+            </div>
+          {%endif%}
+          <div class="profile-stats-mini">
+            <div class="mini-stat-item">
+              <span class="mini-stat-value">4.8</span>
+              <span class="mini-stat-label">Rating</span>
+            </div>
+            <div class="mini-stat-item">
+              <span class="mini-stat-value">127</span>
+              <span class="mini-stat-label">Reviews</span>
+            </div>
+            <div class="mini-stat-item">
+              <span class="mini-stat-value">52</span>
+              <span class="mini-stat-label">Sales</span>
+            </div>
+          </div>
 
-{%endblock%}
+          <a href="#" class="btn-profile-settings">
+            <i class="bi bi-gear"></i>
+            Profile Settings
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Info Card -->
+      <div class="info-card">
+        <h4 class="card-heading">
+          <i class="bi bi-info-circle-fill"></i>
+          Quick Info
+        </h4>
+        <div class="info-list">
+          <div class="info-row">
+            <i class="bi bi-envelope"></i>
+            <span>{{email}}</span>
+          </div>
+          <div class="info-row">
+            <i class="bi bi-telephone"></i>
+            <span>{{phone}}</span>
+          </div>
+          <div class="info-row">
+            <i class="bi bi-geo-alt"></i>
+            <span>{{location}}, Nigeria</span>
+          </div>
+          <div class="info-row">
+            <i class="bi bi-building"></i>
+            <span>Company Name</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Content Column -->
+    <main class="main-column">
+      
+      <!-- Welcome Header -->
+      <div class="welcome-header">
+        <div class="welcome-content">
+          <h1 class="welcome-title">{{greeting}}, {{first_name}}!</h1>
+          <p class="welcome-subtitle">{{tips}}<sub> by: {{by}}</sub></p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-icon-action">
+            <i class="bi bi-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+          <button class="btn-icon-action">
+            <i class="bi bi-chat-dots"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Performance Overview -->
+      <section class="section-block">
+        <div class="section-header">
+          <h2 class="section-title">Performance Overview</h2>
+          <a href="#" class="link-view-all">View Detailed Report</a>
+        </div>
+        
+        <div class="performance-cards">
+          <div class="perf-card">
+            <div class="perf-header">
+              <span class="perf-label">Total Revenue</span>
+              <div class="perf-icon blue">
+                <i class="bi bi-currency-dollar"></i>
+              </div>
+            </div>
+            <div class="perf-value">₦45.2M</div>
+            <div class="perf-footer">
+              <span class="trend-up">
+                <i class="bi bi-arrow-up"></i> 12.5%
+              </span>
+              <span class="trend-text">vs last month</span>
+            </div>
+          </div>
+
+          <div class="perf-card">
+            <div class="perf-header">
+              <span class="perf-label">Properties Sold</span>
+              <div class="perf-icon green">
+                <i class="bi bi-house-check"></i>
+              </div>
+            </div>
+            <div class="perf-value">23</div>
+            <div class="perf-footer">
+              <span class="trend-up">
+                <i class="bi bi-arrow-up"></i> 8.3%
+              </span>
+              <span class="trend-text">vs last month</span>
+            </div>
+          </div>
+
+          <div class="perf-card">
+            <div class="perf-header">
+              <span class="perf-label">Avg. Deal Time</span>
+              <div class="perf-icon orange">
+                <i class="bi bi-clock-history"></i>
+              </div>
+            </div>
+            <div class="perf-value">18 days</div>
+            <div class="perf-footer">
+              <span class="trend-down">
+                <i class="bi bi-arrow-down"></i> 3.2%
+              </span>
+              <span class="trend-text">faster closure</span>
+            </div>
+          </div>
+
+          <div class="perf-card">
+            <div class="perf-header">
+              <span class="perf-label">Client Satisfaction</span>
+              <div class="perf-icon purple">
+                <i class="bi bi-star-fill"></i>
+              </div>
+            </div>
+            <div class="perf-value">4.8/5</div>
+            <div class="perf-footer">
+              <span class="trend-neutral">
+                <i class="bi bi-dash"></i> 0%
+              </span>
+              <span class="trend-text">consistent</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Actions Grid -->
+      <section class="section-block">
+        <div class="section-header">
+          <h2 class="section-title">Quick Actions</h2>
+        </div>
+        
+        <div class="actions-grid">
+          
+          <a href="{%url 'lease-property'%}" class="action-tile">
+            <div class="tile-icon green-gradient">
+              <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <h3 class="tile-title">Lease Property</h3>
+            <p class="tile-desc">List new property for rent</p>
+          </a>
+
+          <a href="{%url 'sell-property'%}" class="action-tile">
+            <div class="tile-icon blue-gradient">
+              <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <h3 class="tile-title">Sell Property</h3>
+            <p class="tile-desc">List new property for sale</p>
+          </a>
+
+          <a href="#" class="action-tile">
+            <div class="tile-icon green-gradient">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+            </div>
+            <h3 class="tile-title">My Portfolio</h3>
+            <p class="tile-desc">View all your active listings</p>
+          </a>
+
+          <a href="#" class="action-tile">
+            <div class="tile-icon orange-gradient">
+              <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <h3 class="tile-title">Manage Leads</h3>
+            <p class="tile-desc">Track and follow up with clients</p>
+          </a>
+
+          <a href="#" class="action-tile">
+            <div class="tile-icon purple-gradient">
+              <i class="bi bi-calendar-event-fill"></i>
+            </div>
+            <h3 class="tile-title">Schedule Visit</h3>
+            <p class="tile-desc">Book property viewing appointments</p>
+          </a>
+
+          <a href="#" class="action-tile">
+            <div class="tile-icon teal-gradient">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <h3 class="tile-title">Analytics</h3>
+            <p class="tile-desc">View performance metrics & insights</p>
+          </a>
+
+          <a href="#" class="action-tile">
+            <div class="tile-icon red-gradient">
+              <i class="bi bi-file-earmark-text-fill"></i>
+            </div>
+            <h3 class="tile-title">Documents</h3>
+            <p class="tile-desc">Manage contracts and agreements</p>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Two Column Section -->
+      <div class="two-col-grid">
+        
+        <!-- Recent Activity -->
+        <section class="activity-box">
+          <div class="box-header">
+            <h3 class="box-title">
+              <i class="bi bi-activity"></i>
+              Recent Activity
+            </h3>
+            <a href="#" class="link-small">See All</a>
+          </div>
+          
+          <div class="activity-stream">
+            <div class="activity-item">
+              <div class="activity-icon blue">
+                <i class="bi bi-house-add"></i>
+              </div>
+              <div class="activity-details">
+                <p class="activity-text">New property listed in Victoria Island</p>
+                <span class="activity-time">2 hours ago</span>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon green">
+                <i class="bi bi-person-check"></i>
+              </div>
+              <div class="activity-details">
+                <p class="activity-text">Client meeting completed with John Doe</p>
+                <span class="activity-time">5 hours ago</span>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon orange">
+                <i class="bi bi-chat-square-text"></i>
+              </div>
+              <div class="activity-details">
+                <p class="activity-text">Received inquiry for 3-bedroom apartment</p>
+                <span class="activity-time">1 day ago</span>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon purple">
+                <i class="bi bi-clipboard-check"></i>
+              </div>
+              <div class="activity-details">
+                <p class="activity-text">Contract signed for property in Lekki</p>
+                <span class="activity-time">2 days ago</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Upcoming Schedule -->
+        <section class="activity-box">
+          <div class="box-header">
+            <h3 class="box-title">
+              <i class="bi bi-calendar-check"></i>
+              Today's Schedule
+            </h3>
+            <button class="btn-small-action">
+              <i class="bi bi-plus"></i> Add
+            </button>
+          </div>
+          
+          <div class="schedule-list">
+            <div class="schedule-item">
+              <div class="schedule-time">
+                <span class="time-text">10:00</span>
+                <span class="time-label">AM</span>
+              </div>
+              <div class="schedule-details">
+                <h4 class="schedule-title">Property Viewing</h4>
+                <p class="schedule-location">
+                  <i class="bi bi-geo-alt"></i> Ikoyi, Lagos
+                </p>
+              </div>
+              <div class="schedule-status pending">Pending</div>
+            </div>
+
+            <div class="schedule-item">
+              <div class="schedule-time">
+                <span class="time-text">2:30</span>
+                <span class="time-label">PM</span>
+              </div>
+              <div class="schedule-details">
+                <h4 class="schedule-title">Client Meeting</h4>
+                <p class="schedule-location">
+                  <i class="bi bi-geo-alt"></i> Estate Web Office
+                </p>
+              </div>
+              <div class="schedule-status confirmed">Confirmed</div>
+            </div>
+
+            <div class="schedule-item">
+              <div class="schedule-time">
+                <span class="time-text">5:00</span>
+                <span class="time-label">PM</span>
+              </div>
+              <div class="schedule-details">
+                <h4 class="schedule-title">Document Review</h4>
+                <p class="schedule-location">
+                  <i class="bi bi-geo-alt"></i> Virtual Meeting
+                </p>
+              </div>
+              <div class="schedule-status confirmed">Confirmed</div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Recent Listings -->
+      <section class="section-block">
+        <div class="section-header">
+          <h2 class="section-title">Your Recent Listings</h2>
+          <a href="#" class="link-view-all">View All Properties</a>
+        </div>
+        
+        <div class="listings-grid">
+          
+          <div class="listing-card">
+            <div class="listing-image">
+              <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" alt="Property">
+              <span class="listing-badge">For Sale</span>
+            </div>
+            <div class="listing-content">
+              <h4 class="listing-title">Luxury 4BR Duplex</h4>
+              <p class="listing-location">
+                <i class="bi bi-geo-alt"></i> Lekki Phase 1, Lagos
+              </p>
+              <div class="listing-footer">
+                <span class="listing-price">₦85M</span>
+                <span class="listing-views">
+                  <i class="bi bi-eye"></i> 234
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="listing-image">
+              <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400" alt="Property">
+              <span class="listing-badge rent">For Rent</span>
+            </div>
+            <div class="listing-content">
+              <h4 class="listing-title">Modern 3BR Apartment</h4>
+              <p class="listing-location">
+                <i class="bi bi-geo-alt"></i> Victoria Island, Lagos
+              </p>
+              <div class="listing-footer">
+                <span class="listing-price">₦3.5M/yr</span>
+                <span class="listing-views">
+                  <i class="bi bi-eye"></i> 189
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="listing-card">
+            <div class="listing-image">
+              <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400" alt="Property">
+              <span class="listing-badge">For Sale</span>
+            </div>
+            <div class="listing-content">
+              <h4 class="listing-title">Executive 5BR Villa</h4>
+              <p class="listing-location">
+                <i class="bi bi-geo-alt"></i> Banana Island, Lagos
+              </p>
+              <div class="listing-footer">
+                <span class="listing-price">₦250M</span>
+                <span class="listing-views">
+                  <i class="bi bi-eye"></i> 456
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+</div>
+
+{% endblock %}

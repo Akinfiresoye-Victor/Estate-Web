@@ -1,19 +1,25 @@
 from django.db import models
-from estate.choices import STATES, SOCIAL_LINKS
-from estate.validators import validate_image, validate_file
+from core.choices import STATES, SOCIAL_LINKS
+from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
 from django.utils import timezone
 
 def company_logo_path(instance, filename):
-    return f"company/{instance.company_name}/{filename}"
+    return f"company/logo/{instance.company_name}/{filename}"
+
+
+
+def company_file_path(instance, filename):
+    return f"company/certificate/{instance.company_name}/{filename}"
+
 
 
 class CompanyInformation(models.Model):
     user_id= models.IntegerField(blank=False, default=1)
     unique_company_id = models.CharField('uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
     company_name= models.CharField('Registered Company Name', blank=False, max_length=100, unique=True)
-    legal_certificate= models.FileField('Certificate of Incoperation',blank=True, null=True, upload_to='company/certificate', validators=[validate_file])
+    legal_certificate= models.FileField('Certificate of Incoperation',blank=True, null=True, upload_to=company_file_path, validators=[validate_file])
     year_established= models.IntegerField('Year Established',blank=False,)
     phone_number=models.CharField('Phone Number',blank=False, max_length=11)
     email=models.EmailField('Company Email', blank=False, max_length=30, unique=True)
@@ -24,6 +30,7 @@ class CompanyInformation(models.Model):
     company_logo=models.ImageField('Company Logo', blank=True, upload_to=company_logo_path, validators=[validate_image], null=True)
     principal_broker= models.CharField('Registered Owner of Company', max_length=100)
     time_created=models.DateTimeField(default=timezone.now, blank=False)
+    verified=models.BooleanField('Verified Company',default=False)
     def __str__(self):
         return self.company_name
 
