@@ -10,7 +10,7 @@ env/
 
 # Django stuff
 *.log
-staticfiles/
+
 media/
 media/images
 
