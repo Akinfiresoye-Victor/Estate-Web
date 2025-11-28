@@ -30,7 +30,7 @@ def dashboard(request):
             company = CompanyInformation.objects.get(user_id=request.user.id) 
             social_links = company.social.all()
             total_views_raw= company.analytics.all()
-            profile_views=total_views_raw.profile_views
+            profile_views=0
             
             total_prop= PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).count() + PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).count()
             total_inq=LeadInfo.objects.filter(company_uuid=company.unique_company_id).count()
