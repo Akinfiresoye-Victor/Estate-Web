@@ -186,7 +186,7 @@ def time_formatting(formatted_time):
 def view_feedbacks(request):
     if request.user.username == admin:
         feedbacks=Feedback.objects.all()
-        return render(request,'view_feedack.html', {'feedback': feedbacks})
+        return render(request,'view_feedback.html', {'feedback': feedbacks})
     else:
         messages.warning(request, 'Page is for aadmins only')
         return redirect('landing')
