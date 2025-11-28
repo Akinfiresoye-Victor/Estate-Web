@@ -187,6 +187,9 @@ def view_feedbacks(request):
     if request.user.username == admin:
         feedbacks=Feedback.objects.all()
         return render(request,'view_feedack.html', {'feedback': feedbacks})
+    else:
+        messages.warning(request, 'Page is for aadmins only')
+        return redirect('landing')
 
 #for admins only
 def delete_feedback(request, feedback_id):
