@@ -6,6 +6,13 @@ from django.db import transaction
 from members.models import User
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from core.models import PropertyManagementRent, PropertyManagementSale
+
+
+
+
+
+
 
 
 # Create your views here.
@@ -39,6 +46,12 @@ def dashboard(request):
                     greeting='Good Evening'
                     tips='Real Estate is the purest form of Entrepreneurship'
                     by='brian Bufini'
+                agent_prop_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
+                agent_prop_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
+                
+                
+                
+                
                 return render(request, 'agent/dashboard.html', {
                     'agent_info':agent_data,
                     'name':agent_name,
@@ -49,7 +62,8 @@ def dashboard(request):
                     'first_name': first_name,
                     'greeting': greeting,
                     'tips': tips,
-                    'by': by
+                    'by': by,
+                    'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
                 })
         except AgentInformation.DoesNotExist:
             messages.error(request, 'Set up your Profile to access other pages')
@@ -71,10 +85,10 @@ def agent_form(request):
         # Check if agent already has a profile
         try:
             existing_agent = AgentInformation.objects.get(user_id=request.user.id)
-            messages.info(request, 'Form has been filled go to edit mode to edit details')
+            messages.info(request, 'Form has been filled go into edit mode to edit details')
             return redirect('agent:dashboard')
         except AgentInformation.DoesNotExist:
-            pass
+            messages.info(request, 'Complete Form To gain full access')
         
         submitted = False
         
@@ -147,3 +161,31 @@ def agent_form(request):
     except Exception as e:
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
+
+def update_agent_profile(request, agent_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'You have to be logged in to access this page')
+        return redirect('landing')
+    if request.user.role != 'agent':
+        messages.info(request, 'Open an agent account to access this page')
+        return redirect('landing')
+    try:
+        agent_information=AgentInformation.objects.get(pk=agent_id)
+        if request.user.id == agent_information.user_id:
+            if request.method == 'POST':
+                form= AgentInformationForm(request.POST or None, request.FILES)
+                social_form=SocialLinksFormSet(request.POST or None)
+                exp_form=ExperienceFormSet(request.POST or None)
+                if form.is_valid() and social_form.is_valid() and exp_form.is_valid():
+                    with transaction.atomic():
+                        agent=form.save(commit=False)
+                        
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
+        
+    
+    
+
+
+def lead_management(request):
+    pass

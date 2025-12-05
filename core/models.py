@@ -56,7 +56,7 @@ class PropertyManagementSaleAnalytics(models.Model):
 #model handling the datatabase requirements cointaining all the property up for lease requirements
 class PropertyManagementRent(models.Model):
     user_id=models.IntegerField('Landlord', blank=False, default=1)
-    owner = models.CharField('Listed By', max_length=120, default="Akinfiresoye")
+    owner = models.CharField('Listed By', max_length=120)
     company_uuid=models.CharField('Company', max_length=36, default='None', blank=True)
     agent_uuid= models.CharField('Agent', max_length=36, default='None', blank=True)
     description= models.TextField('Description')

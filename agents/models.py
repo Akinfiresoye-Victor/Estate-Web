@@ -62,3 +62,12 @@ class UniversalAgent(models.Model):
     years_experience=models.CharField('Years Of Experience',default='0-1', choices=YEARS_OF_EXPERINCE)
     agency=models.BooleanField('Affiliated With Agency?', default=False)
     agency_name=models.CharField('Agency Name', default='Not With Agency', max_length=50)
+
+
+class AgentAnalytics(models.Model):
+    agent=models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='analytics')
+    listing_views=models.IntegerField('Total No of views on properties', default=0,  null=False)
+    profile_views=models.IntegerField('Companies That viewed your profile', default=0, null=False, blank=True)
+    ratings=models.FloatField('Agents Rating', default=0.0, blank=True, null=True)
+    reviews=models.IntegerField('Number Of Reviews', default=0, blank=True, null= True)
+    

@@ -109,11 +109,11 @@
                   </div>
 
                   <div class="card-actions">
-                    <a href="{% url 'customer:update-property' property_id=property.id %}" class="btn-update lease-btn">
+                    <a href="{% url 'update-property' property_id=property.id %}" class="btn-update lease-btn">
                       <i class="bi bi-pencil-square me-1"></i>
                       Update
                     </a>
-                    <a href="{% url 'customer:delete-property-r' property_id=property.id %}" class="btn-delete">
+                    <a href="{% url 'delete-property-r' property_id=property.id %}" class="btn-delete">
                       <i class="bi bi-trash-fill me-1"></i>
                       Delete
                     </a>
@@ -181,11 +181,11 @@
                   </div>
 
                   <div class="card-actions">
-                    <a href="{% url 'customer:update-property-s' property_id=property.id %}" class="btn-update sale-btn">
+                    <a href="{% url 'update-property-s' property_id=property.id %}" class="btn-update sale-btn">
                       <i class="bi bi-pencil-square me-1"></i>
                       Update
                     </a>
-                    <a href="{% url 'customer:delete-property-s' property_id=property.id %}" class="btn-delete">
+                    <a href="{% url 'delete-property-s' property_id=property.id %}" class="btn-delete">
                       <i class="bi bi-trash-fill me-1"></i>
                       Delete
                     </a>

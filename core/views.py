@@ -6,6 +6,7 @@ from django.db import transaction
 from companies.models import CompanyInformation
 from . import news_scrape as ns
 from admin_panel.views import admin
+from agents.models import AgentInformation
 
 
 # Create your views here.
@@ -94,6 +95,10 @@ def sell_property(request):
                                 image_form.instance=landlord
                                 image_form.save()
                             except CompanyInformation.DoesNotExist:
+                                agent=AgentInformation.objects.get(user_id=request.user.id)
+                                landlord.agent_uuid=agent.agent_uuid
+                                if agent.company_uuid:
+                                    landlord.company_uuid = agent.company_uuid
                                 landlord.user_id= request.user.id
                                 landlord.time_stamp= 0
                                 landlord.save()
@@ -154,8 +159,12 @@ def lease_property(request):
                                 image_form.instance=landlord
                                 image_form.save()
                             except CompanyInformation.DoesNotExist:
+                                agent= AgentInformation.objects.get(user_id=request.user.id)
+                                landlord.agent_uuid= agent.agent_uuid
+                                if agent.company_uuid != None:
+                                    landlord.company_uuid= agent.company_uuid
                                 landlord.user_id= request.user.id
-                                landlord.time_stamp= 0
+                                landlord.time_stamp= timezone.now()
                                 landlord.save()
                                 image_form.instance=landlord
                                 image_form.save()
@@ -171,7 +180,7 @@ def lease_property(request):
                 return render(request, 'core/lease_property.html', {'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template})
             
             except Exception as e:
-                print(f'ERROR IS{e}')
+                print(f'ERROR IS {e}')
                 return render(request, 'estate/error_page.html', {'e': e})
             
         else:

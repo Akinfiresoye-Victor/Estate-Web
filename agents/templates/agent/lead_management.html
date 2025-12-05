@@ -1,0 +1,639 @@
+{% extends 'company/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/lead_management.css' %}">
+{% endblock %}
+
+{% block content %}
+<a href="javascript:history.back()" class="attractive-back-button">
+    &larr; Go Back to the Previous Page
+</a>
+
+<style>
+.attractive-back-button {
+    margin-bottom: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.attractive-back-button:hover {
+    background-color: #1a3c4e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.attractive-back-button:active {
+    background-color: #0a0a0aff;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete Confirmation Modal */
+.delete-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.delete-modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.delete-modal-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.delete-modal-icon i {
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.delete-modal h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.delete-modal p {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn-cancel {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.modal-btn-cancel:hover {
+    background: #dee2e6;
+}
+
+.modal-btn-delete {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #fff;
+}
+
+.modal-btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+</style>
+
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="delete-modal-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this lead? This action cannot be undone and all associated data will be permanently removed.</p>
+        <div class="delete-modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+            </button>
+            <a href="#" id="confirmDeleteBtn" class="modal-btn modal-btn-delete" style="text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-trash me-2"></i>Yes, Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Page Header -->
+<div class="leads-header">
+  <div class="container">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-people-fill me-3"></i>Lead Management
+        </h1>
+        <p class="page-subtitle">Manage and track customer inquiries and potential deals</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-export">
+          <i class="bi bi-download me-2"></i>Export Leads
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Dashboard -->
+<div class="stats-dashboard">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon total">
+          <i class="bi bi-person-lines-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ lead_count|default:"0" }}</h3>
+          <p>Total Leads</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon new">
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ new_leads|default:"0" }}</h3>
+          <p>New Leads</p>
+        </div>
+        <div class="stat-badge">Today</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon hot">
+          <i class="bi bi-fire"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ potential_count|default:"0" }}</h3>
+          <p>Potential Friends</p>
+        </div>
+        <div class="stat-badge priority">High Priority</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon converted">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="stat-info">
+          <h3>{{ closed_count|default:"0" }}</h3>
+          <p>Closed/Won</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter & Search Section -->
+<div class="filter-section">
+  <div class="container">
+    <div class="filter-bar">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchLeads" placeholder="Search by name, email, or phone...">
+      </div>
+
+      <div class="filter-controls">
+        <select class="filter-select" id="statusFilter">
+          <option value="all">All Status</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Not Contacted">Not Contacted</option>
+          <option value="Cold Lead">Cold Lead</option>
+          <option value="Hot Lead">Hot Lead</option>
+          <option value="Warm Lead">Warm Lead</option>
+          <option value="Qualified">Qualified</option>
+          <option value="Unqualified">Unqualified</option>
+        </select>
+
+        <select class="filter-select" id="propertyFilter">
+          <option value="all">All Properties</option>
+          <option value="Sale">For Sale</option>
+          <option value="Rent">For Rent</option>
+        </select>
+
+        <select class="filter-select" id="dateFilter">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Status Tabs (Based on Stages) -->
+    <div class="status-tabs">
+      <button class="status-tab active" data-stage="all">
+        All Stages <span class="tab-count">{{ lead_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="New">
+        New Leads <span class="tab-count">{{ new_stage|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="Potential Friend">
+        Potential Friend <span class="tab-count">{{ potential_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="True Friend">
+        True Friend <span class="tab-count">{{ true_friend_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="Contracted">
+        Contracted <span class="tab-count">{{ contracted_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="Closed/Won">
+        Closed/Won <span class="tab-count">{{ closed_count|default:"0" }}</span>
+      </button>
+      <button class="status-tab" data-stage="Disposition">
+        Disposition <span class="tab-count">{{ disposition_count|default:"0" }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Leads Table -->
+<div class="leads-container">
+  <div class="container">
+    
+    {% if leads %}
+    <div class="leads-table-wrapper">
+      <table class="leads-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" id="selectAll">
+            </th>
+            <th>Lead Info</th>
+            <th>Property Interest</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead in leads %}
+          <tr class="lead-row" 
+              data-stage="{{ lead.stages }}" 
+              data-status="{{ lead.status }}"
+              data-property-type="{{ lead.property_type }}" 
+              data-date="{{ lead.date_created|date:'Y-m-d' }}">
+            <td>
+              <input type="checkbox" class="lead-checkbox" value="{{ lead.id }}">
+            </td>
+            <td>
+              <div class="lead-info">
+                <div class="lead-avatar">
+                  {{ lead.name.0|upper }}
+                </div>
+                <div class="lead-details">
+                  <h4 class="lead-name">{{ lead.name }}</h4>
+                  <span class="lead-source">
+                    <i class="bi bi-envelope"></i>Contact through-> {{ lead.contact_type|default:"Whatsapp" }} only
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="property-info">
+                {% if lead.property_type == 'Sale' %}
+                <span class="property-title">Market id: {{ lead.property_intrested }}</span>
+                <span class="property-title">{{ lead.property_name|truncatewords:5 }}</span>
+                <span class="property-type sale">
+                  <i class="bi bi-tag"></i> For Sale
+                </span>
+                {% else %}
+                <span class="property-title">Market id: {{ lead.property_intrested }}</span>
+                <span class="property-title">{{ lead.property_name|truncatewords:5 }}</span>
+                <span class="property-type rent">
+                  <i class="bi bi-key"></i> For Rent
+                </span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              <div class="contact-info">
+                <a href="mailto:{{ lead.email }}" class="contact-link">
+                  <i class="bi bi-envelope"></i> {{ lead.email }}
+                </a>
+                <a href="tel:{{ lead.phone_no }}" class="contact-link">
+                  <i class="bi bi-telephone"></i> {{ lead.phone_no }}
+                </a>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-{{ lead.status|lower|cut:' ' }}">
+                {{ lead.status }}
+              </span>
+            </td>
+            <td>
+              <span class="lead-date">{{ lead.date_created|date:"M d, Y" }}</span>
+              <span class="lead-time">{{ lead.date_created|time:"g:i A" }}</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <a href="{% url 'company:lead-detail' lead.id %}" class="action-btn view" title="View/Edit Details">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <button class="action-btn delete" onclick="showDeleteModal('{% url 'company:delete-lead' lead.id %}')" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+<!--Pagination-->
+{% if leads.paginator.num_pages > 1 %}
+<div class="pagination-section">
+  <div class="container">
+    <nav class="pagination-nav" aria-label="Page navigation">
+      <ul class="pagination">
+        <!-- First Page -->
+        {% if leads.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" title="First Page">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ leads.previous_page_number }}" title="Previous Page">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-double-left"></i>
+            </span>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-left"></i>
+            </span>
+          </li>
+        {% endif %}
+
+        <!-- Page Numbers -->
+        {% for i in nums %}
+          <li class="page-item {% if leads.number == forloop.counter %}active{% endif %}">
+            <a class="page-link" href="?page={{ forloop.counter }}">
+              {{ forloop.counter }}
+            </a>
+          </li>
+        {% endfor %}
+
+        <!-- Next Page -->
+        {% if leads.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ leads.next_page_number }}" title="Next Page">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ leads.paginator.num_pages }}" title="Last Page">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-right"></i>
+            </span>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link">
+              <i class="bi bi-chevron-double-right"></i>
+            </span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    
+    <div class="pagination-info">
+      <span>Page <strong>{{ leads.number }}</strong> of <strong>{{ leads.paginator.num_pages }}</strong></span>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h3>No Leads Yet</h3>
+      <p>Start receiving customer inquiries when they contact you about properties</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+
+    // Search functionality
+    const searchInput = document.getElementById('searchLeads');
+    if (searchInput) {
+        searchInput.addEventListener('input', filterLeads);
+    }
+
+    // Stage tabs
+    const statusTabs = document.querySelectorAll('.status-tab');
+    statusTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            statusTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            filterLeads();
+        });
+    });
+
+    // Filter dropdowns
+    const statusFilter = document.getElementById('statusFilter');
+    const propertyFilter = document.getElementById('propertyFilter');
+    const dateFilter = document.getElementById('dateFilter');
+
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterLeads);
+    }
+    if (propertyFilter) {
+        propertyFilter.addEventListener('change', filterLeads);
+    }
+    if (dateFilter) {
+        dateFilter.addEventListener('change', filterLeads);
+    }
+
+    // IMPROVED FILTER FUNCTION - Works with BOTH Stage and Status
+    function filterLeads() {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const activeTab = document.querySelector('.status-tab.active');
+        const selectedStage = activeTab ? activeTab.dataset.stage : 'all';
+        const selectedStatus = statusFilter ? statusFilter.value : 'all';
+        const selectedPropertyType = propertyFilter ? propertyFilter.value : 'all';
+        const selectedDateFilter = dateFilter ? dateFilter.value : 'all';
+
+        const rows = document.querySelectorAll('.lead-row');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const rowStage = row.dataset.stage;
+            const rowStatus = row.dataset.status;
+            const rowPropertyType = row.dataset.propertyType;
+            const rowDate = new Date(row.dataset.date);
+            rowDate.setHours(0, 0, 0, 0);
+
+            // Search filter
+            const matchesSearch = text.includes(searchTerm);
+
+            // Stage filter (from tabs)
+            const matchesStage = selectedStage === 'all' || rowStage === selectedStage;
+
+            // Status filter (from dropdown) - NEW!
+            const matchesStatus = selectedStatus === 'all' || rowStatus === selectedStatus;
+
+            // Property type filter
+            const matchesPropertyType = selectedPropertyType === 'all' || rowPropertyType === selectedPropertyType;
+
+            // Date filter
+            let matchesDate = true;
+            if (selectedDateFilter === 'today') {
+                matchesDate = rowDate.getTime() === today.getTime();
+            } else if (selectedDateFilter === 'week') {
+                const weekAgo = new Date(today);
+                weekAgo.setDate(today.getDate() - 7);
+                matchesDate = rowDate >= weekAgo && rowDate <= today;
+            } else if (selectedDateFilter === 'month') {
+                const monthAgo = new Date(today);
+                monthAgo.setMonth(today.getMonth() - 1);
+                matchesDate = rowDate >= monthAgo && rowDate <= today;
+            }
+
+            // Show/hide row - ALL filters must match
+            if (matchesSearch && matchesStage && matchesStatus && matchesPropertyType && matchesDate) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show count of visible leads
+        console.log(`Showing ${visibleCount} of ${rows.length} leads`);
+    }
+
+    // Select all checkbox
+    const selectAll = document.getElementById('selectAll');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.lead-checkbox:not([style*="display: none"])');
+            checkboxes.forEach(cb => {
+                if (cb.closest('.lead-row').style.display !== 'none') {
+                    cb.checked = this.checked;
+                }
+            });
+        });
+    }
+
+})();
+
+// Delete Modal Functions
+function showDeleteModal(deleteUrl) {
+    const modal = document.getElementById('deleteModal');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    if (modal && confirmBtn) {
+        confirmBtn.href = deleteUrl;
+        modal.classList.add('active');
+    }
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('deleteModal');
+    if (e.target === modal) {
+        closeDeleteModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeDeleteModal();
+    }
+});
+
+function editLead(leadId) {
+    console.log('Editing lead:', leadId);
+    // Redirect to edit page or implement edit functionality
+}
+</script>
+{% endblock %}
