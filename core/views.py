@@ -96,11 +96,11 @@ def sell_property(request):
                                 image_form.save()
                             except CompanyInformation.DoesNotExist:
                                 agent=AgentInformation.objects.get(user_id=request.user.id)
-                                landlord.agent_uuid=agent.agent_uuid
+                                landlord.agent_uuid=str(agent.agent_uuid)
                                 if agent.company_uuid:
                                     landlord.company_uuid = agent.company_uuid
                                 landlord.user_id= request.user.id
-                                landlord.time_stamp= 0
+                                landlord.time_stamp= timezone.now()
                                 landlord.save()
                                 image_form.instance=landlord
                                 image_form.save()
@@ -117,7 +117,7 @@ def sell_property(request):
             
             except Exception as e:
                 print(f'ERROR IS{e}')
-                return render(request, 'estate/error_page.html', {'e': e}, {e})
+                return render(request, 'estate/error_page.html', {'e': e})
         
         else:
                 messages.info(request, 'Verify your email to start listing with us')

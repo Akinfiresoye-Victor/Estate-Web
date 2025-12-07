@@ -30,7 +30,7 @@
         <i class="bi bi-people-fill"></i>
       </div>
       <div class="stat-content">
-        <span class="stat-number">8</span>
+        <span class="stat-number">{{new_lead_count}}</span>
         <span class="stat-label">New Leads</span>
       </div>
     </div>
@@ -169,18 +169,12 @@
 
           <div class="perf-card">
             <div class="perf-header">
-              <span class="perf-label">Leads This Month</span>
+              <span class="perf-label">Active Leads</span>
               <div class="perf-icon orange">
                 <i class="bi bi-person"></i>
               </div>
             </div>
-            <div class="perf-value">23</div>
-            <div class="perf-footer">
-              <span class="trend-up">
-                <i class="bi bi-arrow-up"></i> 8.3%
-              </span>
-              <span class="trend-text">vs last month</span>
-            </div>
+            <div class="perf-value">{{lead_count}}</div>
           </div>
 
           <div class="perf-card">

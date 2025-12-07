@@ -277,13 +277,13 @@
                             Call Agent
                         </a>
                         
-                        <a href="{%url 'customer:estate-agent-profile' agent_id=property.user_id%}" class="btn-contact secondary">
+                        <a href="#" class="btn-contact secondary">
                             <i class="fas fa-user-circle me-2"></i>
                             View Agents Profile
                         </a>
-                        <a href="mailto:{{ email|default:'' }}" class="btn-contact primary">
+                        <a href="{%url 'customer:inquiry-form-s' property.id%}" class="btn-contact primary">
                             <i class="bi bi-envelope me-2"></i>
-                            Email Agent
+                            Book Property
                         </a>
                     </div>
                 </div>
@@ -301,7 +301,7 @@
                             Call Agent
                         </a>
                         {%if agent_info%}
-                        <a href="{%url 'customer:estate-agent-profile' agent_id=property.user_id%}" class="btn-contact secondary">
+                        <a href="#" class="btn-contact secondary">
                             <i class="fas fa-user-circle me-2"></i>
                             View Agents Profile
                         </a>
@@ -315,25 +315,6 @@
                         <a href="{%url 'customer:inquiry-form-s' property.id%}" class="btn-contact primary">
                             <i class="bi bi-person-lines-fill me-2"></i>
                             Book Property Now
-                        </a>
-                    </div>
-                </div>
-        {%else%}
-                <!-- Contact Buttons -->
-                <div class="contact-section">
-                    <h3 class="section-title text-center">
-                        <i class="fas fa-phone me-2"></i>
-                        Contact Home Owner
-                    </h3>
-                    <div class="contact-buttons">
-                        <a href="tel:{{ property.phone_number|default:'' }}" class="btn-contact primary">
-                            <i class="fas fa-phone-alt me-2"></i>
-                            Call Home Owner
-                        </a>
-
-                        <a href="mailto:{{ email|default:'' }}" class="btn-contact primary">
-                            <i class="bi bi-envelope me-2"></i>
-                            Email Home Owner
                         </a>
                     </div>
                 </div>

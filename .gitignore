@@ -16,6 +16,9 @@ media/images
 staticfiles/
 
 
+#personal
+Random_Tests.py
+
 # IDE/editor
 .vscode/
 .idea/

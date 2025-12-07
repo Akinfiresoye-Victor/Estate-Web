@@ -10,6 +10,5 @@ from estate.models import UserInformation, LeadInfo
 admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedback, AgentInformation,
                     Experience, SocialLinks, UserInformation, PropertyRentImage, PropertySaleImage, User, CompanyInformation,
                     CompanyAnalytics, PropertyManagementRentAnalytics, PropertyManagementSaleAnalytics, LeadInfo,WishlistForRent,
-                    WishlistForSale
+                    WishlistForSale, WishlistStorageUnit
                     ])
-    

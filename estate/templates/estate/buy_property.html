@@ -41,7 +41,7 @@
 
     <!-- Properties Grid -->
     <div class="properties-grid">
-      {% for bought in buy %}
+      {% for bought,wishlist in buy %}
         {% if bought.available %}
           <div class="property-card-wrapper">
             <div class="property-card buy-card">
@@ -63,7 +63,7 @@
                     For Sale
                   </div>
                   <a href="{% url 'customer:toggle-wishlist-buy' bought.id %}" class="wishlist-icon">
-                    {% if bought.whilist %}
+                    {% if wishlist %}
                       <i class="bi bi-heart-fill"></i>
                     {% else %}
                       <i class="bi bi-heart"></i>

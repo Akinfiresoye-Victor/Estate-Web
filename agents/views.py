@@ -7,8 +7,8 @@ from members.models import User
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from core.models import PropertyManagementRent, PropertyManagementSale
-
-
+from estate.models import LeadInfo
+from datetime import datetime
 
 
 
@@ -50,6 +50,13 @@ def dashboard(request):
                 agent_prop_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
                 
                 
+                leads=LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
+                new_leads= leads.filter(date_created=datetime.today())
+                
+                
+                
+                
+                
                 
                 
                 return render(request, 'agent/dashboard.html', {
@@ -64,6 +71,8 @@ def dashboard(request):
                     'tips': tips,
                     'by': by,
                     'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
+                    'lead_count': leads.count(),
+                    'new_lead_count': new_leads.count()
                 })
         except AgentInformation.DoesNotExist:
             messages.error(request, 'Set up your Profile to access other pages')

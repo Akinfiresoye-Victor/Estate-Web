@@ -28,6 +28,28 @@ from core.models import *
 
 
 
+# Algorithm for adding properties to the wishlist
+def wishlist_generator(properties_list, user_id):
+    if properties_list[0].property_type == 'Rent':
+        user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id).filter(property_type='Rent')
+    else:
+        user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id).filter(property_type='Sale')
+        
+    properties_id=[]
+    for prop in properties_list:
+        properties_id.append(prop.id)
+    user_wishlist_list=[]
+    for i in user_wishlists:
+        i=i.property_id
+        user_wishlist_list.append(i)
+    boolean_results=[]
+    for k in properties_id:
+        if k in user_wishlist_list:
+            boolean_results.append(True)
+        else:
+            boolean_results.append(False)
+    return boolean_results
+
 
 
 
@@ -49,9 +71,14 @@ def buy_property(request):
             page=request.GET.get('page')
             on_sale= p.get_page(page)
             nums= "a" * on_sale.paginator.num_pages
-            wishlist_sale = WishlistForSale.objects.filter(user=request.user).select_related('property')
             
-            return render(request, 'estate/buy_property.html', {'buy': on_sale,'nums':nums, 'salefilter':myfilter, 'wishlist':wishlist_sale})
+            properties_list=[]
+            for prop in sale_qs:
+                properties_list.append(prop)
+            in_wishlist=wishlist_generator(properties_list, request.user.id)
+            properties_with_wishist=zip(on_sale, in_wishlist)
+            
+            return render(request, 'estate/buy_property.html', {'buy': properties_with_wishist,'nums':nums, 'salefilter':myfilter})
         
         except Exception as e:
             print(f'ERROR IS{e}')
@@ -78,7 +105,13 @@ def rent_property(request):
                 page= request.GET.get('page')
                 on_lease= p.get_page(page)
                 nums= "a" * on_lease.paginator.num_pages
-                return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': on_lease, 'rentfilter':myfilter})
+                
+                properties_list=[]
+                for prop in rent_qs:
+                    properties_list.append(prop)
+                in_wishlist=wishlist_generator(properties_list, request.user.id)
+                properties_with_wishlist=zip(on_lease, in_wishlist)
+                return render(request, 'estate/rent_property.html', {'nums':nums, 'on_lease': properties_with_wishlist, 'rentfilter':myfilter})
             
             except Exception as e:
                 print(f'ERROR IS{e}')
@@ -101,7 +134,6 @@ def view_property_on_sale(request, property_id):
             property= PropertyManagementSale.objects.get(pk=property_id)
             property_image=property.images.all()
             email=request.user.email #contact information
-            user=User.objects.get(pk=request.user.id)
             #checking if owner of listing is an estate agent
             if property.company_uuid != 'None':
                 company_handled=CompanyInformation.objects.get(unique_company_id=property.company_uuid)
@@ -139,13 +171,12 @@ def view_property_on_sale(request, property_id):
                 company_info=company_handled
                 messages.info(request, f'Listing Is handled by {company_handled.company_name}')
                 return render(request, 'estate/view_property_s.html', {'property':property,'images':property_image, 
-                                                                'email':email, 'user':user, 'company_info':company_info})
+                                                                'email':email, 'company_info':company_info})
             elif property.agent_uuid != 'None':
                 agent_handled=AgentInformation.objects.get(user_id=property.user_id)
-                agent_info=agent_handled.personal_info
                 messages.info(request, f'Listing Is handled by a universal agent')
                 return render(request, 'estate/view_property_s.html', {'property':property,'images':property_image, 
-                                                                'agent_info':agent_info, 'email':email, 'user':user})
+                                                                'agent_info':agent_handled, 'email':email})
         
             else:
                 messages.info(request, 'Listing Is handled by the home owner')
@@ -170,7 +201,6 @@ def view_property_on_lease(request, property_id):
             email=request.user.email#contact information
             property= PropertyManagementRent.objects.get(pk=property_id)
             property_images= property.images.all()
-            user=User.objects.get(pk=request.user.id)
             if property.company_uuid != 'None':
                 company_handled=CompanyInformation.objects.get(unique_company_id=property.company_uuid)
                 try:
@@ -206,13 +236,13 @@ def view_property_on_lease(request, property_id):
                 company_info=company_handled
                 messages.info(request, f'Listing Is handled by {company_handled.company_name}')
                 return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 
-                                                                'email':email, 'user':user, 'company_info':company_info})
+                                                                'email':email, 'company_info':company_info})
             elif property.agent_uuid != 'None':
                 agent_handled=AgentInformation.objects.get(user_id=property.user_id)
-                agent_info=agent_handled.personal_info
+                
                 messages.info(request, f'Listing Is handled by a universal agent')
                 return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 
-                                                                'agent_info':agent_info, 'email':email, 'user':user})
+                                                                'agent_info':agent_handled, 'email':email})
         
             else:
                 messages.info(request, 'Listing Is handled by the home owner')
@@ -287,20 +317,22 @@ def toggle_wishlist_rent(request, property_id):
         messages.info(request, 'Only Customers can save properties')
         return redirect('landing')
     try:
-        property_obj = get_object_or_404(PropertyManagementRent, id=property_id)
-        lease = get_object_or_404(PropertyManagementRent, id=property_id)
-        #What handles the wishlist toggling
-        lease.whilist = not lease.whilist
-        lease.save()
-        wishlist_item, created = WishlistForRent.objects.get_or_create(property=property_obj, user=request.user)
-        
-        if not created:
-            wishlist_item.delete()
-            messages.success(request, "Property removed from your wishlist.")
+        wishlist_storage=WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Rent")
+        if wishlist_storage.exists():
+            wishlist_storage.delete()
+            messages.success(request, 'Property Removed From Wishlist')
         else:
-            messages.success(request, "Property added to your wishlist.")
-
-        return redirect('customer:rent-prop')
+            favourite=WishlistStorageUnit.objects.create(
+                user_id=request.user.id,
+                property_id=property_id,
+                property_type="Rent"
+            )
+            favourite.save()
+            messages.success(request, 'Property Added to wishlist')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            return redirect('customer:rent-property')
     except Exception as e:
         print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
@@ -316,20 +348,22 @@ def toggle_wishlist_buy(request, property_id):
         messages.info(request, 'Only Customers can save properties')
         return redirect('landing')
     try:
-        buy = get_object_or_404(PropertyManagementSale, id=property_id)
-        #What handles the wishlist toggling
-        buy.whilist = not buy.whilist
-        buy.save()
-        property_obj = get_object_or_404(PropertyManagementSale, id=property_id)
-        wishlist_item, created = WishlistForSale.objects.get_or_create(property=property_obj, user=request.user)
-        
-        if not created:
-            wishlist_item.delete()
-            messages.success(request, "Property removed from your wishlist.")
-            
+        wishlist_storage= WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Sale")
+        if wishlist_storage.exists():
+            wishlist_storage.delete()
+            messages.success(request, 'Property Removed From wishlist')
         else:
-            messages.success(request, "Property added to your wishlist.")
-        return redirect('customer:buy-property')  
+            favourite=WishlistStorageUnit.objects.create(
+                user_id=request.user.id,
+                property_id=property_id,
+                property_type="Sale"
+            )
+            favourite.save()
+            messages.success(request, 'Property Added Successfully')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            return redirect('customer:buy-property')
     
     except Exception as e:
         print(f'ERROR IS{e}')
@@ -346,15 +380,27 @@ def wishlist(request):
         return redirect('landing')
     try:
         #fetching the related forign key object in a single query
-        wishlist_rent = WishlistForRent.objects.filter(user=request.user).select_related('property')
-        wishlist_sale = WishlistForSale.objects.filter(user=request.user).select_related('property')
-
+        wishlist_rent = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Rent")
+        wishlist_sale = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Sale")
+        
+        rent_list=[]
+        for i in wishlist_rent:
+            i=i.property_id
+            on_lease=PropertyManagementRent.objects.get(pk=i)
+            rent_list.append(on_lease)
+        sale_list=[]
+        for i in wishlist_sale:
+            i=i.property_id
+            on_sale=PropertyManagementSale.objects.get(pk=i)
+            sale_list.append(on_sale)
+        
+        
         #Total items in wishlist
         total_saved = wishlist_rent.count() + wishlist_sale.count()
-
+        print(total_saved)
         context = {
-            'wishlist_rent': wishlist_rent,
-            'wishlist_sale': wishlist_sale,
+            'wishlist_rent': zip(wishlist_rent, rent_list),
+            'wishlist_sale': zip(wishlist_sale, sale_list),
             'total_saved': total_saved,
         }
         return render(request, 'estate/wishlist.html', context)
@@ -552,7 +598,7 @@ def inquiry_form_rent(request, property_id):
                     inq_form=inq_form.save(commit=False)
                     inq_form.company_uuid=on_rent.company_uuid
                     inq_form.property_intrested=on_rent.id
-                    inq_form.agent_id='None'
+                    inq_form.agent_id=on_rent.agent_uuid
                     inq_form.property_type='Rent'
                     inq_form.property_name=on_rent.house_type
                     inq_form.date_created=date.today()
@@ -594,7 +640,7 @@ def inquiry_form_sale(request, property_id):
                     inq_form=inq_form.save(commit=False)
                     inq_form.company_uuid=on_sale.company_uuid
                     inq_form.property_intrested=on_sale.id
-                    inq_form.agent_id='None'
+                    inq_form.agent_id=on_sale.agent_uuid
                     inq_form.property_type='Sale'
                     inq_form.property_name=on_sale.house_type
                     inq_form.date_created=date.today()

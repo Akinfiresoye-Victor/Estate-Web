@@ -42,7 +42,7 @@
 
     <!-- Properties Grid -->
     <div class="properties-grid">
-      {% for lease in on_lease %}
+      {% for lease,wishlist in on_lease %}
         {% if lease.available %}
           <div class="property-card-wrapper">
             <div class="property-card rent-card">
@@ -64,7 +64,7 @@
                     For Lease
                   </div>
                   <a href="{% url 'customer:toggle-wishlist-rent' lease.id %}" class="wishlist-icon">
-                    {% if lease.whilist %}
+                    {% if wishlist %}
                       <i class="bi bi-heart-fill"></i>
                     {% else %}
                       <i class="bi bi-heart"></i>
