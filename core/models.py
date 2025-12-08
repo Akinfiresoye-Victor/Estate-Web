@@ -106,23 +106,6 @@ class PropertyRentImage(models.Model):
 
 
 
-class WishlistForRent(models.Model):
-    property = models.ForeignKey('PropertyManagementRent', on_delete=models.CASCADE, related_name='wishlist_rent')
-    whilist=models.BooleanField('Add to Whilist', default=False)
-    users_id=models.IntegerField('User In question', default=1, blank=False, null=False)
-    added_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return f"{self.users_id} → {self.property.house_type}"
-
-
-class WishlistForSale(models.Model):
-    property = models.ForeignKey('PropertyManagementSale', on_delete=models.CASCADE, related_name='wishlist_sale')
-    whilist=models.BooleanField('Add to Whilist', default=False)
-    users_id=models.IntegerField('User In question', default=1, blank=False, null=False)
-    added_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return f"{self.users_id} → {self.property.house_type}"
-
 class Feedback(models.Model):
     email=models.EmailField('Your Email')
     feedback= models.CharField(max_length=300, blank=False)

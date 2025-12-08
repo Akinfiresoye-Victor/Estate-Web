@@ -185,7 +185,14 @@ def company_analytics(request):
         if days_since_reset >= 30:
             # A. Reset the views to 0
             analytics.last_month_profile_views= analytics.profile_views
+            analytics.last_month_lease_views=analytics.property_views_l
+            analytics.last_month_sale_views=analytics.property_views_s
             analytics.profile_views = 0 
+            analytics.property_views_l=0
+            analytics.property_views_s=0
+            
+            session_id=SessionId.objects.all()
+            session_id.delete()
             
             # B. UPDATE the last_reset_date to today
             analytics.last_reset_date = timezone.now()
@@ -263,10 +270,10 @@ def company_analytics(request):
         wishlist_rent_list=[]
         wishlist_sale_list=[]
         for on_lease in prop_rent:
-            count=on_lease.wishlist.count()
+            count=on_lease.total_likes
             wishlist_rent_list.append(count)
         for on_sale in prop_sale:
-            count=on_sale.wishlist.count()
+            count=on_sale.total_likes
             wishlist_sale_list.append(count)
             
         wishlist_rent = sum(wishlist_rent_list)
@@ -283,10 +290,10 @@ def company_analytics(request):
             wishlist_rent_list=[]
             wishlist_sale_list=[]
             for on_lease in prop_rent:
-                count=on_lease.wishlist.count()
+                count=on_lease.total_likes
                 wishlist_rent_list.append(count)
             for on_sale in prop_sale:
-                count=on_sale.wishlist.count()
+                count=on_sale.total_likes
                 wishlist_sale_list.append(count)
                 
             wishlist_rent = sum(wishlist_rent_list)

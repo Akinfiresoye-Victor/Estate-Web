@@ -157,7 +157,7 @@
               <a href="{% url 'customer:view-property-s' property.id %}" class="overlay-btn">
                 <i class="bi bi-eye"></i> View
               </a>
-              <a href="{% url 'customer:update-property-s' property.id %}" class="overlay-btn">
+              <a href="{% url 'update-property-s' property.id %}" class="overlay-btn">
                 <i class="bi bi-pencil"></i> Edit
               </a>
             </div>
@@ -199,7 +199,7 @@
                 <span class="price-amount">₦{{ property.price|floatformat:0|intcomma }}</span>
               </div>
               <div class="property-actions">
-                <a href="{% url 'customer:update-property-s' property.id %}" class="action-btn edit">
+                <a href="{% url 'update-property-s' property.id %}" class="action-btn edit">
                   <i class="bi bi-pencil-square"></i>
                 </a>
                 <button class="action-btn delete" data-id="{{ property.id }}" data-type="sale">
@@ -238,7 +238,7 @@
               <a href="{% url 'customer:view-property-r' property.id %}" class="overlay-btn">
                 <i class="bi bi-eye"></i> View
               </a>
-              <a href="{% url 'customer:update-property' property.id %}" class="overlay-btn">
+              <a href="{% url 'update-property' property.id %}" class="overlay-btn">
                 <i class="bi bi-pencil"></i> Edit
               </a>
             </div>
@@ -280,7 +280,7 @@
                 <span class="price-amount">₦{{ property.price_range|floatformat:0|intcomma }}</span>
               </div>
               <div class="property-actions">
-                <a href="{% url 'customer:update-property' property.id %}" class="action-btn edit">
+                <a href="{% url 'update-property' property.id %}" class="action-btn edit">
                   <i class="bi bi-pencil-square"></i>
                 </a>
                 <button class="action-btn delete" data-id="{{ property.id }}" data-type="rent">

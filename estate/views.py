@@ -135,39 +135,8 @@ def view_property_on_sale(request, property_id):
             property_image=property.images.all()
             email=request.user.email #contact information
             #checking if owner of listing is an estate agent
-            if property.company_uuid != 'None':
+            if property.company_uuid:
                 company_handled=CompanyInformation.objects.get(unique_company_id=property.company_uuid)
-            
-                try:
-                    analytics=company_handled.analytics.get()
-                except ObjectDoesNotExist:
-                    analytics = CompanyAnalytics.objects.create(
-                        company=company_handled,
-                        profile_views=0, 
-                        property_views_l=0,
-                        property_views_s=0,
-                        last_month_profile_views=0,
-                        last_month_lease_views=0,
-                        last_month_sale_views=0,
-                    )
-                time_since_reset= abs(timezone.now() - property.last_reset_date)
-                final_property_time= time_since_reset.days
-                if final_property_time > 30:
-                    analytics.last_month_sale_views= analytics.property_views_s
-                    analytics.property_views_s = 0
-                    property.last_reset_date=timezone.now()
-                    analytics.save()
-                    property.save()
-                try:
-                    prop_analytics=property.prop_analytics.get(session_id=request.user.id)
-                except ObjectDoesNotExist:
-                    prop_analytics=PropertyManagementSaleAnalytics.objects.create(
-                        on_sale= property,
-                        session_id=request.user.id,
-                        inquires_check=0
-                    )
-                    analytics.property_views_s +=1
-                    analytics.save()
                 company_info=company_handled
                 messages.info(request, f'Listing Is handled by {company_handled.company_name}')
                 return render(request, 'estate/view_property_s.html', {'property':property,'images':property_image, 
@@ -203,36 +172,6 @@ def view_property_on_lease(request, property_id):
             property_images= property.images.all()
             if property.company_uuid != 'None':
                 company_handled=CompanyInformation.objects.get(unique_company_id=property.company_uuid)
-                try:
-                    analytics=company_handled.analytics.get()
-                except ObjectDoesNotExist:
-                    analytics = CompanyAnalytics.objects.create(
-                        company=company_handled,
-                        profile_views=0, 
-                        property_views_l=0,
-                        property_views_s=0,
-                        last_month_profile_views=0,
-                        last_month_lease_views=0,
-                        last_month_sale_views=0,
-                    )
-                time_since_reset= abs(timezone.now() - property.last_reset_date)
-                final_property_time= time_since_reset.days
-                if final_property_time > 30:
-                    analytics.last_month_lease_views= analytics.property_views_l
-                    analytics.property_views_l = 0
-                    property.last_reset_date=timezone.now()
-                    analytics.save()
-                    property.save()
-                try:
-                    prop_analytics=property.prop_analytics.get(session_id=request.user.id)
-                except ObjectDoesNotExist:
-                    prop_analytics=PropertyManagementRentAnalytics.objects.create(
-                        on_lease= property,
-                        session_id=request.user.id,
-                        inquires_check=0
-                    )
-                    analytics.property_views_l +=1
-                    analytics.save()
                 company_info=company_handled
                 messages.info(request, f'Listing Is handled by {company_handled.company_name}')
                 return render(request, 'estate/view_property_r.html', {'property':property,'images':property_images, 
@@ -320,6 +259,9 @@ def toggle_wishlist_rent(request, property_id):
         wishlist_storage=WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Rent")
         if wishlist_storage.exists():
             wishlist_storage.delete()
+            like_decrement=PropertyManagementRent.objects.get(pk=property_id)
+            like_decrement.total_likes=like_decrement.total_likes - 1
+            like_decrement.save()
             messages.success(request, 'Property Removed From Wishlist')
         else:
             favourite=WishlistStorageUnit.objects.create(
@@ -328,6 +270,9 @@ def toggle_wishlist_rent(request, property_id):
                 property_type="Rent"
             )
             favourite.save()
+            like_increment=PropertyManagementRent.objects.get(pk=property_id)
+            like_increment.total_likes=like_increment.total_likes + 1
+            like_increment.save()
             messages.success(request, 'Property Added to wishlist')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
@@ -351,6 +296,9 @@ def toggle_wishlist_buy(request, property_id):
         wishlist_storage= WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Sale")
         if wishlist_storage.exists():
             wishlist_storage.delete()
+            like_decrement=PropertyManagementSale.objects.get(pk=property_id)
+            like_decrement.total_likes=like_decrement.total_likes - 1
+            like_decrement.save()
             messages.success(request, 'Property Removed From wishlist')
         else:
             favourite=WishlistStorageUnit.objects.create(
@@ -359,6 +307,9 @@ def toggle_wishlist_buy(request, property_id):
                 property_type="Sale"
             )
             favourite.save()
+            like_increment=PropertyManagementSale.objects.get(pk=property_id)
+            like_increment.total_likes=like_increment.total_likes + 1
+            like_increment.save()
             messages.success(request, 'Property Added Successfully')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
@@ -397,7 +348,6 @@ def wishlist(request):
         
         #Total items in wishlist
         total_saved = wishlist_rent.count() + wishlist_sale.count()
-        print(total_saved)
         context = {
             'wishlist_rent': zip(wishlist_rent, rent_list),
             'wishlist_sale': zip(wishlist_sale, sale_list),
