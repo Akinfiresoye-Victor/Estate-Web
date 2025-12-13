@@ -97,11 +97,11 @@
               <i class="fas fa-heart"></i>
             </a>
             {% if property.base_image %}
-              <img src="{{ property.base_image.url }}" alt="{{ property.house_type }}" class="property-img">
+              <img src="{{ property.base_image.url }}" alt="{{ property.residential }}" class="property-img">
             {% endif %}
           </div>
           <div class="card-body d-flex flex-column">
-            <h5 class="property-title lease-title">{{ property.house_type }}</h5>
+            <h5 class="property-title lease-title">{{ property.residential }}</h5>
             <p class="property-location"><i class="fas fa-map-marker-alt lease-accent"></i> {{ property.location }}, {{ property.state }}</p>
             <p class="property-price lease-price">₦{{ property.price_range }} <span class="price-period">/month</span></p>
             <p class="property-description">{{ property.description|truncatewords:20 }}</p>
@@ -132,11 +132,11 @@
               <i class="fas fa-heart"></i>
             </a>
             {% if property.base_image %}
-              <img src="{{ property.base_image.url }}" alt="{{ property.house_type}}" class="property-img">
+              <img src="{{ property.base_image.url }}" alt="{{ property.residential}}" class="property-img">
             {% endif %}
           </div>
           <div class="card-body d-flex flex-column">
-            <h5 class="property-title sale-title">{{ property.house_type }}</h5>
+            <h5 class="property-title sale-title">{{ property.residential }}</h5>
             <p class="property-location"><i class="fas fa-map-marker-alt sale-accent"></i> {{ property.location }}, {{ property.state }}</p>
             <p class="property-price sale-price">₦{{ property.price }}</p>
             <p class="property-description">{{ .property.property_description|truncatewords:20 }}</p>

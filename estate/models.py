@@ -1,26 +1,7 @@
 '''Models holding/Handling all our datatbases requirement used all through the website'''
-
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 from core.choices import LEAD_STAGES, LEAD_STATUS, CONTACT_TYPE
-
-
-
-
-
-
-
-
-
-class UserInformation(models.Model):
-    first_name = models.CharField('Professional First Name', max_length=30)
-    last_name = models.CharField('Professional Last Name', max_length=30)
-    phone_number = models.CharField('Phone Number', max_length=13) 
-    email = models.EmailField('Email', max_length=100) 
-    def __str__(self):
-        return(self.first_name + ' ' +self.last_name)
-
 
 
 

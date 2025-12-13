@@ -16,17 +16,17 @@ def company_file_path(instance, filename):
 
 
 class CompanyInformation(models.Model):
+    users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     user_id= models.IntegerField(blank=False, default=1)
     unique_company_id = models.CharField('uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
-    company_name= models.CharField('Registered Company Name', blank=False, max_length=100, unique=True)
+    company_name= models.CharField('Company Name', blank=False, max_length=100, unique=True)
     legal_certificate= models.FileField('Certificate of Incoperation',blank=True, null=True, upload_to=company_file_path, validators=[validate_file])
     year_established= models.IntegerField('Year Established',blank=False,)
     phone_number=models.CharField('Phone Number',blank=False, max_length=11)
-    email=models.EmailField('Company Email', blank=False, max_length=30, unique=True)
-    address=models.CharField('Company Adress', blank=False, max_length=255)
+    email=models.EmailField('Company Email', blank=False, max_length=40, unique=True)
+    address=models.CharField('Company Adress', blank=False, max_length=100)
     service_areas= models.CharField(max_length=20,choices=STATES, default='Lagos')
-    area_specialization=models.CharField('Area of specialization', blank=False, max_length=50)
-    company_bio=models.TextField('Brief Company Overview', blank=False, max_length=2000, unique=True)
+    company_bio=models.TextField('Brief Company Overview', blank=False, max_length=500, unique=True)
     company_logo=models.ImageField('Company Logo', blank=True, upload_to=company_logo_path, validators=[validate_image], null=True)
     principal_broker= models.CharField('Registered Owner of Company', max_length=100)
     time_created=models.DateTimeField(default=timezone.now, blank=False)

@@ -50,7 +50,7 @@
               <!-- Property Image -->
               <div class="property-image-section">
                 {% if lease.base_image %}
-                  <img src="{{ lease.base_image.url }}" alt="{{ lease.house_type }}" class="property-img">
+                  <img src="{{ lease.base_image.url }}" alt="{{ lease.residential }}" class="property-img">
                 {% else %}
                   <div class="placeholder-image">
                     <i class="bi bi-image"></i>
@@ -75,7 +75,7 @@
               
               <!-- Property Content -->
               <div class="property-content">
-                <h3 class="property-title">{{ lease.house_type }}</h3>
+                <h3 class="property-title">{{ lease.residential }}</h3>
                 
                 <div class="property-location">
                   <i class="bi bi-geo-alt-fill"></i>

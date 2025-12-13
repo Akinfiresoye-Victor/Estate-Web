@@ -41,7 +41,15 @@ STATES=[
 ]
 
 
-TYPE=[
+
+PROPERTY_CATEGORY=[
+    ('Residential', 'Residential'),
+    ('Commercial', 'Commercial'),
+    ('Plot/Land', 'Plot/Land')
+]
+
+
+RESIDENTIAL_PROPERTIES=[
     ('Apartment','Apartment'),
     ('Bungalow','Bungalow'),
     ('Block of flats','Block of Flats'),
@@ -54,18 +62,85 @@ TYPE=[
     ('Duplex Design','Duplex Design'),
     ('Detached','Detached'),
     ('Detached House','Detached House'),
+    ('Gated estate houses', 'Gated estate houses'),
+    ('Luxury homes', 'Luxury homes'),
     ('Massionette', 'Masionette'),
     ('Mansion','Mansion'),
+    ('Mini Flat', 'Mini Flat'),
     ('Penthouse','Penthouse'),
     ('Semi detached duplex','Semi Detached Duplex'),
     ('Semi detached bungalow','Semi Detached Bungalow'),
+    ('Self-contained apartments', 'Self-contained apartments'),
+    ('Studio apartments', 'Studio apartments'),
+    ('Serviced apartments', 'Serviced apartments'),
+    ('Smart homes', 'Smart homes'),
     ('Terraced bungalow','Terraced Bungalow'),
     ('Terraced duplex','Terraced Duplexes'),
     ('Townhouse','Townhouse'),
     ('Terraced houses','Terraced houses'),
     ('Traditional houses','Traditional Houses'),
     ('Terrace','Terrace'),
+    ]
+
+
+COMMERCIAL_PROPERTIES=[
+    ('Office Space', 'Office Space'),
+    ('Co-Working Space', 'Co-Working Space'),
+    ('Serviced Offices', 'Co-Working Space'),
+    ('Corperate Buildings', 'Corperate Buildings'),
+    ('Buisness Centers', 'Buisness Centers'),
+    ('Shops', 'Shops'),
+    ('Retail Spaces', 'Retail Spaces'),
+    ('Shopping Complexes', 'Shopping Complexes'),
+    ('Malls', 'Malls'),
+    ('Showrooms', 'Showrooms'),
+    ('Event Halls', 'Event Halls'),
+    ('Conference Centers', 'Conference Centers'),
+    ('Hotels', 'Hotels'),
+    ('Guest Houses', 'Guest Houses')
 ]
+
+INDUSTRIAL_PROPERTIES=[
+    """Later Update"""
+]
+
+
+LAND=[
+    ('Residential land', 'Residential land'),
+    ('Commercial land', 'Commercial land'),
+    ('Industrial land', 'Industrial land'),
+    ('Mixed-use land', 'Mixed-use land'),
+    ('Plots', 'Plots'),
+    ('Acres/Hectares', 'Acres/Hectares'),
+    ('Dry Land', 'Dry Land'),
+    ('Swampy land','Swampy land' ),
+    ('Waterfront land', 'Waterfront land'),
+    ('Beachfront land', 'Beachfront land'),
+    ('Farmland', 'Farmland'),
+    ('Agricultural land', 'Agricultural land'),
+    ('Estate Plot', 'Estate Plot')
+]
+
+SPECIAL_PROPERTIES=[
+    """Later Update"""
+]
+
+ESTATE_BASED=[
+    """Later Update"""
+]
+
+SHORT_STAY=[
+    """Later Update"""
+]
+
+
+BUDGET_FRIENDLY=[
+    """Later Update"""
+]
+
+
+
+
 
 SOCIAL_LINKS=[
     ('X', 'X'),

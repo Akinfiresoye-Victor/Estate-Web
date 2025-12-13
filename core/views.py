@@ -83,9 +83,21 @@ def sell_property(request):
                     prop_form=SellForm(request.POST or None, request.FILES or None)
                     image_form=SaleImageFormSet(request.POST or None, request.FILES or None)
                     if prop_form.is_valid() and image_form.is_valid():
-                        
+                        print('valid')
                         with transaction.atomic():
                             landlord= prop_form.save(commit=False)
+                            category = prop_form.cleaned_data.get('property_category')
+                            print(category)
+                            # Clear the non-selected fields
+                            if category == 'Residential':
+                                landlord.commercial = ''
+                                landlord.lands = ''
+                            elif category == 'Commercial':
+                                landlord.residential = ''
+                                landlord.lands = ''
+                            elif category == 'Plot/Land':
+                                landlord.residential = ''
+                                landlord.commercial = ''
                             try:
                                 company= CompanyInformation.objects.get(user_id= request.user.id)
                                 landlord.company_uuid= company.unique_company_id
@@ -105,7 +117,11 @@ def sell_property(request):
                                 image_form.instance=landlord
                                 image_form.save()
                         return HttpResponseRedirect('?submitted=True')
-                    
+                    else:
+                        print('not valid')
+                        print(prop_form.errors)
+                        category = prop_form.cleaned_data.get('property_category')
+                        print(category)
                 else:
                     prop_form= SellForm()
                     image_form=SaleImageFormSet()
@@ -148,8 +164,19 @@ def lease_property(request):
                     image_form=RentImageFormSet(request.POST or None, request.FILES or None)
                     with transaction.atomic():
                         if prop_form.is_valid() and image_form.is_valid():
-                            print(prop_form.errors)
                             landlord= prop_form.save(commit=False)
+                            category = prop_form.cleaned_data.get('property_category')
+                            
+                            # Clear the non-selected fields
+                            if category == 'Residential':
+                                landlord.commercial = ''
+                                landlord.lands = ''
+                            elif category == 'Commercial':
+                                landlord.residential = ''
+                                landlord.lands = ''
+                            elif category == 'Plot/Land':
+                                landlord.residential = ''
+                                landlord.commercial = ''
                             try:
                                 company= CompanyInformation.objects.get(user_id= request.user.id)
                                 landlord.company_uuid= company.unique_company_id

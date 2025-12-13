@@ -113,7 +113,7 @@
           <div class="property-interest-card">
             <div class="property-image-small">
               {% if property.base_image %}
-                <img src="{{ property.base_image.url }}" alt="{{ property.house_type }}">
+                <img src="{{ property.base_image.url }}" alt="{{ property.residential }}">
               {% else %}
                 <div class="property-placeholder">
                   <i class="bi bi-house"></i>
@@ -121,12 +121,12 @@
               {% endif %}
             </div>
             <div class="property-info-small">
-              <h4>{{ property.house_type }}</h4>
+              <h4>{{ property.residential }}</h4>
               <p class="property-location">
                 <i class="bi bi-geo-alt me-1"></i>{{ property.location }}
               </p>
               <div class="property-details-small">
-                <span><i class="bi bi-house-door me-1"></i>{{ property.house_type }}</span>
+                <span><i class="bi bi-house-door me-1"></i>{{ property.residential }}</span>
                 <span><i class="bi bi-door-open me-1"></i>{{ property.bedrooms }} Beds</span>
                 <span><i class="bi bi-droplet me-1"></i>{{ property.bathrooms }} Baths</span>
               </div>

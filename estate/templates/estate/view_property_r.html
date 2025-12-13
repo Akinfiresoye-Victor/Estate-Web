@@ -56,7 +56,7 @@
                     <i class="bi bi-key-fill me-1"></i>
                     For Rent
                 </div>
-                <h1 class="property-title">{{ property.house_type|default:"Bungalow" }}</h1>
+                <h1 class="property-title">{{ property.residential|default:"Bungalow" }}</h1>
                 <div class="property-location">
                     <div class="location-item">
                         <i class="bi bi-geo-alt-fill"></i>
@@ -184,10 +184,6 @@
                             <span class="agent-value">{{ agent_info.phone_number|default:"N/A" }}</span>
                         </li>
                         <li class="agent-item">
-                            <span class="agent-label">Negotiable</span>
-                            <span class="agent-value">{{ property.get_negotiate_display|default:"N/A" }}</span>
-                        </li>
-                        <li class="agent-item">
                             <span class="agent-label">Last Updated</span>
                             <span class="agent-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
                         </li>
@@ -215,10 +211,6 @@
                             <span class="agent-value">{{ company_info.phone_number|default:"N/A" }}</span>
                         </li>
                         <li class="agent-item">
-                            <span class="agent-label">Negotiable</span>
-                            <span class="agent-value">{{ property.get_negotiate_display|default:"N/A" }}</span>
-                        </li>
-                        <li class="agent-item">
                             <span class="agent-label">Last Updated</span>
                             <span class="agent-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
                         </li>
@@ -243,10 +235,6 @@
                         <li class="agent-item">
                             <span class="agent-label">Phone Number</span>
                             <span class="agent-value">{{ property.phone_number|default:"N/A" }}</span>
-                        </li>
-                        <li class="agent-item">
-                            <span class="agent-label">Negotiable</span>
-                            <span class="agent-value">{{ property.get_negotiate_display|default:"N/A" }}</span>
                         </li>
                         <li class="agent-item">
                             <span class="agent-label">Last Updated</span>

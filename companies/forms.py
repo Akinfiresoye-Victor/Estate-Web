@@ -12,7 +12,7 @@ class CompanyForm(ModelForm):
         model=CompanyInformation
         fields=(
         'company_name', 'company_bio', 'year_established', 'company_logo', 'phone_number', 'email', 'address', 
-        'service_areas', 'area_specialization', 'principal_broker','legal_certificate'
+        'service_areas', 'principal_broker','legal_certificate'
         )
         labels={
             'company_name': 'Company/Organization Name*',
@@ -23,7 +23,6 @@ class CompanyForm(ModelForm):
             'email': 'Registered Email*',
             'address': 'Company Address*' ,
             'service_areas': 'State Functioning*',
-            'area_specialization': 'What Do you deal with?*',
             'principal_broker': 'Registered Owner of buisness*', 
             'legal_certificate': 'Oficial Legal Certificate(optional.. For Verification Purpose)'
         }
@@ -34,7 +33,6 @@ class CompanyForm(ModelForm):
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
-            'area_specialization': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Commercial,industrial'}),
             'principal_broker': forms.TextInput(attrs={'class': 'form-control'}),
         }
         

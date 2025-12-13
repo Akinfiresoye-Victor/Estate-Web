@@ -2,10 +2,7 @@
 
 from django import forms
 from django.forms import ModelForm
-from .models import *
-from core.choices import STATES
-from django.forms import formset_factory, inlineformset_factory
-from django.core.exceptions import ValidationError
+from .models import LeadInfo
 
 
 
@@ -18,20 +15,6 @@ from django.core.exceptions import ValidationError
 
 
 
-
-class UserInformationForm(ModelForm):
-    class Meta:
-        model = UserInformation
-        fields = ['first_name', 'last_name', 'phone_number', 'email']
-        labels={
-            'first_name': '',
-            'last_name': '',
-            'phone_number': 'Company/Personal Contact Number',
-            'email': 'Company/Personal Email'
-        }
-        widgets={'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Adeola'}),
-                'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Victor'}),
-                }
 
 
 

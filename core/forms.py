@@ -24,14 +24,34 @@ class LeaseForm(ModelForm):
     class Meta:
         model=PropertyManagementRent
         fields=(
-                'house_type','description', 'state','location', 'owner', 'bedrooms','bathrooms','parking_spaces','size' ,
+                'property_category','residential','commercial','lands','description', 'state','location', 'bedrooms','bathrooms','parking_spaces','size' ,
                 'phone_number','price_range','base_image'
                 )
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            
+            # Add CSS classes to fields
+            self.fields['property_category'].widget.attrs.update({
+                'class': 'form-input',
+                'id': 'property_category'
+            })
+            self.fields['residential'].widget.attrs.update({
+                'class': 'form-input property-type-field',
+                'id': 'residential'
+            })
+            self.fields['commercial'].widget.attrs.update({
+                'class': 'form-input property-type-field',
+                'id': 'commercial'
+            })
+            self.fields['lands'].widget.attrs.update({
+                'class': 'form-input property-type-field',
+                'id': 'lands'
+            })
         labels={
-                'house_type':'House Type',
+                'property_category': 'Property Category',
+                'residential':'House Type',
                 'description': 'Property Description',
                 'location': 'Precise Location',
-                'owner': 'Listed by?',
                 'price_range': 'Price',
                 'phone_number': 'Phone Number',
                 'state': 'State',
@@ -41,10 +61,8 @@ class LeaseForm(ModelForm):
         widgets= {
                     'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Property Description'}),
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Oda Road, Kagola, Plot2,3'}),
-                    'owner': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Company/Personal Name'}),
                     'price_range': forms.TextInput(attrs={'class': 'form-control'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-                    # 'state': forms.ChoiceField(choices=[('', 'Any State')]+STATES, attrs={'class': 'form-control'}),
                     'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
                     'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
@@ -58,17 +76,36 @@ class LeaseForm(ModelForm):
 class SellForm(ModelForm):
     class Meta:
         model=PropertyManagementSale
-        fields=('house_type','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
-                'owner','phone_number','size', 'price','negotiate','available', 'base_image')
+        fields=('property_category','residential','commercial','lands','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
+                'phone_number','size', 'price','available', 'base_image')
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            
+            # Add CSS classes to fields
+            self.fields['property_category'].widget.attrs.update({
+                'class': 'form-input',
+                'id': 'property_category'
+            })
+            self.fields['residential'].widget.attrs.update({
+                'class': 'form-input property-type-field',
+                'id': 'residential'
+            })
+            self.fields['commercial'].widget.attrs.update({
+                'class': 'form-input property-type-field',
+                'id': 'commercial'
+            })
+            self.fields['lands'].widget.attrs.update({
+                'class': 'form-input property-type-field',
+                'id': 'lands'
+            })
         labels={
-                'house_type':'House Type',
+                'property_category': 'Property Category',
+                'residential':'House Type',
                 'property_description': 'Property Description',
                 'location': 'Location',
                 'phone_number': 'Phone.No',
                 'price': 'Price',
-                'owner':'Listed By?',
                 'state': 'State',
-                'negotiate': 'Is it Negotiatable?',
                 'available': 'Visible To Public',
                 'base_image': 'Add Overview image Of Property ',
 }
@@ -77,9 +114,7 @@ class SellForm(ModelForm):
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Akure,Oda road'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
                     'price': forms.TextInput(attrs={'class': 'form-control'}),
-                    'owner': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Company/Personal Name'}),
                     # 'state': forms.ChoiceField(attrs={'class': 'form-control'}),
-                    'negotiate': forms.Select(attrs={'class': 'form-control'}),
                     'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),

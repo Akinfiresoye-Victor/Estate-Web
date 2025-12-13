@@ -2,6 +2,8 @@ from django.db import models
 from core.choices import STATES, AGENT_SOCIAL_LINKS, YEARS_OF_EXPERINCE
 from core.validators import validate_image, validate_file
 import uuid
+from members.models import User
+
 
 
 
@@ -16,6 +18,7 @@ def company_file_path(instance, filename):
 
 # Create your models here.
 class AgentInformation(models.Model):
+    users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     user_id = models.IntegerField(blank=False)
     profile_name = models.CharField('Full Name', max_length=100, blank=False)
     agent_uuid = models.CharField('Agent uuid', unique=True, max_length=36, blank=False, default=uuid.uuid4)
@@ -25,7 +28,7 @@ class AgentInformation(models.Model):
     email = models.EmailField('Email', blank=True, max_length=100)
     location = models.CharField('Base City', blank=False, choices=STATES)
     language = models.CharField('language Spoken', blank=False, max_length=100)
-    bio = models.TextField('Work Summary')
+    bio = models.TextField('Work Summary', max_length=200)
     work_type = models.CharField('Nature of work', blank=False, max_length=100)
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=agent_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
@@ -33,6 +36,7 @@ class AgentInformation(models.Model):
     verified = models.BooleanField('Verified agent', default=False)
     def __str__(self):
         return self.profile_name
+
 
 class Experience(models.Model):
     # Foreign Key: Links multiple experiences back to ONE AgentInformation profile

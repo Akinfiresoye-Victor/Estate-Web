@@ -49,7 +49,7 @@
               <!-- Property Image -->
               <div class="property-image-section">
                 {% if bought.base_image %}
-                  <img src="{{ bought.base_image.url }}" alt="{{ bought.house_type }}" class="property-img">
+                  <img src="{{ bought.base_image.url }}" alt="{{ bought.residential }}" class="property-img">
                 {% else %}
                   <div class="placeholder-image">
                     <i class="bi bi-image"></i>
@@ -74,7 +74,7 @@
               
               <!-- Property Content -->
               <div class="property-content">
-                <h3 class="property-title">{{ bought.house_type }}</h3>
+                <h3 class="property-title">{{ bought.residential }}</h3>
                 
                 <div class="property-location">
                   <i class="bi bi-geo-alt-fill"></i>
@@ -95,16 +95,6 @@
                   <div class="info-item">
                     <i class="bi bi-calendar-check"></i>
                     <span>{{ bought.listed_date|date:"M d, Y" }}</span>
-                  </div>
-                  <div class="info-item">
-                    <i class="bi bi-chat-dots-fill"></i>
-                    <span>
-                      {% if bought.negotiate %}
-                        <span class="negotiable-badge">Negotiable</span>
-                      {% else %}
-                        <span class="negotiable-badge not-negotiable">Fixed Price</span>
-                      {% endif %}
-                    </span>
                   </div>
                 </div>
                 

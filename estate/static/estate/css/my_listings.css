@@ -1,849 +1,500 @@
-/* General Layout */
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    min-height: 100vh;
-    padding: 2rem 1rem;
+/* Root Variables */
+:root {
+  --primary-color: #1a3c4e;
+  --secondary-color: #c19b76;
+  --accent-color: #2c5f7a;
+  --bg-light: #f8f9fa;
+  --text-dark: #2c3e50;
+  --text-light: #6c757d;
+  --lease-color: #007bff;
+  --sale-color: #28a745;
+  --danger-color: #dc3545;
+  --border-color: #e1e8ed;
 }
 
-/* Listings Wrapper */
-.listings-wrapper {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
+/* Hero Section */
+.my-listings-hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  padding: 3rem 0 4rem;
+  color: #fff;
+  margin-bottom: 3rem;
 }
 
-.listings-container {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    padding: 2.5rem;
+.hero-nav {
+  margin-bottom: 2rem;
 }
 
-/* Page Header */
-.listings-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #e8f5e9;
+.back-link-modern {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
 }
 
-.header-icon {
-    width: 90px;
-    height: 90px;
-    background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    font-size: 3rem;
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(67, 160, 71, 0.3);
+.back-link-modern:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-5px);
 }
 
-.listings-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2e7d32;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.5px;
+.hero-content-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
-.listings-subtitle {
-    color: #6c757d;
-    font-size: 1.1rem;
-    margin: 0;
+.hero-icon-large {
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #fff;
+  flex-shrink: 0;
 }
 
-/* Section Header */
-.section-header {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    margin-bottom: 2rem;
-    margin-top: 3rem;
+.hero-text-wrap {
+  flex: 1;
 }
 
-.section-header:first-of-type {
-    margin-top: 0;
+.hero-main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  line-height: 1.2;
 }
 
-.section-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: #fff;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+.hero-main-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-.section-icon.lease {
-    background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+/* Main Content */
+.my-listings-content {
+  padding: 0 0 4rem;
 }
 
-.section-icon.sale {
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+/* Section Wrapper */
+.listings-section-wrapper {
+  margin-bottom: 4rem;
 }
 
-.section-info {
-    flex: 1;
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
 }
 
-.section-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #2e7d32;
-    margin: 0;
+.section-icon-box {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #fff;
+  flex-shrink: 0;
 }
 
-.sale-section .section-title {
-    color: #1565c0;
+.lease-icon {
+  background: linear-gradient(135deg, #007bff, #00bcd4);
 }
 
-.section-count {
-    font-size: 0.95rem;
-    color: #6c757d;
-    margin: 0.3rem 0 0 0;
+.sale-icon {
+  background: linear-gradient(135deg, #28a745, #20c997);
 }
 
-/* Listings Grid */
-.listings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+.section-title-content {
+  flex: 1;
 }
 
-/* Listing Card */
-.listing-card {
-    background: #f8f9fa;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
+.section-main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.3rem;
 }
 
-.listing-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+.section-subtitle-text {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin: 0;
 }
 
-.lease-card {
-    border-left: 4px solid #43a047;
+/* Properties Grid */
+.properties-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
 }
 
-.sale-card {
-    border-left: 4px solid #1976d2;
+/* Property Card */
+.property-card-modern {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-/* Card Badge */
-.card-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.property-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
-.lease-badge {
-    background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+.lease-type {
+  border-left: 4px solid var(--lease-color);
 }
 
-.sale-badge {
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+.sale-type {
+  border-left: 4px solid var(--sale-color);
 }
 
-/* Card Content */
-.card-content {
-    padding: 1.5rem;
-    padding-top: 3rem;
+.property-badge-tag {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1;
 }
 
-.property-title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #2e7d32;
-    margin-bottom: 1rem;
-    line-height: 1.3;
+.lease-badge-style {
+  background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
-.sale-card .property-title {
-    color: #1565c0;
+.sale-badge-style {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
 }
 
-.property-location {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #6c757d;
-    font-size: 0.95rem;
-    margin-bottom: 1.2rem;
-    padding-bottom: 1.2rem;
-    border-bottom: 1px solid #dee2e6;
+.property-card-body {
+  padding: 2rem;
 }
 
-.property-location i {
-    color: #43a047;
-    font-size: 1.1rem;
+.property-main-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  line-height: 1.4;
 }
 
-.sale-card .property-location i {
-    color: #1976d2;
+.property-location-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  background: var(--bg-light);
+  border-radius: 8px;
 }
 
-/* Property Details */
-.property-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+.property-location-info i {
+  color: var(--secondary-color);
+  font-size: 1.2rem;
 }
 
-.detail-item {
-    display: grid;
-    grid-template-columns: 20px auto;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    align-items: start;
+/* Property Info Grid */
+.property-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-light);
+  border-radius: 12px;
 }
 
-.detail-item i {
-    color: #66bb6a;
-    margin-top: 0.2rem;
+.info-grid-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-.sale-card .detail-item i {
-    color: #42a5f5;
+.info-icon {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-color);
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
-.detail-label {
-    font-weight: 600;
-    color: #495057;
-    grid-column: 2;
+.info-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.detail-value {
-    color: #6c757d;
-    grid-column: 2;
-    word-wrap: break-word;
+.info-label-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Card Actions */
-.card-actions {
-    display: flex;
-    gap: 0.8rem;
-    padding-top: 1.2rem;
-    border-top: 1px solid #dee2e6;
+.info-value-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.5;
 }
 
-.btn-update,
-.btn-delete {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.7rem 1rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    border: 2px solid;
+/* Action Buttons */
+.property-action-buttons {
+  display: flex;
+  gap: 1rem;
 }
 
-.btn-update.lease-btn {
-    background: transparent;
-    color: #43a047;
-    border-color: #43a047;
+.btn-action-modern {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
-.btn-update.lease-btn:hover {
-    background: #43a047;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(67, 160, 71, 0.3);
+.update-lease {
+  background: rgba(0, 123, 255, 0.1);
+  color: var(--lease-color);
+  border-color: rgba(0, 123, 255, 0.3);
 }
 
-.btn-update.sale-btn {
-    background: transparent;
-    color: #1976d2;
-    border-color: #1976d2;
+.update-lease:hover {
+  background: var(--lease-color);
+  color: #fff;
+  border-color: var(--lease-color);
+  transform: translateY(-2px);
 }
 
-.btn-update.sale-btn:hover {
-    background: #1976d2;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(25, 118, 210, 0.3);
+.update-sale {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--sale-color);
+  border-color: rgba(40, 167, 69, 0.3);
 }
 
-.btn-delete {
-    background: transparent;
-    color: #e53935;
-    border-color: #e53935;
+.update-sale:hover {
+  background: var(--sale-color);
+  color: #fff;
+  border-color: var(--sale-color);
+  transform: translateY(-2px);
 }
 
-.btn-delete:hover {
-    background: #e53935;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(229, 57, 53, 0.3);
+.delete-action {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--danger-color);
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+.delete-action:hover {
+  background: var(--danger-color);
+  color: #fff;
+  border-color: var(--danger-color);
+  transform: translateY(-2px);
 }
 
 /* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
+.empty-state-modern {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.empty-icon {
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 2rem;
-    font-size: 4rem;
-    color: #fff;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+.empty-illustration-box {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  color: #fff;
 }
 
-.empty-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #6c757d;
-    margin-bottom: 1rem;
+.empty-main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
 }
 
-.empty-message {
-    font-size: 1.1rem;
-    color: #adb5bd;
-    margin-bottom: 2.5rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+.empty-description-text {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  line-height: 1.6;
 }
 
-.btn-dashboard {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
-    color: #fff;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.btn-back-dashboard {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: #fff;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
-.btn-dashboard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(67, 160, 71, 0.3);
-    color: #fff;
+.btn-back-dashboard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(26, 60, 78, 0.3);
+  color: #fff;
 }
 
 /* Responsive Design */
-/* ========================================
-   COMPACT RENT PROPERTIES CSS
-   ======================================== */
-
-@media (max-width: 992px) {
-  .properties-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.2rem;
-  }
-
-  .filter-section form {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+@media (max-width: 1200px) {
+  .properties-grid-layout {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   }
 }
 
-@media (max-width: 768px) {
-  .page-header.rent-header {
-    padding: 3rem 0 2.5rem;
-    margin-top: 70px;
-  }
-
-  .header-icon {
-    width: 65px;
-    height: 65px;
-    font-size: 2rem;
-  }
-
-  .header-title {
-    font-size: 2rem;
-  }
-
-  .header-subtitle {
-    font-size: 0.95rem;
-  }
-
-  .header-stats {
+@media (max-width: 992px) {
+  .hero-content-wrap {
     flex-direction: column;
-    gap: 0.8rem;
+    align-items: flex-start;
+    text-align: left;
   }
 
-  .stat-item {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
+  .hero-main-title {
+    font-size: 2.5rem;
   }
 
-  .filter-section {
-    padding: 1.2rem;
-  }
-
-  .filter-section form {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-  }
-
-  .properties-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  /* Compact Property Cards */
-  .property-card {
-    border-radius: 10px;
-  }
-
-  .property-image-section {
-    height: 180px;
-  }
-
-  .property-badge {
-    padding: 0.35rem 0.8rem;
-    font-size: 0.7rem;
-    border-radius: 12px;
-  }
-
-  .image-count {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
-    gap: 0.3rem;
-  }
-
-  .property-content {
-    padding: 1rem;
-  }
-
-  .property-title {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-  }
-
-  .property-location {
-    font-size: 0.8rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .property-location i {
-    font-size: 0.85rem;
-  }
-
-  /* Compact Price Section */
-  .rent-price {
-    padding: 0.8rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .rent-price .price-label {
-    font-size: 0.75rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .rent-price .price-amount {
-    font-size: 1.4rem;
-  }
-
-  /* Compact Features */
-  .property-features {
-    gap: 0.6rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .feature-item {
-    padding: 0.5rem 0.7rem;
-    gap: 0.4rem;
-  }
-
-  .feature-item i {
-    font-size: 1rem;
-  }
-
-  .feature-item span {
-    font-size: 0.8rem;
-  }
-
-  /* Compact Meta Info */
-  .property-meta {
-    padding: 0.7rem 0;
-    margin-bottom: 0.8rem;
-  }
-
-  .meta-item {
-    font-size: 0.75rem;
-  }
-
-  .meta-item i {
-    font-size: 0.85rem;
-  }
-
-  /* Compact Action Footer */
-  .property-actions {
-    gap: 0.6rem;
-  }
-
-  .btn-view-property {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.85rem;
-  }
-
-  .btn-view-property i {
-    font-size: 1rem;
-  }
-
-  .wishlist-icon {
-    width: 38px;
-    height: 38px;
+  .hero-main-subtitle {
     font-size: 1.1rem;
   }
 
-  /* Compact Pagination */
-  .pagination {
-    flex-wrap: wrap;
-    gap: 0.4rem;
+  .properties-grid-layout {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
-
-  .page-link {
-    min-width: 38px;
-    height: 38px;
-    padding: 0.4rem 0.7rem;
-    font-size: 0.85rem;
-  }
-}
-
-
-/* ========================================
-   COMPACT MY LISTINGS CSS
-   ======================================== */
-
-@media (max-width: 992px) {
-    .listings-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1rem;
-    }
-
-    .listings-title {
-        font-size: 1.8rem;
-    }
-
-    .section-title {
-        font-size: 1.3rem;
-    }
 }
 
 @media (max-width: 768px) {
-    body {
-        padding: 1rem 0.5rem;
-    }
+  .my-listings-hero {
+    padding: 2rem 0 3rem;
+  }
 
-    .listings-container {
-        padding: 1.8rem 1.3rem;
-    }
+  .hero-icon-large {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+  }
 
-    .header-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
-    }
+  .hero-main-title {
+    font-size: 2rem;
+  }
 
-    .listings-title {
-        font-size: 1.6rem;
-    }
+  .hero-main-subtitle {
+    font-size: 1rem;
+  }
 
-    .listings-subtitle {
-        font-size: 0.9rem;
-    }
+  .section-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .section-header {
-        gap: 0.8rem;
-    }
+  .section-main-title {
+    font-size: 1.6rem;
+  }
 
-    .section-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
-    }
+  .properties-grid-layout {
+    grid-template-columns: 1fr;
+  }
 
-    .section-title {
-        font-size: 1.2rem;
-    }
-
-    .section-count {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.7rem;
-    }
-
-    .listings-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    /* Compact Listing Cards */
-    .listing-card {
-        border-radius: 10px;
-    }
-
-    .card-image {
-        height: 160px;
-    }
-
-    .card-content {
-        padding: 1rem;
-        padding-top: 2.2rem;
-    }
-
-    .card-badge {
-        top: 0.7rem;
-        right: 0.7rem;
-        padding: 0.35rem 0.7rem;
-        font-size: 0.7rem;
-    }
-
-    .property-title {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .property-location {
-        font-size: 0.8rem;
-        margin-bottom: 0.7rem;
-    }
-
-    .property-location i {
-        font-size: 0.85rem;
-    }
-
-    .property-details {
-        gap: 0.7rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .detail-item {
-        font-size: 0.8rem;
-        gap: 0.3rem;
-    }
-
-    .detail-item i {
-        font-size: 0.9rem;
-    }
-
-    .card-actions {
-        gap: 0.6rem;
-    }
-
-    .btn-update,
-    .btn-delete {
-        padding: 0.6rem 1rem;
-        font-size: 0.8rem;
-    }
-
-    .empty-icon {
-        width: 90px;
-        height: 90px;
-        font-size: 3rem;
-    }
-
-    .empty-title {
-        font-size: 1.5rem;
-    }
-
-    .empty-message {
-        font-size: 0.95rem;
-    }
+  .property-action-buttons {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 576px) {
-    body {
-        padding: 0.5rem;
-    }
+  .my-listings-hero {
+    padding: 1.5rem 0 2.5rem;
+  }
 
-    .listings-container {
-        padding: 1.5rem 1rem;
-    }
+  .hero-icon-large {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+  }
 
-    .header-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.7rem;
-        margin-bottom: 0.8rem;
-    }
+  .hero-main-title {
+    font-size: 1.8rem;
+  }
 
-    .listings-title {
-        font-size: 1.4rem;
-    }
+  .section-icon-box {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
 
-    .listings-subtitle {
-        font-size: 0.85rem;
-    }
+  .property-card-body {
+    padding: 1.5rem;
+  }
 
-    .section-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.6rem;
-    }
+  .property-main-title {
+    font-size: 1.3rem;
+  }
 
-    .section-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
-    }
+  .info-grid-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .section-title {
-        font-size: 1.1rem;
-    }
+  .empty-illustration-box {
+    width: 120px;
+    height: 120px;
+    font-size: 4rem;
+  }
 
-    .section-count {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.6rem;
-    }
-
-    /* Extra Compact Listing Cards */
-    .listing-card {
-        border-radius: 8px;
-    }
-
-    .card-image {
-        height: 140px;
-    }
-
-    .card-content {
-        padding: 0.9rem;
-        padding-top: 2rem;
-    }
-
-    .card-badge {
-        top: 0.6rem;
-        right: 0.6rem;
-        padding: 0.3rem 0.6rem;
-        font-size: 0.65rem;
-    }
-
-    .property-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.4rem;
-    }
-
-    .property-location {
-        font-size: 0.75rem;
-        margin-bottom: 0.6rem;
-    }
-
-    .property-details {
-        gap: 0.6rem;
-        margin-bottom: 0.7rem;
-    }
-
-    .detail-item {
-        font-size: 0.75rem;
-        gap: 0.25rem;
-    }
-
-    .detail-item i {
-        font-size: 0.85rem;
-    }
-
-    .card-actions {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .btn-update,
-    .btn-delete {
-        width: 100%;
-        padding: 0.65rem;
-        font-size: 0.8rem;
-    }
-
-    .empty-icon {
-        width: 75px;
-        height: 75px;
-        font-size: 2.5rem;
-    }
-
-    .empty-title {
-        font-size: 1.3rem;
-    }
-
-    .empty-message {
-        font-size: 0.85rem;
-    }
-
-    .btn-dashboard {
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 400px) {
-    .listings-title {
-        font-size: 1.2rem;
-    }
-
-    .section-title {
-        font-size: 1rem;
-    }
-
-    .property-title {
-        font-size: 0.9rem;
-    }
-
-    .detail-item {
-        font-size: 0.7rem;
-    }
-
-    .card-image {
-        height: 130px;
-    }
-
-    .btn-update,
-    .btn-delete {
-        font-size: 0.75rem;
-        padding: 0.6rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .card-image {
-        height: 120px;
-    }
-
-    .property-title {
-        font-size: 0.85rem;
-    }
-
-    .detail-item {
-        font-size: 0.65rem;
-    }
+  .empty-main-title {
+    font-size: 1.6rem;
+  }
 }

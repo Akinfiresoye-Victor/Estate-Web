@@ -11,7 +11,6 @@ from members.models import User
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 
@@ -21,10 +20,10 @@ from django.core.paginator import Paginator
 def dashboard(request):
     try:
         if not request.user.is_authenticated:
-            messages.info(request, 'You must be authenticated to access this page')
+            messages.info(request, 'log in to access page')
             return redirect('landing')
         if not request.user.role == 'company':
-            messages.info(request, 'Account must be a company account')
+            messages.info(request, 'Company account only')
             return redirect('landing')
         try:
             company = CompanyInformation.objects.get(user_id=request.user.id) 
@@ -52,7 +51,7 @@ def dashboard(request):
             return render(request, 'company/dashboard.html', context)
             
         except CompanyInformation.DoesNotExist:
-            messages.warning(request, 'Company Profile has to be setup to access other pages')
+            messages.warning(request, 'Set company profile')
             return redirect('company:company_form')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
@@ -63,7 +62,7 @@ def dashboard(request):
 def company_form(request):
     if request.user.is_authenticated:
         if not request.user.role == 'company':
-            messages.info(request, 'Account must be a company account')
+            messages.info(request, 'Company account only')
             return redirect('landing')
         try:
             submitted=False
@@ -82,7 +81,7 @@ def company_form(request):
                             company_form.save()
                             link_form.instance=company_form
                             link_form.save()
-                            messages.success(request, 'Company Profile Successfully Set')
+                            messages.success(request, 'Profile Successfully Set')
                             return HttpResponseRedirect('?submitted=True')
             else:
                 comp_form= CompanyForm()
@@ -100,7 +99,7 @@ def company_form(request):
             print(f'Error is {e}')
             return render(request, 'estate/error_page.html', {'e': e}, {'e':e})
     else:
-        messages.info(request, 'open a company account to perform this action')
+        messages.info(request, 'Company account only')
         return redirect('articles')
 
 def update_company_profile(request, company_id):
@@ -128,13 +127,13 @@ def update_company_profile(request, company_id):
                     'social': link_form
                 })
             else:
-                messages.warning(request, 'Youre not authorized to visit that page please relogin and be careful!!')
+                messages.warning(request, 'Access Denied')
                 logout_user(request)
         except Exception as e:
             print(f'Error is {e}')
             return render(request, 'estate/error_page.html', {'e': e})
     else:
-        messages.success(request, 'You have to be logged in to access this page')
+        messages.success(request, 'Log in to gain access')
         return redirect('login')
 
 
@@ -153,11 +152,11 @@ def manaage_listings(request):
 
 def company_analytics(request):
     if not request.user.is_authenticated:
-        messages.warning(request, 'You must be logged in to access this page.')
+        messages.warning(request, 'Login to gain access')
         return redirect('login')
         
     if request.user.role != 'company':
-        messages.info(request, 'You must open a company account to perform this action.')
+        messages.info(request, 'Company account only')
         return redirect('landing')
 
     try:
@@ -444,7 +443,7 @@ def delete_lead(request, lead_id):
         lead_to_delete=LeadInfo.objects.get(pk=lead_id)
         if company.unique_company_id == lead_to_delete.company_uuid:
             lead_to_delete.delete()
-            messages.success(request, "Client's Data Deleted Successfully")
+            messages.success(request, "Lead Deleted")
             return redirect('company:lead-management')
         else:
             messages.warning(request, "You aren't authorized to perform that action")
@@ -457,7 +456,7 @@ def delete_lead(request, lead_id):
 @require_POST
 def update_lead_status(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'You have to be authenticated to perform this action')
+        messages.info(request, 'log in to access this page')
         return redirect('landing')
     if request.user.role !='company':
         messages.info(request, 'Access Denied')
@@ -475,7 +474,7 @@ def update_lead_status(request, lead_id):
             messages.success(request, 'Status Updated Successfully')
             return redirect('company:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
-            messages.error(request, 'Lead Not found <404>')
+            messages.error(request, 'Lead Not found')
             return redirect('company:lead-management')
     except Exception as e:
         return render(request, 'estate/error_page.html')
@@ -485,7 +484,7 @@ def update_lead_status(request, lead_id):
 @require_POST
 def update_lead_stage(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'You have to be authenticated to perform this action')
+        messages.info(request, 'Log in to gain access')
         return redirect('landing')
     if request.user.role != 'company':
         messages.info(request, 'Access Denied')
@@ -503,7 +502,7 @@ def update_lead_stage(request, lead_id):
             messages.success(request, 'Stage Updated Successfully')
             return redirect('company:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
-            messages.error(request, 'Lead Not found <404>')
+            messages.error(request, 'Lead Not found')
             return redirect('company:lead-management')
     except Exception as e:
         return render(request, 'estate/error_page.html')
@@ -561,7 +560,7 @@ def company_profile(request, company_uuid):
 def properties_by_company(request, company_uuid):
     if request.user.is_authenticated:
         if request.user.role == 'company':
-            messages.info(request, 'This page is for clients only')
+            messages.info(request, 'Customer\'s only')
             return redirect('company:dashboard')
         company=CompanyInformation.objects.get(unique_company_id=company_uuid)
         on_lease=PropertyManagementRent.objects.filter(company_uuid=company_uuid)
