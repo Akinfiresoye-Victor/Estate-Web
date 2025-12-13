@@ -6,7 +6,6 @@ import re
 
 
 try:
-    i
     ue= UserAgent().random
     url="https://www.nigeriahousingmarket.com/real-estate-news-nigeria/"
     headers={"User-Agent": ue}
