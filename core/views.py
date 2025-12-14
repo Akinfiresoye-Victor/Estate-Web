@@ -83,11 +83,9 @@ def sell_property(request):
                     prop_form=SellForm(request.POST or None, request.FILES or None)
                     image_form=SaleImageFormSet(request.POST or None, request.FILES or None)
                     if prop_form.is_valid() and image_form.is_valid():
-                        print('valid')
                         with transaction.atomic():
                             landlord= prop_form.save(commit=False)
                             category = prop_form.cleaned_data.get('property_category')
-                            print(category)
                             # Clear the non-selected fields
                             if category == 'Residential':
                                 landlord.commercial = ''
@@ -118,10 +116,7 @@ def sell_property(request):
                                 image_form.save()
                         return HttpResponseRedirect('?submitted=True')
                     else:
-                        print('not valid')
-                        print(prop_form.errors)
-                        category = prop_form.cleaned_data.get('property_category')
-                        print(category)
+                        return render(request, 'estate/error_page.html', {'e': prop_form.errors})
                 else:
                     prop_form= SellForm()
                     image_form=SaleImageFormSet()
@@ -162,8 +157,8 @@ def lease_property(request):
                 if request.method== 'POST':
                     prop_form=LeaseForm(request.POST or None, request.FILES or None) #request.FILES to handle the images 
                     image_form=RentImageFormSet(request.POST or None, request.FILES or None)
-                    with transaction.atomic():
-                        if prop_form.is_valid() and image_form.is_valid():
+                    if prop_form.is_valid() and image_form.is_valid():
+                        with transaction.atomic():
                             landlord= prop_form.save(commit=False)
                             category = prop_form.cleaned_data.get('property_category')
                             
@@ -196,8 +191,9 @@ def lease_property(request):
                                 image_form.instance=landlord
                                 image_form.save()
                             #making sure form is submitted once
-                        return HttpResponseRedirect('?submitted=True')
-                    
+                            return HttpResponseRedirect('?submitted=True')
+                    else:
+                        return render(request, 'estate/error_page.html', {'e': prop_form.errors})
                 else:
                     prop_form= LeaseForm()
                     image_form=RentImageFormSet()

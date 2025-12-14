@@ -18,7 +18,7 @@
     <div class="header-stats">
       <div class="stat-item">
         <i class="bi bi-house-door"></i>
-        <span>{{ on_lease.paginator.count|default:"0" }} Properties</span>
+        <span>{{ leased.paginator.count|default:"0" }} Properties</span>
       </div>
     </div>
   </div>
@@ -137,38 +137,38 @@
 </div>
 
 <!-- Pagination -->
-{% if on_lease.paginator.num_pages > 1 %}
+{% if leased.paginator.num_pages > 1 %}
 <div class="pagination-section">
   <div class="container">
     <nav class="pagination-nav">
       <ul class="pagination rent-pagination">
-        {% if on_lease.has_previous %}
+        {% if leased.has_previous %}
           <li class="page-item">
             <a class="page-link" href="?page=1">
               <i class="bi bi-chevron-double-left"></i>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ on_lease.previous_page_number }}">
+            <a class="page-link" href="?page={{ leased.previous_page_number }}">
               <i class="bi bi-chevron-left"></i>
             </a>
           </li>
         {% endif %}
 
         {% for i in nums %}
-          <li class="page-item {% if on_lease.number == forloop.counter %}active{% endif %}">
+          <li class="page-item {% if leased.number == forloop.counter %}active{% endif %}">
             <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
           </li>
         {% endfor %}
 
-        {% if on_lease.has_next %}
+        {% if leased.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ on_lease.next_page_number }}">
+            <a class="page-link" href="?page={{ leased.next_page_number }}">
               <i class="bi bi-chevron-right"></i>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ on_lease.paginator.num_pages }}">
+            <a class="page-link" href="?page={{ leased.paginator.num_pages }}">
               <i class="bi bi-chevron-double-right"></i>
             </a>
           </li>
@@ -177,7 +177,7 @@
     </nav>
     
     <div class="pagination-info">
-      <span>Page <strong>{{ on_lease.number }}</strong> of <strong>{{ on_lease.paginator.num_pages }}</strong></span>
+      <span>Page <strong>{{ leased.number }}</strong> of <strong>{{ leased.paginator.num_pages }}</strong></span>
     </div>
   </div>
 </div>

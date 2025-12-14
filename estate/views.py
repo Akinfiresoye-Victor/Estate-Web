@@ -24,7 +24,6 @@ def wishlist_generator(properties_list, user_id):
     Takes in a list of indexes and returns the boolean output based on 
     favourited properties of each users
     """
-    
     if properties_list[0].property_type == 'Rent':
         user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id).filter(property_type='Rent')
     else:
@@ -33,10 +32,12 @@ def wishlist_generator(properties_list, user_id):
     user_wishlist_list=[]
     boolean_results=[]
     
-    for prop,i in zip(properties_list, user_wishlists):
+    for prop in properties_list:
         properties_id.append(prop.id)
-        user_wishlist_list.append(i)
-    
+        
+    for raw_wishlist_calculation in user_wishlists:
+        user_wishlist_list.append(raw_wishlist_calculation)
+        
     for k in properties_id:
         if k in user_wishlist_list:
             boolean_results.append(True)
@@ -78,6 +79,7 @@ def buy_property(request):
         properties_with_wishist=zip(on_sale, in_wishlist)
         context={
             'buy': properties_with_wishist,
+            'on_sale': on_sale,
             'nums':nums,
             'salefilter':myfilter
         }
@@ -104,7 +106,7 @@ def rent_property(request):
             #Filtering
             myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
             rent_qs=myfilter.qs
-            p=Paginator(rent_qs, 9)
+            p=Paginator(rent_qs, 1)
             page= request.GET.get('page')
             on_lease= p.get_page(page)
             nums= "a" * on_lease.paginator.num_pages
@@ -117,6 +119,7 @@ def rent_property(request):
             context={
                 'nums':nums,
                 'on_lease': properties_with_wishlist,
+                'leased':on_lease,
                 'rentfilter':myfilter
             }
             return render(request, 'estate/rent_property.html', context)

@@ -17,7 +17,7 @@
     <div class="header-stats">
       <div class="stat-item">
         <i class="bi bi-house-door"></i>
-        <span>{{ buy.paginator.count|default:"0" }} Properties</span>
+        <span>{{ on_sale.paginator.count|default:"0" }} Properties</span>
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@
 <!-- Properties Container -->
 <div class="container properties-container">
   
-  {% if buy %}
+  {% if on_sale %}
     <!-- Filter Section -->
     <div class="filter-section">
       <form method="get">
@@ -136,38 +136,38 @@
 </div>
 
 <!-- Pagination -->
-{% if buy.paginator.num_pages > 1 %}
+{% if on_sale.paginator.num_pages > 1 %}
 <div class="pagination-section">
   <div class="container">
     <nav class="pagination-nav">
       <ul class="pagination buy-pagination">
-        {% if buy.has_previous %}
+        {% if on_sale.has_previous %}
           <li class="page-item">
             <a class="page-link" href="?page=1">
               <i class="bi bi-chevron-double-left"></i>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ buy.previous_page_number }}">
+            <a class="page-link" href="?page={{ on_sale.previous_page_number }}">
               <i class="bi bi-chevron-left"></i>
             </a>
           </li>
         {% endif %}
 
         {% for i in nums %}
-          <li class="page-item {% if buy.number == forloop.counter %}active{% endif %}">
+          <li class="page-item {% if on_sale.number == forloop.counter %}active{% endif %}">
             <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
           </li>
         {% endfor %}
 
-        {% if buy.has_next %}
+        {% if on_sale.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ buy.next_page_number }}">
+            <a class="page-link" href="?page={{ on_sale.next_page_number }}">
               <i class="bi bi-chevron-right"></i>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ buy.paginator.num_pages }}">
+            <a class="page-link" href="?page={{ on_sale.paginator.num_pages }}">
               <i class="bi bi-chevron-double-right"></i>
             </a>
           </li>
@@ -176,7 +176,7 @@
     </nav>
     
     <div class="pagination-info">
-      <span>Page <strong>{{ buy.number }}</strong> of <strong>{{ buy.paginator.num_pages }}</strong></span>
+      <span>Page <strong>{{ on_sale.number }}</strong> of <strong>{{ on_sale.paginator.num_pages }}</strong></span>
     </div>
   </div>
 </div>
