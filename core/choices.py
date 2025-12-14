@@ -45,7 +45,7 @@ STATES=[
 PROPERTY_CATEGORY=[
     ('Residential', 'Residential'),
     ('Commercial', 'Commercial'),
-    ('Plot/Land', 'Plot/Land')
+    ('Land', 'Plot/Land')
 ]
 
 

@@ -27,7 +27,7 @@
 <!-- Properties Container -->
 <div class="container properties-container">
   
-  {% if on_lease %}
+  {% if leased %} 
     <!-- Filter Section -->
     <div class="filter-section">
       <form method="get">
@@ -75,8 +75,15 @@
               
               <!-- Property Content -->
               <div class="property-content">
+                {%if lease.residential%}
                 <h3 class="property-title">{{ lease.residential }}</h3>
-                
+                {%endif%}
+                {%if lease.commercial%}
+                <h3 class="property-title">{{ lease.commercial }}</h3>
+                {%endif%}
+                {%if lease.lands%}
+                <h3 class="property-title">{{ lease.lands}}</h3>
+                {%endif%}
                 <div class="property-location">
                   <i class="bi bi-geo-alt-fill"></i>
                   <span>{{ lease.location }}, {{ lease.state }}</span>

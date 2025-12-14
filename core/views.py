@@ -93,7 +93,7 @@ def sell_property(request):
                             elif category == 'Commercial':
                                 landlord.residential = ''
                                 landlord.lands = ''
-                            elif category == 'Plot/Land':
+                            elif category == 'Land':
                                 landlord.residential = ''
                                 landlord.commercial = ''
                             try:
@@ -169,7 +169,7 @@ def lease_property(request):
                             elif category == 'Commercial':
                                 landlord.residential = ''
                                 landlord.lands = ''
-                            elif category == 'Plot/Land':
+                            elif category == 'Land':
                                 landlord.residential = ''
                                 landlord.commercial = ''
                             try:

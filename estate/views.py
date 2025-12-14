@@ -24,26 +24,30 @@ def wishlist_generator(properties_list, user_id):
     Takes in a list of indexes and returns the boolean output based on 
     favourited properties of each users
     """
-    if properties_list[0].property_type == 'Rent':
-        user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id).filter(property_type='Rent')
-    else:
-        user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id).filter(property_type='Sale')
-    properties_id=[]
-    user_wishlist_list=[]
-    boolean_results=[]
-    
-    for prop in properties_list:
-        properties_id.append(prop.id)
-        
-    for raw_wishlist_calculation in user_wishlists:
-        user_wishlist_list.append(raw_wishlist_calculation)
-        
-    for k in properties_id:
-        if k in user_wishlist_list:
-            boolean_results.append(True)
+    if properties_list:
+        if properties_list[0].property_type == 'Rent':
+            user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id, property_type='Rent')
         else:
-            boolean_results.append(False)
-    return boolean_results
+            user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id, property_type='Sale')
+        properties_id=[]
+        user_wishlist_list=[]
+        boolean_results=[]
+        
+        for prop in properties_list:
+            properties_id.append(prop.id)
+            
+        for raw_wishlist in user_wishlists:
+            user_wishlist_list.append(raw_wishlist.property_id)
+            
+        for k in properties_id:
+            if k in user_wishlist_list:
+                boolean_results.append(True)
+            else:
+                boolean_results.append(False)
+        return boolean_results
+    else:
+        boolean_results =[]
+        return boolean_results
 
 
 
@@ -64,7 +68,10 @@ def buy_property(request):
         sale_qs=PropertyManagementSale.objects.all().order_by('-listed_date')
         #Filtering Code
         myfilter=PropertySaleFilter(request.GET, queryset=sale_qs)
-        sale_qs=myfilter.qs
+        if myfilter.qs:
+            sale_qs=myfilter.qs
+        else:
+            sale_qs=[]
         #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
         p=Paginator(sale_qs, 9)
         page=request.GET.get('page')
@@ -105,7 +112,10 @@ def rent_property(request):
             rent_qs=PropertyManagementRent.objects.all().order_by('-listed_date')
             #Filtering
             myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
-            rent_qs=myfilter.qs
+            if myfilter.qs:
+                rent_qs=myfilter.qs
+            else:
+                rent_qs=[]
             p=Paginator(rent_qs, 9)
             page= request.GET.get('page')
             on_lease= p.get_page(page)
@@ -116,6 +126,7 @@ def rent_property(request):
                 properties_list.append(prop)
             in_wishlist=wishlist_generator(properties_list, request.user.id)
             properties_with_wishlist=zip(on_lease, in_wishlist)
+            print(in_wishlist)
             context={
                 'nums':nums,
                 'on_lease': properties_with_wishlist,
@@ -297,10 +308,12 @@ def wishlist(request):
         
         rent_list=[]
         sale_list=[]
-        for rent,sale in zip(wishlist_rent, wishlist_sale):
+        for rent in wishlist_rent:
             rent=rent.property_id
             on_lease=PropertyManagementRent.objects.get(pk=rent)
             rent_list.append(on_lease)
+        
+        for sale in wishlist_sale:
             sale=sale.property_id
             on_sale=PropertyManagementSale.objects.get(pk=sale)
             sale_list.append(on_sale)
@@ -309,6 +322,8 @@ def wishlist(request):
         context = {
             'wishlist_rent': zip(wishlist_rent, rent_list),
             'wishlist_sale': zip(wishlist_sale, sale_list),
+            'lease_count': wishlist_rent.count(),
+            'sale_count': wishlist_sale.count(),
             'total_saved': total_saved,
         }
         return render(request, 'estate/wishlist.html', context)

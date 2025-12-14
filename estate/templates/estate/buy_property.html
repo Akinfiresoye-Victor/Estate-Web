@@ -74,8 +74,15 @@
               
               <!-- Property Content -->
               <div class="property-content">
-                <h3 class="property-title">{{ bought.residential }}</h3>
-                
+                {%if bought.residential%}
+                  <h3 class="property-title">{{ bought.residential }}</h3>
+                {%endif%}
+                {%if bought.commercial%}
+                  <h3 class="property-title">{{ bought.commercial }}</h3>
+                {%endif%}
+                {%if bought.lands%}
+                  <h3 class="property-title">{{ bought.lands }}</h3>
+                {%endif%}
                 <div class="property-location">
                   <i class="bi bi-geo-alt-fill"></i>
                   <span>{{ bought.location }}, {{ bought.state }}</span>
