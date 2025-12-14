@@ -106,7 +106,7 @@ def rent_property(request):
             #Filtering
             myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
             rent_qs=myfilter.qs
-            p=Paginator(rent_qs, 1)
+            p=Paginator(rent_qs, 9)
             page= request.GET.get('page')
             on_lease= p.get_page(page)
             nums= "a" * on_lease.paginator.num_pages
