@@ -408,3 +408,7 @@ def listed_properties(request):
     else:
         messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('landing')
+
+
+def partner_with_us(request):
+    return render(request, 'core/partner.html')

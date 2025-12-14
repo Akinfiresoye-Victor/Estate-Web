@@ -13,4 +13,5 @@ urlpatterns = [
     path('lease_property/', views.lease_property, name="lease-property"),
     path('latest_news/', views.articles, name='articles'),
     path('my_listings/', views.listed_properties, name="my-listings"),
+    path('estateweb/partners/', views.partner_with_us, name="partner-with-us"),
 ]
