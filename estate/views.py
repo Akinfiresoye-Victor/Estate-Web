@@ -14,7 +14,7 @@ from members.models import User
 from datetime import date
 from agents.models import AgentInformation
 from core.models import *
-
+from companies.models import CompanyInformation
 
 
 
@@ -61,7 +61,7 @@ def buy_property(request):
         messages.info(request,'Log in to gain access')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer Account Only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     
     try:
@@ -103,10 +103,10 @@ def rent_property(request):
         Lists all the properties on rent
         """
         if not request.user.is_authenticated:
-            messages.info(request, 'Login to gain access')
+            messages.info(request, 'login Required')
             return redirect('login')
         if not request.user.role == 'customer':
-            messages.info(request, 'Customer Account Only')
+            messages.info(request, 'Customer Access Only')
             return redirect('landing')
         try:
             rent_qs=PropertyManagementRent.objects.all().order_by('-listed_date')
@@ -149,12 +149,23 @@ def view_property_on_sale(request, property_id):
         messages.info(request, 'Log in to gain access')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         property_to_be_viewed= PropertyManagementSale.objects.get(pk=property_id)
+        try:
+            company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            agent_in_charge=None
+            messages.info(request, 'Corperate Listing')
+        except CompanyInformation.DoesNotExist:
+            agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            company_in_charge=None
+            messages.info(request, 'Agent Listing')
+        
         context={
-            'property': property_to_be_viewed
+            'property': property_to_be_viewed,
+            'agent_info': agent_in_charge,
+            'company_info': company_in_charge
         }
         return render(request, 'estate/view_property_s.html', context)
     except Exception as e:
@@ -170,12 +181,25 @@ def view_property_on_lease(request, property_id):
         messages.info(request, 'Log in to gain access')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
+    
     try:
         property_to_be_viewed= PropertyManagementRent.objects.get(pk=property_id)
+        
+        try:
+            company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            agent_in_charge=None
+            messages.info(request, 'Corperate Listing')
+        except CompanyInformation.DoesNotExist:
+            agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            company_in_charge=None
+            messages.info(request, 'Agent Listing')
+        
         context={
-            'property': property_to_be_viewed
+            'property': property_to_be_viewed,
+            'agent_info': agent_in_charge,
+            'company_info': company_in_charge
         }
         return render(request, 'estate/view_property_r.html', context)
     except Exception as e:
@@ -189,7 +213,7 @@ def user_profile(request):
     """
     try:
         if not request.user.is_authenticated:
-            messages.info(request, 'Login to gain access')
+            messages.info(request, 'login Required')
             return redirect('login')
         if not request.user.role == 'customer':
             messages.info(request, 'Different account different profile')
@@ -233,7 +257,7 @@ def toggle_wishlist_rent(request, property_id):
         messages.info(request, "Log in to gain access")
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         wishlist_storage=WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Rent")
@@ -266,7 +290,7 @@ def toggle_wishlist_buy(request, property_id):
         messages.info(request, "Log in to gain access")
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         wishlist_storage= WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Sale")
@@ -300,7 +324,7 @@ def wishlist(request):
         messages.info(request, "Log in to gain access")
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         wishlist_rent = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Rent")
@@ -381,7 +405,7 @@ def change_password(request):
         messages.info(request, 'Log in to gain acess')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         if request.method == 'POST':
@@ -432,7 +456,7 @@ def profile_settings(request):
         messages.info(request, 'Log in to gain access')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         return render(request, 'estate/settings.html')
@@ -451,10 +475,10 @@ def delete_account(request):
     Delete user account view
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'Login to gain access')
+        messages.info(request, 'login Required')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     try:
         property1= PropertyManagementRent.objects.filter(user_id=request.user.id)
@@ -511,7 +535,7 @@ def inquiry_form_rent(request, property_id):
         return redirect('login')
     
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     
     try:
@@ -553,7 +577,7 @@ def inquiry_form_sale(request, property_id):
         return redirect('landing')
     
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer account only')
+        messages.info(request, 'Customer Access Only')
         return redirect('landing')
     
     try:

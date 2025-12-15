@@ -1,0 +1,717 @@
+/* ============================================
+   ROOT VARIABLES
+   ============================================ */
+:root {
+  --primary-color: #1a3c4e;
+  --secondary-color: #c19b76;
+  --accent-color: #8b7355;
+  --text-dark: #2c3e50;
+  --text-light: #6c757d;
+  --bg-light: #f8f9fa;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+}
+
+/* ============================================
+   GENERAL STYLES
+   ============================================ */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f8f9fa;
+}
+
+/* ============================================
+   PROFILE HEADER CARD
+   ============================================ */
+.profile-header-card {
+  background: #fff;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.profile-cover {
+  height: 200px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>');
+  opacity: 0.3;
+}
+
+.profile-header-content {
+  padding: 0 3rem 2rem;
+  position: relative;
+}
+
+.profile-header-content .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ============================================
+   AGENT PHOTO
+   ============================================ */
+.agent-photo-container {
+  width: 150px;
+  height: 150px;
+  margin: -75px auto 1.5rem;
+  position: relative;
+}
+
+.agent-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.agent-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  color: #fff;
+  font-weight: 700;
+  border: 5px solid #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.verified-badge {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 45px;
+  height: 45px;
+  background: var(--success-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.verified-badge i {
+  color: #fff;
+  font-size: 1.3rem;
+}
+
+/* ============================================
+   AGENT INFO
+   ============================================ */
+.agent-info {
+  margin-bottom: 1.5rem;
+}
+
+.agent-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.agent-work-type {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+}
+
+.agent-badges {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.badge-item {
+  background: rgba(193, 155, 118, 0.1);
+  color: var(--secondary-color);
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge-item.verified {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--success-color);
+}
+
+.badge-item.universal {
+  background: rgba(255, 193, 7, 0.1);
+  color: var(--warning-color);
+}
+
+.badge-item.location {
+  background: rgba(26, 60, 78, 0.1);
+  color: var(--primary-color);
+}
+
+/* ============================================
+   AGENT STATS
+   ============================================ */
+.agent-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-dark);
+}
+
+.stat-item i {
+  font-size: 1.3rem;
+  color: var(--secondary-color);
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+/* ============================================
+   PROFILE ACTIONS
+   ============================================ */
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.btn-contact.phone {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.btn-contact.phone:hover {
+  background: var(--accent-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(26, 60, 78, 0.3);
+  color: #fff;
+}
+
+.btn-contact.email {
+  background: var(--secondary-color);
+  color: #fff;
+}
+
+.btn-contact.email:hover {
+  background: var(--accent-color);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(193, 155, 118, 0.3);
+  color: #fff;
+}
+
+.btn-contact.whatsapp {
+  background: #25d366;
+  color: #fff;
+}
+
+.btn-contact.whatsapp:hover {
+  background: #20ba5a;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+  color: #fff;
+}
+
+/* ============================================
+   PROFILE CONTENT
+   ============================================ */
+.profile-content {
+  padding-bottom: 4rem;
+}
+
+/* ============================================
+   INFO CARDS
+   ============================================ */
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.card-header {
+  background: var(--bg-light);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 2px solid #e1e8ed;
+}
+
+.card-header i {
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.card-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* ============================================
+   AGENT BIO
+   ============================================ */
+.agent-bio {
+  color: var(--text-dark);
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+/* ============================================
+   INFO GRID
+   ============================================ */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+}
+
+.info-item i {
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  margin-top: 0.2rem;
+}
+
+.info-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 0.2rem;
+}
+
+.info-value {
+  display: block;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 1rem;
+}
+
+/* ============================================
+   EXPERIENCE TIMELINE
+   ============================================ */
+.experience-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.experience-item {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--bg-light);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.experience-item:hover {
+  background: rgba(193, 155, 118, 0.08);
+  transform: translateX(5px);
+}
+
+.exp-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--secondary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.exp-content h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.3rem;
+}
+
+.exp-company {
+  font-size: 1rem;
+  color: var(--secondary-color);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.exp-duration {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.exp-description {
+  color: var(--text-dark);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================
+   COMING SOON TEXT
+   ============================================ */
+.coming-soon-text {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.coming-soon-text i {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+/* ============================================
+   CONTACT LIST
+   ============================================ */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+  background: rgba(193, 155, 118, 0.1);
+  transform: translateX(5px);
+}
+
+.contact-item i {
+  font-size: 1.3rem;
+  color: var(--secondary-color);
+  margin-top: 0.3rem;
+}
+
+.contact-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 0.2rem;
+}
+
+.contact-value {
+  display: block;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+/* ============================================
+   SOCIAL LINKS
+   ============================================ */
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background: var(--primary-color);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.social-link i {
+  font-size: 1.3rem;
+}
+
+/* ============================================
+   VERIFICATION LIST
+   ============================================ */
+.verification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.verification-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.verification-item i {
+  font-size: 1.3rem;
+  color: var(--danger-color);
+}
+
+.verification-item.verified {
+  color: var(--text-dark);
+}
+
+.verification-item.verified i {
+  color: var(--success-color);
+}
+
+/* ============================================
+   TRUST CARD
+   ============================================ */
+.trust-card {
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  border-left: 4px solid var(--danger-color);
+}
+
+.trust-card .card-body {
+  text-align: center;
+  padding: 2rem;
+}
+
+.trust-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(220, 53, 69, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.8rem;
+  color: var(--danger-color);
+}
+
+.trust-card h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.8rem;
+}
+
+.trust-card p {
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.btn-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--danger-color);
+  border: 2px solid var(--danger-color);
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.btn-report:hover {
+  background: var(--danger-color);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - TABLET
+   ============================================ */
+@media (max-width: 992px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-header-content {
+    padding: 0 1.5rem 2rem;
+  }
+
+  .agent-name {
+    font-size: 2rem;
+  }
+
+  .agent-work-type {
+    font-size: 1rem;
+  }
+
+  .agent-badges {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .agent-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-contact {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-cover {
+    height: 150px;
+  }
+
+  .agent-photo-container {
+    width: 120px;
+    height: 120px;
+    margin-top: -60px;
+  }
+
+  .agent-photo-placeholder {
+    font-size: 3rem;
+  }
+
+  .verified-badge {
+    width: 38px;
+    height: 38px;
+  }
+
+  .verified-badge i {
+    font-size: 1.1rem;
+  }
+
+  .agent-name {
+    font-size: 1.8rem;
+  }
+
+  .agent-work-type {
+    font-size: 0.95rem;
+  }
+
+  .card-header {
+    padding: 1rem;
+  }
+
+  .card-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .experience-item {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .exp-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+}

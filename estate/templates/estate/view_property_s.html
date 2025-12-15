@@ -178,11 +178,11 @@
                     <ul class="agent-list">
                         <li class="agent-item">
                             <span class="agent-label">Listed By</span>
-                            <span class="agent-value">{{ info.first_name|default:"" }} {{ info.last_name|default:"" }}</span>
+                            <span class="agent-value">{{agent_info.profile_name}}</span>
                         </li>
                         <li class="agent-item">
                             <span class="agent-label">Phone Number</span>
-                            <span class="agent-value">{{ info.phone_number|default:"N/A" }}</span>
+                            <span class="agent-value">{{ agent_info.phone_number|default:"N/A" }}</span>
                         </li>
                         <li class="agent-item">
                             <span class="agent-label">Last Updated</span>
@@ -260,12 +260,12 @@
                         Contact Agent
                     </h3>
                     <div class="contact-buttons">
-                        <a href="tel:{{ property.phone_number|default:'' }}" class="btn-contact primary">
+                        <a href="tel:{{ agent_info.phone_number|default:'' }}" class="btn-contact primary">
                             <i class="fas fa-phone-alt me-2"></i>
                             Call Agent
                         </a>
                         
-                        <a href="#" class="btn-contact secondary">
+                        <a href="{%url 'agent:agent-profile' agent_uuid=property.agent_uuid%}" class="btn-contact secondary">
                             <i class="fas fa-user-circle me-2"></i>
                             View Agents Profile
                         </a>

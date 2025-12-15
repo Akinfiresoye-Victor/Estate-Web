@@ -177,7 +177,7 @@
                     <ul class="agent-list">
                         <li class="agent-item">
                             <span class="agent-label">Listed By</span>
-                            <span class="agent-value">{{ agent_info.first_name|default:"" }} {{ info.last_name|default:"" }}</span>
+                            <span class="agent-value">{{ agent_info.profile_name|default:"" }}</span>
                         </li>
                         <li class="agent-item">
                             <span class="agent-label">Phone Number</span>
@@ -195,7 +195,7 @@
                 </div>
             </div>
 
-            {%elif agent_info %}
+            {%elif company_info %}
                 <div class="info-card agent-card">
                     <h4 class="info-card-title">
                         <i class="bi bi-person-badge me-2"></i>
@@ -256,12 +256,12 @@
                         Contact Agent
                     </h3>
                     <div class="contact-buttons">
-                        <a href="tel:{{ property.phone_number|default:'' }}" class="btn-contact primary">
+                        <a href="tel:{{ agent_info.phone_number|default:'' }}" class="btn-contact primary">
                             <i class="fas fa-phone-alt me-2"></i>
                             Call Agent
                         </a>
                         
-                        <a href="#" class="btn-contact secondary">
+                        <a href="{%url 'agent:agent-profile' agent_uuid=property.agent_uuid%}" class="btn-contact secondary">
                             <i class="fas fa-user-circle me-2"></i>
                             View Agents Profile
                         </a>

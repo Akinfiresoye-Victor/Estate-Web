@@ -152,7 +152,7 @@ def manaage_listings(request):
 
 def company_analytics(request):
     if not request.user.is_authenticated:
-        messages.warning(request, 'Login to gain access')
+        messages.warning(request, 'login Required')
         return redirect('login')
         
     if request.user.role != 'company':

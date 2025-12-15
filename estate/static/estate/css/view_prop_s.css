@@ -100,16 +100,20 @@ body {
     font-size: 1.2rem;
 }
 
-/* Main Image */
+/* Main Image Section - FIXED */
+.main-image-section {
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    position: relative;
+    background: #f8f9fa;
+}
+
 .main-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-.main-image {
-    width: 275px;
-    height: 183px;
-    object-fit: cover;
+    display: block;
 }
 
 /* Gallery Section */
@@ -126,6 +130,7 @@ body {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .section-title i {
@@ -158,6 +163,7 @@ body {
     object-fit: cover;
     display: block;
 }
+
 /* Price Section */
 .price-section {
     padding: 2.5rem;
@@ -221,6 +227,7 @@ body {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .info-card-title i {
@@ -318,6 +325,7 @@ body {
     display: flex;
     gap: 1.2rem;
     justify-content: center;
+    flex-wrap: wrap;
     margin-top: 1.5rem;
 }
 
@@ -332,6 +340,7 @@ body {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    gap: 0.5rem;
 }
 
 .btn-contact.primary {
@@ -393,6 +402,35 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Attractive Back Button Styles */
+.attractive-back-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #c19b76;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.attractive-back-button:hover {
+    background-color: #1a3c4e;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.attractive-back-button:active {
+    background-color: #0a0a0aff;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
     .info-grid {
@@ -410,6 +448,10 @@ body {
 
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .main-image-section {
+        height: 400px;
     }
 }
 
@@ -450,5 +492,31 @@ body {
     .btn-contact {
         width: 100%;
         justify-content: center;
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .property-location {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .property-title {
+        font-size: 1.5rem;
+    }
+
+    .price-amount {
+        font-size: 2rem;
+    }
+
+    .main-image-section {
+        height: 280px;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
     }
 }

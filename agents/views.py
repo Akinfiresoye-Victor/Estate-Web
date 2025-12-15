@@ -198,3 +198,21 @@ def update_agent_profile(request, agent_id):
 
 def lead_management(request):
     pass
+
+
+
+
+def agent_profile(request, agent_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('landing')
+    if not request.user.role == 'customer':
+        messages.info(request, 'Customer Access Only')
+        return redirect('landing')
+    
+    try:
+        agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        return render(request, 'estate/agent_profile.html', {'agent':agent})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e', e})
+        
