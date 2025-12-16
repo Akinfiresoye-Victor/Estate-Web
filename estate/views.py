@@ -57,7 +57,7 @@ def property_view_count(property_id, property_type, users_id):
     """
     Tracks Property Views
     """
-    all_views=PropertyViews.objects.filter(property_type=property_type)
+    all_views=PropertyViews.objects.filter(property_type=property_type, property_id=property_id)
     viewers_id=[]
     for users in all_views:
         all_viewers_id=users.user_id
@@ -70,18 +70,6 @@ def property_view_count(property_id, property_type, users_id):
             time_stamp=timezone.now()
         )
         new_object.save()
-    else:
-        users_view=all_views.get(user_id=users_id)
-        time_tracked=timezone.now() - users_view.time_stamp
-        if time_tracked.days >= 30:
-            users_view.delete()
-            new_object=PropertyViews.objects.create(
-                user_id=users_id,
-                property_type=property_type,
-                property_id=property_id,
-                time_stamp=timezone.now()
-            )
-            new_object.save()
 
 '''Algorithms End👆 '''
 

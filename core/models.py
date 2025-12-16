@@ -103,6 +103,4 @@ class WishlistStorageUnit(models.Model):
 class PropertyViews(models.Model):
     user_id=models.IntegerField('Users ID', default=1, blank=False, null=False)
     property_type=models.CharField('Property Type', default="Rent", blank=False, null=False)
-    property_id=models.IntegerField('Property Viewed', default=1, blank=False, null=False)
-    time_stamp=models.DateTimeField(default=timezone.now)
-    
+    property_id=models.IntegerField('Property ID Viewed', default=1, blank=False, null=False)

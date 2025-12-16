@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .models import CompanyInformation, CompanyAnalytics, SessionId
 from members.views import logout_user
-from core.models import PropertyManagementRent, PropertyManagementSale, WishlistStorageUnit
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews
 from estate.models import LeadInfo
 from members.models import User
 from django.utils import timezone
@@ -90,6 +90,28 @@ def reset_button(general_data):
         general_data.last_reset_date = timezone.now()
         
         general_data.save()
+
+
+
+def property_views_count(property_type, property_id, reset):
+    if property_type == "Rent":
+        property_to_be_checked=PropertyViews.objects.filter(property_type='Rent', property_id=property_id)
+    else:
+        property_to_be_checked=PropertyViews.objects.filter(property_type='Sale', property_id=property_id)
+    
+    if property_to_be_checked.exists():
+        x=0
+        for prop in property_to_be_checked:
+            x+=1
+            if reset:
+                prop.delete()
+                result=0
+            else:
+                result=x
+    else:
+        result=0
+    return result
+
 
 
 
@@ -257,6 +279,34 @@ def company_analytics(request):
 
         reset_button(analytics)
         profile_views = analytics.profile_views
+        companies_properties_lease=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
+        companies_properties_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
+        each_lease_views=[]
+        each_sale_views=[]
+        
+        
+        month=timezone.now() - analytics.last_reset_date
+        month=month.days
+        
+        if month >= 30:
+            reset=True
+        else:
+            reset=False
+        
+        for prop_id in companies_properties_lease:
+            view=property_views_count("Rent", prop_id.pk, reset)
+            each_lease_views.append(view)
+            
+        for prop_id in companies_properties_sale:
+            view=property_views_count("Sale", prop_id.pk, reset)
+            each_sale_views.append(view)
+        
+        total_lease_views=sum(each_lease_views)
+        total_sale_views=sum(each_sale_views)
+        analytics.property_views_l=total_lease_views
+        analytics.property_views_s=total_sale_views 
+        analytics.save()
+        
         total_prop_views = analytics.property_views_l + analytics.property_views_s
         prop_views_on_sale = analytics.property_views_s
         prop_views_on_lease = analytics.property_views_l
