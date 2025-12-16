@@ -392,15 +392,9 @@ def listed_properties(request):
             else:
                 base_template='estate/base.html'
             model= request.user.id
-            #filtering the listings using both the users id and the properties id(Hacked my way through this🤡)
-            if request.user.username == admin:
-                property1= PropertyManagementRent.objects.order_by('-listed_date')
-                property2= PropertyManagementSale.objects.order_by('-listed_date')
-                return render(request, 'core/my_listings.html', {'property1':property1, 'property2':property2})
-            else:
-                property1= PropertyManagementRent.objects.filter(user_id=model).order_by('-listed_date')
-                property2= PropertyManagementSale.objects.filter(user_id=model).order_by('-listed_date')
-                return render(request, 'core/my_listings.html', {'property1':property1, 'property2':property2, 'base_template':base_template})
+            property1= PropertyManagementRent.objects.filter(user_id=model).order_by('-listed_date')
+            property2= PropertyManagementSale.objects.filter(user_id=model).order_by('-listed_date')
+            return render(request, 'core/my_listings.html', {'property1':property1, 'property2':property2, 'base_template':base_template})
         except Exception as e:
             print(f'ERROR IS{e}')
             return render(request, 'estate/error_page.html', {'e': e})

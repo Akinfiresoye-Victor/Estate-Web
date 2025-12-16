@@ -36,12 +36,6 @@ class PropertyManagementSale(models.Model):
     total_likes=models.IntegerField('Wishlisted time', default=0, blank=False, null=False)
 
 
-class PropertyManagementSaleAnalytics(models.Model):
-    on_sale= models.ForeignKey(PropertyManagementSale, on_delete=models.CASCADE, related_name='prop_analytics')
-    session_id= models.IntegerField('user_id', default=None)
-    inquires_check=models.IntegerField('Inquiries', default=None)
-
-
 
 
 #model handling the datatabase requirements cointaining all the property up for lease requirements
@@ -71,12 +65,6 @@ class PropertyManagementRent(models.Model):
     last_reset_date= models.DateTimeField(default=timezone.now)
     property_type=models.CharField('property Type', default='Rent')
     total_likes=models.IntegerField('Wishlisted time', default=0, blank=False, null=False)
-
-
-class PropertyManagementRentAnalytics(models.Model):
-    on_lease= models.ForeignKey(PropertyManagementRent, on_delete=models.CASCADE, related_name='prop_analytics')
-    session_id= models.IntegerField('user_id', default=None)
-    inquires_check=models.IntegerField('Inquiries', default=None)
 
 
 
@@ -109,3 +97,12 @@ class WishlistStorageUnit(models.Model):
     user_id=models.IntegerField('Owner Of Wishlist', default=1, null=False, blank=False)
     property_id=models.IntegerField('Property In Question', default=1,null=False, blank=False)
     property_type=models.CharField('Property_type', default='Rent', null=False, blank=False)
+
+
+
+class PropertyViews(models.Model):
+    user_id=models.IntegerField('Users ID', default=1, blank=False, null=False)
+    property_type=models.CharField('Property Type', default="Rent", blank=False, null=False)
+    property_id=models.IntegerField('Property Viewed', default=1, blank=False, null=False)
+    time_stamp=models.DateTimeField(default=timezone.now)
+    

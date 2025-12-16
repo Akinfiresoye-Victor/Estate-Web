@@ -357,13 +357,17 @@
                 <div class="metric-header">
                   <h4>Average Engagement Rate</h4>
                   <span class="metric-badge positive">
-                    <i class="bi bi-arrow-up"></i>{{engagement_rate|floatformat:1}}%
+                    <i class="bi bi-arrow-up"></i>{{competition|floatformat:0}}%
                   </span>
                 </div>
                 <div class="metric-bar">
-                  <div class="metric-bar-fill" style="width: {{engagement_rate}}%"></div>
+                  <div class="metric-bar-fill" style="width: {{competition}}%"></div>
                 </div>
-                <p class="metric-subtext">{{competition|floatformat:2}}% ahead of other companies</p>
+                {% if competition <= 0%}
+                  <p class="metric-subtext">Success needs time and paitence😉</p>
+                {%else%}
+                  <p class="metric-subtext">{{competition|floatformat:2}}% ahead of other companies</p>
+                {%endif%}
               </div>
             </div>
 

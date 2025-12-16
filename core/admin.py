@@ -9,6 +9,5 @@ from estate.models import LeadInfo
 #registering all our models to our admin site
 admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedback, AgentInformation,
                     Experience, SocialLinks, PropertyRentImage, PropertySaleImage, User, CompanyInformation,
-                    CompanyAnalytics, PropertyManagementRentAnalytics, PropertyManagementSaleAnalytics, LeadInfo,
-                    WishlistStorageUnit, SessionId
+                    CompanyAnalytics, LeadInfo,WishlistStorageUnit, SessionId, PropertyViews
                     ])

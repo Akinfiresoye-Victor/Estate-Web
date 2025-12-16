@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .models import CompanyInformation, CompanyAnalytics, SessionId
 from members.views import logout_user
-from core.models import PropertyManagementRent, PropertyManagementSale
+from core.models import PropertyManagementRent, PropertyManagementSale, WishlistStorageUnit
 from estate.models import LeadInfo
 from members.models import User
 from django.utils import timezone
@@ -13,6 +13,85 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
+
+
+
+
+
+
+def monthly_change(present_data, last_month_data):
+    if last_month_data == 0 and present_data == 0:
+        change=0
+    elif last_month_data == 0:
+        change=100
+    elif last_month_data > present_data:
+        change= -(last_month_data - present_data)/ last_month_data * 100
+    else:
+        change=(present_data - last_month_data)/ last_month_data * 100
+    return change
+
+
+def engagement_rate(total_liked_prop,total_company_listings_views, profile_views):
+    total_engagements= total_liked_prop + total_company_listings_views + profile_views 
+    engagement_rate=(total_engagements/User.objects.count()) * 100
+    return engagement_rate
+
+
+def get_total_likes(property_type, properties):
+    if property_type == "Rent":
+        rent_likes=[]
+        for likes in properties:
+            count=likes.total_likes
+            rent_likes.append(count)
+        total_likes=sum(rent_likes)
+    elif property_type == "Sale":
+        sale_likes=[]
+        for likes in properties:
+            count=likes.total_likes
+            sale_likes.append(count)
+        total_likes=sum(sale_likes)
+    else:
+        total_likes=0
+    return total_likes
+
+
+def total_companies_engagement_calculator(total_rate, personal_rate, personal_uuid, property_views):
+    if total_rate > 0:
+        total_company_competition=(personal_rate / total_rate) * 100
+    else:
+        total_company_competition = 0
+
+    total_impression=LeadInfo.objects.filter(company_uuid=personal_uuid).count()
+    
+    if property_views > 0:
+        expression_rate=(total_impression/property_views) * 100
+    else:
+        expression_rate= 0
+    return [total_company_competition, expression_rate]
+
+
+
+def reset_button(general_data):
+    time_since_reset= timezone.now() - general_data.last_reset_date
+    days_since_reset=time_since_reset.days
+    
+    if days_since_reset >=30:
+        general_data.last_month_profile_views = general_data.profile_views
+        general_data.last_month_lease_views = general_data.property_views_l
+        general_data.last_month_sale_views= general_data.property_views_s
+        
+        general_data.profile_views = 0
+        general_data.property_views_l = 0
+        general_data.property_views_s=0
+        
+        session_id=SessionId.objects.all()
+        session_id.delete()
+        
+        general_data.last_reset_date = timezone.now()
+        
+        general_data.save()
+
+
 
 
 
@@ -176,84 +255,17 @@ def company_analytics(request):
                 last_month_sale_views=0,
             )
 
-                # --- View Calculation Logic ---
-        time_since_reset = timezone.now() - analytics.last_reset_date
-        days_since_reset = time_since_reset.days # total_seconds() / 86400
-        
-        # 2. Check if 30 days have passed
-        if days_since_reset >= 30:
-            # A. Reset the views to 0
-            analytics.last_month_profile_views= analytics.profile_views
-            analytics.last_month_lease_views=analytics.property_views_l
-            analytics.last_month_sale_views=analytics.property_views_s
-            analytics.profile_views = 0 
-            analytics.property_views_l=0
-            analytics.property_views_s=0
-            
-            session_id=SessionId.objects.all()
-            session_id.delete()
-            
-            # B. UPDATE the last_reset_date to today
-            analytics.last_reset_date = timezone.now()
-            
-            # C. Save the changes to the database
-            analytics.save()
-            
+        reset_button(analytics)
         profile_views = analytics.profile_views
         total_prop_views = analytics.property_views_l + analytics.property_views_s
         prop_views_on_sale = analytics.property_views_s
         prop_views_on_lease = analytics.property_views_l
         
+        lease_views_change=monthly_change(analytics.property_views_l, analytics.last_month_lease_views)
+        sale_views_change=monthly_change(analytics.property_views_s, analytics.last_month_sale_views)
+        profile_views_change=monthly_change(profile_views, analytics.last_month_profile_views)
         
-        if analytics.last_month_lease_views == 0 and analytics.property_views_l == 0:
-            monthly_lease_view_incr= 0
-            
-        
-        elif analytics.last_month_lease_views == 0:
-            monthly_lease_view_incr= 100
-
-        elif analytics.last_month_lease_views > analytics.property_views_l:
-            # CORRECTED: Denominator changed to last_month_lease_views
-            if analytics.last_month_lease_views == 0: # Already handled above, but for safety
-                monthly_lease_view_incr = 0
-            else:
-                monthly_lease_view_incr= -(analytics.last_month_lease_views - analytics.property_views_l )/analytics.last_month_lease_views * 100
-            
-        else:
-            monthly_lease_view_incr= (analytics.property_views_l - analytics.last_month_lease_views )/analytics.last_month_lease_views * 100
-        
-        
-        # --- Profile Views: CORRECTED LOGIC REMAINS ---
-        if analytics.last_month_profile_views == 0 and profile_views == 0:
-            monthly_profile_view_incr = 0
-            
-        elif analytics.last_month_profile_views == 0:
-            monthly_profile_view_incr = 100
-            
-        elif analytics.last_month_profile_views > profile_views:
-            # Denominator is last_month_profile_views
-            monthly_profile_view_incr = -(analytics.last_month_profile_views - profile_views) / analytics.last_month_profile_views * 100 
-            
-        else:
-            # Denominator is last_month_profile_views
-            monthly_profile_view_incr = (profile_views - analytics.last_month_profile_views) / analytics.last_month_profile_views * 100
-        
-        # --- Sale Views: CORRECTED LOGIC REMAINS ---
-        if analytics.last_month_sale_views == 0 and analytics.property_views_s == 0:
-            monthly_sale_view_incr = 0
-        
-        elif analytics.last_month_sale_views == 0:
-            monthly_sale_view_incr = 100
-            
-        elif analytics.last_month_sale_views > analytics.property_views_s :
-            # Denominator is last_month_sale_views
-            monthly_sale_view_incr = -(analytics.last_month_sale_views - analytics.property_views_s) / analytics.last_month_sale_views * 100 
-            
-        else:
-            # Denominator is last_month_sale_views
-            monthly_sale_view_incr = (analytics.property_views_s - analytics.last_month_sale_views) / analytics.last_month_sale_views * 100
-        
-        total_prop_incr_perc= monthly_sale_view_incr + monthly_lease_view_incr/2
+        total_prop_incr_perc= sale_views_change + lease_views_change/2
 
 
         
@@ -266,38 +278,19 @@ def company_analytics(request):
         prop_rent=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
         prop_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
         
-        wishlist_rent_list=[]
-        wishlist_sale_list=[]
-        for on_lease in prop_rent:
-            count=on_lease.total_likes
-            wishlist_rent_list.append(count)
-        for on_sale in prop_sale:
-            count=on_sale.total_likes
-            wishlist_sale_list.append(count)
-            
-        wishlist_rent = sum(wishlist_rent_list)
-        wishlist_sale = sum(wishlist_sale_list)
-        total_liked_prop= wishlist_rent + wishlist_sale
+        rent_likes=get_total_likes("Rent", prop_rent)
+        sale_likes=get_total_likes("Sale", prop_sale)
+        total_liked_prop= rent_likes + sale_likes
         eng_rate=engagement_rate(total_liked_prop,total_company_listings_views, profile_views)
         analytics.competition=eng_rate
         analytics.save()
         
-        
         for comp in companies:
             prop_rent=PropertyManagementRent.objects.filter(company_uuid=comp.unique_company_id)
             prop_sale=PropertyManagementSale.objects.filter(company_uuid=comp.unique_company_id)
-            wishlist_rent_list=[]
-            wishlist_sale_list=[]
-            for on_lease in prop_rent:
-                count=on_lease.total_likes
-                wishlist_rent_list.append(count)
-            for on_sale in prop_sale:
-                count=on_sale.total_likes
-                wishlist_sale_list.append(count)
-                
-            wishlist_rent = sum(wishlist_rent_list)
-            wishlist_sale = sum(wishlist_sale_list)
-            total_liked_prop= wishlist_rent + wishlist_sale
+            rent_likes=get_total_likes("Rent", prop_rent)
+            sale_likes=get_total_likes("Sale", prop_sale)
+            total_liked_prop= rent_likes + sale_likes
             
             try:
                 analy = comp.analytics.get()
@@ -320,32 +313,22 @@ def company_analytics(request):
             
         # 1. Calculate competition score (now safe from ZeroDivisionError)
         total_eng_sum = sum(total_companies_eng)
-        
-        if total_eng_sum > 0:
-            competition = (analytics.competition / total_eng_sum) * 100
-        else:
-            competition = 0
-            
-        # 2. Calculate Inquiry Conversion Rate (must be calculated after competition)
-        total_inq=LeadInfo.objects.filter(company_uuid=company.unique_company_id).count()
-        
-        # Check for zero property views before division (Now safe)
-        if total_prop_views > 0:
-            inq_conv_rate=(total_inq/total_prop_views) * 100
-        else:
-            inq_conv_rate = 0
-        
-        # REMOVED: The final line 'inq_conv_rate=(total_inq/total_prop_views) *100' was deleted.
-        
-        # 3. Render the correct template
+        calculated_engagement= total_companies_engagement_calculator(
+            total_eng_sum,
+            analytics.competition,
+            company.unique_company_id,
+            total_prop_views
+        )
+        competition=calculated_engagement[0]
+        inq_conv_rate= calculated_engagement[1]
         return render(request, 'company/company_analytics.html', {
             'profile_views': profile_views,
             'prop_views': total_prop_views,
             'leased_view': prop_views_on_lease,
             'sale_view': prop_views_on_sale,
-            'profile_incr_perc': monthly_profile_view_incr,
-            'lease_incr_perc': monthly_lease_view_incr,
-            'sale_incr_perc': monthly_sale_view_incr,
+            'profile_incr_perc': profile_views_change,
+            'lease_incr_perc': lease_views_change,
+            'sale_incr_perc': sale_views_change,
             'total_prop_incr_perc': total_prop_incr_perc,
             'engagement_rate': analytics.competition,
             'competition':competition,
@@ -574,7 +557,3 @@ def properties_by_company(request, company_uuid):
 
 
 
-def engagement_rate(total_liked_prop,total_company_listings_views, profile_views):
-    total_engagements= total_liked_prop + total_company_listings_views + profile_views 
-    engagement_rate=(total_engagements/User.objects.count()) * 100
-    return engagement_rate

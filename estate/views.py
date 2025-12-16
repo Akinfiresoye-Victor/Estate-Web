@@ -15,8 +15,10 @@ from datetime import date
 from agents.models import AgentInformation
 from core.models import *
 from companies.models import CompanyInformation
+from django.core.exceptions import ObjectDoesNotExist
 
 
+'''Algorithms Start👇'''
 
 def wishlist_generator(properties_list, user_id):
     
@@ -48,6 +50,40 @@ def wishlist_generator(properties_list, user_id):
     else:
         boolean_results =[]
         return boolean_results
+
+
+
+def property_view_count(property_id, property_type, users_id):
+    """
+    Tracks Property Views
+    """
+    all_views=PropertyViews.objects.filter(property_type=property_type)
+    viewers_id=[]
+    for users in all_views:
+        all_viewers_id=users.user_id
+        viewers_id.append(all_viewers_id)
+    if not users_id in viewers_id:
+        new_object=PropertyViews.objects.create(
+            user_id=users_id,
+            property_type=property_type,
+            property_id=property_id,
+            time_stamp=timezone.now()
+        )
+        new_object.save()
+    else:
+        users_view=all_views.get(user_id=users_id)
+        time_tracked=timezone.now() - users_view.time_stamp
+        if time_tracked.days >= 30:
+            users_view.delete()
+            new_object=PropertyViews.objects.create(
+                user_id=users_id,
+                property_type=property_type,
+                property_id=property_id,
+                time_stamp=timezone.now()
+            )
+            new_object.save()
+
+'''Algorithms End👆 '''
 
 
 
@@ -161,7 +197,7 @@ def view_property_on_sale(request, property_id):
             agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
             company_in_charge=None
             messages.info(request, 'Agent Listing')
-        
+        property_view_count(property_id, "Sale", request.user.id)
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
@@ -195,7 +231,7 @@ def view_property_on_lease(request, property_id):
             agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
             company_in_charge=None
             messages.info(request, 'Agent Listing')
-        
+        property_view_count(property_id, "Rent", request.user.id)
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
@@ -204,6 +240,8 @@ def view_property_on_lease(request, property_id):
         return render(request, 'estate/view_property_r.html', context)
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+
+
 
 
 
@@ -263,6 +301,9 @@ def toggle_wishlist_rent(request, property_id):
         wishlist_storage=WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Rent")
         if wishlist_storage.exists():
             wishlist_storage.delete()
+            property_like_decrement=PropertyManagementRent.objects.get(pk=property_id)
+            property_like_decrement.total_likes-=1
+            property_like_decrement.save()
             messages.success(request, 'Property Removed From wishlist')
         else:
             favourite=WishlistStorageUnit.objects.create(
@@ -271,6 +312,9 @@ def toggle_wishlist_rent(request, property_id):
                 property_type="Rent"
             )
             favourite.save()
+            property_like_increment=PropertyManagementRent.objects.get(pk=property_id)
+            property_like_increment.total_likes+=1
+            property_like_increment.save()
             messages.success(request, 'Property Added to wishlist')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
@@ -296,6 +340,9 @@ def toggle_wishlist_buy(request, property_id):
         wishlist_storage= WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Sale")
         if wishlist_storage.exists():
             wishlist_storage.delete()
+            property_like_decrement=PropertyManagementSale.objects.get(pk=property_id)
+            property_like_decrement.total_likes-=1
+            property_like_decrement.save()
             messages.success(request, 'Property Removed From wishlist')
         else:
             favourite=WishlistStorageUnit.objects.create(
@@ -304,6 +351,9 @@ def toggle_wishlist_buy(request, property_id):
                 property_type="Sale"
             )
             favourite.save()
+            property_like_increment=PropertyManagementSale.objects.get(pk=property_id)
+            property_like_increment.total_likes+=1
+            property_like_increment.save()
             messages.success(request, 'Property Added Successfully')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
