@@ -9,279 +9,281 @@
 {% block content %}
 
 <!-- Profile Header -->
-<div class="profile-header-card">
-  <div class="profile-cover">
-    <div class="cover-overlay"></div>
-  </div>
-  <div class="profile-header-content">
-    <div class="company-logo-container">
-      {% if company.company_logo %}
-        <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}" class="company-logo">
-      {% else %}
-        <div class="company-logo-placeholder">
-          <i class="bi bi-building"></i>
-        </div>
-      {% endif %}
-    </div>
-    <div class="company-info">
-      <h1 class="company-name">{{ company.company_name }}</h1>
-      <p class="company-tagline">
-        <i class="bi bi-geo-alt-fill me-2"></i>{{ company.service_areas }}
-        <span class="mx-3">|</span>
-        <i class="bi bi-calendar-check me-2"></i>Since {{ company.year_established }}
-      </p>
-      <div class="company-badges">
-        <span class="badge-item">
-          <i class="bi bi-patch-check-fill"></i>Verified
-        </span>
+<div class="profile-header">
+  <div class="profile-cover"></div>
+  <div class="container">
+    <div class="profile-content">
+      
+      <div class="company-logo">
+        {% if company.company_logo %}
+          <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}">
+        {% else %}
+          <div class="logo-placeholder">
+            <i class="bi bi-building"></i>
+          </div>
+        {% endif %}
       </div>
-    </div>
-    <div class="profile-actions">
-      <a href="{% url 'company:edit-profile' company.id%}" class="btn-edit">
-        <i class="bi bi-pencil-square me-2"></i>Edit Profile
-      </a>
+      
+      <div class="company-details">
+        <h1 class="company-name">{{ company.company_name }}</h1>
+        <div class="company-meta">
+          <span class="meta-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            {{ company.service_areas }}
+          </span>
+          <span class="meta-divider">•</span>
+          <span class="meta-item">
+            <i class="bi bi-calendar-check"></i>
+            Since {{ company.year_established }}
+          </span>
+        </div>
+        <div class="company-badge">
+          <i class="bi bi-patch-check-fill"></i>
+          <span>Verified</span>
+        </div>
+      </div>
+      
+      <div class="profile-action">
+        <a href="{% url 'company:edit-profile' company.id %}" class="btn-edit">
+          <i class="bi bi-pencil-square"></i>
+          <span>Edit Profile</span>
+        </a>
+      </div>
+      
     </div>
   </div>
 </div>
 
-<!-- Main Grid -->
-<div class="row g-4 mt-4">
+<!-- Dashboard Content -->
+<div class="container dashboard-container">
   
-  <!-- Left Column -->
-  <div class="col-lg-4">
+  <div class="dashboard-grid">
     
-    <!-- About Section -->
-    <div class="info-card">
-      <div class="card-header">
-        <i class="bi bi-info-circle-fill"></i>
-        <h3>About Company</h3>
-      </div>
-      <div class="card-body">
-        <p class="company-bio">{{ company.company_bio }}</p>
-        
-        <div class="info-list">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      
+      <!-- About -->
+      <div class="info-card">
+        <div class="card-header">
+          <i class="bi bi-info-circle-fill"></i>
+          <h3>About Company</h3>
+        </div>
+        <div class="card-body">
+          <p class="company-bio">{{ company.company_bio }}</p>
+          
           <div class="info-item">
             <i class="bi bi-person-badge"></i>
-            <div>
+            <div class="info-content">
               <span class="info-label">Principal Broker</span>
               <span class="info-value">{{ company.principal_broker }}</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Contact Information -->
-    <div class="info-card">
-      <div class="card-header">
-        <i class="bi bi-telephone-fill"></i>
-        <h3>Contact Information</h3>
-      </div>
-      <div class="card-body">
-        <div class="contact-list">
+      <!-- Contact -->
+      <div class="info-card">
+        <div class="card-header">
+          <i class="bi bi-telephone-fill"></i>
+          <h3>Contact</h3>
+        </div>
+        <div class="card-body">
           <a href="tel:{{ company.phone_number }}" class="contact-item">
             <i class="bi bi-phone"></i>
-            <div>
+            <div class="contact-content">
               <span class="contact-label">Phone</span>
               <span class="contact-value">{{ company.phone_number }}</span>
             </div>
           </a>
+          
           <a href="mailto:{{ company.email }}" class="contact-item">
             <i class="bi bi-envelope"></i>
-            <div>
+            <div class="contact-content">
               <span class="contact-label">Email</span>
               <span class="contact-value">{{ company.email }}</span>
             </div>
           </a>
+          
           <div class="contact-item">
             <i class="bi bi-geo-alt"></i>
-            <div>
+            <div class="contact-content">
               <span class="contact-label">Address</span>
               <span class="contact-value">{{ company.address }}</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Social Links -->
-    {% if social_links %}
-    <div class="info-card">
-      <div class="card-header">
-        <i class="bi bi-share-fill"></i>
-        <h3>Social Media</h3>
-      </div>
-      <div class="card-body">
-        <div class="social-links">
-          {% for link in social_links %}
-            <a href="{{ link.link_to_social }}" target="_blank" class="social-link">
-              <i class="bi bi-{{ link.social_platform|lower }}"></i>
-              <span>{{ link.social_platform }}</span>
-            </a>
-          {% endfor %}
+      <!-- Social Links -->
+      {% if social_links %}
+      <div class="info-card">
+        <div class="card-header">
+          <i class="bi bi-share-fill"></i>
+          <h3>Social Media</h3>
         </div>
-      </div>
-    </div>
-    {% endif %}
-
-  </div>
-
-  <!-- Right Column -->
-  <div class="col-lg-8">
-    
-    <!-- Quick Tools -->
-    <div class="tools-section">
-      <h2 class="section-title">Company Tools</h2>
-      <div class="tools-grid">
-        
-        <a href="{% url 'lease-property' %}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-house-add"></i>
-          </div>
-          <h4>Lease New Property</h4>
-          <p>List a new property for rent</p>
-        </a>
-
-        <a href="{% url 'sell-property' %}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-house-add"></i>
-          </div>
-          <h4>Sell New Property</h4>
-          <p>List a new property for Sale</p>
-        </a>
-
-
-        <a href="{%url 'company:listings'%}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-houses"></i>
-          </div>
-          <h4>Manage Properties</h4>
-          <p>View and edit your property listings</p>
-        </a>
-
-        <a href="{%url 'company:analytics'%}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-graph-up-arrow"></i>
-          </div>
-          <h4>Analytics</h4>
-          <p>Track views, inquiries, and performance</p>
-        </a>
-
-        <a href="{%url 'company:lead-management'%}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-people"></i>
-          </div>
-          <h4>Lead Management</h4>
-          <p>Manage customer inquiries and leads</p>
-        </a>
-
-        <a href="{%url 'company:appointment'%}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-calendar-event"></i>
-          </div>
-          <h4>Appointments</h4>
-          <p>Schedule and manage property viewings</p>
-        </a>
-
-        <a href="{%url 'company:documents'%}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-file-earmark-text"></i>
-          </div>
-          <h4>Documents</h4>
-          <p>Store and manage legal documents</p>
-        </a>
-
-        <a href="#" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-bar-chart"></i>
-          </div>
-          <h4>Reports</h4>
-          <p>Generate sales and activity reports</p>
-        </a>
-
-        <a href="{%url 'company:company-settings'%}" class="tool-card">
-          <div class="tool-icon">
-            <i class="bi bi-gear"></i>
-          </div>
-          <h4>Settings</h4>
-          <p>Configure company preferences</p>
-        </a>
-
-      </div>
-    </div>
-
-    <!-- Recent Activity -->
-    <div class="info-card mt-4">
-      <div class="card-header">
-        <i class="bi bi-clock-history"></i>
-        <h3>Recent Activity</h3>
-      </div>
-      <div class="card-body">
-        <div class="activity-list">
-          {% if recent_activities %}
-            {% for activity in recent_activities %}
-              <div class="activity-item">
-                <div class="activity-icon">
-                  <i class="bi bi-{{ activity.icon }}"></i>
-                </div>
-                <div class="activity-content">
-                  <p class="activity-text">{{ activity.description }}</p>
-                  <span class="activity-time">{{ activity.timestamp|timesince }} ago</span>
-                </div>
-              </div>
+        <div class="card-body">
+          <div class="social-links">
+            {% for link in social_links %}
+              <a href="{{ link.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
+                <i class="bi bi-{{ link.social_platform|lower }}"></i>
+                <span>{{ link.social_platform }}</span>
+              </a>
             {% endfor %}
-          {% else %}
-            <div class="empty-state">
-              <i class="bi bi-inbox"></i>
-              <p>No recent activity</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Statistics -->
+      <div class="stats-section">
+        <h2 class="section-title">Overview</h2>
+        <div class="stats-grid">
+          
+          <div class="stat-card">
+            <div class="stat-icon properties">
+              <i class="bi bi-house-check"></i>
             </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
+            <div class="stat-data">
+              <h3>{{ total_properties|default:"0" }}</h3>
+              <p>Total Properties</p>
+            </div>
+          </div>
 
-    <!-- Statistics -->
-    <div class="stats-grid mt-4">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="bi bi-house-check"></i>
-        </div>
-        <div class="stat-content">
-          <h4>{{ total_properties|default:"0" }}</h4>
-          <p>Total Properties</p>
+          <div class="stat-card">
+            <div class="stat-icon views">
+              <i class="bi bi-eye"></i>
+            </div>
+            <div class="stat-data">
+              <h3>{{ total_views|default:"0" }}</h3>
+              <p>Profile Views</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon inquiries">
+              <i class="bi bi-chat-dots"></i>
+            </div>
+            <div class="stat-data">
+              <h3>{{ total_inquiries|default:"0" }}</h3>
+              <p>Inquiries</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon rating">
+              <i class="bi bi-star"></i>
+            </div>
+            <div class="stat-data">
+              <h3>{{ average_rating|default:"0.0" }}</h3>
+              <p>Avg Rating</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="bi bi-eye"></i>
-        </div>
-        <div class="stat-content">
-          <h4>{{ total_views|default:"0" }}</h4>
-          <p>Profile Views</p>
+      <!-- Quick Actions -->
+      <div class="actions-section">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="actions-grid">
+          
+          <a href="{% url 'lease-property' %}" class="action-card primary">
+            <div class="action-icon">
+              <i class="bi bi-house-add"></i>
+            </div>
+            <div class="action-content">
+              <h4>Lease Property</h4>
+              <p>List new rental</p>
+            </div>
+          </a>
+
+          <a href="{% url 'sell-property' %}" class="action-card primary">
+            <div class="action-icon">
+              <i class="bi bi-house-add"></i>
+            </div>
+            <div class="action-content">
+              <h4>Sell Property</h4>
+              <p>List for sale</p>
+            </div>
+          </a>
+
+          <a href="{% url 'company:listings' %}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-houses"></i>
+            </div>
+            <div class="action-content">
+              <h4>Manage Properties</h4>
+              <p>View all listings</p>
+            </div>
+          </a>
+
+          <a href="{% url 'company:analytics' %}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="action-content">
+              <h4>Analytics</h4>
+              <p>Track performance</p>
+            </div>
+          </a>
+
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="bi bi-chat-dots"></i>
-        </div>
-        <div class="stat-content">
-          <h4>{{ total_inquiries|default:"0" }}</h4>
-          <p>Inquiries</p>
+      <!-- Management Tools -->
+      <div class="tools-section">
+        <h2 class="section-title">Management Tools</h2>
+        <div class="tools-grid">
+          
+          <a href="{% url 'company:lead-management' %}" class="tool-card">
+            <div class="tool-icon">
+              <i class="bi bi-people"></i>
+            </div>
+            <h4>Lead Management</h4>
+            <p>Manage customer inquiries</p>
+          </a>
+
+          <a href="{% url 'company:appointment' %}" class="tool-card">
+            <div class="tool-icon">
+              <i class="bi bi-calendar-event"></i>
+            </div>
+            <h4>Appointments</h4>
+            <p>Schedule viewings</p>
+          </a>
+
+          <a href="{% url 'company:documents' %}" class="tool-card">
+            <div class="tool-icon">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+            <h4>Documents</h4>
+            <p>Manage legal docs</p>
+          </a>
+
+          <a href="#" class="tool-card">
+            <div class="tool-icon">
+              <i class="bi bi-bar-chart"></i>
+            </div>
+            <h4>Reports</h4>
+            <p>Generate reports</p>
+          </a>
+
+          <a href="{% url 'company:company-settings' %}" class="tool-card">
+            <div class="tool-icon">
+              <i class="bi bi-gear"></i>
+            </div>
+            <h4>Settings</h4>
+            <p>Configure preferences</p>
+          </a>
+
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon">
-          <i class="bi bi-star"></i>
-        </div>
-        <div class="stat-content">
-          <h4>{{ average_rating|default:"0.0" }}</h4>
-          <p>Average Rating</p>
-        </div>
-      </div>
-    </div>
+    </main>
 
   </div>
 

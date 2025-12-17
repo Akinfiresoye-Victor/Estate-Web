@@ -1,181 +1,163 @@
 {% extends 'estate/base.html' %}
 {% load static %}
-{%load humanize%}
+{% load humanize %}
+
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/rent.css' %}">
 {% endblock %}
+
 {% block content %}
 
 <!-- Page Header -->
-<div class="page-header rent-header">
+<div class="page-header">
   <div class="header-overlay"></div>
-  <div class="container header-content">
-    <div class="header-icon">
-      <i class="bi bi-building"></i>
-    </div>
-    <h1 class="header-title">Properties for Lease</h1>
-    <p class="header-subtitle">Find the perfect rental property from our available listings</p>
-    <div class="header-stats">
-      <div class="stat-item">
-        <i class="bi bi-house-door"></i>
-        <span>{{ leased.paginator.count|default:"0" }} Properties</span>
+  <div class="container">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="bi bi-building"></i>
       </div>
+      <h1 class="header-title">Properties for Lease</h1>
+      <p class="header-subtitle">Find your perfect rental from {{ leased.paginator.count|default:"0" }} available properties</p>
     </div>
   </div>
 </div>
 
-<!-- Properties Container -->
-<div class="container properties-container">
+<div class="container main-content">
   
-  {% if leased %} 
-    <!-- Filter Section -->
-    <div class="filter-section">
-      <form method="get">
-        {{ rentfilter.form }}
-        {% csrf_token %}
-        <button class="btn-filter" type="submit">
-          <i class="bi bi-funnel-fill me-2"></i>
-          Filter
-        </button>
-      </form>
-    </div>
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <form method="get" class="filter-form">
+      {{ rentfilter.form }}
+      {% csrf_token %}
+      <button type="submit" class="btn-filter">
+        <i class="bi bi-funnel-fill"></i>
+        <span>Apply Filters</span>
+      </button>
+    </form>
+  </div>
 
+  {% if leased %}
     <!-- Properties Grid -->
     <div class="properties-grid">
-      {% for lease,wishlist in on_lease %}
+      {% for lease, wishlist in on_lease %}
         {% if lease.available %}
-          <div class="property-card-wrapper">
-            <div class="property-card rent-card">
+          <article class="property-card">
+            
+            <!-- Property Image -->
+            <div class="property-image">
+              {% if lease.base_image %}
+                <img src="{{ lease.base_image.url }}" alt="Property Image" class="property-img">
+              {% else %}
+                <div class="placeholder-image">
+                  <i class="bi bi-image"></i>
+                </div>
+              {% endif %}
               
-              <!-- Property Image -->
-              <div class="property-image-section">
-                {% if lease.base_image %}
-                  <img src="{{ lease.base_image.url }}" alt="{{ lease.residential }}" class="property-img">
-                {% else %}
-                  <div class="placeholder-image">
-                    <i class="bi bi-image"></i>
-                    <span>No Image</span>
-                  </div>
-                {% endif %}
-                
-                <div class="image-overlay">
-                  <div class="property-badge rent-badge">
-                    <i class="bi bi-key-fill me-1"></i>
-                    For Lease
-                  </div>
-                  <a href="{% url 'customer:toggle-wishlist-rent' lease.id %}" class="wishlist-icon">
-                    {% if wishlist %}
-                      <i class="bi bi-heart-fill"></i>
-                    {% else %}
-                      <i class="bi bi-heart"></i>
-                    {% endif %}
-                  </a>
-                </div>
-              </div>
-              
-              <!-- Property Content -->
-              <div class="property-content">
-                {%if lease.residential%}
-                <h3 class="property-title">{{ lease.residential }}</h3>
-                {%endif%}
-                {%if lease.commercial%}
-                <h3 class="property-title">{{ lease.commercial }}</h3>
-                {%endif%}
-                {%if lease.lands%}
-                <h3 class="property-title">{{ lease.lands}}</h3>
-                {%endif%}
-                <div class="property-location">
-                  <i class="bi bi-geo-alt-fill"></i>
-                  <span>{{ lease.location }}, {{ lease.state }}</span>
-                </div>
-                
-                <div class="property-price rent-price">
-                  <span class="price-amount">₦{{ lease.price_range|floatformat:0|intcomma }}</span>
-                  <span class="price-period">/ month</span>
-                </div>
-                
-                <p class="property-description">{{ lease.description|truncatewords:20 }}</p>
-                
-                <div class="property-info">
-                  <div class="info-item">
-                    <i class="bi bi-telephone-fill"></i>
-                    <span>{{ lease.phone_number }}</span>
-                  </div>
-                  <div class="info-item">
-                    <i class="bi bi-calendar-check"></i>
-                    <span>{{ lease.listed_date|date:"M d, Y" }}</span>
-                  </div>
-                </div>
-                
-                <div class="property-actions">
-                  <a href="{% url 'customer:view-property-r' property_id=lease.id %}" class="btn-view-property rent-btn">
-                    <span>View Details</span>
-                    <i class="bi bi-arrow-right-circle"></i>
-                  </a>
-                </div>
+              <div class="image-overlay">
+                <span class="property-badge">
+                  <i class="bi bi-key-fill"></i>
+                  For Lease
+                </span>
+                <a href="{% url 'customer:toggle-wishlist-rent' lease.id %}" class="wishlist-btn" aria-label="Add to wishlist">
+                  <i class="bi bi-heart{% if wishlist %}-fill{% endif %}"></i>
+                </a>
               </div>
             </div>
-          </div>
+            
+            <!-- Property Content -->
+            <div class="property-body">
+              <h2 class="property-title">
+                {% if lease.residential %}
+                  {{ lease.residential }}
+                {% elif lease.commercial %}
+                  {{ lease.commercial }}
+                {% elif lease.lands %}
+                  {{ lease.lands }}
+                {% endif %}
+              </h2>
+              
+              <p class="property-location">
+                <i class="bi bi-geo-alt-fill"></i>
+                {{ lease.location }}, {{ lease.state }}
+              </p>
+              
+              <div class="property-price">
+                <span class="price-value">₦{{ lease.price_range|floatformat:0|intcomma }}</span>
+                <span class="price-period">/month</span>
+              </div>
+              
+              <p class="property-description">{{ lease.description|truncatewords:20 }}</p>
+              
+              <div class="property-meta">
+                <div class="meta-item">
+                  <i class="bi bi-telephone-fill"></i>
+                  <span>{{ lease.phone_number }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="bi bi-calendar-check"></i>
+                  <span>{{ lease.listed_date|date:"M d, Y" }}</span>
+                </div>
+              </div>
+              
+              <a href="{% url 'customer:view-property-r' property_id=lease.id %}" class="btn-view">
+                View Details
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </article>
         {% endif %}
       {% endfor %}
     </div>
   {% else %}
-      <div class="filter-section">
-      <form method="get">
-        {{ rentfilter.form }}
-        {% csrf_token %}
-        <button class="btn-filter" type="submit">
-          <i class="bi bi-funnel-fill me-2"></i>
-          Filter
-        </button>
-      </form>
-    </div>
     <!-- Empty State -->
-    <div class="properties-grid">
-      <div class="empty-state">
-        <div class="empty-icon">
-          <i class="bi bi-inbox"></i>
-        </div>
-        <h3 class="empty-title">No Properties Available for Lease</h3>
-        <p class="empty-message">Check back soon for new rental listings or contact us to list your property.</p>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
       </div>
+      <h2 class="empty-title">No Properties Available</h2>
+      <p class="empty-text">We don't have any rental properties at the moment. Check back soon or contact us to list your property.</p>
     </div>
   {% endif %}
 </div>
 
 <!-- Pagination -->
 {% if leased.paginator.num_pages > 1 %}
-<div class="pagination-section">
+<div class="pagination-wrapper">
   <div class="container">
-    <nav class="pagination-nav">
-      <ul class="pagination rent-pagination">
+    <nav class="pagination" aria-label="Property pagination">
+      <ul class="pagination-list">
         {% if leased.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page=1">
+          <li>
+            <a href="?page=1" class="page-link" aria-label="First page">
               <i class="bi bi-chevron-double-left"></i>
             </a>
           </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ leased.previous_page_number }}">
+          <li>
+            <a href="?page={{ leased.previous_page_number }}" class="page-link" aria-label="Previous page">
               <i class="bi bi-chevron-left"></i>
             </a>
           </li>
         {% endif %}
 
         {% for i in nums %}
-          <li class="page-item {% if leased.number == forloop.counter %}active{% endif %}">
-            <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
+          <li>
+            <a href="?page={{ forloop.counter }}" 
+               class="page-link {% if leased.number == forloop.counter %}active{% endif %}"
+               aria-label="Page {{ forloop.counter }}"
+               {% if leased.number == forloop.counter %}aria-current="page"{% endif %}>
+              {{ forloop.counter }}
+            </a>
           </li>
         {% endfor %}
 
         {% if leased.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ leased.next_page_number }}">
+          <li>
+            <a href="?page={{ leased.next_page_number }}" class="page-link" aria-label="Next page">
               <i class="bi bi-chevron-right"></i>
             </a>
           </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ leased.paginator.num_pages }}">
+          <li>
+            <a href="?page={{ leased.paginator.num_pages }}" class="page-link" aria-label="Last page">
               <i class="bi bi-chevron-double-right"></i>
             </a>
           </li>
@@ -183,14 +165,11 @@
       </ul>
     </nav>
     
-    <div class="pagination-info">
-      <span>Page <strong>{{ leased.number }}</strong> of <strong>{{ leased.paginator.num_pages }}</strong></span>
-    </div>
+    <p class="pagination-info">
+      Page <strong>{{ leased.number }}</strong> of <strong>{{ leased.paginator.num_pages }}</strong>
+    </p>
   </div>
 </div>
 {% endif %}
-
-<!-- Include Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 {% endblock %}

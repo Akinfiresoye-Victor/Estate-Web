@@ -1,13 +1,15 @@
 :root {
-  --primary-color: #1a3c4e;      
-  --secondary-color: #c19b76;    
-  --accent-color: #8b7355;       
+  --primary-color: #1a3c4e;
+  --secondary-color: #c19b76;
+  --accent-color: #8b7355;
   --lease-color: #28a745;
   --lease-dark: #218838;
   --sale-color: #007bff;
   --sale-dark: #0056b3;
   --text-dark: #2c3e50;
   --text-light: #6c757d;
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
 }
 
 body {
@@ -17,9 +19,38 @@ body {
 }
 
 /* ============================================
+   BACK BUTTON
+   ============================================ */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  background: #fff;
+  color: var(--secondary-color);
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  margin-bottom: 1.5rem;
+}
+
+.back-button:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.back-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
    PAGE HEADER
    ============================================ */
-
 .page-header {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
   padding: 4rem 0;
@@ -36,7 +67,7 @@ body {
   right: -10%;
   width: 500px;
   height: 500px;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 }
 
@@ -49,7 +80,7 @@ body {
 .header-icon {
   width: 100px;
   height: 100px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -70,7 +101,7 @@ body {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .page-header p {
@@ -82,63 +113,40 @@ body {
 /* ============================================
    STATISTICS BAR
    ============================================ */
-
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
-  padding: 2rem 0;
 }
 
 .stat-item {
   background: #fff;
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: var(--transition);
   border-left: 4px solid;
 }
 
 .stat-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-.lease-stat {
-  border-left-color: var(--lease-color);
-}
-
-.lease-stat i {
-  color: var(--lease-color);
+.stat-item i {
   font-size: 2.5rem;
 }
 
-.sale-stat {
-  border-left-color: var(--sale-color);
-}
-
-.sale-stat i {
-  color: var(--sale-color);
-  font-size: 2.5rem;
-}
-
-.total-stat {
-  border-left-color: var(--secondary-color);
-}
-
-.total-stat i {
-  color: var(--secondary-color);
-  font-size: 2.5rem;
-}
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
+.stat-item.lease { border-left-color: var(--lease-color); }
+.stat-item.lease i { color: var(--lease-color); }
+.stat-item.sale { border-left-color: var(--sale-color); }
+.stat-item.sale i { color: var(--sale-color); }
+.stat-item.total { border-left-color: var(--secondary-color); }
+.stat-item.total i { color: var(--secondary-color); }
 
 .stat-number {
   font-size: 2rem;
@@ -158,7 +166,6 @@ body {
 /* ============================================
    SECTION HEADERS
    ============================================ */
-
 .section-header {
   margin: 3rem 0 2rem;
 }
@@ -177,19 +184,12 @@ body {
   margin-right: 0.8rem;
 }
 
-.section-subtitle {
-  color: var(--text-light);
-  font-size: 1rem;
-  margin-left: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.lease-section {
+.section-title.lease {
   color: var(--lease-color);
   border-bottom-color: var(--lease-color);
 }
 
-.sale-section {
+.section-title.sale {
   color: var(--sale-color);
   border-bottom-color: var(--sale-color);
 }
@@ -197,28 +197,23 @@ body {
 /* ============================================
    PROPERTY CARDS
    ============================================ */
-
 .property-card {
   border: none;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   overflow: hidden;
   transition: all 0.4s ease;
   background: #fff;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  height: 100%;
 }
 
 .property-card:hover {
   transform: translateY(-12px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 }
 
-.lease-card {
-  border-top: 4px solid var(--lease-color);
-}
-
-.sale-card {
-  border-top: 4px solid var(--sale-color);
-}
+.property-card.lease { border-top: 4px solid var(--lease-color); }
+.property-card.sale { border-top: 4px solid var(--sale-color); }
 
 .property-image {
   height: 280px;
@@ -229,11 +224,11 @@ body {
   justify-content: center;
 }
 
-.lease-image {
+.property-image.lease {
   background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
 }
 
-.sale-image {
+.property-image.sale {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
@@ -242,6 +237,7 @@ body {
   position: absolute;
   font-size: 6rem;
   opacity: 0.2;
+  z-index: 0;
   animation: float 3s ease-in-out infinite;
 }
 
@@ -250,18 +246,18 @@ body {
   50% { transform: translateY(-20px); }
 }
 
-.image-overlay {
+.property-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
-.property-card:hover .image-overlay {
-  background: rgba(0,0,0,0.1);
+.property-card:hover .property-img {
+  transform: scale(1.1);
 }
 
 .property-status {
@@ -269,7 +265,7 @@ body {
   top: 1rem;
   left: 1rem;
   color: #fff;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(10px);
   padding: 0.5rem 1.2rem;
   font-size: 0.85rem;
@@ -287,8 +283,8 @@ body {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  z-index: 3;
-  background: rgba(255,255,255,0.95);
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   width: 50px;
   height: 50px;
@@ -296,8 +292,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   text-decoration: none;
   font-size: 1.4rem;
   cursor: pointer;
@@ -306,16 +302,11 @@ body {
 .wishlist-btn:hover {
   background: #fff;
   transform: scale(1.15) rotate(10deg);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.lease-btn {
-  color: var(--lease-color);
-}
-
-.sale-btn {
-  color: var(--sale-color);
-}
+.wishlist-btn.lease { color: var(--lease-color); }
+.wishlist-btn.sale { color: var(--sale-color); }
 
 .property-card .card-body {
   padding: 2rem;
@@ -333,13 +324,8 @@ body {
   overflow: hidden;
 }
 
-.lease-title {
-  color: var(--lease-dark);
-}
-
-.sale-title {
-  color: var(--sale-dark);
-}
+.property-title.lease { color: var(--lease-dark); }
+.property-title.sale { color: var(--sale-dark); }
 
 .property-location {
   color: var(--text-light);
@@ -350,13 +336,8 @@ body {
   gap: 0.5rem;
 }
 
-.lease-accent {
-  color: var(--lease-color);
-}
-
-.sale-accent {
-  color: var(--sale-color);
-}
+.property-location i.lease { color: var(--lease-color); }
+.property-location i.sale { color: var(--sale-color); }
 
 .property-price {
   font-size: 2rem;
@@ -368,44 +349,13 @@ body {
   gap: 0.5rem;
 }
 
-.lease-price {
-  color: var(--lease-color);
-}
-
-.sale-price {
-  color: var(--sale-color);
-}
+.property-price.lease { color: var(--lease-color); }
+.property-price.sale { color: var(--sale-color); }
 
 .price-period {
   font-size: 1rem;
   font-weight: 500;
   color: var(--text-light);
-}
-
-.property-details {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  color: var(--text-dark);
-}
-
-.detail-item i {
-  font-size: 1.1rem;
-}
-
-.detail-value {
-  font-weight: 600;
 }
 
 .property-description {
@@ -419,38 +369,13 @@ body {
   overflow: hidden;
 }
 
-.negotiable-info {
-  margin: 1rem 0;
-}
-
-.negotiable-badge {
-  display: inline-flex;
-  align-items: center;
-  background: #e8f5e9;
-  color: #2e7d32;
-  padding: 0.5rem 1rem;
-  border-radius: 25px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.negotiable-badge.not-negotiable {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.card-actions {
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-}
-
 .btn-view-property {
   color: #fff;
   border: none;
   padding: 1rem 2rem;
   font-weight: 600;
   width: 100%;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.9rem;
@@ -461,21 +386,21 @@ body {
   border-radius: 8px;
 }
 
-.lease-btn-primary {
+.btn-view-property.lease {
   background: linear-gradient(135deg, var(--lease-color) 0%, var(--lease-dark) 100%);
 }
 
-.lease-btn-primary:hover {
+.btn-view-property.lease:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
   color: #fff;
 }
 
-.sale-btn-primary {
+.btn-view-property.sale {
   background: linear-gradient(135deg, var(--sale-color) 0%, var(--sale-dark) 100%);
 }
 
-.sale-btn-primary:hover {
+.btn-view-property.sale:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
   color: #fff;
@@ -484,13 +409,12 @@ body {
 /* ============================================
    EMPTY STATE
    ============================================ */
-
 .empty-state {
   text-align: center;
   padding: 5rem 2rem;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin: 2rem 0;
 }
 
@@ -534,7 +458,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   border-radius: 8px;
   color: #fff;
   text-decoration: none;
@@ -546,14 +470,13 @@ body {
 
 .btn-empty:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   color: #fff;
 }
 
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
-
 @media (max-width: 768px) {
   body {
     padding-top: 70px !important;
@@ -576,7 +499,6 @@ body {
   .stats-bar {
     grid-template-columns: 1fr;
     gap: 1rem;
-    padding: 1rem 0;
   }
 
   .stat-item {
@@ -666,104 +588,4 @@ body {
   .empty-state h3 {
     font-size: 1.6rem;
   }
-}
-
-
-/* --- Responsive Tweaks for Wishlist --- */
-@media (max-width: 992px) {
-  .page-header {
-    padding: 3rem 1rem;
-    text-align: center;
-  }
-
-  .property-card {
-    margin-bottom: 1.5rem;
-  }
-
-  .property-image img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
-
-  .property-title {
-    font-size: 1.4rem;
-  }
-
-  .property-description {
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .stats-bar {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .page-header h1 {
-    font-size: 2rem;
-  }
-
-  .property-card {
-    margin: 0 auto;
-    max-width: 90%;
-  }
-
-  .btn-view-property {
-    font-size: 0.85rem;
-    padding: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-header h1 {
-    font-size: 1.6rem;
-  }
-
-  .page-header p {
-    font-size: 0.9rem;
-  }
-
-  .property-card {
-    margin: 0.5rem auto;
-  }
-
-  .property-price {
-    font-size: 1.2rem;
-  }
-
-  .empty-state h3 {
-    font-size: 1.6rem;
-  }
-}
-
-
-/* Property Image Styling */
-.property-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  transition: transform 0.3s ease;
-}
-
-.property-card:hover .property-img {
-  transform: scale(1.1);
-}
-
-/* Ensure proper stacking */
-.property-image {
-  position: relative;
-}
-
-.property-image::before {
-  z-index: 0;
-}
-
-.property-status,
-.wishlist-btn {
-  z-index: 2;
 }

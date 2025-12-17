@@ -1,72 +1,109 @@
-/* General Layout */
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
-    min-height: 100vh;
-    padding: 2rem 1rem;
+/* ======================
+   CSS Variables
+   ====================== */
+:root {
+    --color-primary: #007bff;
+    --color-primary-dark: #0056b3;
+    --color-primary-darker: #004085;
+    --color-bg-light: #e7f3ff;
+    --color-bg-lighter: #f0f7ff;
+    --color-bg-card: #b3d9ff;
+    --color-white: #fff;
+    --color-text: #495057;
+    --color-text-light: #6c757d;
+    --color-border: #dee2e6;
+    --color-bg-gray: #f8f9fa;
+    
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    --transition: all 0.3s ease;
 }
 
-/* Detail Wrapper */
+/* ======================
+   Base Styles
+   ====================== */
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/* ======================
+   Layout
+   ====================== */
 .detail-wrapper {
-    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.detail-container {
-    background: transparent;
-}
-
-/* Back Button */
-.back-button-section {
-    margin-bottom: 1.5rem;
-}
-
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #6c757d;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-.btn-back:hover {
-    background: #007bff;
-    color: #fff;
-    border-color: #007bff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.2);
-}
-
-/* Property Card */
 .property-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
 }
 
-/* Property Header */
+/* ======================
+   Back Button
+   ====================== */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    margin-bottom: 1.5rem;
+    background: var(--color-white);
+    color: #c19b76;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.back-button:hover {
+    background: #1a3c4e;
+    color: var(--color-white);
+    border-color: #1a3c4e;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.back-button:active {
+    background: #0a0a0a;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ======================
+   Property Header
+   ====================== */
 .property-header {
     padding: 2.5rem;
-    background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
-    border-bottom: 2px solid #b3d9ff;
-    position: relative;
+    background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
+    border-bottom: 2px solid var(--color-bg-card);
 }
 
 .header-badge {
     display: inline-flex;
     align-items: center;
+    gap: 0.5rem;
     padding: 0.6rem 1.2rem;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: #fff;
-    border-radius: 20px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
+    border-radius: var(--radius-xl);
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
@@ -76,8 +113,8 @@ body {
 .property-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #004085;
-    margin-bottom: 1.2rem;
+    color: var(--color-primary-darker);
+    margin: 0 0 1.2rem;
     line-height: 1.3;
 }
 
@@ -91,50 +128,36 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #6c757d;
+    color: var(--color-text-light);
     font-size: 1rem;
 }
 
 .location-item i {
-    color: #007bff;
+    color: var(--color-primary);
     font-size: 1.2rem;
 }
 
-/* Main Image Section - FIXED */
+/* ======================
+   Images
+   ====================== */
 .main-image-section {
     width: 100%;
     height: 500px;
     overflow: hidden;
-    position: relative;
-    background: #f8f9fa;
+    background: var(--color-bg-gray);
 }
 
-.main-image {
+.main-image-section img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-/* Gallery Section */
 .gallery-section {
     padding: 2.5rem;
-    background: #f8f9fa;
-    border-bottom: 2px solid #e8f5e9;
-}
-
-.section-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #004085;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.section-title i {
-    color: #0056b3;
+    background: var(--color-bg-gray);
+    border-bottom: 2px solid var(--color-bg-light);
 }
 
 .gallery-grid {
@@ -144,17 +167,17 @@ body {
 }
 
 .gallery-item {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    background: #fff;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    background: var(--color-white);
     height: 250px;
 }
 
 .gallery-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-hover);
 }
 
 .gallery-item img {
@@ -164,14 +187,34 @@ body {
     display: block;
 }
 
-/* Price Section */
-.price-section {
-    padding: 2.5rem;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: #fff;
+/* ======================
+   Section Titles
+   ====================== */
+.section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-primary-darker);
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.price-box {
+.section-title i {
+    color: var(--color-primary-dark);
+}
+
+.section-title.center {
+    justify-content: center;
+}
+
+/* ======================
+   Price Section
+   ====================== */
+.price-section {
+    padding: 2.5rem;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -191,51 +234,56 @@ body {
     margin-bottom: 0.3rem;
 }
 
-/* Description Section */
+/* ======================
+   Description Section
+   ====================== */
 .description-section {
     padding: 2.5rem;
-    border-bottom: 2px solid #e7f3ff;
+    border-bottom: 2px solid var(--color-bg-light);
 }
 
 .description-text {
     font-size: 1.05rem;
     line-height: 1.8;
-    color: #495057;
+    color: var(--color-text);
+    margin: 0;
 }
 
-/* Info Grid */
+/* ======================
+   Info Grid & Cards
+   ====================== */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     padding: 2.5rem;
-    background: #f8f9fa;
-    border-bottom: 2px solid #e7f3ff;
+    background: var(--color-bg-gray);
+    border-bottom: 2px solid var(--color-bg-light);
 }
 
 .info-card {
-    background: #fff;
-    border-radius: 12px;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
     padding: 2rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
 }
 
 .info-card-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #004085;
-    margin-bottom: 1.5rem;
+    color: var(--color-primary-darker);
+    margin: 0 0 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 .info-card-title i {
-    color: #0056b3;
+    color: var(--color-primary-dark);
 }
 
-/* Feature List */
-.feature-list {
+/* Info Lists */
+.info-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -244,79 +292,73 @@ body {
     gap: 1.2rem;
 }
 
-.feature-item {
+.info-item {
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: #f0f7ff;
-    border-radius: 8px;
-    border-left: 4px solid #007bff;
+    background: var(--color-bg-lighter);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--color-primary);
 }
 
-.feature-icon {
+.info-icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--color-white);
     font-size: 1.5rem;
     flex-shrink: 0;
 }
 
-.feature-content {
+.info-content {
     display: flex;
     flex-direction: column;
 }
 
-.feature-label {
+.info-label {
     font-size: 0.9rem;
-    color: #6c757d;
+    color: var(--color-text-light);
     font-weight: 500;
 }
 
-.feature-value {
+.info-value {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #004085;
+    color: var(--color-primary-darker);
 }
 
-/* Agent List */
-.agent-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.agent-item {
+/* Simple Info Items (for contact details) */
+.info-item-simple {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.8rem 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-bottom: 2px solid #e7f3ff;
+    background: var(--color-bg-gray);
+    border-radius: var(--radius-sm);
+    border-bottom: 2px solid var(--color-bg-light);
 }
 
-.agent-label {
+.info-item-simple .info-label {
     font-size: 0.95rem;
-    color: #6c757d;
+    color: var(--color-text-light);
     font-weight: 600;
 }
 
-.agent-value {
+.info-item-simple .info-value {
     font-size: 0.95rem;
-    color: #004085;
+    color: var(--color-primary-darker);
     font-weight: 600;
+    text-align: right;
 }
 
-/* Contact Section */
+/* ======================
+   Contact Section
+   ====================== */
 .contact-section {
     padding: 2.5rem;
 }
@@ -332,106 +374,81 @@ body {
 .btn-contact {
     display: inline-flex;
     align-items: center;
+    gap: 0.5rem;
     padding: 1rem 2rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     text-decoration: none;
     font-weight: 600;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: var(--transition);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    gap: 0.5rem;
 }
 
 .btn-contact.primary {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
     border: none;
 }
 
 .btn-contact.primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
-    color: #fff;
+    color: var(--color-white);
 }
 
 .btn-contact.secondary {
     background: transparent;
-    color: #007bff;
-    border: 2px solid #007bff;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .btn-contact.secondary:hover {
-    background: #007bff;
-    color: #fff;
+    background: var(--color-primary);
+    color: var(--color-white);
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
 }
 
-/* Map Section */
+/* ======================
+   Map Section
+   ====================== */
 .map-section {
     padding: 2.5rem;
-    background: #f8f9fa;
+    background: var(--color-bg-gray);
 }
 
 .map-placeholder {
-    background: #fff;
-    border-radius: 12px;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
     padding: 3rem 2rem;
     text-align: center;
-    border: 2px dashed #b3d9ff;
+    border: 2px dashed var(--color-bg-card);
     margin-top: 1.5rem;
 }
 
 .map-placeholder i {
     font-size: 4rem;
-    color: #0056b3;
+    color: var(--color-primary-dark);
     margin-bottom: 1rem;
 }
 
 .map-placeholder p {
     font-size: 1.1rem;
-    color: #6c757d;
+    color: var(--color-text-light);
     margin-bottom: 2rem;
 }
 
-.map-image {
+.map-placeholder img {
     width: 100%;
     max-width: 800px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
 }
 
-/* Attractive Back Button Styles */
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
-}
-
-.attractive-back-button:hover {
-    background-color: #1a3c4e;
-    color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
-}
-
-.attractive-back-button:active {
-    background-color: #0a0a0aff;
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Responsive Design */
+/* ======================
+   Responsive Design
+   ====================== */
 @media (max-width: 992px) {
     .info-grid {
         grid-template-columns: 1fr;
@@ -460,7 +477,13 @@ body {
         padding: 1rem 0.5rem;
     }
 
-    .property-header {
+    .property-header,
+    .gallery-section,
+    .description-section,
+    .info-grid,
+    .contact-section,
+    .map-section,
+    .price-section {
         padding: 2rem 1.5rem;
     }
 
@@ -472,26 +495,8 @@ body {
         height: 350px;
     }
 
-    .gallery-section,
-    .description-section,
-    .info-grid,
-    .contact-section,
-    .map-section {
-        padding: 2rem 1.5rem;
-    }
-
-    .price-section {
-        padding: 2rem 1.5rem;
-    }
-    
-    .contact-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .btn-contact {
-        width: 100%;
-        justify-content: center;
+    .section-title {
+        font-size: 1.4rem;
     }
 
     .gallery-grid {
@@ -501,22 +506,100 @@ body {
     .property-location {
         gap: 1rem;
     }
+
+    .contact-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-contact {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 576px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .property-header,
+    .gallery-section,
+    .description-section,
+    .info-grid,
+    .contact-section,
+    .map-section,
+    .price-section {
+        padding: 1.5rem 1rem;
+    }
+
     .property-title {
         font-size: 1.5rem;
     }
 
-    .price-amount {
-        font-size: 2rem;
+    .property-location {
+        flex-direction: column;
+        gap: 0.8rem;
     }
 
     .main-image-section {
         height: 280px;
     }
 
+    .price-amount {
+        font-size: 2rem;
+    }
+
     .section-title {
         font-size: 1.3rem;
+    }
+
+    .info-card {
+        padding: 1.5rem;
+    }
+
+    .info-card-title {
+        font-size: 1.1rem;
+    }
+
+    .info-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+    }
+
+    .btn-contact {
+        padding: 0.9rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .map-placeholder {
+        padding: 2rem 1rem;
+    }
+
+    .map-placeholder i {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .property-title {
+        font-size: 1.3rem;
+    }
+
+    .price-amount {
+        font-size: 1.8rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    .description-text {
+        font-size: 0.95rem;
     }
 }
