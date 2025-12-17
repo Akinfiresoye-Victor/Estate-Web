@@ -328,6 +328,7 @@ def company_analytics(request):
         prop_rent=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
         prop_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
         
+        
         rent_likes=get_total_likes("Rent", prop_rent)
         sale_likes=get_total_likes("Sale", prop_sale)
         total_liked_prop= rent_likes + sale_likes
@@ -371,6 +372,23 @@ def company_analytics(request):
         )
         competition=calculated_engagement[0]
         inq_conv_rate= calculated_engagement[1]
+        
+        
+        '''Most Liked Property'''
+        prop_rent = PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
+        prop_sale = PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
+
+        total_property_list = list(prop_rent) + list(prop_sale)
+
+        total_property_list.sort(key=lambda x: x.total_likes, reverse=True)
+
+        total_property_list = total_property_list[:4]
+        view_list=[]
+        for prop in total_property_list:
+            prop_views=PropertyViews.objects.filter(property_type=prop.property_type,property_id=prop.pk).count()
+            view_list.append(prop_views)
+        likes_views= zip(total_property_list, view_list)
+        
         return render(request, 'company/company_analytics.html', {
             'profile_views': profile_views,
             'prop_views': total_prop_views,
@@ -382,7 +400,8 @@ def company_analytics(request):
             'total_prop_incr_perc': total_prop_incr_perc,
             'engagement_rate': analytics.competition,
             'competition':competition,
-            'inq_rate':inq_conv_rate
+            'inq_rate':inq_conv_rate,
+            'ranking': likes_views
         })
         
     except CompanyInformation.DoesNotExist:

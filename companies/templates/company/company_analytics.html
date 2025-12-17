@@ -8,577 +8,335 @@
 {% endblock %}
 
 {% block content %}
-<a href="javascript:history.back()" class="attractive-back-button">
-    &larr; Go Back to the Previous Page
+<a href="javascript:history.back()" class="back-button">
+    <i class="bi bi-arrow-left"></i>
+    <span>Back</span>
 </a>
-
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
-
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
 
 <!-- Analytics Header -->
 <div class="analytics-header">
   <div class="container-fluid">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
+    <div class="header-content">
+      <div class="header-text">
         <h1 class="page-title">
-          <i class="bi bi-graph-up-arrow me-3"></i>Analytics Dashboard
+          <i class="bi bi-graph-up-arrow"></i>Analytics Dashboard
         </h1>
         <p class="page-subtitle">Track your performance and insights</p>
       </div>
-      <div class="col-lg-6 text-lg-end">
-        <div class="header-actions">
-          <button class="btn-export" onclick="exportReport()">
-            <i class="bi bi-download me-2"></i>Export Report
-          </button>
-        </div>
-      </div>
+      <button class="btn-export" onclick="exportReport()">
+        <i class="bi bi-download"></i>
+        <span>Export Report</span>
+      </button>
     </div>
   </div>
 </div>
 
 <!-- Main Analytics Content -->
-<div class="container-fluid mt-4">
+<div class="container-fluid analytics-container">
   
-  <!-- Overview Stats -->
-  <div class="row g-4 mb-4">
+  <!-- Key Metrics Grid -->
+  <div class="metrics-grid">
     
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper profile">
-            <i class="bi bi-eye-fill"></i>
-          </div>
-          {%if profile_incr_perc > 0%}
-          <div class="stat-trend positive">
-            <i class="bi bi-arrow-up"></i>
-            <span>{{profile_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ profile_views|intcomma }}</h3>
-          <p class="stat-label">Profile Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width: {{profile_incr_perc}}%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This month
-          </p>
-            </div>
-          </div>
-        </div>
-        {%else%}
-        <div class="stat-trend negative">
-            <i class="bi bi-arrow-down"></i>
-            <span>{{profile_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ profile_views|intcomma }}</h3>
-          <p class="stat-label">Profile Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width:0%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This month
-          </p>
-        </div>
+    <!-- Profile Views -->
+    <div class="metric-card">
+      <div class="metric-icon profile-icon">
+        <i class="bi bi-eye-fill"></i>
       </div>
-    </div>
-        {%endif%}
-
-{%if total_prop_incr_perc > 0%}
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper total">
-            <i class="bi bi-graph-up"></i>
-          </div>
-          <div class="stat-trend positive">
-            <i class="bi bi-arrow-up"></i>
-            <span>{{total_prop_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ prop_views|intcomma }}</h3>
-          <p class="stat-label">Total Property Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width: {{total_prop_incr_perc}}%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This Month
-          </p>
-        </div>
-      </div>
-    </div>
-{%else%}
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper total">
-            <i class="bi bi-graph-up"></i>
-          </div>
-          <div class="stat-trend negative">
-            <i class="bi bi-arrow-down"></i>
-            <span>{{total_prop_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ prop_views|intcomma }}</h3>
-          <p class="stat-label">Total Property Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width: 0%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This Month
-          </p>
-        </div>
-      </div>
-    </div>
-{%endif%}
-  
-
-{%if sale_incr_perc > 0%}
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper sale">
-            <i class="bi bi-tag-fill"></i>
-          </div>
-          <div class="stat-trend positive">
-            <i class="bi bi-arrow-up"></i>
-            <span>{{sale_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ sale_view|intcomma }}</h3>
-          <p class="stat-label">Sale Properties Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width: {{sale_incr_perc}}%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This Month
-          </p>
-        </div>
-      </div>
-    </div>
-{%else%}
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper sale">
-            <i class="bi bi-tag-fill"></i>
-          </div>
-          <div class="stat-trend negative">
-            <i class="bi bi-arrow-down"></i>
-            <span>{{sale_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ sale_view|intcomma }}</h3>
-          <p class="stat-label">Sale Properties Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width: 0%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This Month
-          </p>
-        </div>
-      </div>
-    </div>
-{%endif%}
-
-
-{%if lease_incr_perc > 0%}
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper lease">
-            <i class="bi bi-key-fill"></i>
-          </div>
-          <div class="stat-trend positive">
-            <i class="bi bi-arrow-up"></i>
-            <span>{{lease_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ leased_view|intcomma }}</h3>
-          <p class="stat-label">Lease Properties Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width: {{lease_incr_perc}}%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This Month
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-{%else%}
-    <div class="col-xl-3 col-md-6">
-      <div class="analytics-stat-card">
-        <div class="stat-header">
-          <div class="stat-icon-wrapper lease">
-            <i class="bi bi-key-fill"></i>
-          </div>
-          <div class="stat-trend negative">
-            <i class="bi bi-arrow-down"></i>
-            <span>{{lease_incr_perc|floatformat:2}}%</span>
-          </div>
-        </div>
-        <div class="stat-body">
-          <h3 class="stat-number">{{ leased_view|intcomma }}</h3>
-          <p class="stat-label">Lease Properties Views</p>
-          <div class="stat-progress">
-            <div class="progress-bar" style="width:0%"></div>
-          </div>
-          <p class="stat-subtext">
-            <i class="bi bi-calendar3 me-1"></i>This Month
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-{%endif%}
-
-  <!-- Charts Row -->
-  <div class="row g-4 mb-4">
-    
-    <!-- Views Chart -->
-    <div class="col-xl-8">
-      <div class="analytics-card">
-        <div class="card-header-analytics">
-          <div>
-            <h3 class="card-title-analytics">
-              <i class="bi bi-bar-chart-line me-2"></i>Views Overview
-            </h3>
-            <p class="card-subtitle-analytics">Track your visibility metrics</p>
-          </div>
-          <div class="chart-controls">
-            <button class="chart-btn active" data-chart="views">Views</button>
-            <button class="chart-btn" data-chart="engagement">Engagement</button>
-          </div>
-        </div>
-        <div class="card-body-analytics">
-          <canvas id="viewsChart" height="80"></canvas>
+      <div class="metric-data">
+        <p class="metric-label">Profile Views</p>
+        <h3 class="metric-value">{{ profile_views|intcomma }}</h3>
+        <div class="metric-trend {% if profile_incr_perc > 0 %}positive{% else %}negative{% endif %}">
+          <i class="bi bi-arrow-{% if profile_incr_perc > 0 %}up{% else %}down{% endif %}"></i>
+          <span>{{ profile_incr_perc|floatformat:1 }}%</span>
         </div>
       </div>
     </div>
 
-    <!-- Property Distribution -->
-    <div class="col-xl-4">
-      <div class="analytics-card">
-        <div class="card-header-analytics">
-          <div>
-            <h3 class="card-title-analytics">
-              <i class="bi bi-pie-chart me-2"></i>Property Views Distribution
-            </h3>
-            <p class="card-subtitle-analytics">Sale vs Lease comparison</p>
-          </div>
+    <!-- Total Property Views -->
+    <div class="metric-card">
+      <div class="metric-icon total-icon">
+        <i class="bi bi-house-door-fill"></i>
+      </div>
+      <div class="metric-data">
+        <p class="metric-label">Total Property Views</p>
+        <h3 class="metric-value">{{ prop_views|intcomma }}</h3>
+        <div class="metric-trend {% if total_prop_incr_perc > 0 %}positive{% else %}negative{% endif %}">
+          <i class="bi bi-arrow-{% if total_prop_incr_perc > 0 %}up{% else %}down{% endif %}"></i>
+          <span>{{ total_prop_incr_perc|floatformat:1 }}%</span>
         </div>
-        <div class="card-body-analytics">
-          <canvas id="distributionChart"></canvas>
-          <div class="distribution-legend mt-4">
-            <div class="legend-item">
-              <div class="legend-color sale"></div>
-              <div class="legend-info">
-                <span class="legend-label">For Sale</span>
-                <span class="legend-value">{{ sale_view|intcomma }} views</span>
-                <span class="legend-percentage">{{ sale_view|add:0|floatformat:0 }}%</span>
-              </div>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color lease"></div>
-              <div class="legend-info">
-                <span class="legend-label">For Lease</span>
-                <span class="legend-value">{{ leased_view|intcomma }} views</span>
-                <span class="legend-percentage">{{ leased_view|add:0|floatformat:0 }}%</span>
-              </div>
-            </div>
-          </div>
+      </div>
+    </div>
+
+    <!-- Competition Score -->
+    <div class="metric-card">
+      <div class="metric-icon competition-icon">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <div class="metric-data">
+        <p class="metric-label">Market Performance</p>
+        <h3 class="metric-value">{{ competition|floatformat:1 }}%</h3>
+        <div class="metric-trend {% if competition > 0 %}positive{% else %}negative{% endif %}">
+          <i class="bi bi-{% if competition > 0 %}award{% else %}dash-circle{% endif %}"></i>
+          <span>{% if competition > 0 %}Above{% else %}Below{% endif %} Average</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inquiry Rate -->
+    <div class="metric-card">
+      <div class="metric-icon inquiry-icon">
+        <i class="bi bi-chat-dots-fill"></i>
+      </div>
+      <div class="metric-data">
+        <p class="metric-label">Inquiry Rate</p>
+        <h3 class="metric-value">{{ inq_rate|floatformat:1 }}%</h3>
+        <div class="metric-trend {% if inq_rate > 40 %}positive{% else %}warning{% endif %}">
+          <i class="bi bi-{% if inq_rate > 40 %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
+          <span>{% if inq_rate > 40 %}Strong{% else %}Needs Attention{% endif %}</span>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Performance Metrics -->
-  <div class="row g-4 mb-4">
+  <!-- Main Content Grid -->
+  <div class="content-grid">
     
-    <!-- Engagement Metrics -->
-    <div class="col-xl-6">
-      <div class="analytics-card">
-        <div class="card-header-analytics">
-          <div>
-            <h3 class="card-title-analytics">
-              <i class="bi bi-activity me-2"></i>Engagement Metrics
-            </h3>
-            <p class="card-subtitle-analytics">How users interact with your listings</p>
+    <!-- Sale vs Lease Comparison -->
+    <div class="analytics-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-pie-chart-fill"></i>Property Views Breakdown
+        </h3>
+      </div>
+      <div class="card-body">
+        
+        <!-- Sale Properties -->
+        <div class="property-breakdown">
+          <div class="breakdown-header">
+            <div class="breakdown-label">
+              <span class="color-indicator sale-color"></span>
+              <span class="label-text">For Sale</span>
+            </div>
+            <span class="breakdown-value">{{ sale_view|intcomma }}</span>
           </div>
-        </div>
-        <div class="card-body-analytics">
-          <div class="metrics-list">
-            
-            <div class="metric-item">
-              <div class="metric-icon-wrapper engagement">
-                <i class="bi bi-cursor-fill"></i>
-              </div>
-              <div class="metric-content">
-                <div class="metric-header">
-                  <h4>Average Engagement Rate</h4>
-                  <span class="metric-badge positive">
-                    <i class="bi bi-arrow-up"></i>{{competition|floatformat:0}}%
-                  </span>
-                </div>
-                <div class="metric-bar">
-                  <div class="metric-bar-fill" style="width: {{competition}}%"></div>
-                </div>
-                {% if competition <= 0%}
-                  <p class="metric-subtext">Success needs time and paitence😉</p>
-                {%else%}
-                  <p class="metric-subtext">{{competition|floatformat:2}}% ahead of other companies</p>
-                {%endif%}
-              </div>
+          <div class="progress-bar-wrapper">
+            {% widthratio sale_view sale_view|add:leased_view 100 as sale_percentage %}
+            <div class="progress-bar sale-bar" style="width: {{ sale_percentage }}%">
+              <span class="progress-label">{{ sale_percentage }}%</span>
             </div>
-
-            <div class="metric-item">
-              <div class="metric-icon-wrapper time">
-                <i class="bi bi-clock-fill"></i>
-              </div>
-              <div class="metric-content">
-                <div class="metric-header">
-                  <h4>Avg. Time on Listing</h4>
-                  <span class="metric-badge neutral">2:45 min</span>
-                </div>
-                <div class="metric-bar">
-                  <div class="metric-bar-fill" style="width: 75%"></div>
-                </div>
-                <p class="metric-subtext">Users spend quality time viewing</p>
-              </div>
-            </div>
-
-            <div class="metric-item">
-              <div class="metric-icon-wrapper conversion">
-                <i class="bi bi-telephone-fill"></i>
-              </div>
-              <div class="metric-content">
-                <div class="metric-header">
-                  <h4>Inquiry Conversion Rate</h4>
-                  <span class="metric-badge positive">
-                    <i class="bi bi-arrow-up"></i>{{inq_rate|floatformat:2}}%
-                  </span>
-                </div>
-                <div class="metric-bar">
-                  <div class="metric-bar-fill" style="width: {{inq_rate}}%"></div>
-                </div>
-                <p class="metric-subtext">Strong conversion from views to inquiries</p>
-              </div>
-            </div>
-
           </div>
+          {% if sale_incr_perc != 0 %}
+          <p class="breakdown-change {% if sale_incr_perc > 0 %}positive{% else %}negative{% endif %}">
+            <i class="bi bi-arrow-{% if sale_incr_perc > 0 %}up{% else %}down{% endif %}"></i>
+            {{ sale_incr_perc|floatformat:1 }}% this month
+          </p>
+          {% endif %}
         </div>
+
+        <!-- Lease Properties -->
+        <div class="property-breakdown">
+          <div class="breakdown-header">
+            <div class="breakdown-label">
+              <span class="color-indicator lease-color"></span>
+              <span class="label-text">For Lease</span>
+            </div>
+            <span class="breakdown-value">{{ leased_view|intcomma }}</span>
+          </div>
+          <div class="progress-bar-wrapper">
+            {% widthratio leased_view sale_view|add:leased_view 100 as lease_percentage %}
+            <div class="progress-bar lease-bar" style="width: {{ lease_percentage }}%">
+              <span class="progress-label">{{ lease_percentage }}%</span>
+            </div>
+          </div>
+          {% if lease_incr_perc != 0 %}
+          <p class="breakdown-change {% if lease_incr_perc > 0 %}positive{% else %}negative{% endif %}">
+            <i class="bi bi-arrow-{% if lease_incr_perc > 0 %}up{% else %}down{% endif %}"></i>
+            {{ lease_incr_perc|floatformat:1 }}% this month
+          </p>
+          {% endif %}
+        </div>
+
+        <!-- Market Insight -->
+        <div class="market-insight">
+          <i class="bi bi-lightbulb-fill"></i>
+          {% widthratio sale_view sale_view|add:leased_view 100 as sale_percent %}
+          {% if sale_percent > 60 %}
+            <p><strong>Sale-focused market:</strong> Your sale properties are attracting more attention. Consider adding premium listings.</p>
+          {% elif sale_percent < 40 %}
+            <p><strong>Lease-focused market:</strong> Rental properties are trending. Great time to promote lease options.</p>
+          {% else %}
+            <p><strong>Balanced market:</strong> You have a healthy mix of sale and lease interest.</p>
+          {% endif %}
+        </div>
+
       </div>
     </div>
 
     <!-- Top Performing Properties -->
-    <div class="col-xl-6">
-      <div class="analytics-card">
-        <div class="card-header-analytics">
-          <div>
-            <h3 class="card-title-analytics">
-              <i class="bi bi-trophy me-2"></i>Top Performing Properties
-            </h3>
-            <p class="card-subtitle-analytics">Most viewed listings this month</p>
-          </div>
-          <a href="{% url 'company:listings' %}" class="link-view-all">
-            View All <i class="bi bi-arrow-right ms-1"></i>
-          </a>
-        </div>
-        <div class="card-body-analytics">
-          <div class="top-properties-list">
+    <div class="analytics-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="bi bi-star-fill"></i>Top Performing Properties
+        </h3>
+        <a href="{% url 'company:listings' %}" class="view-all-link">
+          View All <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="top-properties">
+          
+          {% for rank, eyes in ranking %}
+          <div class="property-item">
+            <span class="property-rank">{{ forloop.counter }}</span>
             
-            <div class="top-property-item">
-              <div class="property-rank">1</div>
-              <div class="property-mini-image">
-                <i class="bi bi-house-fill"></i>
-              </div>
-              <div class="property-mini-info">
-                <h5>Luxury Villa in Lekki</h5>
-                <p><i class="bi bi-geo-alt"></i> Lekki Phase 1, Lagos</p>
-              </div>
-              <div class="property-mini-stats">
-                <div class="mini-stat">
-                  <i class="bi bi-eye-fill"></i>
-                  <span>1,234</span>
-                </div>
-                <div class="mini-stat">
-                  <i class="bi bi-heart-fill"></i>
-                  <span>89</span>
-                </div>
-              </div>
+            <div class="property-info">
+              <h5 class="property-name">
+                {% if rank.property_category == "Residential" %}
+                  {{ rank.residential }}
+                {% elif rank.property_category == "Commercial" %}
+                  {{ rank.commercial }}
+                {% else %}
+                  {{ rank.lands }}
+                {% endif %}
+              </h5>
+              <p class="property-details">
+                <i class="bi bi-tag"></i>{{ rank.property_category }}
+                <span class="separator">•</span>
+                <i class="bi bi-geo-alt"></i>{{ rank.location }}, {{ rank.state }}
+              </p>
             </div>
-
-            <div class="top-property-item">
-              <div class="property-rank">2</div>
-              <div class="property-mini-image">
-                <i class="bi bi-house-fill"></i>
-              </div>
-              <div class="property-mini-info">
-                <h5>Modern Apartment</h5>
-                <p><i class="bi bi-geo-alt"></i> Victoria Island, Lagos</p>
-              </div>
-              <div class="property-mini-stats">
-                <div class="mini-stat">
-                  <i class="bi bi-eye-fill"></i>
-                  <span>987</span>
-                </div>
-                <div class="mini-stat">
-                  <i class="bi bi-heart-fill"></i>
-                  <span>76</span>
-                </div>
-              </div>
+            
+            <div class="property-stats">
+              <span class="stat-item">
+                <i class="bi bi-eye-fill"></i>{{ eyes }}
+              </span>
+              <span class="stat-item">
+                <i class="bi bi-heart-fill"></i>{{ rank.total_likes }}
+              </span>
             </div>
-
-            <div class="top-property-item">
-              <div class="property-rank">3</div>
-              <div class="property-mini-image">
-                <i class="bi bi-house-fill"></i>
-              </div>
-              <div class="property-mini-info">
-                <h5>Duplex in Ikoyi</h5>
-                <p><i class="bi bi-geo-alt"></i> Ikoyi, Lagos</p>
-              </div>
-              <div class="property-mini-stats">
-                <div class="mini-stat">
-                  <i class="bi bi-eye-fill"></i>
-                  <span>856</span>
-                </div>
-                <div class="mini-stat">
-                  <i class="bi bi-heart-fill"></i>
-                  <span>64</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="top-property-item">
-              <div class="property-rank">4</div>
-              <div class="property-mini-image">
-                <i class="bi bi-house-fill"></i>
-              </div>
-              <div class="property-mini-info">
-                <h5>Bungalow in Ajah</h5>
-                <p><i class="bi bi-geo-alt"></i> Ajah, Lagos</p>
-              </div>
-              <div class="property-mini-stats">
-                <div class="mini-stat">
-                  <i class="bi bi-eye-fill"></i>
-                  <span>743</span>
-                </div>
-                <div class="mini-stat">
-                  <i class="bi bi-heart-fill"></i>
-                  <span>52</span>
-                </div>
-              </div>
-            </div>
-
           </div>
+          {% endfor %}
+
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Insights & Recommendations -->
-  <div class="row g-4">
-    
-    <div class="col-12">
-      <div class="analytics-card insights-card">
-        <div class="card-header-analytics">
-          <div>
-            <h3 class="card-title-analytics">
-              <i class="bi bi-lightbulb me-2"></i>Insights & Recommendations
-            </h3>
-            <p class="card-subtitle-analytics">AI-powered suggestions to improve your performance</p>
-          </div>
-        </div>
-        <div class="card-body-analytics">
-          <div class="insights-grid">
-            
-            <div class="insight-card positive">
-              <div class="insight-icon">
-                <i class="bi bi-graph-up-arrow"></i>
-              </div>
-              <div class="insight-content">
-                <h4>Strong Growth Trend</h4>
-                <p>Your profile views increased by 25% this month. Keep up the great work!</p>
-              </div>
-            </div>
-
-            <div class="insight-card warning">
-              <div class="insight-icon">
-                <i class="bi bi-exclamation-triangle"></i>
-              </div>
-              <div class="insight-content">
-                <h4>Low Inquiry Rate on Sale Properties</h4>
-                <p>Consider updating your sale property descriptions or pricing to attract more inquiries.</p>
-              </div>
-            </div>
-
-            <div class="insight-card info">
-              <div class="insight-icon">
-                <i class="bi bi-camera"></i>
-              </div>
-              <div class="insight-content">
-                <h4>Add More Photos</h4>
-                <p>Listings with 8+ photos get 45% more views. Consider adding more images to your properties.</p>
-              </div>
-            </div>
-
-            <div class="insight-card success">
-              <div class="insight-icon">
-                <i class="bi bi-trophy"></i>
-              </div>
-              <div class="insight-content">
-                <h4>Top Performer in Your Area</h4>
-                <p>You're among the top 10% of agents in Lagos. Congratulations!</p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
+  <!-- Insights Section -->
+  <div class="insights-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <i class="bi bi-lightbulb"></i>Insights & Recommendations
+      </h3>
     </div>
 
+    <div class="insights-grid">
+      
+      <!-- Profile Views Insight -->
+      {% if profile_incr_perc > 0 %}
+        <div class="insight-card success-card">
+          <div class="insight-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Strong Growth Trend</h4>
+            <p>Profile views increased by <strong>{{ profile_incr_perc|floatformat:1 }}%</strong>. Keep up the momentum!</p>
+          </div>
+        </div>
+      {% elif profile_incr_perc < 0 %}
+        <div class="insight-card danger-card">
+          <div class="insight-icon">
+            <i class="bi bi-graph-down-arrow"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Attention Required</h4>
+            <p>Profile views dropped by <strong>{{ profile_incr_perc|floatformat:1|cut:"-" }}%</strong>. Share top listings on social media to boost traffic.</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Inquiry Rate Insight -->
+      {% if inq_rate > 40 %}
+        <div class="insight-card success-card">
+          <div class="insight-icon">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <div class="insight-content">
+            <h4>High Engagement</h4>
+            <p>Your <strong>{{ inq_rate|floatformat:1 }}%</strong> inquiry rate shows strong buyer interest. Keep it up!</p>
+          </div>
+        </div>
+      {% else %}
+        <div class="insight-card warning-card">
+          <div class="insight-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Low Inquiry Rate</h4>
+            <p>At <strong>{{ inq_rate|floatformat:1 }}%</strong>, consider updating descriptions or adjusting prices to attract leads.</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Property Views Insight -->
+      {% if total_prop_incr_perc > 0 %}
+        <div class="insight-card success-card">
+          <div class="insight-icon">
+            <i class="bi bi-rocket-takeoff"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Inventory Momentum</h4>
+            <p>Properties gained <strong>{{ total_prop_incr_perc|floatformat:1 }}%</strong> more traction. Great time to push for closings!</p>
+          </div>
+        </div>
+      {% elif total_prop_incr_perc < -10 %}
+        <div class="insight-card danger-card">
+          <div class="insight-icon">
+            <i class="bi bi-arrow-down-circle"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Listing Stagnation</h4>
+            <p>Views dropped <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Update cover photos or refresh listings to boost visibility.</p>
+          </div>
+        </div>
+      {% elif total_prop_incr_perc < 0 %}
+        <div class="insight-card warning-card">
+          <div class="insight-icon">
+            <i class="bi bi-dash-circle"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Slight Decline</h4>
+            <p>Views dipped <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Consistency is key—keep updating your listings regularly.</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Competition Insight -->
+      {% if competition > 0 %}
+        <div class="insight-card success-card">
+          <div class="insight-icon">
+            <i class="bi bi-award"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Market Leader</h4>
+            <p>You're performing <strong>{{ competition|floatformat:1 }}%</strong> better than competitors. Excellent work!</p>
+          </div>
+        </div>
+      {% else %}
+        <div class="insight-card info-card">
+          <div class="insight-icon">
+            <i class="bi bi-info-circle"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Room for Growth</h4>
+            <p>Competitors are gaining traction. Focus on quality listings and consistent updates to improve your position.</p>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
   </div>
 
 </div>
@@ -586,169 +344,14 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function() {
     'use strict';
 
-    // Calculate percentages for distribution
-    const saleViews = {{ sale_view|default:0 }};
-    const leaseViews = {{ leased_view|default:0 }};
-    const totalViews = saleViews + leaseViews || 1; // Avoid division by zero
-    
-    const salePercentage = ((saleViews / totalViews) * 100).toFixed(1);
-    const leasePercentage = ((leaseViews / totalViews) * 100).toFixed(1);
-
-    // Update legend percentages
-    document.querySelectorAll('.legend-percentage')[0].textContent = salePercentage + '%';
-    document.querySelectorAll('.legend-percentage')[1].textContent = leasePercentage + '%';
-
-    // Views Chart
-    const viewsCtx = document.getElementById('viewsChart');
-    if (viewsCtx) {
-        new Chart(viewsCtx, {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [
-                    {
-                        label: 'Profile Views',
-                        data: [120, 190, 150, {{ profile_views }}],
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    },
-                    {
-                        label: 'Property Views',
-                        data: [200, 250, 220, {{ prop_views|floatformat:0 }}],
-                        borderColor: '#f093fb',
-                        backgroundColor: 'rgba(240, 147, 251, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20,
-                            font: {
-                                size: 14,
-                                weight: '600'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        cornerRadius: 8
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 12
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Distribution Pie Chart
-    const distCtx = document.getElementById('distributionChart');
-    if (distCtx) {
-        new Chart(distCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['For Sale', 'For Lease'],
-                datasets: [{
-                    data: [saleViews, leaseViews],
-                    backgroundColor: [
-                        'rgba(102, 126, 234, 0.8)',
-                        'rgba(240, 147, 251, 0.8)'
-                    ],
-                    borderColor: [
-                        '#667eea',
-                        '#f093fb'
-                    ],
-                    borderWidth: 3,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const percentage = ((value / totalViews) * 100).toFixed(1);
-                                return `${label}: ${value.toLocaleString()} views (${percentage}%)`;
-                            }
-                        }
-                    }
-                },
-                cutout: '65%'
-            }
-        });
-    }
-
     // Export Report Function
     window.exportReport = function() {
         alert('Export functionality will be implemented soon!');
-        // TODO: Implement PDF/Excel export
     };
-
-    // Period Select (placeholder for future implementation)
-    const periodSelect = document.getElementById('periodSelect');
-    if (periodSelect) {
-        periodSelect.addEventListener('change', function() {
-            // TODO: Fetch data for selected period
-            console.log('Selected period:', this.value, 'days');
-        });
-    }
 
 })();
 </script>
