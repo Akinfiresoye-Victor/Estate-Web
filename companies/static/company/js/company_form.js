@@ -7,6 +7,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         initializeSocialLinksFormset();
         initializeFileUploads();
+        initializeAlertDismissal();
     });
 
     function initializeSocialLinksFormset() {
@@ -249,15 +250,41 @@
         }
     }
 
-    // Auto-dismiss alerts
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
+    // Auto-dismiss alerts - ONLY dismiss message/notification alerts, NOT file info
+    function initializeAlertDismissal() {
+        // Wait a bit to ensure DOM is fully loaded
         setTimeout(function() {
-            alert.classList.remove('show');
-            setTimeout(function() {
-                alert.remove();
-            }, 300);
-        }, 5000);
-    });
+            // Only target alerts that are NOT inside .current-file-info
+            // AND are either dismissible or Django messages
+            const allAlerts = document.querySelectorAll('.alert');
+            
+            allAlerts.forEach(function(alert) {
+                // Skip if this alert is inside current-file-info
+                if (alert.closest('.current-file-info')) {
+                    console.log('Protecting file info alert from auto-dismiss');
+                    return; // Skip this alert
+                }
+                
+                // Skip if alert has data-permanent attribute
+                if (alert.hasAttribute('data-permanent')) {
+                    console.log('Protecting permanent alert from auto-dismiss');
+                    return;
+                }
+                
+                // Only dismiss if it's a message alert or has dismissible class
+                const isMessage = alert.closest('.messages') || 
+                                 alert.classList.contains('alert-dismissible');
+                
+                if (isMessage) {
+                    setTimeout(function() {
+                        alert.classList.remove('show');
+                        setTimeout(function() {
+                            alert.remove();
+                        }, 300);
+                    }, 5000);
+                }
+            });
+        }, 100); // Small delay to ensure everything is loaded
+    }
 
 })();

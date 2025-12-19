@@ -276,10 +276,13 @@
                   <span class="optional-badge">Optional</span>
                 </label>
                 
-                <!-- Show current certificate if exists -->
+                <!-- Debug: Check if file exists -->
+                <p>Debug: {{ form.instance.legal_certificate }}</p>
+                <p>Has file: {{ form.instance.legal_certificate|yesno:"YES,NO" }}</p>
+
                 {% if form.instance.legal_certificate %}
                   <div class="current-file-info mb-2">
-                    <div class="alert alert-success d-flex align-items-center">
+                    <div class="alert alert-success d-flex align-items-center" data-permanent="true">
                       <i class="bi bi-file-earmark-check me-2"></i>
                       <span>Current certificate: <strong>{{ form.instance.legal_certificate.name|slice:"18:" }}</strong></span>
                       <a href="{{ form.instance.legal_certificate.url }}" target="_blank" class="ms-auto btn btn-sm btn-outline-primary">
@@ -287,6 +290,8 @@
                       </a>
                     </div>
                   </div>
+                {% else %}
+                  <p class="text-muted">No certificate uploaded yet</p>
                 {% endif %}
                 
                 <div class="file-upload-wrapper">
