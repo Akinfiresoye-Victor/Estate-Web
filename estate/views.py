@@ -64,7 +64,6 @@ def property_view_count(property_id, property_type, users_id):
             user_id=users_id,
             property_type=property_type,
             property_id=property_id,
-            time_stamp=timezone.now()
         )
         new_object.save()
 
