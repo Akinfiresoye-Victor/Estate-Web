@@ -3,17 +3,26 @@
 from django import forms
 from django.forms import ModelForm
 from .models import LeadInfo
+from companies.models import CompanyRating
 
 
-
-
-
-
-
-
-
-
-
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = CompanyRating
+        fields = ['rating', 'comment']
+        labels = {
+            'rating': 'Your Rating',
+            'comment': 'Your Review'
+        }
+        widgets = {
+            'rating': forms.HiddenInput(attrs={'id': 'rating-value'}),
+            'comment': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Share your experience with this company...',
+                'rows': 4,
+                'required': True
+            })
+        }
 
 
 

@@ -3,7 +3,7 @@ from .forms import SocialLinksFormset, CompanyForm
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from .models import CompanyInformation, CompanyAnalytics, SessionId
+from .models import CompanyInformation, CompanyAnalytics, SessionId, CompanyRating
 from members.views import logout_user
 from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews
 from estate.models import LeadInfo
@@ -13,8 +13,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
-
-
+from django.db.models import Avg, Count
+from django.shortcuts import get_object_or_404
 
 
 
@@ -138,15 +138,22 @@ def dashboard(request):
             
             total_prop= PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).count() + PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).count()
             total_inq=LeadInfo.objects.filter(company_uuid=company.unique_company_id).count()
+            reviews = CompanyRating.objects.filter(company_uuid=company.unique_company_id).select_related('user')
+            rating_data = reviews.aggregate(
+            avg_rating=Avg('rating'),
+            total_reviews=Count('id')
+            )
+
+            average_rating = rating_data['avg_rating'] or 0.0
+            total_reviews = rating_data['total_reviews']
+
             context = {
                 'company': company,
                 'social_links': social_links,
                 'total_properties': total_prop,
                 'total_views': profile_views,
                 'total_inquiries': total_inq,
-                'average_rating': 0.0,
-                'recent_activities': 'None',
-                'recent_activities': 'None' 
+                'average_rating': average_rating,
             }
             print('working here')
             return render(request, 'company/dashboard.html', context)
@@ -560,53 +567,91 @@ def update_lead_stage(request, lead_id):
         return render(request, 'estate/error_page.html')
 
 
+
 def company_profile(request, company_uuid):
-    if request.user.is_authenticated:
-        try:
-            company = CompanyInformation.objects.get(unique_company_id=company_uuid)
-            total_property_on_lease = PropertyManagementRent.objects.filter(company_uuid=company_uuid).count()
-            total_property_on_sale = PropertyManagementSale.objects.filter(company_uuid=company_uuid).count()
-            total_properties = int(total_property_on_lease) + int(total_property_on_sale)
-            social_links = company.social.all()
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('landing')
+    if request.user.role == 'company':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        company = get_object_or_404(CompanyInformation, unique_company_id=company_uuid)
+        
+        # Count properties
+        total_property_on_lease = PropertyManagementRent.objects.filter(company_uuid=company_uuid).count()
+        total_property_on_sale = PropertyManagementSale.objects.filter(company_uuid=company_uuid).count()
+        total_properties = total_property_on_lease + total_property_on_sale
+        
+        # Get social links
+        social_links = company.social.all()
+        
+        # Property querysets
+        on_sale_qs = PropertyManagementSale.objects.filter(company_uuid=company_uuid)
+        on_lease_qs = PropertyManagementRent.objects.filter(company_uuid=company_uuid)
+        
+        # Pagination (2 items per page)
+        p_sale = Paginator(on_sale_qs, 2)
+        p_lease = Paginator(on_lease_qs, 2)
+        
+        page_sale = request.GET.get('page_sale', 1)
+        page_rent = request.GET.get('page_rent', 1)
+        
+        properties_on_sale = p_sale.get_page(page_sale)
+        properties_on_lease = p_lease.get_page(page_rent)
+        
+        # Get reviews and calculate average rating
+        reviews = CompanyRating.objects.filter(company_uuid=company_uuid).select_related('user')
+        rating_data = reviews.aggregate(
+            avg_rating=Avg('rating'),
+            total_reviews=Count('id')
+        )
+        
+        average_rating = rating_data['avg_rating'] or 0.0
+        total_reviews = rating_data['total_reviews']
+        
+        # Check if user has already reviewed (if authenticated)
+        user_has_reviewed = False
+        if request.user.is_authenticated:
+            user_has_reviewed = reviews.filter(user=request.user).exists()
             
-            # Get querysets
-            on_sale_qs = PropertyManagementSale.objects.filter(company_uuid=company_uuid)
-            on_lease_qs = PropertyManagementRent.objects.filter(company_uuid=company_uuid)
-            
-            # Create paginators (4 items per page)
-            p_sale = Paginator(on_sale_qs, 2)
-            p_lease = Paginator(on_lease_qs, 2)
-            
-            # Get separate page numbers for each type
-            page_sale = request.GET.get('page_sale', 1)
-            page_rent = request.GET.get('page_rent', 1)
-            
-            properties_on_sale = p_sale.get_page(page_sale)
-            properties_on_lease = p_lease.get_page(page_rent)
-            
+            # Track profile view
             try:
-                prop_analytics=company.session_id.get(session_id=request.user.id)
+                prop_analytics = company.session_id.get(session_id=request.user.id)
             except ObjectDoesNotExist:
-                prop_analytics=SessionId.objects.create(
-                    company= company,
+                prop_analytics = SessionId.objects.create(
+                    company=company,
                     session_id=request.user.id,
                     inquires_check=0
                 )
-                profile= company.analytics.get()
-                profile.profile_views +=1
+                profile = company.analytics.get()
+                profile.profile_views += 1
                 profile.save()
-            
-            return render(request, 'company/company_profile.html', {
-                'company': company,
-                'total_properties': total_properties,
-                'properties_for_sale': total_property_on_sale,
-                'properties_for_rent': total_property_on_lease,
-                'social_links': social_links,
-                'on_lease': properties_on_lease,
-                'on_sale': properties_on_sale,
-            })
-        except Exception as e:
-            return render(request, 'estate/error_page.html', {'e': e})
+        
+        # Generate page numbers for pagination
+        nums_sale = "x" * properties_on_sale.paginator.num_pages
+        nums_rent = "x" * properties_on_lease.paginator.num_pages
+        
+        context = {
+            'company': company,
+            'total_properties': total_properties,
+            'properties_for_sale': total_property_on_sale,
+            'properties_for_rent': total_property_on_lease,
+            'social_links': social_links,
+            'on_lease': properties_on_lease,
+            'on_sale': properties_on_sale,
+            'nums_s': nums_sale,
+            'nums_r': nums_rent,
+            'reviews': reviews[:5],  # Show only 5 most recent
+            'average_rating': average_rating,
+            'total_reviews': total_reviews,
+            'user_has_reviewed': user_has_reviewed,
+        }
+        
+        return render(request, 'company/company_profile.html', context)
+        
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 def properties_by_company(request, company_uuid):

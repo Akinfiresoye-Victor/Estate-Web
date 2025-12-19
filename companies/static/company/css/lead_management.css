@@ -1,4 +1,4 @@
-/* Lead Management CSS */
+/* Lead Management CSS - Optimized */
 
 :root {
   --secondary-color: #c19b76;
@@ -11,9 +11,168 @@
   --danger-color: #dc3545;
   --warning-color: #ffc107;
   --info-color: #17a2b8;
+  --border-radius: 16px;
+  --transition: all 0.3s ease;
 }
 
-/* Page Header */
+/* ============================================
+   BACK BUTTON
+   ============================================ */
+.back-button {
+  margin-bottom: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  background: #fff;
+  color: var(--secondary-color);
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.back-button:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.back-button:active {
+  background-color: #0a0a0aff;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   DELETE CONFIRMATION MODAL
+   ============================================ */
+.delete-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.delete-modal-overlay.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-modal {
+  background: #fff;
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.delete-modal-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--danger-color), #c82333);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.delete-modal-icon i {
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+.delete-modal h3 {
+  text-align: center;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.delete-modal p {
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-btn-cancel {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.modal-btn-cancel:hover {
+  background: #dee2e6;
+}
+
+.modal-btn-delete {
+  background: linear-gradient(135deg, var(--danger-color), #c82333);
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+  color: #fff;
+}
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
 .leads-header {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
   padding: 2.5rem 0;
@@ -62,11 +221,6 @@
   margin: 0;
 }
 
-.header-actions {
-  display: flex;
-  gap: 1rem;
-}
-
 .btn-export {
   display: inline-flex;
   align-items: center;
@@ -77,7 +231,7 @@
   border: none;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   box-shadow: 0 5px 20px rgba(0,0,0,0.2);
 }
 
@@ -86,7 +240,9 @@
   box-shadow: 0 8px 30px rgba(0,0,0,0.3);
 }
 
-/* Stats Dashboard */
+/* ============================================
+   STATS DASHBOARD
+   ============================================ */
 .stats-dashboard {
   margin-bottom: 3rem;
 }
@@ -99,7 +255,7 @@
 
 .stat-card {
   background: #fff;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   padding: 2rem;
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
   display: flex;
@@ -107,7 +263,7 @@
   gap: 1.5rem;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   border: 2px solid transparent;
 }
 
@@ -136,7 +292,7 @@
 .stat-icon {
   width: 70px;
   height: 70px;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -161,10 +317,6 @@
   background: linear-gradient(135deg, var(--success-color), #20c997);
 }
 
-.stat-info {
-  flex: 1;
-}
-
 .stat-info h3 {
   font-size: 2.5rem;
   font-weight: 800;
@@ -178,31 +330,6 @@
   font-size: 0.95rem;
   margin: 0.3rem 0 0;
   font-weight: 500;
-}
-
-.stat-trend {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(40, 167, 69, 0.1);
-  color: var(--success-color);
-  padding: 0.3rem 0.7rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.stat-trend.up {
-  background: rgba(40, 167, 69, 0.1);
-  color: var(--success-color);
-}
-
-.stat-trend.down {
-  background: rgba(220, 53, 69, 0.1);
-  color: var(--danger-color);
 }
 
 .stat-badge {
@@ -222,14 +349,16 @@
   color: #ff6b6b;
 }
 
-/* Filter Section */
+/* ============================================
+   FILTER SECTION
+   ============================================ */
 .filter-section {
   margin-bottom: 3rem;
 }
 
 .filter-bar {
   background: #fff;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   padding: 1.5rem;
   box-shadow: 0 5px 20px rgba(0,0,0,0.08);
   display: flex;
@@ -259,7 +388,7 @@
   border: 2px solid #e1e8ed;
   border-radius: 12px;
   font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .search-box input:focus {
@@ -275,7 +404,7 @@
 }
 
 .filter-select {
-  padding: 1rem 1.5rem;
+  padding: 1rem 3rem 1rem 1.5rem;
   border: 2px solid #e1e8ed;
   border-radius: 12px;
   font-size: 1rem;
@@ -283,12 +412,11 @@
   color: var(--text-dark);
   background: #fff;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
-  padding-right: 3rem;
 }
 
 .filter-select:focus {
@@ -297,7 +425,9 @@
   box-shadow: 0 0 0 4px rgba(193, 155, 118, 0.1);
 }
 
-/* Status Tabs */
+/* ============================================
+   STATUS TABS
+   ============================================ */
 .status-tabs {
   display: flex;
   gap: 1rem;
@@ -314,7 +444,7 @@
   font-weight: 700;
   color: var(--text-dark);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
@@ -342,14 +472,16 @@
   background: rgba(255,255,255,0.25);
 }
 
-/* Leads Table */
+/* ============================================
+   LEADS TABLE
+   ============================================ */
 .leads-container {
   padding: 2rem 0 4rem;
 }
 
 .leads-table-wrapper {
   background: #fff;
-  border-radius: 16px;
+  border-radius: var(--border-radius);
   box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   overflow: hidden;
   margin-bottom: 2rem;
@@ -377,7 +509,7 @@
 
 .leads-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .leads-table tbody tr:hover {
@@ -410,11 +542,6 @@
   font-weight: 700;
   font-size: 1.2rem;
   flex-shrink: 0;
-}
-
-.lead-details {
-  display: flex;
-  flex-direction: column;
 }
 
 .lead-name {
@@ -480,7 +607,7 @@
   color: var(--text-dark);
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.3s ease;
+  transition: var(--transition);
 }
 
 .contact-link:hover {
@@ -491,12 +618,7 @@
   color: var(--secondary-color);
 }
 
-/* ====================================
-   ADD THESE STYLES TO YOUR lead_management.css
-   Replace the existing .status-badge section
-   ==================================== */
-
-/* Status Badge - Read Only Display */
+/* Status Badge */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -506,10 +628,26 @@
   font-weight: 700;
   border: 2px solid;
   white-space: nowrap;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
-/* Individual Status Colors */
+.status-badge::before {
+  content: '●';
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.status-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .status-badge.status-contacted {
   background-color: rgba(30, 144, 255, 0.2);
   color: #1E90FF;
@@ -536,7 +674,7 @@
 
 .status-badge.status-hotlead {
   background-color: rgba(255, 107, 107, 0.15);
-  color: #dc3545;
+  color: var(--danger-color);
   border-color: rgba(255, 107, 107, 0.3);
   animation: pulse-hot 2s ease-in-out infinite;
 }
@@ -560,37 +698,6 @@
   background-color: rgba(220, 53, 69, 0.15);
   color: #bd2130;
   border-color: rgba(220, 53, 69, 0.3);
-}
-
-/* Add icon before status text (optional but looks nice) */
-.status-badge::before {
-  content: '●';
-  margin-right: 0.5rem;
-  font-size: 0.8rem;
-  animation: blink 2s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Hover effect for read-only badge */
-.status-badge:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .status-badge {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-  }
 }
 
 /* Lead Date */
@@ -623,8 +730,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
   font-size: 1rem;
+  text-decoration: none;
 }
 
 .action-btn.view {
@@ -634,17 +742,6 @@
 
 .action-btn.view:hover {
   background: var(--info-color);
-  color: #fff;
-  transform: translateY(-2px);
-}
-
-.action-btn.edit {
-  background: rgba(193, 155, 118, 0.1);
-  color: var(--secondary-color);
-}
-
-.action-btn.edit:hover {
-  background: var(--secondary-color);
   color: #fff;
   transform: translateY(-2px);
 }
@@ -660,7 +757,9 @@
   transform: translateY(-2px);
 }
 
-/* Modern Pagination Styling */
+/* ============================================
+   PAGINATION
+   ============================================ */
 .pagination-section {
   padding: 2rem 0;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -683,10 +782,6 @@
   margin: 0;
 }
 
-.page-item {
-  display: inline-block;
-}
-
 .page-link {
   display: flex;
   align-items: center;
@@ -697,7 +792,7 @@
   border-radius: 10px;
   border: 2px solid #e1e8ed;
   background: #fff;
-  color: #2c3e50;
+  color: var(--text-dark);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
@@ -707,17 +802,17 @@
 }
 
 .page-link:hover {
-  background: linear-gradient(135deg, #c19b76 0%, #d4af8a 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, #d4af8a 100%);
   color: #fff;
-  border-color: #c19b76;
+  border-color: var(--secondary-color);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(193, 155, 118, 0.3);
 }
 
 .page-item.active .page-link {
-  background: linear-gradient(135deg, #1a3c4e 0%, #2d5568 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #2d5568 100%);
   color: #fff;
-  border-color: #1a3c4e;
+  border-color: var(--primary-color);
   box-shadow: 0 4px 12px rgba(26, 60, 78, 0.4);
   font-weight: 700;
 }
@@ -728,39 +823,6 @@
   pointer-events: none;
 }
 
-/* First/Last page buttons */
-.page-item:first-child .page-link,
-.page-item:last-child .page-link {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-color: #dee2e6;
-}
-
-.page-item:first-child .page-link:hover,
-.page-item:last-child .page-link:hover {
-  background: linear-gradient(135deg, #1a3c4e 0%, #2d5568 100%);
-  border-color: #1a3c4e;
-}
-
-/* Previous/Next buttons - special styling */
-.page-item:nth-child(2) .page-link,
-.page-item:nth-last-child(2) .page-link {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  font-weight: 700;
-}
-
-.page-item:nth-child(2) .page-link:hover,
-.page-item:nth-last-child(2) .page-link:hover {
-  background: linear-gradient(135deg, #c19b76 0%, #d4af8a 100%);
-  border-color: #c19b76;
-}
-
-/* Icons */
-.page-link i {
-  font-size: 1rem;
-  line-height: 1;
-}
-
-/* Pagination Info */
 .pagination-info {
   text-align: center;
   margin-top: 1rem;
@@ -780,63 +842,14 @@
 }
 
 .pagination-info strong {
-  color: #1a3c4e;
+  color: var(--primary-color);
   font-weight: 700;
   padding: 0 0.25rem;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .pagination {
-    gap: 0.3rem;
-  }
-  
-  .page-link {
-    min-width: 36px;
-    height: 36px;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-    border-width: 1.5px;
-  }
-  
-  .page-link i {
-    font-size: 0.9rem;
-  }
-  
-  .pagination-info {
-    font-size: 0.85rem;
-    padding: 0.6rem 1.2rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .pagination-section {
-    padding: 1.5rem 0.5rem;
-  }
-  
-  .pagination {
-    gap: 0.25rem;
-    flex-wrap: wrap;
-  }
-  
-  .page-link {
-    min-width: 32px;
-    height: 32px;
-    padding: 0.3rem 0.5rem;
-    font-size: 0.8rem;
-  }
-  
-  /* Hide some page numbers on very small screens */
-  .page-item:not(.active):not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
-    display: none;
-  }
-  
-  .page-item.active {
-    display: inline-block !important;
-  }
-}
-
-/* Empty State */
+/* ============================================
+   EMPTY STATE
+   ============================================ */
 .empty-state {
   text-align: center;
   padding: 6rem 2rem;
@@ -872,98 +885,9 @@
   margin: 0 auto;
 }
 
-/* Modal Styling */
-.modal-content {
-  border-radius: 20px;
-  border: none;
-  overflow: hidden;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, rgba(26, 60, 78, 0.05), rgba(193, 155, 118, 0.05));
-  border-bottom: 2px solid rgba(193, 155, 118, 0.1);
-  padding: 2rem;
-}
-
-.modal-title {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-}
-
-.lead-detail-content {
-  padding: 1rem 0;
-}
-
-.detail-section {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid #e1e8ed;
-}
-
-.detail-section:last-child {
-  border-bottom: none;
-}
-
-.detail-section h6 {
-  font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.detail-item label {
-  font-weight: 600;
-  color: var(--text-light);
-  font-size: 0.85rem;
-}
-
-.detail-item span {
-  color: var(--text-dark);
-  font-size: 1rem;
-}
-
-.add-note-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.btn-add-note {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  color: #fff;
-  padding: 0.8rem 1.5rem;
-  border-radius: 10px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-add-note:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(26, 60, 78, 0.25);
-}
-
-/* Responsive */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
 @media (max-width: 1200px) {
   .leads-table-wrapper {
     overflow-x: auto;
@@ -1013,6 +937,17 @@
     width: 100%;
     justify-content: space-between;
   }
+
+  .pagination {
+    gap: 0.3rem;
+  }
+  
+  .page-link {
+    min-width: 36px;
+    height: 36px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 576px) {
@@ -1034,5 +969,17 @@
 
   .stat-info h3 {
     font-size: 2rem;
+  }
+
+  .pagination {
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+  
+  .page-link {
+    min-width: 32px;
+    height: 32px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
   }
 }

@@ -1,4 +1,4 @@
-/* Public Company Profile CSS - Redesigned */
+/* Public Company Profile CSS - Complete Version */
 
 :root {
   --primary-color: #1a3c4e;
@@ -12,7 +12,40 @@
   --rent-color: #6f42c1;
 }
 
-/* Company Header with Modern Design */
+/* ============================================
+   BACK BUTTON STYLES
+   ============================================ */
+.attractive-back-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  background: #fff;
+  color: #c19b76;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.attractive-back-button:hover {
+  background-color: #1a3c4e;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.attractive-back-button:active {
+  background-color: #0a0a0aff;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   COMPANY HEADER
+   ============================================ */
 .company-header {
   position: relative;
   padding: 0;
@@ -156,13 +189,6 @@
   font-size: 1.2rem;
 }
 
-.company-tagline {
-  font-size: 1.3rem;
-  color: var(--text-dark);
-  margin-bottom: 1.2rem;
-  font-weight: 500;
-}
-
 .company-meta {
   display: flex;
   gap: 2.5rem;
@@ -255,7 +281,9 @@
   box-shadow: 0 12px 35px rgba(193, 155, 118, 0.3);
 }
 
-/* Stats Bar with Modern Cards */
+/* ============================================
+   STATS BAR
+   ============================================ */
 .stats-bar {
   background: #fff;
   padding: 2.5rem 0;
@@ -327,7 +355,9 @@
   font-weight: 500;
 }
 
-/* Profile Cards with Enhanced Design */
+/* ============================================
+   PROFILE CARDS
+   ============================================ */
 .profile-card {
   background: #fff;
   border-radius: 20px;
@@ -383,7 +413,9 @@
   font-size: 1.05rem;
 }
 
-/* Info Grid Enhanced */
+/* ============================================
+   INFO GRID
+   ============================================ */
 .info-grid {
   display: flex;
   flex-direction: column;
@@ -438,7 +470,9 @@
   font-size: 1.05rem;
 }
 
-/* Contact List Enhanced */
+/* ============================================
+   CONTACT LIST
+   ============================================ */
 .contact-list {
   display: flex;
   flex-direction: column;
@@ -517,7 +551,9 @@
   box-shadow: 0 12px 35px rgba(26, 60, 78, 0.3);
 }
 
-/* Social Grid Modern */
+/* ============================================
+   SOCIAL GRID
+   ============================================ */
 .social-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -554,7 +590,9 @@
   font-weight: 600;
 }
 
-/* Properties Section Modern */
+/* ============================================
+   PROPERTIES SECTION
+   ============================================ */
 .properties-section {
   background: #fff;
   border-radius: 20px;
@@ -585,38 +623,6 @@
   align-items: center;
 }
 
-.property-tabs {
-  display: flex;
-  gap: 0.7rem;
-  background: var(--bg-light);
-  padding: 0.4rem;
-  border-radius: 12px;
-}
-
-.tab-btn {
-  padding: 0.8rem 1.5rem;
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  color: var(--text-dark);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-}
-
-.tab-btn:hover {
-  background: rgba(193, 155, 118, 0.15);
-  color: var(--primary-color);
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  color: #fff;
-  box-shadow: 0 5px 15px rgba(26, 60, 78, 0.25);
-}
-
-/* Properties Grid Modern */
 .properties-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -692,23 +698,6 @@
 
 .rent-badge {
   background: linear-gradient(135deg, var(--rent-color), #5a32a3);
-}
-
-.featured-badge {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
-  padding: 0.6rem 1.3rem;
-  background: linear-gradient(135deg, #ffc107, #ff9800);
-  color: #fff;
-  border-radius: 25px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  z-index: 2;
-  box-shadow: 0 5px 20px rgba(255, 193, 7, 0.4);
 }
 
 .property-details {
@@ -812,7 +801,6 @@
   box-shadow: 0 8px 25px rgba(26, 60, 78, 0.3);
 }
 
-/* No Properties Enhanced */
 .no-properties {
   text-align: center;
   padding: 5rem 2rem;
@@ -832,13 +820,26 @@
   margin-bottom: 0.5rem;
 }
 
-/* Reviews Section Modern */
+/* ============================================
+   REVIEWS SECTION
+   ============================================ */
 .reviews-section {
   background: #fff;
   border-radius: 20px;
   padding: 2.5rem;
   box-shadow: 0 10px 40px rgba(0,0,0,0.08);
   border: 1px solid rgba(193, 155, 118, 0.1);
+}
+
+.review-count {
+  display: inline-block;
+  background: rgba(193, 155, 118, 0.15);
+  color: var(--secondary-color);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
 }
 
 .btn-write-review {
@@ -853,12 +854,50 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 5px 15px rgba(193, 155, 118, 0.25);
+  text-decoration: none;
 }
 
 .btn-write-review:hover {
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(26, 60, 78, 0.3);
+  color: #fff;
+}
+
+/* Average Rating Display */
+.average-rating-display {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.05));
+  border-radius: 16px;
+  padding: 2rem;
+  border: 2px solid rgba(255, 193, 7, 0.2);
+}
+
+.rating-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.rating-number {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #ffc107;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+.rating-stars {
+  display: flex;
+  gap: 0.3rem;
+  font-size: 1.8rem;
+  color: #ffc107;
+}
+
+.rating-count {
+  font-size: 1rem;
+  color: var(--text-light);
+  font-weight: 500;
 }
 
 .reviews-list {
@@ -896,45 +935,45 @@
 }
 
 .reviewer-avatar {
-  width: 55px;
-  height: 55px;
+  width: 60px;
+  height: 60px;
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-weight: 800;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  flex-shrink: 0;
   box-shadow: 0 5px 15px rgba(26, 60, 78, 0.2);
 }
 
 .reviewer-name {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary-color);
-  margin: 0;
+  color: var(--text-dark);
+  margin: 0 0 0.3rem;
 }
 
 .review-date {
   font-size: 0.9rem;
   color: var(--text-light);
-  margin: 0.2rem 0 0;
-  font-weight: 500;
+  margin: 0;
 }
 
 .review-rating {
   display: flex;
-  gap: 0.3rem;
-  color: #ffc107;
+  gap: 0.2rem;
   font-size: 1.2rem;
+  color: #ffc107;
 }
 
 .review-text {
   color: var(--text-dark);
-  line-height: 2;
+  line-height: 1.8;
+  font-size: 1rem;
   margin: 0;
-  font-size: 1.05rem;
 }
 
 .no-reviews {
@@ -945,612 +984,255 @@
 
 .no-reviews i {
   font-size: 4rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   opacity: 0.3;
   color: var(--secondary-color);
 }
 
-.no-reviews p {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-/* Load More Button Modern */
-.btn-load-more {
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(135deg, rgba(26, 60, 78, 0.05), rgba(193, 155, 118, 0.05));
-  color: var(--primary-color);
-  padding: 1.2rem 2.5rem;
-  border-radius: 12px;
-  border: 2px solid var(--secondary-color);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.05rem;
-}
-
-.btn-load-more:hover {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  color: #fff;
-  border-color: var(--primary-color);
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(26, 60, 78, 0.25);
-}
-
-/* Modal Styles Enhanced */
+/* ============================================
+   MODAL STYLES
+   ============================================ */
 .modal-content {
   border-radius: 20px;
   border: none;
-  overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
 
 .modal-header {
   background: linear-gradient(135deg, rgba(26, 60, 78, 0.05), rgba(193, 155, 118, 0.05));
-  border-bottom: 3px solid rgba(193, 155, 118, 0.15);
-  padding: 2rem;
+  border-bottom: 2px solid rgba(193, 155, 118, 0.1);
+  padding: 1.5rem 2rem;
+  border-radius: 20px 20px 0 0;
 }
 
 .modal-title {
-  display: flex;
-  align-items: center;
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 1.5rem;
   font-family: 'Playfair Display', serif;
-}
-
-.modal-title i {
-  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-  width: 40px;
-  height: 40px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  color: #fff;
 }
 
 .modal-body {
-  padding: 2.5rem;
+  padding: 2rem;
 }
 
 .form-label {
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 0.7rem;
-  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
 }
 
 .form-control {
   border: 2px solid rgba(193, 155, 118, 0.2);
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
-  transition: all 0.3s ease;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
   font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .form-control:focus {
   border-color: var(--secondary-color);
-  box-shadow: 0 0 0 5px rgba(193, 155, 118, 0.1);
+  box-shadow: 0 0 0 0.2rem rgba(193, 155, 118, 0.15);
   outline: none;
 }
 
-.btn-submit-contact {
+.btn-submit-contact,
+.btn-submit-review {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   color: #fff;
-  padding: 1.3rem;
-  border-radius: 12px;
+  padding: 1rem 2rem;
+  border-radius: 10px;
   border: none;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.4s ease;
-  box-shadow: 0 8px 25px rgba(26, 60, 78, 0.25);
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(26, 60, 78, 0.2);
   margin-top: 1rem;
 }
 
-.btn-submit-contact:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 35px rgba(26, 60, 78, 0.35);
+.btn-submit-contact:hover,
+.btn-submit-review:hover {
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(26, 60, 78, 0.3);
 }
 
-/* Rating Input Enhanced */
-.rating-input {
+/* Star Rating Input */
+.star-rating-input {
   display: flex;
   flex-direction: row-reverse;
   justify-content: center;
-  gap: 0.8rem;
-  font-size: 2.5rem;
-  margin: 1rem 0;
+  gap: 0.5rem;
 }
 
-.rating-input input {
+.star-rating-input input[type="radio"] {
   display: none;
 }
 
-.rating-input label {
+.star-rating-input label {
+  font-size: 2.5rem;
   color: #ddd;
   cursor: pointer;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
+  transition: all 0.2s ease;
 }
 
-.rating-input label:hover {
-  transform: scale(1.2);
-}
-
-.rating-input input:checked ~ label,
-.rating-input label:hover,
-.rating-input label:hover ~ label {
+.star-rating-input label:hover,
+.star-rating-input label:hover ~ label,
+.star-rating-input input[type="radio"]:checked ~ label {
   color: #ffc107;
-  filter: drop-shadow(0 4px 10px rgba(255, 193, 7, 0.5));
+  transform: scale(1.1);
 }
 
-/* Responsive Design */
+.rating-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-height: 30px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
 @media (max-width: 1200px) {
-  .company-header-content {
-    flex-wrap: wrap;
-  }
-
-  .company-main-info {
-    padding-top: 20px;
-    width: 100%;
-  }
-
-  .company-actions {
-    padding-top: 0;
-    width: 100%;
-  }
-}
-
-@media (max-width: 992px) {
-  .header-background {
-    height: 280px;
-  }
-
-  .company-header-content {
-    margin-top: -100px;
-  }
-
-  .company-logo,
-  .company-logo-placeholder {
-    width: 180px;
-    height: 180px;
-    font-size: 4.5rem;
-  }
-
   .company-name {
     font-size: 2.5rem;
   }
-
+  
   .properties-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
-@media (max-width: 768px) {
-  .header-background {
-    height: 240px;
-  }
-
+@media (max-width: 992px) {
   .company-header-content {
-    margin-top: -80px;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding-top: 2rem;
   }
-
-  .company-logo,
-  .company-logo-placeholder {
-    width: 150px;
-    height: 150px;
-    font-size: 4rem;
+  
+  .company-logo-section,
+  .company-main-info,
+  .company-actions {
+    padding-top: 0;
   }
-
-  .company-name {
-    font-size: 2rem;
+  
+  .company-main-info {
+    width: 100%;
   }
-
+  
   .company-title-row {
     justify-content: center;
   }
-
+  
   .company-meta {
     justify-content: center;
-    gap: 1.5rem;
   }
-
+  
   .company-actions {
-    flex-direction: row;
     width: 100%;
     justify-content: center;
   }
-
-  .btn-contact {
-    flex: 1;
-    justify-content: center;
-    padding: 1rem 1.5rem;
+  
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
 
+@media (max-width: 768px) {
+  .header-background {
+    height: 200px;
+  }
+  
+  .company-header-content {
+    margin-top: -80px;
+  }
+  
+  .company-logo,
+  .company-logo-placeholder {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .company-name {
+    font-size: 2rem;
+  }
+  
+  .company-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .btn-contact {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .btn-share {
+    width: 100%;
+  }
+  
   .stats-row {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
-
+  
+  .properties-grid {
+    grid-template-columns: 1fr;
+  }
+  
   .section-header {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .property-tabs {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .tab-btn {
-    flex: 1;
-    padding: 0.7rem 1rem;
-  }
-
-  .properties-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .property-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .btn-view-property {
-    width: 100%;
-    justify-content: center;
+  
+  .social-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 576px) {
-  .header-background {
-    height: 200px;
-  }
-
-  .company-header-content {
-    margin-top: -60px;
-    padding: 0 0 1.5rem;
-  }
-
-  .company-logo,
-  .company-logo-placeholder {
-    width: 120px;
-    height: 120px;
-    font-size: 3rem;
-    border-width: 5px;
-  }
-
   .company-name {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
-
-  .company-tagline {
-    font-size: 1rem;
-  }
-
+  
   .verified-badge {
     font-size: 0.85rem;
     padding: 0.5rem 1rem;
   }
-
-  .company-meta {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
+  
   .meta-item {
     font-size: 0.9rem;
   }
-
-  .company-actions {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .btn-contact {
-    padding: 1rem;
-    font-size: 1rem;
-  }
-
-  .btn-share {
-    width: 100%;
-    height: 50px;
-  }
-
-  .stats-row {
-    padding: 0 1rem;
-  }
-
-  .stat-item {
-    gap: 1rem;
-  }
-
-  .stat-icon {
-    width: 55px;
-    height: 55px;
-    font-size: 1.5rem;
-  }
-
+  
   .stat-info h3 {
     font-size: 2rem;
   }
-
-  .profile-card,
-  .properties-section,
-  .reviews-section {
-    padding: 1.5rem;
-  }
-
-  .card-header {
-    padding: 1.2rem;
-  }
-
+  
   .section-title {
     font-size: 1.5rem;
   }
-
-  .property-tabs {
-    padding: 0.3rem;
-    gap: 0.4rem;
+  
+  .rating-number {
+    font-size: 3rem;
   }
-
-  .tab-btn {
+  
+  .property-features {
+    gap: 0.8rem;
+  }
+  
+  .feature {
     font-size: 0.85rem;
-    padding: 0.6rem 0.8rem;
   }
-
-  .property-title {
-    font-size: 1.1rem;
+  
+  .company-meta {
+    gap: 1.5rem;
   }
-
-  .price {
-    font-size: 1.5rem;
-  }
-
-  .btn-view-property {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.9rem;
-  }
-
-  .review-card {
-    padding: 1.3rem;
-  }
-
-  .reviewer-avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 1.2rem;
-  }
-
-  .modal-header,
-  .modal-body {
-    padding: 1.5rem;
-  }
-
-  .modal-title {
-    font-size: 1.2rem;
-  }
-
-  .rating-input {
-    font-size: 2rem;
-    gap: 0.5rem;
-  }
-}
-
-/* Additional Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.company-content {
-  animation: fadeIn 0.8s ease;
-}
-
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Selection Color */
-::selection {
-  background: var(--secondary-color);
-  color: #fff;
-}
-
-::-moz-selection {
-  background: var(--secondary-color);
-  color: #fff;
-}
-/* Pagination Wrapper */
-.pagination-wrapper {
-    margin-top: 3rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.pagination-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.pagination-info {
-    font-size: 0.95rem;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.page-text {
-    background: #f8f9fa;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-}
-
-/* Pagination */
-.pagination {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.page-item {
-    display: inline-block;
-}
-
-.page-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 0.5rem 1rem;
-    border: 2px solid #dee2e6;
-    background: #fff;
-    color: #495057;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.page-link:hover {
-    background: #f8f9fa;
-    border-color: #adb5bd;
-    color: #212529;
-    transform: translateY(-2px);
-}
-
-.page-item.active .page-link {
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-    border-color: #1976d2;
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-}
-
-.page-item.disabled .page-link {
-    background: #f8f9fa;
-    border-color: #dee2e6;
-    color: #adb5bd;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.page-link i {
-    font-size: 1rem;
-}
-
-/* Property Tabs Styling */
-.property-tabs {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.tab-btn {
-    padding: 0.7rem 1.5rem;
-    border: 2px solid #dee2e6;
-    background: #fff;
-    color: #495057;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
-}
-
-.tab-btn:hover {
-    background: #f8f9fa;
-    border-color: #adb5bd;
-    transform: translateY(-2px);
-}
-
-.tab-btn.active {
-    background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
-    border-color: #1976d2;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-}
-
-/* No Properties State */
-.no-properties {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    text-align: center;
-    background: #f8f9fa;
-    border-radius: 12px;
-    border: 2px dashed #dee2e6;
-}
-
-.no-properties i {
-    font-size: 4rem;
-    color: #adb5bd;
-    margin-bottom: 1rem;
-}
-
-.no-properties h4 {
-    font-size: 1.5rem;
-    color: #495057;
-    margin-bottom: 0.5rem;
-}
-
-.no-properties p {
-    color: #6c757d;
-    font-size: 1rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .section-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .property-tabs {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .tab-btn {
-        flex: 1;
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .pagination {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .page-link {
-        min-width: 36px;
-        height: 36px;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.9rem;
-    }
 }

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from .forms import *
 from django.http import HttpResponseRedirect
@@ -9,14 +9,11 @@ from django.contrib.auth import update_session_auth_hash
 from core import news_scrape as ns
 from django.core.paginator import Paginator
 from .filters import *
-from admin_panel.views import admin
 from members.models import User
 from datetime import date
 from agents.models import AgentInformation
 from core.models import *
-from companies.models import CompanyInformation
-from django.core.exceptions import ObjectDoesNotExist
-
+from companies.models import CompanyInformation, CompanyRating
 
 '''Algorithms Start👇'''
 
@@ -646,3 +643,49 @@ def inquiry_form_sale(request, property_id):
         return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted': submitted})
     except Exception as e:
         return render(request, 'estate/error_page.html', {e})
+
+
+
+def review_company(request, company_uuid):
+    # Check if user is a customer
+    if request.user.role != 'customer':
+        messages.error(request, 'Only customers can submit reviews')
+        return redirect('company:company-profile', company_uuid=company_uuid)
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login to gain access')
+        return redirect('landing')
+    try:
+        company = get_object_or_404(CompanyInformation, unique_company_id=company_uuid)
+        
+        # Check if user has already reviewed
+        existing_review = CompanyRating.objects.filter(
+            company_uuid=company_uuid,
+            user=request.user
+        ).first()
+        
+        if existing_review:
+            messages.warning(request, 'You have already reviewed this company')
+            return redirect('company:company-profile', company_uuid=company_uuid)
+        
+        if request.method == 'POST':
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.company_uuid = company.unique_company_id
+                review.user = request.user
+                
+                # Ensure rating is between 1 and 5
+                if not (1 <= review.rating <= 5):
+                    messages.error(request, 'Rating must be between 1 and 5 stars')
+                    return redirect('company:company_profile', company_uuid=company_uuid)
+                
+                review.save()
+                messages.success(request, 'Thank you for your review!')
+                return redirect('company:company_profile', company_uuid=company_uuid)
+            else:
+                messages.error(request, 'Please correct the errors below')
+        
+        return redirect('company:company_profile', company_uuid=company_uuid)
+        
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})

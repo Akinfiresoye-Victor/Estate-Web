@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{%load humanize%}
+{% load humanize %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'company/css/company_profile.css' %}">
 <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
@@ -10,40 +11,6 @@
 <a href="javascript:history.back()" class="attractive-back-button">
     &larr; Go Back to the Previous Page
 </a>
-
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
-
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
 
 <!-- Company Header -->
 <div class="company-header">
@@ -166,7 +133,6 @@
                   <span class="info-value">{{ company.principal_broker }}</span>
                 </div>
               </div>
-              
             </div>
           </div>
         </div>
@@ -241,207 +207,195 @@
       <!-- Right Content -->
       <div class="col-lg-8">
 
-<!-- Properties Section -->
-
-<div class="properties-section">
-  <div class="section-header">
-    <h2 class="section-title">
-      <i class="bi bi-houses-fill me-2"></i>Recent Listings by {{company.company_name}}
-    </h2>
-  </div>
-
-  {% if on_lease or on_sale %}
-  <div class="properties-grid">
-    
-    <!-- Properties for Sale -->
-    {% for property in on_sale %}
-    <div class="property-card" data-type="sale">
-      <div class="property-image">
-        {% if property.base_image %}
-          <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
-        {% else %}
-          <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
-        {% endif %}
-        <div class="property-badge sale-badge">For Sale</div>
-      </div>
-      
-      <div class="property-details">
-        <h3 class="property-title">{{ property.title }}</h3>
-        <p class="property-location">
-          <i class="bi bi-geo-alt"></i>{{ property.location }}
-        </p>
-        
-        <div class="property-features">
-          <span class="feature">
-            <i class="bi bi-house"></i>{{ property.residential }}
-          </span>
-          <span class="feature">
-            <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
-          </span>
-          <span class="feature">
-            <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
-          </span>
-        </div>
-        
-        <div class="property-footer">
-          <div class="property-price">
-            <span class="price">₦{{ property.price|floatformat:0|intcomma }}</span>
+        <!-- Properties Section -->
+        <div class="properties-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <i class="bi bi-houses-fill me-2"></i>Recent Listings by {{company.company_name}}
+            </h2>
           </div>
-          <a href="{% url 'customer:view-property-s' property.id %}" class="btn-view-property">
-            View Details <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
 
-    <!-- Properties for Rent -->
-    {% for property in on_lease %}
-    <div class="property-card" data-type="rent">
-      <div class="property-image">
-        {% if property.base_image %}
-          <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
-        {% else %}
-          <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
-        {% endif %}
-        <div class="property-badge rent-badge">For Rent</div>
-      </div>
-      
-      <div class="property-details">
-        <h3 class="property-title">{{ property.title }}</h3>
-        <p class="property-location">
-          <i class="bi bi-geo-alt"></i>{{ property.location }}
-        </p>
-        
-        <div class="property-features">
-          <span class="feature">
-            <i class="bi bi-house"></i>{{ property.residential }}
-          </span>
-          <span class="feature">
-            <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
-          </span>
-          <span class="feature">
-            <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
-          </span>
-        </div>
-        
-        <div class="property-footer">
-          <div class="property-price">
-            <span class="price">₦{{ property.price_range|floatformat:0|intcomma }}</span>
-            <span class="price-period">/month</span>
-          </div>
-          <a href="{% url 'customer:view-property-r' property.id %}" class="btn-view-property">
-            View Details <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-            <a href="{%url 'company:company-properties' company_uuid=company.unique_company_id%}" class="btn-view-property">
-            View All <i class="bi bi-arrow-right"></i>
+          {% if on_lease or on_sale %}
+          <div class="properties-grid">
+            
+            <!-- Properties for Sale -->
+            {% for property in on_sale %}
+            <div class="property-card" data-type="sale">
+              <div class="property-image">
+                {% if property.base_image %}
+                  <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
+                {% else %}
+                  <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
+                {% endif %}
+                <div class="property-badge sale-badge">For Sale</div>
+              </div>
+              
+              <div class="property-details">
+                <h3 class="property-title">{{ property.title }}</h3>
+                <p class="property-location">
+                  <i class="bi bi-geo-alt"></i>{{ property.location }}
+                </p>
+                
+                <div class="property-features">
+                  <span class="feature">
+                    <i class="bi bi-house"></i>{{ property.residential }}
+                  </span>
+                  <span class="feature">
+                    <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
+                  </span>
+                  <span class="feature">
+                    <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
+                  </span>
+                </div>
+                
+                <div class="property-footer">
+                  <div class="property-price">
+                    <span class="price">₦{{ property.price|floatformat:0|intcomma }}</span>
+                  </div>
+                  <a href="{% url 'customer:view-property-s' property.id %}" class="btn-view-property">
+                    View Details <i class="bi bi-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+
+            <!-- Properties for Rent -->
+            {% for property in on_lease %}
+            <div class="property-card" data-type="rent">
+              <div class="property-image">
+                {% if property.base_image %}
+                  <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
+                {% else %}
+                  <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
+                {% endif %}
+                <div class="property-badge rent-badge">For Rent</div>
+              </div>
+              
+              <div class="property-details">
+                <h3 class="property-title">{{ property.title }}</h3>
+                <p class="property-location">
+                  <i class="bi bi-geo-alt"></i>{{ property.location }}
+                </p>
+                
+                <div class="property-features">
+                  <span class="feature">
+                    <i class="bi bi-house"></i>{{ property.residential }}
+                  </span>
+                  <span class="feature">
+                    <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
+                  </span>
+                  <span class="feature">
+                    <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
+                  </span>
+                </div>
+                
+                <div class="property-footer">
+                  <div class="property-price">
+                    <span class="price">₦{{ property.price_range|floatformat:0|intcomma }}</span>
+                    <span class="price-period">/month</span>
+                  </div>
+                  <a href="{% url 'customer:view-property-r' property.id %}" class="btn-view-property">
+                    View Details <i class="bi bi-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+
+            <a href="{% url 'company:company-properties' company_uuid=company.unique_company_id %}" class="btn-view-property">
+              View All <i class="bi bi-arrow-right"></i>
             </a>
 
+          </div>
 
-    <!-- Rent Pagination -->
-    {% if on_lease.has_other_pages %}
-    <div class="pagination-container" id="rentPagination" style="display: none;">
-      <div class="pagination-info">
-        <span class="page-text">Page {{ on_lease.number }} of {{ on_lease.paginator.num_pages }}</span>
-      </div>
-      <ul class="pagination">
-        {% if on_lease.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page_rent={{ on_lease.previous_page_number }}{% if request.GET.page_sale %}&page_sale={{ request.GET.page_sale }}{% endif %}#properties" aria-label="Previous">
-              <i class="bi bi-chevron-left"></i>
-            </a>
-          </li>
-        {% else %}
-          <li class="page-item disabled">
-            <span class="page-link"><i class="bi bi-chevron-left"></i></span>
-          </li>
-        {% endif %}
-
-        {% for i in nums_r %}
-          {% if on_lease.number == forloop.counter %}
-            <li class="page-item active">
-              <span class="page-link">{{ forloop.counter }}</span>
-            </li>
           {% else %}
-            <li class="page-item">
-              <a class="page-link" href="?page_rent={{ forloop.counter }}{% if request.GET.page_sale %}&page_sale={{ request.GET.page_sale }}{% endif %}#properties">{{ forloop.counter }}</a>
-            </li>
+          <div class="no-properties">
+            <i class="bi bi-house-x"></i>
+            <h4>No Properties Available</h4>
+            <p>This company hasn't listed any properties yet</p>
+          </div>
           {% endif %}
-        {% endfor %}
-
-        {% if on_lease.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page_rent={{ on_lease.next_page_number }}{% if request.GET.page_sale %}&page_sale={{ request.GET.page_sale }}{% endif %}#properties" aria-label="Next">
-              <i class="bi bi-chevron-right"></i>
-            </a>
-          </li>
-        {% else %}
-          <li class="page-item disabled">
-            <span class="page-link"><i class="bi bi-chevron-right"></i></span>
-          </li>
-        {% endif %}
-      </ul>
-    </div>
-    {% endif %}
-  </div>
-
-  {% else %}
-  <div class="no-properties">
-    <i class="bi bi-house-x"></i>
-    <h4>No Properties Available</h4>
-    <p>This company hasn't listed any properties yet</p>
-  </div>
-  {% endif %}
-</div>
+        </div>
 
         <!-- Reviews Section -->
         <div class="reviews-section">
           <div class="section-header">
             <h2 class="section-title">
               <i class="bi bi-chat-quote-fill me-2"></i>Client Reviews
+              {% if total_reviews > 0 %}
+                <span class="review-count">({{ total_reviews }})</span>
+              {% endif %}
             </h2>
-            <button class="btn-write-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
-              <i class="bi bi-pencil-square me-2"></i>Write a Review
-            </button>
+            
+            {% if user.is_authenticated and not user_has_reviewed %}
+              <button class="btn-write-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <i class="bi bi-pencil-square me-2"></i>Write a Review
+              </button>
+            {% elif user_has_reviewed %}
+              <button class="btn-write-review" disabled style="opacity: 0.6; cursor: not-allowed;">
+                <i class="bi bi-check-circle me-2"></i>Already Reviewed
+              </button>
+            {% else %}
+              <a href="{% url 'login' %}?next={{ request.path }}" class="btn-write-review">
+                <i class="bi bi-pencil-square me-2"></i>Login to Review
+              </a>
+            {% endif %}
           </div>
 
           {% if reviews %}
-          <div class="reviews-list">
-            {% for review in reviews %}
-            <div class="review-card">
-              <div class="review-header">
-                <div class="reviewer-info">
-                  <div class="reviewer-avatar">
-                    {{ review.user.first_name.0|upper }}
-                  </div>
-                  <div>
-                    <h4 class="reviewer-name">{{ review.user.get_full_name }}</h4>
-                    <p class="review-date">{{ review.created_at|date:"M d, Y" }}</p>
-                  </div>
-                </div>
-                <div class="review-rating">
+            <!-- Average Rating Display -->
+            <div class="average-rating-display mb-4">
+              <div class="rating-summary">
+                <div class="rating-number">{{ average_rating|floatformat:1 }}</div>
+                <div class="rating-stars">
                   {% for i in "12345" %}
-                    {% if forloop.counter <= review.rating %}
+                    {% if forloop.counter <= average_rating|floatformat:0 %}
                       <i class="bi bi-star-fill"></i>
+                    {% elif forloop.counter <= average_rating|add:"0.5"|floatformat:0 %}
+                      <i class="bi bi-star-half"></i>
                     {% else %}
                       <i class="bi bi-star"></i>
                     {% endif %}
                   {% endfor %}
                 </div>
+                <div class="rating-count">Based on {{ total_reviews }} review{{ total_reviews|pluralize }}</div>
               </div>
-              <p class="review-text">{{ review.comment }}</p>
             </div>
-            {% endfor %}
-          </div>
+
+            <!-- Reviews List -->
+            <div class="reviews-list">
+              {% for review in reviews %}
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="reviewer-info">
+                    <div class="reviewer-avatar">
+                      {{ review.user.username.0|upper }}
+                    </div>
+                    <div>
+                      <h4 class="reviewer-name">{{ review.user.username }}</h4>
+                      <p class="review-date">{{ review.created_at|date:"M d, Y" }}</p>
+                    </div>
+                  </div>
+                  <div class="review-rating">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= review.rating %}
+                        <i class="bi bi-star-fill"></i>
+                      {% else %}
+                        <i class="bi bi-star"></i>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <p class="review-text">{{ review.comment }}</p>
+              </div>
+              {% endfor %}
+            </div>
           {% else %}
-          <div class="no-reviews">
-            <i class="bi bi-chat-left-text"></i>
-            <p>No reviews yet. Be the first to review this company!</p>
-          </div>
+            <div class="no-reviews">
+              <i class="bi bi-chat-left-text"></i>
+              <p>No reviews yet. Be the first to review {{ company.company_name }}!</p>
+            </div>
           {% endif %}
         </div>
 
@@ -495,38 +449,160 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
-          <i class="bi bi-star-fill me-2"></i>Write a Review
+          <i class="bi bi-star-fill me-2"></i>Write a Review for {{ company.company_name }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form id="reviewForm" method="post" action="#">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label">Your Rating</label>
-            <div class="rating-input">
-              <input type="radio" name="rating" value="5" id="star5" required>
-              <label for="star5"><i class="bi bi-star-fill"></i></label>
-              <input type="radio" name="rating" value="4" id="star4">
-              <label for="star4"><i class="bi bi-star-fill"></i></label>
-              <input type="radio" name="rating" value="3" id="star3">
-              <label for="star3"><i class="bi bi-star-fill"></i></label>
-              <input type="radio" name="rating" value="2" id="star2">
-              <label for="star2"><i class="bi bi-star-fill"></i></label>
-              <input type="radio" name="rating" value="1" id="star1">
-              <label for="star1"><i class="bi bi-star-fill"></i></label>
+        {% if user.is_authenticated %}
+          {% if user_has_reviewed %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              You have already submitted a review for this company.
             </div>
+          {% else %}
+            <form id="reviewForm" method="post" action="{% url 'customer:review-company' company.unique_company_id %}">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="form-label">Your Rating *</label>
+                <div class="star-rating-input">
+                  <input type="radio" name="rating" value="5" id="star5" required>
+                  <label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="4" id="star4">
+                  <label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="3" id="star3">
+                  <label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="2" id="star2">
+                  <label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="1" id="star1">
+                  <label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                </div>
+                <div class="rating-text text-center mt-2">
+                  <span id="ratingText" class="text-muted">Select a rating</span>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Your Review *</label>
+                <textarea name="comment" class="form-control" rows="5" required 
+                          placeholder="Share your experience with {{ company.company_name }}..."></textarea>
+                <small class="text-muted">Minimum 10 characters</small>
+              </div>
+              
+              <button type="submit" class="btn-submit-review">
+                <i class="bi bi-check-circle-fill me-2"></i>Submit Review
+              </button>
+            </form>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to write a review.
           </div>
-          <div class="mb-3">
-            <label class="form-label">Your Review</label>
-            <textarea name="comment" class="form-control" rows="4" required></textarea>
-          </div>
-          <button type="submit" class="btn-submit-contact">
-            <i class="bi bi-check-circle-fill me-2"></i>Submit Review
-          </button>
-        </form>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Star rating interaction
+    const starInputs = document.querySelectorAll('.star-rating-input input[type="radio"]');
+    const starLabels = document.querySelectorAll('.star-rating-input label');
+    const ratingText = document.getElementById('ratingText');
+    
+    const ratingDescriptions = {
+        '5': '⭐ Excellent - 5 stars',
+        '4': '⭐ Very Good - 4 stars',
+        '3': '⭐ Good - 3 stars',
+        '2': '⭐ Fair - 2 stars',
+        '1': '⭐ Poor - 1 star'
+    };
+    
+    // Handle star selection
+    starInputs.forEach((input) => {
+        input.addEventListener('change', function() {
+            const rating = this.value;
+            if (ratingText) {
+                ratingText.textContent = ratingDescriptions[rating];
+                ratingText.style.color = '#ffc107';
+                ratingText.style.fontWeight = '600';
+            }
+        });
+    });
+    
+    // Hover effects for star rating
+    starLabels.forEach((label, index) => {
+        label.addEventListener('mouseenter', function() {
+            const value = this.previousElementSibling.value;
+            if (!document.querySelector('.star-rating-input input:checked') && ratingText) {
+                ratingText.textContent = ratingDescriptions[value];
+                ratingText.style.color = '#6c757d';
+            }
+        });
+    });
+    
+    // Reset text on mouse leave if no selection
+    const starRatingContainer = document.querySelector('.star-rating-input');
+    if (starRatingContainer) {
+        starRatingContainer.addEventListener('mouseleave', function() {
+            const checkedInput = document.querySelector('.star-rating-input input:checked');
+            if (!checkedInput && ratingText) {
+                ratingText.textContent = 'Select a rating';
+                ratingText.style.color = '';
+                ratingText.style.fontWeight = '';
+            }
+        });
+    }
+    
+    // Form validation
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            const ratingChecked = document.querySelector('.star-rating-input input:checked');
+            const commentField = document.querySelector('textarea[name="comment"]');
+            
+            if (!ratingChecked) {
+                e.preventDefault();
+                alert('Please select a star rating');
+                return false;
+            }
+            
+            if (commentField && commentField.value.trim().length < 10) {
+                e.preventDefault();
+                alert('Please write at least 10 characters in your review');
+                commentField.focus();
+                return false;
+            }
+            
+            return true;
+        });
+    }
+});
+
+// Share company function
+function shareCompany() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ company.company_name }}',
+            text: 'Check out {{ company.company_name }} on our platform',
+            url: window.location.href
+        }).catch(err => console.log('Error sharing:', err));
+    } else {
+        // Fallback: copy URL to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('Link copied to clipboard!');
+        });
+    }
+}
+</script>
 {% endblock %}
