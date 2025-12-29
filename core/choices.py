@@ -192,3 +192,10 @@ YEARS_OF_EXPERINCE=[
     ('5-10', '5-10'),
     ('10+', '10+')
 ]
+
+APPOINTMENT_TYPE=[
+    ('Client', 'Client'),
+    ('Personal', 'Personal'),
+    ('Company', 'Company')
+]
+

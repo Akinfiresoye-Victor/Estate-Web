@@ -13,9 +13,6 @@
 <style>
 .attractive-back-button {
     margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
     display: inline-flex;
     align-items: center;
     padding: 0.7rem 1.5rem;
@@ -29,18 +26,37 @@
     transition: all 0.3s ease;
 }
 
-/* Hover Effect: Changes appearance on mouse over */
 .attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
+    background-color: #1a3c4e;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
 }
 
-/* Active Effect: Simulates a press */
 .attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+    background-color: #0a0a0aff;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.day-appointments {
+    margin-top: 0.5rem;
+}
+
+.appointment-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    display: inline-block;
+    margin: 2px;
+}
+
+.appointment-indicator {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2px;
 }
 </style>
 
@@ -53,11 +69,6 @@
           <i class="bi bi-calendar-event me-3"></i>Property Viewings
         </h1>
         <p class="page-subtitle">Schedule and manage property viewing appointments</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn-new-appointment" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
-          <i class="bi bi-plus-circle me-2"></i>Schedule Viewing
-        </button>
       </div>
     </div>
   </div>
@@ -72,10 +83,10 @@
           <i class="bi bi-calendar-check"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ total_appointments|default:"0" }}</h3>
+          <h3>{{ appointments|length }}</h3>
           <p>Total Viewings</p>
         </div>
-        <div class="stat-badge">This Month</div>
+        <div class="stat-badge">All Time</div>
       </div>
 
       <div class="stat-card">
@@ -83,10 +94,10 @@
           <i class="bi bi-clock-history"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ upcoming_appointments|default:"0" }}</h3>
+          <h3 id="upcomingCount">0</h3>
           <p>Upcoming</p>
         </div>
-        <div class="stat-badge pending">Today</div>
+        <div class="stat-badge pending">Future</div>
       </div>
 
       <div class="stat-card">
@@ -94,28 +105,25 @@
           <i class="bi bi-check-circle-fill"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ completed_appointments|default:"0" }}</h3>
-          <p>Completed</p>
-        </div>
-        <div class="stat-trend up">
-          <i class="bi bi-arrow-up"></i> 15%
+          <h3 id="pastCount">0</h3>
+          <p>Past</p>
         </div>
       </div>
 
       <div class="stat-card">
         <div class="stat-icon cancelled">
-          <i class="bi bi-x-circle-fill"></i>
+          <i class="bi bi-calendar-day"></i>
         </div>
         <div class="stat-content">
-          <h3>{{ cancelled_appointments|default:"0" }}</h3>
-          <p>Cancelled</p>
+          <h3 id="todayCount">0</h3>
+          <p>Today</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Calendar & List View Toggle -->
+<!-- View Controls -->
 <div class="view-controls">
   <div class="container">
     <div class="controls-bar">
@@ -129,20 +137,11 @@
       </div>
 
       <div class="filter-group">
-        <select class="filter-select" id="statusFilter">
-          <option value="all">All Status</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="no-show">No Show</option>
-        </select>
-
-        <select class="filter-select" id="propertyFilter">
-          <option value="all">All Properties</option>
-          {% for property in properties %}
-          <option value="{{ property.id }}">{{ property.title|truncatewords:8 }}</option>
-          {% endfor %}
+        <select class="filter-select" id="typeFilter">
+          <option value="all">All Types</option>
+          <option value="Personal">Personal</option>
+          <option value="Business">Business</option>
+          <option value="Virtual">Virtual</option>
         </select>
       </div>
     </div>
@@ -159,12 +158,13 @@
         <button class="month-nav" id="prevMonth">
           <i class="bi bi-chevron-left"></i>
         </button>
-        <h2 class="current-month" id="currentMonth">January 2025</h2>
+        <h2 class="current-month" id="currentMonth"></h2>
         <button class="month-nav" id="nextMonth">
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
 
+      <!-- Calendar Grid -->
       <!-- Calendar Grid -->
       <div class="calendar-grid">
         <div class="calendar-day-header">Sun</div>
@@ -174,54 +174,22 @@
         <div class="calendar-day-header">Thu</div>
         <div class="calendar-day-header">Fri</div>
         <div class="calendar-day-header">Sat</div>
-
-        <!-- Calendar days will be generated by JavaScript -->
-        <div id="calendarDays"></div>
       </div>
 
-      <!-- Today's Appointments -->
+      <div class="calendar-grid" id="calendarDays"></div>
+
+      <!-- Selected Day's Appointments -->
       <div class="today-schedule">
         <h3 class="schedule-title">
-          <i class="bi bi-calendar-day me-2"></i>Today's Schedule
+          <i class="bi bi-calendar-day me-2"></i><span id="selectedDateTitle">Select a date</span>
         </h3>
         
-        {% if todays_appointments %}
-        <div class="appointments-list">
-          {% for appointment in todays_appointments %}
-          <div class="appointment-card status-{{ appointment.status }}">
-            <div class="appointment-time">
-              <i class="bi bi-clock"></i>
-              <span>{{ appointment.time }}</span>
-            </div>
-            <div class="appointment-details">
-              <h4 class="client-name">{{ appointment.client_name }}</h4>
-              <p class="property-name">
-                <i class="bi bi-house-door"></i>{{ appointment.property.title|truncatewords:6 }}
-              </p>
-              <span class="status-badge status-{{ appointment.status }}">
-                {{ appointment.get_status_display }}
-              </span>
-            </div>
-            <div class="appointment-actions">
-              <button class="action-btn confirm" title="Confirm" onclick="confirmAppointment({{ appointment.id }})">
-                <i class="bi bi-check-lg"></i>
-              </button>
-              <button class="action-btn reschedule" title="Reschedule" onclick="rescheduleAppointment({{ appointment.id }})">
-                <i class="bi bi-calendar-range"></i>
-              </button>
-              <button class="action-btn cancel" title="Cancel" onclick="cancelAppointment({{ appointment.id }})">
-                <i class="bi bi-x-lg"></i>
-              </button>
-            </div>
+        <div id="selectedDateAppointments">
+          <div class="no-appointments">
+            <i class="bi bi-calendar-x"></i>
+            <p>Click on a date to view appointments</p>
           </div>
-          {% endfor %}
         </div>
-        {% else %}
-        <div class="no-appointments">
-          <i class="bi bi-calendar-x"></i>
-          <p>No appointments scheduled for today</p>
-        </div>
-        {% endif %}
       </div>
 
     </div>
@@ -237,83 +205,39 @@
       <table class="appointments-table">
         <thead>
           <tr>
-            <th>Date & Time</th>
-            <th>Client</th>
-            <th>Property</th>
-            <th>Contact</th>
-            <th>Status</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Property ID</th>
+            <th>Property Type</th>
+            <th>Agent</th>
             <th>Notes</th>
-            <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="appointmentsTableBody">
           {% for appointment in appointments %}
-          <tr class="appointment-row" data-status="{{ appointment.status }}">
+          <tr class="appointment-row" data-type="{{ appointment.appointment_type }}" data-date="{{ appointment.appointment|date:'Y-m-d' }}">
             <td>
               <div class="datetime-info">
                 <span class="date">
                   <i class="bi bi-calendar3"></i>
-                  {{ appointment.date|date:"M d, Y" }}
-                </span>
-                <span class="time">
-                  <i class="bi bi-clock"></i>
-                  {{ appointment.time }}
+                  {{ appointment.appointment|date:"M d, Y" }}
                 </span>
               </div>
             </td>
             <td>
-              <div class="client-info">
-                <div class="client-avatar">
-                  {{ appointment.client_name.0|upper }}
-                </div>
-                <div class="client-details">
-                  <h4>{{ appointment.client_name }}</h4>
-                  <span class="client-type">{{ appointment.client_type|default:"Walk-in" }}</span>
-                </div>
-              </div>
+              <span class="status-badge status-scheduled">{{ appointment.appointment_type }}</span>
             </td>
             <td>
-              <div class="property-info">
-                <span class="property-title">{{ appointment.property.title|truncatewords:6 }}</span>
-                <span class="property-location">
-                  <i class="bi bi-geo-alt"></i>{{ appointment.property.location }}
-                </span>
-              </div>
+              <span class="property-title">{% if appointment.property_id %}#{{ appointment.property_id }}{% else %}N/A{% endif %}</span>
             </td>
             <td>
-              <div class="contact-details">
-                <a href="tel:{{ appointment.client_phone }}" class="contact-link">
-                  <i class="bi bi-telephone"></i>{{ appointment.client_phone }}
-                </a>
-                <a href="mailto:{{ appointment.client_email }}" class="contact-link">
-                  <i class="bi bi-envelope"></i>{{ appointment.client_email }}
-                </a>
-              </div>
+              <span>{{ appointment.property_type|default:"N/A" }}</span>
             </td>
             <td>
-              <select class="status-select status-{{ appointment.status }}" onchange="updateStatus({{ appointment.id }}, this.value)">
-                <option value="scheduled" {% if appointment.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
-                <option value="confirmed" {% if appointment.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
-                <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Completed</option>
-                <option value="cancelled" {% if appointment.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                <option value="no-show" {% if appointment.status == 'no-show' %}selected{% endif %}>No Show</option>
-              </select>
+              <span>{% if appointment.agent_uuid %}{{ appointment.agent_uuid|truncatechars:15 }}{% else %}N/A{% endif %}</span>
             </td>
             <td>
-              <span class="notes-preview">{{ appointment.notes|truncatewords:5|default:"No notes" }}</span>
-            </td>
-            <td>
-              <div class="table-actions">
-                <button class="action-btn view" onclick="viewAppointment({{ appointment.id }})" title="View Details">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button class="action-btn edit" onclick="editAppointment({{ appointment.id }})" title="Edit">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="action-btn delete" onclick="deleteAppointment({{ appointment.id }})" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
+              <span class="notes-preview">{{ appointment.note|truncatewords:8 }}</span>
             </td>
           </tr>
           {% endfor %}
@@ -326,136 +250,10 @@
         <i class="bi bi-calendar-x"></i>
       </div>
       <h3>No Appointments Scheduled</h3>
-      <p>Start scheduling property viewings to manage your appointments here</p>
-      <button class="btn-schedule-first" data-bs-toggle="modal" data-bs-target="#newAppointmentModal">
-        <i class="bi bi-plus-circle me-2"></i>Schedule First Viewing
-      </button>
+      <p>You don't have any appointments yet</p>
     </div>
     {% endif %}
 
-  </div>
-</div>
-
-<!-- New Appointment Modal -->
-<div class="modal fade" id="newAppointmentModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-calendar-plus me-2"></i>Schedule New Viewing
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form id="appointmentForm" method="post" action="">
-          {% csrf_token %}
-          
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Client Name *</label>
-              <input type="text" name="client_name" class="form-control" required>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Client Phone *</label>
-              <input type="tel" name="client_phone" class="form-control" required>
-            </div>
-
-            <div class="col-md-12">
-              <label class="form-label">Client Email *</label>
-              <input type="email" name="client_email" class="form-control" required>
-            </div>
-
-            <div class="col-md-12">
-              <label class="form-label">Property *</label>
-              <select name="property" class="form-control" required>
-                <option value="">Select a property</option>
-                {% for property in properties %}
-                <option value="{{ property.id }}">{{ property.title }} - {{ property.location }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Viewing Date *</label>
-              <input type="date" name="date" class="form-control" required>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Viewing Time *</label>
-              <input type="time" name="time" class="form-control" required>
-            </div>
-
-            <div class="col-md-12">
-              <label class="form-label">Notes</label>
-              <textarea name="notes" class="form-control" rows="3" placeholder="Add any special instructions or notes..."></textarea>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn-submit">
-              <i class="bi bi-check-circle me-2"></i>Schedule Viewing
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- View Appointment Modal -->
-<div class="modal fade" id="viewAppointmentModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-calendar-event me-2"></i>Viewing Details
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="appointment-detail-content">
-          <div class="detail-row">
-            <div class="detail-col">
-              <label>Client Name</label>
-              <span id="viewClientName">-</span>
-            </div>
-            <div class="detail-col">
-              <label>Status</label>
-              <span id="viewStatus" class="status-badge">-</span>
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-col">
-              <label>Date & Time</label>
-              <span id="viewDateTime">-</span>
-            </div>
-            <div class="detail-col">
-              <label>Property</label>
-              <span id="viewProperty">-</span>
-            </div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-col">
-              <label>Phone</label>
-              <span id="viewPhone">-</span>
-            </div>
-            <div class="detail-col">
-              <label>Email</label>
-              <span id="viewEmail">-</span>
-            </div>
-          </div>
-
-          <div class="detail-row full">
-            <label>Notes</label>
-            <p id="viewNotes">-</p>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -465,6 +263,24 @@
 <script>
 (function() {
     'use strict';
+
+    // Parse appointments from Django template
+    const appointments = [
+        {% for appointment in appointments %}
+        {
+            id: {{ appointment.id }},
+            date: '{{ appointment.appointment|date:"Y-m-d" }}',
+            type: '{{ appointment.appointment_type }}',
+            note: '{{ appointment.note|escapejs }}',
+            propertyId: {% if appointment.property_id %}{{ appointment.property_id }}{% else %}null{% endif %},
+            propertyType: '{{ appointment.property_type|default:"N/A" }}',
+            agentUuid: '{% if appointment.agent_uuid %}{{ appointment.agent_uuid }}{% else %}N/A{% endif %}'
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    let currentDate = new Date();
+    let selectedDate = null;
 
     // View toggle
     const viewButtons = document.querySelectorAll('.view-btn');
@@ -488,17 +304,128 @@
         });
     });
 
-    // Simple calendar generation
+    // Filter functionality
+    const typeFilter = document.getElementById('typeFilter');
+    if (typeFilter) {
+        typeFilter.addEventListener('change', function() {
+            const filterValue = this.value;
+            const rows = document.querySelectorAll('.appointment-row');
+            
+            rows.forEach(row => {
+                if (filterValue === 'all' || row.dataset.type === filterValue) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Regenerate calendar with filter
+            generateCalendar();
+        });
+    }
+
+    // Calculate stats
+    function updateStats() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let upcomingCount = 0;
+        let pastCount = 0;
+        let todayCount = 0;
+
+        appointments.forEach(apt => {
+            const aptDate = new Date(apt.date);
+            aptDate.setHours(0, 0, 0, 0);
+
+            if (aptDate.getTime() === today.getTime()) {
+                todayCount++;
+            } else if (aptDate > today) {
+                upcomingCount++;
+            } else {
+                pastCount++;
+            }
+        });
+
+        document.getElementById('upcomingCount').textContent = upcomingCount;
+        document.getElementById('pastCount').textContent = pastCount;
+        document.getElementById('todayCount').textContent = todayCount;
+    }
+
+    // Get appointments for a specific date
+    function getAppointmentsForDate(dateStr) {
+        const filterValue = typeFilter ? typeFilter.value : 'all';
+        return appointments.filter(apt => {
+            const matchesDate = apt.date === dateStr;
+            const matchesFilter = filterValue === 'all' || apt.type === filterValue;
+            return matchesDate && matchesFilter;
+        });
+    }
+
+    // Display appointments for selected date
+    function displaySelectedDateAppointments(dateStr, dayNum, monthName) {
+        const dayAppointments = getAppointmentsForDate(dateStr);
+        const container = document.getElementById('selectedDateAppointments');
+        const titleElement = document.getElementById('selectedDateTitle');
+        
+        titleElement.textContent = `${monthName} ${dayNum} Appointments`;
+
+        if (dayAppointments.length === 0) {
+            container.innerHTML = `
+                <div class="no-appointments">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No appointments scheduled for this day</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="appointments-list">';
+        dayAppointments.forEach(apt => {
+            html += `
+                <div class="appointment-card status-scheduled">
+                    <div class="appointment-time">
+                        <i class="bi bi-clock"></i>
+                        <span>${apt.type}</span>
+                    </div>
+                    <div class="appointment-details">
+                        <h4 class="client-name">Appointment #${apt.id}</h4>
+                        <p class="property-name">
+                            <i class="bi bi-house-door"></i>
+                            ${apt.propertyId ? `Property #${apt.propertyId}` : 'No Property'} 
+                            ${apt.propertyType !== 'N/A' ? `- ${apt.propertyType}` : ''}
+                        </p>
+                        <span class="status-badge status-scheduled">${apt.type}</span>
+                    </div>
+                    <div class="appointment-actions">
+                        <button class="action-btn view" title="View Details" onclick="alert('Notes: ${apt.note}')">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // Generate calendar
     function generateCalendar() {
         const calendarDays = document.getElementById('calendarDays');
+        const currentMonthElement = document.getElementById('currentMonth');
+        
         if (!calendarDays) return;
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        currentMonthElement.textContent = `${monthNames[month]} ${year}`;
         
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
 
         let html = '';
         
@@ -507,59 +434,108 @@
             html += '<div class="calendar-day empty"></div>';
         }
 
+        const filterValue = typeFilter ? typeFilter.value : 'all';
+
         // Days of the month
         for (let day = 1; day <= daysInMonth; day++) {
-            const isToday = day === today.getDate() && month === today.getMonth();
-            html += `<div class="calendar-day ${isToday ? 'today' : ''}">
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+            const isSelected = selectedDate === dateStr;
+            
+            // Get appointments for this day
+            const dayAppointments = getAppointmentsForDate(dateStr);
+            const hasAppointments = dayAppointments.length > 0;
+
+            html += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasAppointments ? 'has-appointments' : ''}" 
+                          data-date="${dateStr}" 
+                          data-day="${day}" 
+                          data-month="${monthNames[month]}"
+                          style="cursor: pointer;">
                 <span class="day-number">${day}</span>
-                <div class="day-appointments"></div>
+                <div class="day-appointments">`;
+            
+            if (hasAppointments) {
+                html += '<div class="appointment-indicator">';
+                for (let i = 0; i < Math.min(dayAppointments.length, 3); i++) {
+                    html += '<div class="appointment-dot"></div>';
+                }
+                if (dayAppointments.length > 3) {
+                    html += `<small style="color: var(--secondary-color); font-weight: 700;">+${dayAppointments.length - 3}</small>`;
+                }
+                html += '</div>';
+            }
+            
+            html += `</div>
             </div>`;
         }
 
         calendarDays.innerHTML = html;
+
+        // Add click listeners to calendar days
+        document.querySelectorAll('.calendar-day:not(.empty)').forEach(dayElement => {
+            dayElement.addEventListener('click', function() {
+                const dateStr = this.dataset.date;
+                const dayNum = this.dataset.day;
+                const monthName = this.dataset.month;
+                
+                // Remove previous selection
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                selectedDate = dateStr;
+                displaySelectedDateAppointments(dateStr, dayNum, monthName);
+            });
+        });
     }
 
+    // Month navigation
+    document.getElementById('prevMonth').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        selectedDate = null;
+        generateCalendar();
+        document.getElementById('selectedDateTitle').textContent = 'Select a date';
+        document.getElementById('selectedDateAppointments').innerHTML = `
+            <div class="no-appointments">
+                <i class="bi bi-calendar-x"></i>
+                <p>Click on a date to view appointments</p>
+            </div>
+        `;
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        selectedDate = null;
+        generateCalendar();
+        document.getElementById('selectedDateTitle').textContent = 'Select a date';
+        document.getElementById('selectedDateAppointments').innerHTML = `
+            <div class="no-appointments">
+                <i class="bi bi-calendar-x"></i>
+                <p>Click on a date to view appointments</p>
+            </div>
+        `;
+    });
+
+    // Initialize
+    updateStats();
     generateCalendar();
 
 })();
-
-// Global action functions
-function confirmAppointment(id) {
-    updateStatus(id, 'confirmed');
-}
-
-function rescheduleAppointment(id) {
-    // Open edit modal with appointment data
-    console.log('Reschedule appointment:', id);
-}
-
-function cancelAppointment(id) {
-    if (confirm('Are you sure you want to cancel this viewing?')) {
-        updateStatus(id, 'cancelled');
-    }
-}
-
-function viewAppointment(id) {
-    const modal = new bootstrap.Modal(document.getElementById('viewAppointmentModal'));
-    modal.show();
-    // Fetch and display appointment details
-    console.log('View appointment:', id);
-}
-
-function editAppointment(id) {
-    // Open edit modal
-    console.log('Edit appointment:', id);
-}
-
-function deleteAppointment(id) {
-    if (confirm('Are you sure you want to delete this appointment?')) {
-        console.log('Delete appointment:', id);
-    }
-}
-
-function updateStatus(id, status) {
-    // Send AJAX request to update status
-    console.log('Update appointment', id, 'to status:', status);
-}
 </script>
+
+<style>
+.calendar-day.has-appointments {
+    border-color: var(--secondary-color);
+    background: rgba(193, 155, 118, 0.03);
+}
+
+.calendar-day.selected {
+    background: linear-gradient(135deg, rgba(26, 60, 78, 0.15), rgba(193, 155, 118, 0.15));
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(193, 155, 118, 0.2);
+}
+
+.calendar-day.has-appointments:hover {
+    background: rgba(193, 155, 118, 0.08);
+}
+</style>
 {% endblock %}

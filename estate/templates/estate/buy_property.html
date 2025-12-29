@@ -7,141 +7,189 @@
 
 {% block content %}
 
-<!-- Page Header -->
-<div class="page-header">
-  <div class="header-overlay"></div>
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-background"></div>
   <div class="container">
-    <div class="header-content">
-      <div class="header-icon">
-        <i class="bi bi-house-check-fill"></i>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="bi bi-stars"></i>
+        <span>Premium Properties</span>
       </div>
-      <h1 class="header-title">Properties for Sale</h1>
-      <p class="header-subtitle">Discover your dream property from {{ on_sale.paginator.count|default:"0" }} available properties</p>
+      <h1 class="hero-title">Find Your Dream Home</h1>
+      <p class="hero-subtitle">Explore {{ on_sale.paginator.count|default:"0" }} exceptional properties available for sale</p>
     </div>
   </div>
-</div>
-
-<div class="container main-content">
-  
-  <!-- Filter Section -->
-  <div class="filter-section">
-    <form method="get" class="filter-form">
-      {{ salefilter.form }}
-      {% csrf_token %}
-      <button type="submit" class="btn-filter">
-        <i class="bi bi-funnel-fill"></i>
-        <span>Apply Filters</span>
-      </button>
-    </form>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <path d="M0,50 C300,100 900,0 1200,50 L1200,120 L0,120 Z" fill="#ffffff"></path>
+    </svg>
   </div>
+</section>
 
-  {% if on_sale %}
-    <!-- Properties Grid -->
-    <div class="properties-grid">
-      {% for bought, wishlist in buy %}
-        {% if bought.available %}
-          <article class="property-card">
-            
-            <!-- Property Image -->
-            <div class="property-image">
-              {% if bought.base_image %}
-                <img src="{{ bought.base_image.url }}" alt="Property Image" class="property-img">
-              {% else %}
-                <div class="placeholder-image">
-                  <i class="bi bi-image"></i>
-                </div>
-              {% endif %}
+<!-- Main Content -->
+<main class="main-wrapper">
+  <div class="container">
+    
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-header">
+        <h2 class="filter-title">
+          <i class="bi bi-sliders"></i>
+          Filter Properties
+        </h2>
+        <button type="button" class="filter-toggle" onclick="toggleFilters()">
+          <i class="bi bi-funnel"></i>
+          <span class="filter-toggle-text">Show Filters</span>
+        </button>
+      </div>
+      
+      <div class="filter-content" id="filterContent">
+        <form method="get" class="filter-form">
+          {{ salefilter.form }}
+          {% csrf_token %}
+          <div class="filter-actions">
+            <button type="submit" class="btn-apply">
+              <i class="bi bi-search"></i>
+              Apply Filters
+            </button>
+            <button type="reset" class="btn-reset">
+              <i class="bi bi-arrow-clockwise"></i>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Results Info -->
+    {% if on_sale %}
+      <div class="results-info">
+        <div class="results-count">
+          <i class="bi bi-house-fill"></i>
+          <span><strong>{{ on_sale.paginator.count }}</strong> Properties Found</span>
+        </div>
+        <div class="results-sort">
+          <span class="sort-label">Showing page {{ on_sale.number }} of {{ on_sale.paginator.num_pages }}</span>
+        </div>
+      </div>
+
+      <!-- Properties Grid -->
+      <div class="properties-container">
+        {% for bought, wishlist in buy %}
+          {% if bought.available %}
+            <article class="property-card">
               
-              <div class="image-overlay">
-                <span class="property-badge">
-                  <i class="bi bi-tag-fill"></i>
-                  For Sale
-                </span>
-                <a href="{% url 'customer:toggle-wishlist-buy' bought.id %}" class="wishlist-btn" aria-label="Add to wishlist">
+              <!-- Image Container -->
+              <div class="property-image-wrapper">
+                {% if bought.base_image %}
+                  <img src="{{ bought.base_image.url }}" alt="Property" class="property-image" loading="lazy">
+                {% else %}
+                  <div class="property-placeholder">
+                    <i class="bi bi-building"></i>
+                  </div>
+                {% endif %}
+                
+                <div class="property-badges">
+                  <span class="badge-status">For Sale</span>
+                </div>
+                
+                <button class="btn-wishlist" onclick="location.href='{% url 'customer:toggle-wishlist-buy' bought.id %}'" aria-label="Add to wishlist">
                   <i class="bi bi-heart{% if wishlist %}-fill{% endif %}"></i>
+                </button>
+              </div>
+              
+              <!-- Card Body -->
+              <div class="property-content">
+                
+                <!-- Price Tag -->
+                <div class="property-price-tag">
+                  <span class="price-amount">₦{{ bought.price|floatformat:0|intcomma }}</span>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="property-name">
+                  {% if bought.residential %}
+                    {{ bought.residential }}
+                  {% elif bought.commercial %}
+                    {{ bought.commercial }}
+                  {% elif bought.lands %}
+                    {{ bought.lands }}
+                  {% endif %}
+                </h3>
+                
+                <!-- Location -->
+                <div class="property-location">
+                  <i class="bi bi-geo-alt"></i>
+                  <span>{{ bought.location }}, {{ bought.state }}</span>
+                </div>
+                
+                <!-- Description -->
+                <p class="property-desc">{{ bought.property_description|truncatewords:15 }}</p>
+                
+                <!-- Info Grid -->
+                <div class="property-info-grid">
+                  <div class="info-item">
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ bought.phone_number }}</span>
+                  </div>
+                  <div class="info-item">
+                    <i class="bi bi-calendar3"></i>
+                    <span>{{ bought.listed_date|date:"M d, Y" }}</span>
+                  </div>
+                </div>
+                
+                <!-- Action Button -->
+                <a href="{% url 'customer:view-property-s' property_id=bought.id %}" class="btn-details">
+                  <span>View Details</span>
+                  <i class="bi bi-arrow-right-short"></i>
                 </a>
               </div>
-            </div>
-            
-            <!-- Property Content -->
-            <div class="property-body">
-              <h2 class="property-title">
-                {% if bought.residential %}
-                  {{ bought.residential }}
-                {% elif bought.commercial %}
-                  {{ bought.commercial }}
-                {% elif bought.lands %}
-                  {{ bought.lands }}
-                {% endif %}
-              </h2>
-              
-              <p class="property-location">
-                <i class="bi bi-geo-alt-fill"></i>
-                {{ bought.location }}, {{ bought.state }}
-              </p>
-              
-              <div class="property-price">
-                <span class="price-value">₦{{ bought.price|floatformat:0|intcomma }}</span>
-              </div>
-              
-              <p class="property-description">{{ bought.property_description|truncatewords:20 }}</p>
-              
-              <div class="property-meta">
-                <div class="meta-item">
-                  <i class="bi bi-telephone-fill"></i>
-                  <span>{{ bought.phone_number }}</span>
-                </div>
-                <div class="meta-item">
-                  <i class="bi bi-calendar-check"></i>
-                  <span>{{ bought.listed_date|date:"M d, Y" }}</span>
-                </div>
-              </div>
-              
-              <a href="{% url 'customer:view-property-s' property_id=bought.id %}" class="btn-view">
-                View Details
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-          </article>
-        {% endif %}
-      {% endfor %}
-    </div>
-  {% else %}
-    <!-- Empty State -->
-    <div class="empty-state">
-      <div class="empty-icon">
-        <i class="bi bi-inbox"></i>
+            </article>
+          {% endif %}
+        {% endfor %}
       </div>
-      <h2 class="empty-title">No Properties Available</h2>
-      <p class="empty-text">We don't have any properties for sale at the moment. Check back soon or contact us to list your property.</p>
-    </div>
-  {% endif %}
-</div>
+    {% else %}
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="bi bi-house-x"></i>
+        </div>
+        <h2 class="empty-title">No Properties Found</h2>
+        <p class="empty-message">We couldn't find any properties matching your criteria. Try adjusting your filters or check back later.</p>
+        <button onclick="window.location.href='?'" class="btn-empty-action">
+          <i class="bi bi-arrow-clockwise"></i>
+          Clear Filters
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</main>
 
 <!-- Pagination -->
 {% if on_sale.paginator.num_pages > 1 %}
-<div class="pagination-wrapper">
+<section class="pagination-section">
   <div class="container">
-    <nav class="pagination" aria-label="Property pagination">
+    <nav class="pagination-nav" aria-label="Property pagination">
       <ul class="pagination-list">
+        
         {% if on_sale.has_previous %}
-          <li>
-            <a href="?page=1" class="page-link" aria-label="First page">
-              <i class="bi bi-chevron-double-left"></i>
+          <li class="pagination-item">
+            <a href="?page=1" class="pagination-link" aria-label="First page">
+              <i class="bi bi-chevron-bar-left"></i>
             </a>
           </li>
-          <li>
-            <a href="?page={{ on_sale.previous_page_number }}" class="page-link" aria-label="Previous page">
+          <li class="pagination-item">
+            <a href="?page={{ on_sale.previous_page_number }}" class="pagination-link" aria-label="Previous">
               <i class="bi bi-chevron-left"></i>
             </a>
           </li>
         {% endif %}
 
         {% for i in nums %}
-          <li>
+          <li class="pagination-item">
             <a href="?page={{ forloop.counter }}" 
-               class="page-link {% if on_sale.number == forloop.counter %}active{% endif %}"
-               aria-label="Page {{ forloop.counter }}"
+               class="pagination-link {% if on_sale.number == forloop.counter %}active{% endif %}"
                {% if on_sale.number == forloop.counter %}aria-current="page"{% endif %}>
               {{ forloop.counter }}
             </a>
@@ -149,25 +197,42 @@
         {% endfor %}
 
         {% if on_sale.has_next %}
-          <li>
-            <a href="?page={{ on_sale.next_page_number }}" class="page-link" aria-label="Next page">
+          <li class="pagination-item">
+            <a href="?page={{ on_sale.next_page_number }}" class="pagination-link" aria-label="Next">
               <i class="bi bi-chevron-right"></i>
             </a>
           </li>
-          <li>
-            <a href="?page={{ on_sale.paginator.num_pages }}" class="page-link" aria-label="Last page">
-              <i class="bi bi-chevron-double-right"></i>
+          <li class="pagination-item">
+            <a href="?page={{ on_sale.paginator.num_pages }}" class="pagination-link" aria-label="Last page">
+              <i class="bi bi-chevron-bar-right"></i>
             </a>
           </li>
         {% endif %}
+        
       </ul>
     </nav>
     
-    <p class="pagination-info">
+    <div class="pagination-summary">
       Page <strong>{{ on_sale.number }}</strong> of <strong>{{ on_sale.paginator.num_pages }}</strong>
-    </p>
+    </div>
   </div>
-</div>
+</section>
 {% endif %}
+
+<script>
+function toggleFilters() {
+  const content = document.getElementById('filterContent');
+  const toggleBtn = document.querySelector('.filter-toggle');
+  const toggleText = document.querySelector('.filter-toggle-text');
+  
+  content.classList.toggle('active');
+  
+  if (content.classList.contains('active')) {
+    toggleText.textContent = 'Hide Filters';
+  } else {
+    toggleText.textContent = 'Show Filters';
+  }
+}
+</script>
 
 {% endblock %}

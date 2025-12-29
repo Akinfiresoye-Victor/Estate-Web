@@ -1,613 +1,646 @@
-/* ======================
-   CSS Variables
-   ====================== */
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
 :root {
-    --color-primary: #43a047;
-    --color-primary-dark: #2e7d32;
-    --color-primary-light: #66bb6a;
-    --color-bg-light: #e8f5e9;
-    --color-bg-lighter: #f1f8e9;
-    --color-bg-card: #c8e6c9;
-    --color-white: #fff;
-    --color-text: #495057;
-    --color-text-light: #6c757d;
-    --color-border: #dee2e6;
-    --color-bg-gray: #f8f9fa;
-    
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.1);
-    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
-    
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
-    
-    --transition: all 0.3s ease;
+  --primary-green: #43a047;
+  --primary-dark: #2e7d32;
+  --primary-light: #66bb6a;
+  --primary-lighter: #e8f5e9;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --bg-white: #ffffff;
+  --bg-gray: #f8f9fa;
+  --border-color: #e0e0e0;
+  --shadow-sm: 0 2px 8px rgba(67, 160, 71, 0.08);
+  --shadow-md: 0 4px 16px rgba(67, 160, 71, 0.12);
+  --shadow-lg: 0 8px 32px rgba(67, 160, 71, 0.16);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ======================
-   Base Styles
-   ====================== */
+/* ============================================
+   BASE STYLES
+   ============================================ */
 body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
-    min-height: 100vh;
-    padding: 2rem 1rem;
-    color: var(--color-text);
-    line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-gray);
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding-top: 90px;
 }
 
-/* ======================
-   Layout
-   ====================== */
-.detail-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.property-card {
-    background: var(--color-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-}
-
-/* ======================
-   Back Button
-   ====================== */
+/* ============================================
+   BACK BUTTON
+   ============================================ */
 .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1.5rem;
-    margin-bottom: 1.5rem;
-    background: var(--color-white);
-    color: var(--color-primary);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  margin-bottom: 24px;
+  background: var(--bg-white);
+  color: var(--primary-green);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: var(--transition);
 }
 
 .back-button:hover {
-    background: var(--color-primary-dark);
-    color: var(--color-white);
-    border-color: var(--color-primary-dark);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
+  background: var(--primary-green);
+  color: var(--bg-white);
+  border-color: var(--primary-green);
+  transform: translateX(-5px);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ======================
-   Property Header
-   ====================== */
+/* ============================================
+   CONTAINER
+   ============================================ */
+.detail-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* ============================================
+   PROPERTY HEADER
+   ============================================ */
 .property-header {
-    padding: 2.5rem;
-    background: linear-gradient(135deg, var(--color-bg-light) 0%, var(--color-bg-lighter) 100%);
-    border-bottom: 2px solid var(--color-bg-card);
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
 .header-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-    color: var(--color-white);
-    border-radius: var(--radius-xl);
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 12px rgba(67, 160, 71, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-green);
+  color: var(--bg-white);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
 }
 
 .property-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-primary-dark);
-    margin: 0 0 1.2rem;
-    line-height: 1.3;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  line-height: 1.2;
 }
 
 .property-location {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .location-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-light);
-    font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 15px;
 }
 
 .location-item i {
-    color: var(--color-primary);
-    font-size: 1.2rem;
+  color: var(--primary-green);
+  font-size: 18px;
 }
 
-/* ======================
-   Images
-   ====================== */
+/* ============================================
+   MAIN CONTENT GRID
+   ============================================ */
+.property-card {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ============================================
+   IMAGE SECTION
+   ============================================ */
+.image-container {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
 .main-image-section {
-    width: 100%;
-    height: 500px;
-    overflow: hidden;
-    background: var(--color-bg-gray);
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  position: relative;
 }
 
 .main-image-section img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.gallery-section {
-    padding: 2.5rem;
-    background: var(--color-bg-gray);
-    border-bottom: 2px solid var(--color-bg-light);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px;
 }
 
 .gallery-item {
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-    background: var(--color-white);
-    height: 250px;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
 }
 
 .gallery-item:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
+  transform: scale(1.05);
 }
 
 .gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* ======================
-   Section Titles
-   ====================== */
-.section-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--color-primary-dark);
-    margin: 0 0 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.section-title i {
-    color: var(--color-primary-light);
-}
-
-.section-title.center {
-    justify-content: center;
-}
-
-/* ======================
-   Price Section
-   ====================== */
-.price-section {
-    padding: 2.5rem;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-    color: var(--color-white);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+/* ============================================
+   PRICE CARD
+   ============================================ */
+.price-card {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  color: var(--bg-white);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  /* Change position to relative and remove 'top' */
+  position: relative; 
 }
 
 .price-label {
-    font-size: 1rem;
-    font-weight: 500;
-    opacity: 0.9;
-    margin-bottom: 0.5rem;
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .price-amount {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
+  font-size: 40px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .price-period {
-    font-size: 1.1rem;
-    font-weight: 500;
-    opacity: 0.9;
+  font-size: 16px;
+  opacity: 0.9;
 }
 
-/* ======================
-   Description Section
-   ====================== */
-.description-section {
-    padding: 2.5rem;
-    border-bottom: 2px solid var(--color-bg-light);
+.price-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 24px 0;
 }
 
-.description-text {
-    font-size: 1.05rem;
-    line-height: 1.8;
-    color: var(--color-text);
-    margin: 0;
+/* ============================================
+   CONTACT CARD
+   ============================================ */
+.contact-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
-/* ======================
-   Info Grid & Cards
-   ====================== */
-.info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    padding: 2.5rem;
-    background: var(--color-bg-gray);
-    border-bottom: 2px solid var(--color-bg-light);
+.contact-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.info-card {
-    background: var(--color-white);
-    border-radius: var(--radius-md);
-    padding: 2rem;
-    box-shadow: var(--shadow-md);
+.contact-card-title i {
+  color: var(--primary-green);
 }
 
-.info-card-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--color-primary-dark);
-    margin: 0 0 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.info-card-title i {
-    color: var(--color-primary-light);
+.contact-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--bg-gray);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
 }
 
-/* Info Lists */
-.info-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+.contact-label {
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
-.info-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--color-bg-lighter);
-    border-radius: var(--radius-sm);
-    border-left: 4px solid var(--color-primary);
-}
-
-.info-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-white);
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.info-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.info-label {
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-    font-weight: 500;
-}
-
-.info-value {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--color-primary-dark);
-}
-
-/* Simple Info Items (for contact details) */
-.info-item-simple {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.8rem 1rem;
-    background: var(--color-bg-gray);
-    border-radius: var(--radius-sm);
-    border-bottom: 2px solid var(--color-bg-light);
-}
-
-.info-item-simple .info-label {
-    font-size: 0.95rem;
-    color: var(--color-text-light);
-    font-weight: 600;
-}
-
-.info-item-simple .info-value {
-    font-size: 0.95rem;
-    color: var(--color-primary-dark);
-    font-weight: 600;
-    text-align: right;
-}
-
-/* ======================
-   Contact Section
-   ====================== */
-.contact-section {
-    padding: 2.5rem;
+.contact-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
 }
 
 .contact-buttons {
-    display: flex;
-    gap: 1.2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .btn-contact {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: var(--transition);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: var(--transition);
+  text-align: center;
 }
 
 .btn-contact.primary {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
-    color: var(--color-white);
-    border: none;
+  background: var(--primary-green);
+  color: var(--bg-white);
 }
 
 .btn-contact.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(67, 160, 71, 0.3);
-    color: var(--color-white);
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: var(--bg-white);
 }
 
 .btn-contact.secondary {
-    background: transparent;
-    color: var(--color-primary);
-    border: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--primary-green);
+  border: 2px solid var(--primary-green);
 }
 
 .btn-contact.secondary:hover {
-    background: var(--color-primary);
-    color: var(--color-white);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(67, 160, 71, 0.3);
+  background: var(--primary-green);
+  color: var(--bg-white);
 }
 
-/* ======================
-   Map Section
-   ====================== */
+/* ============================================
+   CONTENT SECTIONS
+   ============================================ */
+.content-section {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title i {
+  color: var(--primary-green);
+  font-size: 26px;
+}
+
+.description-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   FEATURES GRID
+   ============================================ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--primary-lighter);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--primary-green);
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--primary-green);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-white);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.feature-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   MAP SECTION
+   ============================================ */
 .map-section {
-    padding: 2.5rem;
-    background: var(--color-bg-gray);
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
 }
 
 .map-placeholder {
-    background: var(--color-white);
-    border-radius: var(--radius-md);
-    padding: 3rem 2rem;
-    text-align: center;
-    border: 2px dashed var(--color-bg-card);
-    margin-top: 1.5rem;
+  background: var(--bg-gray);
+  border-radius: var(--radius-md);
+  padding: 60px 20px;
+  text-align: center;
+  border: 2px dashed var(--border-color);
 }
 
 .map-placeholder i {
-    font-size: 4rem;
-    color: var(--color-primary-light);
-    margin-bottom: 1rem;
+  font-size: 64px;
+  color: var(--primary-green);
+  margin-bottom: 16px;
 }
 
 .map-placeholder p {
-    font-size: 1.1rem;
-    color: var(--color-text-light);
-    margin-bottom: 2rem;
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0 0 24px 0;
 }
 
 .map-placeholder img {
-    width: 100%;
-    max-width: 800px;
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 800px;
+  border-radius: var(--radius-sm);
 }
 
-/* ======================
-   Responsive Design
-   ====================== */
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
+  .property-card {
+    grid-template-columns: 1fr 340px;
+  }
+
+  .price-card {
+    position: relative;
+    top: 0;
+  }
+}
+
 @media (max-width: 992px) {
-    .info-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
+  .property-card {
+    grid-template-columns: 1fr;
+  }
 
-    .property-title {
-        font-size: 2rem;
-    }
+  .sidebar-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
 
-    .price-amount {
-        font-size: 2.5rem;
-    }
+  .main-image-section {
+    height: 400px;
+  }
 
-    .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-
-    .gallery-item {
-        height: 220px;
-    }
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-    body {
-        padding: 1rem 0.5rem;
-    }
+  body {
+    padding-top: 70px;
+  }
 
-    .property-header,
-    .gallery-section,
-    .description-section,
-    .info-grid,
-    .contact-section,
-    .map-section,
-    .price-section {
-        padding: 2rem 1.5rem;
-    }
+  .detail-wrapper {
+    padding: 0 16px 40px;
+  }
 
-    .property-title {
-        font-size: 1.8rem;
-    }
+  .property-header {
+    padding: 24px;
+  }
 
-    .main-image-section {
-        height: 350px;
-    }
+  .property-title {
+    font-size: 28px;
+  }
 
-    .price-amount {
-        font-size: 2.2rem;
-    }
+  .main-image-section {
+    height: 300px;
+  }
 
-    .section-title {
-        font-size: 1.4rem;
-    }
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-    .gallery-grid {
-        grid-template-columns: 1fr;
-    }
+  .sidebar-content {
+    grid-template-columns: 1fr;
+  }
 
-    .gallery-item {
-        height: 250px;
-    }
+  .price-card {
+    padding: 24px;
+  }
 
-    .contact-buttons {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .price-amount {
+    font-size: 32px;
+  }
 
-    .btn-contact {
-        width: 100%;
-        justify-content: center;
-    }
+  .content-section {
+    padding: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-item {
+    padding: 16px;
+  }
+
+  .feature-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+
+  .feature-value {
+    font-size: 18px;
+  }
+
+  .map-section {
+    padding: 24px;
+  }
 }
 
 @media (max-width: 576px) {
-    body {
-        padding: 0.5rem;
-    }
+  .property-header {
+    padding: 20px;
+  }
 
-    .property-header,
-    .gallery-section,
-    .description-section,
-    .info-grid,
-    .contact-section,
-    .map-section,
-    .price-section {
-        padding: 1.5rem 1rem;
-    }
+  .property-title {
+    font-size: 24px;
+  }
 
-    .property-title {
-        font-size: 1.5rem;
-    }
+  .property-location {
+    flex-direction: column;
+    gap: 12px;
+  }
 
-    .property-location {
-        flex-direction: column;
-        gap: 0.8rem;
-    }
+  .main-image-section {
+    height: 250px;
+  }
 
-    .main-image-section {
-        height: 250px;
-    }
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .price-amount {
-        font-size: 2rem;
-    }
+  .price-card {
+    padding: 20px;
+  }
 
-    .price-period {
-        font-size: 1rem;
-    }
+  .price-amount {
+    font-size: 28px;
+  }
 
-    .section-title {
-        font-size: 1.2rem;
-    }
+  .content-section {
+    padding: 20px;
+  }
 
-    .info-card {
-        padding: 1.5rem;
-    }
+  .section-title {
+    font-size: 18px;
+    flex-wrap: wrap;
+  }
 
-    .info-card-title {
-        font-size: 1.1rem;
-    }
+  .description-text {
+    font-size: 15px;
+  }
 
-    .info-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.3rem;
-    }
+  .contact-card {
+    padding: 20px;
+  }
 
-    .info-value {
-        font-size: 1.1rem;
-    }
+  .contact-card-title {
+    font-size: 16px;
+  }
 
-    .btn-contact {
-        padding: 0.9rem 1.5rem;
-        font-size: 0.95rem;
-    }
+  .contact-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 
-    .map-placeholder {
-        padding: 2rem 1rem;
-    }
+  .contact-value {
+    text-align: left;
+  }
 
-    .map-placeholder i {
-        font-size: 3rem;
-    }
+  .btn-contact {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+
+  .feature-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .feature-label {
+    font-size: 12px;
+  }
+
+  .feature-value {
+    font-size: 16px;
+  }
+
+  .map-placeholder {
+    padding: 40px 16px;
+  }
+
+  .map-placeholder i {
+    font-size: 48px;
+  }
 }
 
 @media (max-width: 400px) {
-    .property-title {
-        font-size: 1.3rem;
-    }
+  .property-title {
+    font-size: 20px;
+  }
 
-    .price-amount {
-        font-size: 1.8rem;
-    }
+  .price-amount {
+    font-size: 24px;
+  }
 
-    .section-title {
-        font-size: 1.1rem;
-    }
-
-    .description-text {
-        font-size: 0.95rem;
-    }
+  .section-title {
+    font-size: 16px;
+  }
 }

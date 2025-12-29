@@ -7,6 +7,7 @@ from members.models import User
 
 
 
+
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
 class PropertyManagementSale(models.Model):
     users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
@@ -89,7 +90,7 @@ class PropertyRentImage(models.Model):
 class Feedback(models.Model):
     email=models.EmailField('Your Email')
     feedback= models.CharField(max_length=300, blank=False)
-    date_sent= models.DateField(default=django.utils.timezone.now)
+    date_sent= models.DateField(default=timezone.now)
 
 
 
@@ -104,3 +105,13 @@ class PropertyViews(models.Model):
     user_id=models.IntegerField('Users ID', default=1, blank=False, null=False)
     property_type=models.CharField('Property Type', default="Rent", blank=False, null=False)
     property_id=models.IntegerField('Property ID Viewed', default=1, blank=False, null=False)
+
+
+class Appointments(models.Model):
+    company_uuid=models.CharField('Company UUID', default=None, blank=True, null=True)
+    agent_uuid=models.CharField('Agents UUID', default=None, blank=True, null=True)
+    appointment=models.DateField('Appointment', default=timezone.now)
+    note= models.CharField('Appointment Note', default='No Note Provided', blank=True, null=True)
+    appointment_type=models.CharField('Appointment type',choices=APPOINTMENT_TYPE, default='Personal', blank=False, null=False)
+    property_id=models.IntegerField('Property ID', default=None, blank=True, null=True)
+    property_type=models.CharField('Property Type', default=None, blank=True, null=True)

@@ -14,6 +14,7 @@ from datetime import date
 from agents.models import AgentInformation
 from core.models import *
 from companies.models import CompanyInformation, CompanyRating
+import uuid
 
 '''Algorithms Start👇'''
 
@@ -308,7 +309,7 @@ def toggle_wishlist_rent(request, property_id):
         print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
-
+#TODO Redisgn the view property on sale page 
 
 def toggle_wishlist_buy(request, property_id):
     """
@@ -411,14 +412,16 @@ def update_profile(request, user_id):
             return redirect('landing')
     
         profile= User.objects.get(pk=user_id)
-        form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
-        
-        if form.is_valid():
-            form.save()
-            return redirect('customer:user-profile')
-        
+        if request.method == 'POST':
+            
+            form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
+            if form.is_valid():
+                form.save()
+                return redirect('customer:user-profile')
+            else:
+                messages.error(request, 'check for errors')
         else:
-            messages.error(request, 'check for errors')
+            form=UpdateUserForm(instance=profile)
         context={
             'profile': profile, 
             'form': form
@@ -578,18 +581,39 @@ def inquiry_form_rent(request, property_id):
         if request.method=='POST':
             inq_form=InquiryForm(request.POST or None)
             if inq_form.is_valid():
+                inq_form=inq_form.save(commit=False)
                 if on_rent.company_uuid:
-                    inq_form=inq_form.save(commit=False)
                     inq_form.company_uuid=on_rent.company_uuid
-                    inq_form.property_intrested=on_rent.id
-                    inq_form.agent_id=on_rent.agent_uuid
-                    inq_form.property_type='Rent'
-                    inq_form.property_name=on_rent.residential
-                    inq_form.date_created=date.today()
-                    inq_form.save()
-                    return HttpResponseRedirect('?submitted=True')
+                    appointment= Appointments.objects.create(
+                        company_uuid=on_rent.company_uuid,
+                        appointment=inq_form.schedule_tour,
+                        note="Reaching Client",
+                        appointment_type='Client',
+                        property_id=property_id,
+                        property_type='Rent'
+                    )
+                    appointment.save()
                 else:
-                    inq_form.save()
+                    inq_form.agent_id= on_rent.agent_uuid
+                    if inq_form.schedule_tour:
+                        appointment= Appointments.objects.create(
+                            agent_uuid=on_rent.agent_uuid,
+                            appointment=inq_form.schedule_tour,
+                            note="Reaching Client",
+                            appointment_type='Client',
+                            property_id=property_id,
+                            property_type='Rent'
+                        )
+                        appointment.save()
+                
+                inq_form.property_intrested=on_rent.id
+                inq_form.agent_id=on_rent.agent_uuid
+                inq_form.property_type='Rent'
+                inq_form.property_name=on_rent.residential
+                inq_form.date_created=date.today()
+                
+                inq_form.save()
+                return HttpResponseRedirect('?submitted=True')
             
         else:
             inq_form= InquiryForm()
@@ -604,7 +628,7 @@ def inquiry_form_rent(request, property_id):
 
 
 
-
+#FIXME Merge both rent and sale inquiry form 
 def inquiry_form_sale(request, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
@@ -617,21 +641,46 @@ def inquiry_form_sale(request, property_id):
     try:
         submitted=False
         on_sale=PropertyManagementSale.objects.get(pk=property_id)
+        print(on_sale.company_uuid)
         if request.method=='POST':
             inq_form=InquiryForm(request.POST or None)
             if inq_form.is_valid():
+                inq_form=inq_form.save(commit=False)
                 if on_sale.company_uuid:
-                    inq_form=inq_form.save(commit=False)
                     inq_form.company_uuid=on_sale.company_uuid
-                    inq_form.property_intrested=on_sale.id
-                    inq_form.agent_id=on_sale.agent_uuid
-                    inq_form.property_type='Sale'
-                    inq_form.property_name=on_sale.residential
-                    inq_form.date_created=date.today()
-                    inq_form.save()
-                    return HttpResponseRedirect('?submitted=True')
+                    if inq_form.schedule_tour:
+                        appointment= Appointments.objects.create(
+                            company_uuid=on_sale.company_uuid,
+                            appointment=inq_form.schedule_tour,
+                            note="Reaching Client",
+                            appointment_type='Client',
+                            property_id=property_id,
+                            property_type='Sale'
+                        )
+                        appointment.save()
                 else:
-                    inq_form.save()
+                    inq_form.agent_id= on_sale.agent_uuid
+                    if inq_form.schedule_tour:
+                            appointment= Appointments.objects.create(
+                                agent_uuid=on_sale.agent_uuid,
+                                appointment=inq_form.schedule_tour,
+                                note="Reaching Client",
+                                appointment_type='Client',
+                                property_id=property_id,
+                                property_type='Sale'
+                            )
+                            appointment.save()
+                    
+                
+                inq_form.property_intrested=on_sale.id
+                inq_form.agent_id=on_sale.agent_uuid
+                inq_form.property_type='Sale'
+                inq_form.property_name=on_sale.residential
+                inq_form.date_created=date.today()
+                        
+                
+                inq_form.save()
+                return HttpResponseRedirect('?submitted=True')
             
         else:
             inq_form= InquiryForm()
