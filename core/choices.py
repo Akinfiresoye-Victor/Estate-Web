@@ -88,7 +88,7 @@ COMMERCIAL_PROPERTIES=[
     ('Co-Working Space', 'Co-Working Space'),
     ('Serviced Offices', 'Co-Working Space'),
     ('Corperate Buildings', 'Corperate Buildings'),
-    ('Buisness Centers', 'Buisness Centers'),
+    ('Business Centers', 'Business Centers'),
     ('Shops', 'Shops'),
     ('Retail Spaces', 'Retail Spaces'),
     ('Shopping Complexes', 'Shopping Complexes'),
@@ -194,8 +194,8 @@ YEARS_OF_EXPERINCE=[
 ]
 
 APPOINTMENT_TYPE=[
-    ('Client', 'Client'),
+    ('Business', 'Business'),
     ('Personal', 'Personal'),
-    ('Company', 'Company')
+    ('Virtual', 'Virtual')
 ]
 

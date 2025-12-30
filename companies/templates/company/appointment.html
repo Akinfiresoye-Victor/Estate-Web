@@ -136,6 +136,12 @@
         </button>
       </div>
 
+      <div class="action-group">
+        <!-- Replaced view-btn with Bootstrap outline classes -->
+        <a href="{%url "add-schedule"%}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-eye me-1"></i> View Schedule
+        </a>
+      </div>
       <div class="filter-group">
         <select class="filter-select" id="typeFilter">
           <option value="all">All Types</option>
@@ -256,14 +262,12 @@
 
   </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
 (function() {
     'use strict';
-
     // Parse appointments from Django template
     const appointments = [
         {% for appointment in appointments %}
@@ -274,7 +278,8 @@
             note: '{{ appointment.note|escapejs }}',
             propertyId: {% if appointment.property_id %}{{ appointment.property_id }}{% else %}null{% endif %},
             propertyType: '{{ appointment.property_type|default:"N/A" }}',
-            agentUuid: '{% if appointment.agent_uuid %}{{ appointment.agent_uuid }}{% else %}N/A{% endif %}'
+            agentUuid: '{% if appointment.agent_uuid %}{{ appointment.agent_uuid }}{% else %}N/A{% endif %}',
+            leadUuid: '{% if appointment.lead_uuid %}{{ appointment.lead_uuid }}{% else %}null{% endif %}'
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -384,11 +389,11 @@
             html += `
                 <div class="appointment-card status-scheduled">
                     <div class="appointment-time">
-                        <i class="bi bi-clock"></i>
+                        <i class="bi bi-brilliance"></i>
                         <span>${apt.type}</span>
                     </div>
                     <div class="appointment-details">
-                        <h4 class="client-name">Appointment #${apt.id}</h4>
+                        <h4 class="client-name">Appointment: ${apt.note}</h4>
                         <p class="property-name">
                             <i class="bi bi-house-door"></i>
                             ${apt.propertyId ? `Property #${apt.propertyId}` : 'No Property'} 
@@ -396,11 +401,13 @@
                         </p>
                         <span class="status-badge status-scheduled">${apt.type}</span>
                     </div>
-                    <div class="appointment-actions">
-                        <button class="action-btn view" title="View Details" onclick="alert('Notes: ${apt.note}')">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </div>
+                      <div class="appointment-actions">
+                          <button class="action-btn view"
+                                  title="View Details"
+                                  onclick="window.location.href = '/schedule_detail/${apt.leadUuid}'">
+                              <i class="bi bi-eye"></i>
+                          </button>
+                      </div>
                 </div>
             `;
         });

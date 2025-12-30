@@ -1,0 +1,610 @@
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+  --primary-color: #1a3c4e;
+  --secondary-color: #c19b76;
+  --accent-color: #8b7355;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --info-color: #3b82f6;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --bg-white: #ffffff;
+  --bg-gray: #f8f9fa;
+  --bg-light: #f3f4f6;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   RESET & BASE STYLES
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+/* ============================================
+   CONTAINER
+   ============================================ */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+.page-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  color: var(--bg-white);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: var(--transition);
+  margin-bottom: 16px;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-5px);
+}
+
+.page-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--bg-white);
+  margin: 0;
+}
+
+/* ============================================
+   GRID LAYOUT
+   ============================================ */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.main-column,
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ============================================
+   CARD STYLES
+   ============================================ */
+.appointment-card,
+.lead-card,
+.property-card,
+.inquiry-card {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.appointment-card:hover,
+.lead-card:hover,
+.property-card:hover,
+.inquiry-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--bg-light);
+}
+
+.card-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-header h2::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: var(--secondary-color);
+  border-radius: 2px;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ============================================
+   INFO ROWS
+   ============================================ */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--bg-gray);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.info-row:hover {
+  background: var(--bg-light);
+  transform: translateX(5px);
+}
+
+.info-row .label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-row .label::before {
+  content: '•';
+  color: var(--secondary-color);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.info-row .value {
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ============================================
+   BADGES & STATUS
+   ============================================ */
+.appointment-type {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.appointment-type::before {
+  content: '●';
+  font-size: 10px;
+}
+
+.appointment-type.personal {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: var(--bg-white);
+}
+
+.appointment-type.business {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: var(--bg-white);
+}
+
+.appointment-type.virtual {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: var(--bg-white);
+}
+
+.status-badge {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-badge::before {
+  content: '●';
+  font-size: 10px;
+}
+
+.status-badge.notcontacted {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.status-badge.contacted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.qualified {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.negotiation {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.closed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stage-badge::before {
+  content: '◆';
+  font-size: 8px;
+}
+
+.stage-badge.new {
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.stage-badge.contacted {
+  background: #f0fdfa;
+  color: #115e59;
+}
+
+.stage-badge.qualified {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.stage-badge.proposal {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stage-badge.negotiation {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* ============================================
+   LINKS
+   ============================================ */
+.phone-link,
+.email-link,
+.property-link {
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.phone-link:hover,
+.email-link:hover,
+.property-link:hover {
+  color: var(--primary-color);
+  transform: translateX(3px);
+}
+
+.phone-link::before {
+  content: '📞';
+  font-size: 14px;
+}
+
+.email-link::before {
+  content: '✉️';
+  font-size: 14px;
+}
+
+.property-link::before {
+  content: '🏠';
+  font-size: 14px;
+}
+
+/* ============================================
+   TAGS
+   ============================================ */
+.tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+  color: var(--bg-white);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tags::before {
+  content: '🏷️';
+  font-size: 14px;
+}
+
+/* ============================================
+   INQUIRY CARD
+   ============================================ */
+.inquiry-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--secondary-color);
+  position: relative;
+}
+
+.inquiry-text::before {
+  content: '"';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 40px;
+  color: var(--secondary-color);
+  opacity: 0.2;
+  font-family: Georgia, serif;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.date-info::before {
+  content: '📅';
+  font-size: 14px;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 32px;
+  padding: 28px;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.btn {
+  flex: 1;
+  min-width: 160px;
+  padding: 16px 28px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn::before {
+  font-size: 18px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  color: var(--bg-white);
+}
+
+.btn-primary::before {
+  content: '📞';
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: var(--bg-white);
+}
+
+.btn-success::before {
+  content: '💬';
+}
+
+.btn-success:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+  color: var(--bg-white);
+}
+
+.btn-secondary::before {
+  content: '✉️';
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   HIGHLIGHT CARD
+   ============================================ */
+.appointment-card {
+  background: linear-gradient(135deg, rgba(26, 60, 78, 0.03) 0%, rgba(193, 155, 118, 0.03) 100%);
+  border: 2px solid var(--secondary-color);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (min-width: 768px) {
+  body {
+    padding: 40px 24px;
+  }
+
+  .page-header {
+    padding: 48px;
+  }
+
+  .page-header h1 {
+    font-size: 40px;
+  }
+
+  .content-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .info-row {
+    flex-direction: row;
+  }
+
+  .info-row .value {
+    text-align: right;
+  }
+}
+
+@media (min-width: 1024px) {
+  .action-buttons {
+    justify-content: flex-start;
+  }
+
+  .btn {
+    flex: 0 1 auto;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .appointment-card,
+  .lead-card,
+  .property-card,
+  .inquiry-card {
+    padding: 20px;
+  }
+
+  .card-header h2 {
+    font-size: 18px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .info-row .value {
+    text-align: left;
+  }
+
+  .action-buttons {
+    padding: 20px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

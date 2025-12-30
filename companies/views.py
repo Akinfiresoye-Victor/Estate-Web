@@ -15,7 +15,7 @@ from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count
 from django.shortcuts import get_object_or_404
-
+from core.forms import AppointmentForm
 
 
 
@@ -436,11 +436,8 @@ def appointment(request):
         total_appointment= Appointments.objects.filter(company_uuid=company.unique_company_id)
         
         
-        
-        
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
-    
     
     
     

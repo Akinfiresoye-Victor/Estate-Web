@@ -1,0 +1,186 @@
+{%extends 'company/base.html'%}
+{% load static %}
+
+{%block  extra_css%}
+<link rel="stylesheet" href="{% static 'core/css/appointment_detail.css' %}">
+{%endblock%}
+{%block content%}
+<div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <a href="{% url 'company:appointment' %}" class="back-btn">← Back to Appointments</a>
+                <h1>Appointment Details</h1>
+            </div>
+        </header>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            
+            <!-- Main Column -->
+            <div class="main-column">
+                
+                <!-- Appointment Card -->
+                <section class="appointment-card">
+                    <div class="card-header">
+                        <h2>Appointment Information</h2>
+                        <span class="appointment-type {{ appointment.appointment_type|lower }}">
+                            {{ appointment.appointment_type }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="label">Appointment Date</span>
+                            <span class="value">{{ appointment.appointment|date:"F d, Y" }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Note</span>
+                            <span class="value">{{ appointment.note }}</span>
+                        </div>
+
+                        {% if appointment.property_id %}
+                        <div class="info-row">
+                            <span class="label">Property ID</span>
+                            <span class="value">#{{ appointment.property_id }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if appointment.property_type %}
+                        <div class="info-row">
+                            <span class="label">Property Type</span>
+                            <span class="value">{{ appointment.property_type }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <!-- Lead Information Card -->
+                <section class="lead-card">
+                    <div class="card-header">
+                        <h2>Client Information</h2>
+                        <span class="status-badge {{ lead_data.status|lower|cut:' ' }}">
+                            {{ lead_data.status }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="label">Full Name</span>
+                            <span class="value">{{ lead_data.name }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Phone Number</span>
+                            <span class="value">
+                                <a href="tel:{{ lead_data.phone_no }}" class="phone-link">
+                                    {{ lead_data.phone_no }}
+                                </a>
+                            </span>
+                        </div>
+
+                        {% if lead_data.email %}
+                        <div class="info-row">
+                            <span class="label">Email Address</span>
+                            <span class="value">
+                                <a href="mailto:{{ lead_data.email }}" class="email-link">
+                                    {{ lead_data.email }}
+                                </a>
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="info-row">
+                            <span class="label">Preferred Contact</span>
+                            <span class="value">{{ lead_data.contact_type }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Current Stage</span>
+                            <span class="value stage-badge {{ lead_data.stages|lower }}">
+                                {{ lead_data.stages }}
+                            </span>
+                        </div>
+
+                        {% if lead_data.tags and lead_data.tags != 'None' %}
+                        <div class="info-row">
+                            <span class="label">Tags</span>
+                            <span class="value tags">{{ lead_data.tags }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <!-- Inquiry Message Card -->
+                <section class="inquiry-card">
+                    <div class="card-header">
+                        <h2>Client Message</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="inquiry-text">{{ lead_data.inquiry_message }}</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="date-info">Created: {{ lead_data.date_created|date:"M d, Y" }}</span>
+                        <span class="date-info">Updated: {{ lead_data.date_updated|date:"M d, Y" }}</span>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Side Column -->
+            <div class="side-column">
+                
+                <!-- Property Interest Card -->
+                <section class="property-card">
+                    <div class="card-header">
+                        <h2>Property Interest</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="label">Property Name</span>
+                            <span class="value">{{ lead_data.property_name }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Type</span>
+                            <span class="value">{{ lead_data.property_type }}</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="label">Property ID</span>
+                            <span class="value">
+                                <a href="#" class="property-link">
+                                    #{{ lead_data.property_intrested }}
+                                </a>
+                            </span>
+                        </div>
+
+                        {% if lead_data.schedule_tour %}
+                        <div class="info-row">
+                            <span class="label">Tour Date</span>
+                            <span class="value">{{ lead_data.schedule_tour|date:"F d, Y" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- Action Buttons -->
+        <section class="action-buttons">
+            <a href="tel:{{ lead_data.phone_no }}" class="btn btn-primary">Call Client</a>
+            {% if lead_data.contact_type == 'Whatsapp' %}
+            <a href="https://wa.me/{{ lead_data.phone_no }}" target="_blank" class="btn btn-success">WhatsApp</a>
+            {% endif %}
+            {% if lead_data.email %}
+            <a href="mailto:{{ lead_data.email }}" class="btn btn-secondary">Send Email</a>
+            {% endif %}
+        </section>
+    </div>
+{%endblock%}

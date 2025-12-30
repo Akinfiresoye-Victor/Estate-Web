@@ -309,7 +309,7 @@ def toggle_wishlist_rent(request, property_id):
         print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
-#TODO Redisgn the view property on sale page 
+
 
 def toggle_wishlist_buy(request, property_id):
     """
@@ -582,15 +582,17 @@ def inquiry_form_rent(request, property_id):
             inq_form=InquiryForm(request.POST or None)
             if inq_form.is_valid():
                 inq_form=inq_form.save(commit=False)
+                inq_form.lead_id=uuid.uuid4()
                 if on_rent.company_uuid:
                     inq_form.company_uuid=on_rent.company_uuid
                     appointment= Appointments.objects.create(
                         company_uuid=on_rent.company_uuid,
                         appointment=inq_form.schedule_tour,
                         note="Reaching Client",
-                        appointment_type='Client',
+                        appointment_type='Business',
                         property_id=property_id,
-                        property_type='Rent'
+                        property_type='Rent',
+                        lead_uuid=inq_form.lead_id
                     )
                     appointment.save()
                 else:
@@ -600,9 +602,10 @@ def inquiry_form_rent(request, property_id):
                             agent_uuid=on_rent.agent_uuid,
                             appointment=inq_form.schedule_tour,
                             note="Reaching Client",
-                            appointment_type='Client',
+                            appointment_type='Business',
                             property_id=property_id,
-                            property_type='Rent'
+                            property_type='Rent',
+                            lead_uuid=inq_form.lead_id
                         )
                         appointment.save()
                 
@@ -641,11 +644,11 @@ def inquiry_form_sale(request, property_id):
     try:
         submitted=False
         on_sale=PropertyManagementSale.objects.get(pk=property_id)
-        print(on_sale.company_uuid)
         if request.method=='POST':
             inq_form=InquiryForm(request.POST or None)
             if inq_form.is_valid():
                 inq_form=inq_form.save(commit=False)
+                inq_form.lead_id=uuid.uuid4()
                 if on_sale.company_uuid:
                     inq_form.company_uuid=on_sale.company_uuid
                     if inq_form.schedule_tour:
@@ -653,9 +656,10 @@ def inquiry_form_sale(request, property_id):
                             company_uuid=on_sale.company_uuid,
                             appointment=inq_form.schedule_tour,
                             note="Reaching Client",
-                            appointment_type='Client',
+                            appointment_type='Business',
                             property_id=property_id,
-                            property_type='Sale'
+                            property_type='Sale',
+                            lead_uuid=inq_form.lead_id
                         )
                         appointment.save()
                 else:
@@ -665,9 +669,10 @@ def inquiry_form_sale(request, property_id):
                                 agent_uuid=on_sale.agent_uuid,
                                 appointment=inq_form.schedule_tour,
                                 note="Reaching Client",
-                                appointment_type='Client',
+                                appointment_type='Business',
                                 property_id=property_id,
-                                property_type='Sale'
+                                property_type='Sale',
+                                lead_uuid=inq_form.lead_id
                             )
                             appointment.save()
                     

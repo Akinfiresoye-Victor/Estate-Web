@@ -200,8 +200,6 @@ body {
   color: var(--bg-white);
   box-shadow: var(--shadow-md);
   text-align: center;
-  /* Change position to relative and remove 'top' */
-  position: relative; 
 }
 
 .price-label {

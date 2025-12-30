@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from core.choices import LEAD_STAGES, LEAD_STATUS, CONTACT_TYPE
+import uuid
 
 
 
@@ -22,3 +23,4 @@ class LeadInfo(models.Model):
     status= models.CharField('Lead Status', choices=LEAD_STATUS, default='Not Contacted')
     stages= models.CharField('Lead Stages', choices=LEAD_STAGES, default='New')
     tags=models.CharField('tags', default='None')
+    lead_id = models.CharField('lead uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)

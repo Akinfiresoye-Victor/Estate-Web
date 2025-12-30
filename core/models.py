@@ -110,8 +110,11 @@ class PropertyViews(models.Model):
 class Appointments(models.Model):
     company_uuid=models.CharField('Company UUID', default=None, blank=True, null=True)
     agent_uuid=models.CharField('Agents UUID', default=None, blank=True, null=True)
+    lead_uuid=models.CharField('Lead UUID', default=None, blank=True, null=True)
     appointment=models.DateField('Appointment', default=timezone.now)
     note= models.CharField('Appointment Note', default='No Note Provided', blank=True, null=True)
     appointment_type=models.CharField('Appointment type',choices=APPOINTMENT_TYPE, default='Personal', blank=False, null=False)
     property_id=models.IntegerField('Property ID', default=None, blank=True, null=True)
     property_type=models.CharField('Property Type', default=None, blank=True, null=True)
+    def __str__(self):
+        return f'Appointment: {self.pk}- {self.note}'

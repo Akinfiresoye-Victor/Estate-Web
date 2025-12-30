@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import *
-from core.choices import STATES
+from core.choices import APPOINTMENT_TYPE
 from django.forms import formset_factory, inlineformset_factory
 from django.core.exceptions import ValidationError
 
@@ -160,3 +160,67 @@ RentImageFormSet= inlineformset_factory(
     max_num=3,
     can_delete=True,
 )
+
+
+class AppointmentForm(ModelForm):
+    class Meta:
+        model = Appointments
+        fields = ('appointment', 'note', 'appointment_type')
+        
+        widgets = {
+            'appointment': forms.DateInput(
+                attrs={
+                    'type': 'date',
+                    'class': 'form-input',
+                    'placeholder': 'Select appointment date',
+                    'required': True
+                }
+            ),
+            'note': forms.Textarea(
+                attrs={
+                    'class': 'form-textarea',
+                    'placeholder': 'Enter appointment notes or details...',
+                    'rows': 4,
+                    'maxlength': 500
+                }
+            ),
+            'appointment_type': forms.Select(
+                attrs={
+                    'class': 'form-select',
+                    'required': True
+                }
+            ),
+        }
+        
+        labels = {
+            'appointment': 'Appointment Date',
+            'note': 'Appointment Notes',
+            'appointment_type': 'Appointment Type',
+        }
+        
+        help_texts = {
+            'appointment': 'Select the date for this appointment',
+            'note': 'Add any relevant notes or details about this appointment',
+            'appointment_type': 'Choose the type of appointment',
+        }
+    
+    def clean_appointment(self):
+        appointment_date = self.cleaned_data.get('appointment')
+        from django.utils import timezone
+        
+        # Ensure appointment is not in the past
+        if appointment_date and appointment_date < timezone.now().date():
+            raise forms.ValidationError('Appointment date cannot be in the past.')
+        
+        return appointment_date
+    
+    def clean_note(self):
+        note = self.cleaned_data.get('note')
+        
+        # Provide default if empty
+        if not note or note.strip() == '':
+            return 'No Note Provided'
+        
+        return note.strip()
+
+# TODO redisign the add schedule html and css

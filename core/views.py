@@ -7,7 +7,7 @@ from companies.models import CompanyInformation
 from . import news_scrape as ns
 from admin_panel.views import admin
 from agents.models import AgentInformation
-
+from estate.models import LeadInfo
 
 # Create your views here.
 def landing_page(request):
@@ -406,3 +406,86 @@ def listed_properties(request):
 
 def partner_with_us(request):
     return render(request, 'core/partner.html')
+
+
+
+#TODO Cross check all authentication side to affect loss of data 
+
+def appointment_detail(request,lead_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log In required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        if request.user.role == 'company':
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+            appointment= Appointments.objects.filter(company_uuid=company.unique_company_id).get(lead_uuid=lead_uuid)
+        else:
+            agent=AgentInformation.objects.get(user_id=request.user.id)
+            appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(lead_uuid=lead_uuid)
+        lead=LeadInfo.objects.get(lead_id=lead_uuid)
+        return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'lead_data': lead})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+# TODO Make sure the correct navbar shows for each account 
+#TODO allow companies and agents to also view property that means you have to track the users role
+def add_schedule(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log In required')
+        return redirect('login')
+    
+    if request.user.role == 'customer':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    
+    try:
+        if request.method == 'POST':
+            form = AppointmentForm(request.POST)
+            
+            if form.is_valid():
+                appointment = form.save(commit=False)
+                
+                if request.user.role == 'company':
+                    company=CompanyInformation.objects.get(user_id=request.user.id)
+                    appointment.company_uuid = str(company.unique_company_id)
+                elif request.user.role == 'agent':
+                    agent=AgentInformation.objects.get(user_id=request.user.id)
+                    appointment.agent_uuid = str(agent.agent_uuid)
+                
+                # Handle property selection if provided
+                property_id = request.POST.get('property_id')
+                property_type = request.POST.get('property_type')
+                
+                if property_id:
+                    appointment.property_id = property_id
+                if property_type:
+                    appointment.property_type = property_type
+                
+                # Handle lead/customer selection if provided
+                lead_uuid = request.POST.get('lead_uuid')
+                if lead_uuid:
+                    appointment.lead_uuid = lead_uuid
+                
+                appointment.save()
+                
+                messages.success(request, 'Appointment scheduled successfully!')
+                return redirect('company:appointment') 
+            else:
+                messages.error(request, 'Please correct the errors below.')
+        else:
+            form = AppointmentForm()
+        
+        context = {
+            'form': form,
+            # Add any additional context like leads, properties, etc.
+            # 'leads': Lead.objects.filter(company_uuid=request.user.uuid),
+            # 'properties': Property.objects.filter(company_uuid=request.user.uuid),
+        }
+        
+        return render(request, 'core/add_schedule.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        return render(request, 'estate/error_page.html', {'e': e})

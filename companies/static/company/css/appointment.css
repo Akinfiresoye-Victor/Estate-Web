@@ -1039,3 +1039,25 @@
     justify-content: center;
   }
 }
+
+.action-group {
+  margin-left: auto; /* This pushes the button to the right */
+}
+
+/* Your existing outline style from the previous step */
+.action-group .view-btn {
+  background: transparent;
+  color: #6c757d;
+  border: 1px solid #6c757d;
+  padding: 6px 16px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.action-group .view-btn:hover {
+  background-color: #6c757d;
+  color: #ffffff;
+}
