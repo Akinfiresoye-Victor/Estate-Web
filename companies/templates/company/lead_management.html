@@ -7,7 +7,7 @@
 
 {% block content %}
 <a href="javascript:history.back()" class="back-button">
-    &larr; Go Back to the Previous Page
+    &larr; Go back
 </a>
 
 <!-- Delete Confirmation Modal -->
@@ -234,10 +234,10 @@
             </td>
             <td>
               <div class="action-buttons">
-                <a href="{% url 'company:lead-detail' lead.id %}" class="action-btn view" title="View/Edit Details">
+                <a href="{% url 'company:lead-detail' lead.lead_id %}" class="action-btn view" title="View/Edit Details">
                   <i class="bi bi-eye"></i>
                 </a>
-                <button class="action-btn delete" onclick="showDeleteModal('{% url 'company:delete-lead' lead.id %}')" title="Delete">
+                <button class="action-btn delete" onclick="showDeleteModal('{% url 'company:delete-lead' lead.lead_id %}')" title="Delete">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>

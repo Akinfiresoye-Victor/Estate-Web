@@ -8,6 +8,8 @@ from . import news_scrape as ns
 from admin_panel.views import admin
 from agents.models import AgentInformation
 from estate.models import LeadInfo
+from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your views here.
 def landing_page(request):
@@ -411,7 +413,7 @@ def partner_with_us(request):
 
 #TODO Cross check all authentication side to affect loss of data 
 
-def appointment_detail(request,lead_uuid):
+def appointment_detail(request,lead_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log In required')
         return redirect('login')
@@ -419,18 +421,28 @@ def appointment_detail(request,lead_uuid):
         messages.info(request, 'Access Denied')
         return redirect('landing')
     try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
         if request.user.role == 'company':
             company=CompanyInformation.objects.get(user_id=request.user.id)
-            appointment= Appointments.objects.filter(company_uuid=company.unique_company_id).get(lead_uuid=lead_uuid)
+            appointment= Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=lead_id)
         else:
             agent=AgentInformation.objects.get(user_id=request.user.id)
-            appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(lead_uuid=lead_uuid)
-        lead=LeadInfo.objects.get(lead_id=lead_uuid)
-        return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'lead_data': lead})
+            appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(pk=lead_id)
+        try:
+            lead=LeadInfo.objects.get(lead_id=appointment.lead_uuid)
+            return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'lead_data': lead, 'base_template':base_template})
+        except ObjectDoesNotExist:
+            return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'base_template':base_template})
+        
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
-# TODO Make sure the correct navbar shows for each account 
-#TODO allow companies and agents to also view property that means you have to track the users role
+
 def add_schedule(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Log In required')
@@ -441,6 +453,13 @@ def add_schedule(request):
         return redirect('landing')
     
     try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
         if request.method == 'POST':
             form = AppointmentForm(request.POST)
             
@@ -479,6 +498,7 @@ def add_schedule(request):
         
         context = {
             'form': form,
+            'base_template':base_template
             # Add any additional context like leads, properties, etc.
             # 'leads': Lead.objects.filter(company_uuid=request.user.uuid),
             # 'properties': Property.objects.filter(company_uuid=request.user.uuid),

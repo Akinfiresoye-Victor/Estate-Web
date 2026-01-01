@@ -6,8 +6,6 @@ from django.forms import formset_factory, inlineformset_factory
 from django.core.exceptions import ValidationError
 
 # TODO add view property page to the update, appointment ets. section for companies
-#  TODO Integrate Lead info into the appointments section 
-#  TODO Have different i tags for various appointment types 
 class CompanyForm(ModelForm):
     class Meta:
         model=CompanyInformation

@@ -7,7 +7,7 @@
 
 {% block content %}
 <a href="javascript:history.back()" class="attractive-back-button">
-    &larr; Go Back to the Previous Page
+    &larr; Go back
 </a>
 
 <style>
@@ -139,7 +139,7 @@
       <div class="action-group">
         <!-- Replaced view-btn with Bootstrap outline classes -->
         <a href="{%url "add-schedule"%}" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-eye me-1"></i> View Schedule
+          <i class="bi bi-plus me-1"></i> Add Schedule
         </a>
       </div>
       <div class="filter-group">
@@ -384,12 +384,22 @@
             return;
         }
 
+        // Icon mapping for different appointment types
+        const typeIcons = {
+            'Personal': 'bi-person-circle',
+            'Business': 'bi-briefcase-fill',
+            'Virtual': 'bi-camera-video-fill'
+        };
+
         let html = '<div class="appointments-list">';
         dayAppointments.forEach(apt => {
+            // Get the appropriate icon based on appointment type
+            const iconClass = typeIcons[apt.type] || 'bi-calendar-event';
+            
             html += `
                 <div class="appointment-card status-scheduled">
                     <div class="appointment-time">
-                        <i class="bi bi-brilliance"></i>
+                        <i class="bi ${iconClass}"></i>
                         <span>${apt.type}</span>
                     </div>
                     <div class="appointment-details">
@@ -404,7 +414,7 @@
                       <div class="appointment-actions">
                           <button class="action-btn view"
                                   title="View Details"
-                                  onclick="window.location.href = '/schedule_detail/${apt.leadUuid}'">
+                                  onclick="window.location.href = '/schedule_detail/${apt.id}'">
                               <i class="bi bi-eye"></i>
                           </button>
                       </div>

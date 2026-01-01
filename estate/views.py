@@ -169,10 +169,15 @@ def view_property_on_sale(request, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
         return redirect('login')
-    if not request.user.role == 'customer':
-        messages.info(request, 'Customer Access Only')
-        return redirect('landing')
     try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+
         property_to_be_viewed= PropertyManagementSale.objects.get(pk=property_id)
         try:
             company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
@@ -186,7 +191,8 @@ def view_property_on_sale(request, property_id):
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
-            'company_info': company_in_charge
+            'company_info': company_in_charge,
+            'base_template':base_template
         }
         return render(request, 'estate/view_property_s.html', context)
     except Exception as e:
@@ -201,11 +207,15 @@ def view_property_on_lease(request, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
         return redirect('login')
-    if not request.user.role == 'customer':
-        messages.info(request, 'Customer Access Only')
-        return redirect('landing')
-    
     try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+
         property_to_be_viewed= PropertyManagementRent.objects.get(pk=property_id)
         
         try:
@@ -220,7 +230,8 @@ def view_property_on_lease(request, property_id):
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
-            'company_info': company_in_charge
+            'company_info': company_in_charge,
+            'base_template':base_template
         }
         return render(request, 'estate/view_property_r.html', context)
     except Exception as e:

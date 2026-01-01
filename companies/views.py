@@ -504,14 +504,14 @@ def lead_management(request):
 
 
 def lead_detail(request, lead_id):
-    client=LeadInfo.objects.get(pk=lead_id)
+    client=LeadInfo.objects.get(lead_id=lead_id)
     if client.property_type =='Sale' :
         property=PropertyManagementSale.objects.get(pk=client.property_intrested)
     else:
         property=PropertyManagementRent.objects.get(pk=client.property_intrested)
     return render(request, 'company/lead_detail_page.html', {'lead':client, 'property':property})
 
-
+#FIXME if a property is deleted all models pointing to that property must be deleted also
 
 
 def delete_lead(request, lead_id):
@@ -519,7 +519,7 @@ def delete_lead(request, lead_id):
         return redirect('landing')
     try:
         company= CompanyInformation.objects.get(user_id=request.user.id)
-        lead_to_delete=LeadInfo.objects.get(pk=lead_id)
+        lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
         if company.unique_company_id == lead_to_delete.company_uuid:
             lead_to_delete.delete()
             messages.success(request, "Lead Deleted")
