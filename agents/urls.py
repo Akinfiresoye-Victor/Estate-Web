@@ -8,4 +8,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('form/',views.agent_form, name='agent-form'),
     path('profile/<agent_uuid>', views.agent_profile, name='agent-profile'),
+    path('lead/management', views.lead_management, name='leads'),
+    path('analytics', views.analytics, name='analytics')
 ]

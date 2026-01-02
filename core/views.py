@@ -509,3 +509,18 @@ def add_schedule(request):
     except Exception as e:
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
+
+
+def estate_blog(request):
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        return render(request, 'core/estate_blog.html', {'base_template': base_template})
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        return render(request, 'estate/error_page.html', {'e': e})

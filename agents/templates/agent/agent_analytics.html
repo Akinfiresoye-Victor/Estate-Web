@@ -1,0 +1,386 @@
+{% extends 'agent/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'agent/css/agent_analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Analytics Header -->
+<div class="analytics-hero">
+  <div class="container-fluid">
+    <a href="javascript:history.back()" class="back-link">
+      <i class="bi bi-arrow-left-circle"></i>
+      <span>Back</span>
+    </a>
+    
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <i class="bi bi-bar-chart-line-fill"></i>
+          Performance Analytics
+        </h1>
+        <p class="hero-subtitle">Track your growth and client engagement metrics</p>
+      </div>
+      <button class="export-btn" onclick="exportReport()">
+        <i class="bi bi-file-earmark-arrow-down"></i>
+        <span>Export Report</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid analytics-wrapper">
+  
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    
+    <!-- Profile Views -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon profile-bg">
+          <i class="bi bi-person-check-fill"></i>
+        </div>
+        <div class="kpi-trend {% if profile_incr_perc > 0 %}up{% else %}down{% endif %}">
+          <i class="bi bi-arrow-{% if profile_incr_perc > 0 %}up{% else %}down{% endif %}-short"></i>
+          <span>{{ profile_incr_perc|floatformat:1 }}%</span>
+        </div>
+      </div>
+      <div class="kpi-body">
+        <h3 class="kpi-value">{{ profile_views|intcomma }}</h3>
+        <p class="kpi-label">Profile Views</p>
+      </div>
+    </div>
+
+    <!-- Listing Views -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon listing-bg">
+          <i class="bi bi-buildings-fill"></i>
+        </div>
+        <div class="kpi-trend {% if total_prop_incr_perc > 0 %}up{% else %}down{% endif %}">
+          <i class="bi bi-arrow-{% if total_prop_incr_perc > 0 %}up{% else %}down{% endif %}-short"></i>
+          <span>{{ total_prop_incr_perc|floatformat:1 }}%</span>
+        </div>
+      </div>
+      <div class="kpi-body">
+        <h3 class="kpi-value">{{ prop_views|intcomma }}</h3>
+        <p class="kpi-label">Total Listing Views</p>
+      </div>
+    </div>
+
+    <!-- Market Position -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon market-bg">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <div class="kpi-badge {% if competition > 0 %}positive{% else %}neutral{% endif %}">
+          {% if competition > 0 %}Leading{% else %}Growing{% endif %}
+        </div>
+      </div>
+      <div class="kpi-body">
+        <h3 class="kpi-value">{{ competition|floatformat:1 }}%</h3>
+        <p class="kpi-label">Market Position</p>
+      </div>
+    </div>
+
+    <!-- Engagement Rate -->
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon engagement-bg">
+          <i class="bi bi-chat-square-heart-fill"></i>
+        </div>
+        <div class="kpi-badge {% if inq_rate > 40 %}positive{% else %}warning{% endif %}">
+          {% if inq_rate > 40 %}Excellent{% else %}Moderate{% endif %}
+        </div>
+      </div>
+      <div class="kpi-body">
+        <h3 class="kpi-value">{{ inq_rate|floatformat:1 }}%</h3>
+        <p class="kpi-label">Engagement Rate</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Analytics Grid -->
+  <div class="analytics-grid">
+    
+    <!-- Listing Performance Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="header-info">
+          <h3 class="chart-title">
+            <i class="bi bi-graph-up-arrow"></i>
+            Listing Performance
+          </h3>
+          <p class="chart-subtitle">Views breakdown by listing type</p>
+        </div>
+      </div>
+      <div class="chart-body">
+        
+        <!-- Sale Listings -->
+        <div class="performance-row">
+          <div class="row-header">
+            <div class="row-label">
+              <div class="label-dot sale-dot"></div>
+              <span>For Sale</span>
+            </div>
+            <span class="row-value">{{ sale_view|intcomma }}</span>
+          </div>
+          <div class="progress-wrapper">
+            {% widthratio sale_view sale_view|add:leased_view 100 as sale_pct %}
+            <div class="progress-fill sale-progress" style="width: {{ sale_pct }}%">
+              <span class="progress-text">{{ sale_pct }}%</span>
+            </div>
+          </div>
+          {% if sale_incr_perc != 0 %}
+          <p class="row-change {% if sale_incr_perc > 0 %}positive{% else %}negative{% endif %}">
+            <i class="bi bi-{% if sale_incr_perc > 0 %}arrow-up-circle-fill{% else %}arrow-down-circle-fill{% endif %}"></i>
+            {{ sale_incr_perc|floatformat:1 }}% from last month
+          </p>
+          {% endif %}
+        </div>
+
+        <!-- Lease Listings -->
+        <div class="performance-row">
+          <div class="row-header">
+            <div class="row-label">
+              <div class="label-dot lease-dot"></div>
+              <span>For Lease</span>
+            </div>
+            <span class="row-value">{{ leased_view|intcomma }}</span>
+          </div>
+          <div class="progress-wrapper">
+            {% widthratio leased_view sale_view|add:leased_view 100 as lease_pct %}
+            <div class="progress-fill lease-progress" style="width: {{ lease_pct }}%">
+              <span class="progress-text">{{ lease_pct }}%</span>
+            </div>
+          </div>
+          {% if lease_incr_perc != 0 %}
+          <p class="row-change {% if lease_incr_perc > 0 %}positive{% else %}negative{% endif %}">
+            <i class="bi bi-{% if lease_incr_perc > 0 %}arrow-up-circle-fill{% else %}arrow-down-circle-fill{% endif %}"></i>
+            {{ lease_incr_perc|floatformat:1 }}% from last month
+          </p>
+          {% endif %}
+        </div>
+
+        <!-- Quick Insight -->
+        <div class="quick-insight">
+          <i class="bi bi-info-circle-fill"></i>
+          <div>
+            {% widthratio sale_view sale_view|add:leased_view 100 as sale_percent %}
+            {% if sale_percent > 60 %}
+              <strong>Sales Focus:</strong> Your sale listings are performing exceptionally well. Consider expanding your portfolio.
+            {% elif sale_percent < 40 %}
+              <strong>Rental Market:</strong> Lease properties are trending. This is a great time to target rental clients.
+            {% else %}
+              <strong>Balanced Portfolio:</strong> You have an excellent balance between sale and lease listings.
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Top Listings -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="header-info">
+          <h3 class="chart-title">
+            <i class="bi bi-trophy-fill"></i>
+            Top Performing Listings
+          </h3>
+          <p class="chart-subtitle">Your most viewed properties</p>
+        </div>
+        <a href="{% url 'company:listings' %}" class="see-all-link">
+          See All <i class="bi bi-chevron-right"></i>
+        </a>
+      </div>
+      <div class="chart-body">
+        <div class="listings-container">
+          
+          {% for rank, eyes in ranking %}
+          <div class="listing-row">
+            <div class="listing-rank">
+              <span class="rank-number">#{{ forloop.counter }}</span>
+            </div>
+            
+            <div class="listing-details">
+              <h5 class="listing-title">
+                {% if rank.property_category == "Residential" %}
+                  {{ rank.residential }}
+                {% elif rank.property_category == "Commercial" %}
+                  {{ rank.commercial }}
+                {% else %}
+                  {{ rank.lands }}
+                {% endif %}
+              </h5>
+              <p class="listing-meta">
+                <span class="meta-item">
+                  <i class="bi bi-bookmark-fill"></i>{{ rank.property_category }}
+                </span>
+                <span class="meta-divider">•</span>
+                <span class="meta-item">
+                  <i class="bi bi-geo-alt-fill"></i>{{ rank.location }}, {{ rank.state }}
+                </span>
+              </p>
+            </div>
+            
+            <div class="listing-metrics">
+              <div class="metric-badge">
+                <i class="bi bi-eye-fill"></i>
+                <span>{{ eyes }}</span>
+              </div>
+              <div class="metric-badge">
+                <i class="bi bi-heart-fill"></i>
+                <span>{{ rank.total_likes }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Insights Section -->
+  <div class="insights-wrapper">
+    <div class="insights-header">
+      <h3 class="insights-title">
+        <i class="bi bi-lightbulb-fill"></i>
+        Actionable Insights
+      </h3>
+      <p class="insights-subtitle">Recommendations based on your performance</p>
+    </div>
+
+    <div class="insights-container">
+      
+      <!-- Profile Performance -->
+      {% if profile_incr_perc > 0 %}
+        <div class="insight-box success-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-arrow-up-circle-fill"></i>
+            </div>
+            <h4>Growing Visibility</h4>
+          </div>
+          <p>Your profile views increased by <strong>{{ profile_incr_perc|floatformat:1 }}%</strong> this month. Keep engaging with clients and sharing quality listings!</p>
+        </div>
+      {% elif profile_incr_perc < 0 %}
+        <div class="insight-box alert-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-arrow-down-circle-fill"></i>
+            </div>
+            <h4>Needs Attention</h4>
+          </div>
+          <p>Profile views dropped by <strong>{{ profile_incr_perc|floatformat:1|cut:"-" }}%</strong>. Consider updating your profile and promoting your top listings on social media.</p>
+        </div>
+      {% endif %}
+
+      <!-- Engagement Analysis -->
+      {% if inq_rate > 40 %}
+        <div class="insight-box success-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-hand-thumbs-up-fill"></i>
+            </div>
+            <h4>Strong Engagement</h4>
+          </div>
+          <p>Your <strong>{{ inq_rate|floatformat:1 }}%</strong> engagement rate is excellent! Clients are actively interested in your listings. Focus on quick follow-ups to convert leads.</p>
+        </div>
+      {% else %}
+        <div class="insight-box warning-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h4>Improve Engagement</h4>
+          </div>
+          <p>Your engagement rate is <strong>{{ inq_rate|floatformat:1 }}%</strong>. Try improving listing descriptions, updating photos, or adjusting pricing to attract more inquiries.</p>
+        </div>
+      {% endif %}
+
+      <!-- Listing Performance -->
+      {% if total_prop_incr_perc > 0 %}
+        <div class="insight-box success-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <h4>Growing Interest</h4>
+          </div>
+          <p>Listing views increased by <strong>{{ total_prop_incr_perc|floatformat:1 }}%</strong>! Your properties are gaining traction. Perfect time to push for closures and secure deals.</p>
+        </div>
+      {% elif total_prop_incr_perc < -10 %}
+        <div class="insight-box alert-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-graph-down-arrow"></i>
+            </div>
+            <h4>Declining Views</h4>
+          </div>
+          <p>Listing views dropped by <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Consider refreshing your listings with new photos, virtual tours, or price adjustments.</p>
+        </div>
+      {% elif total_prop_incr_perc < 0 %}
+        <div class="insight-box warning-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-dash-circle-fill"></i>
+            </div>
+            <h4>Minor Decline</h4>
+          </div>
+          <p>Views decreased by <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Stay consistent with updates and consider highlighting unique property features.</p>
+        </div>
+      {% endif %}
+
+      <!-- Competition Analysis -->
+      {% if competition > 0 %}
+        <div class="insight-box success-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-trophy-fill"></i>
+            </div>
+            <h4>Top Performer</h4>
+          </div>
+          <p>You're outperforming competitors by <strong>{{ competition|floatformat:1 }}%</strong>! Maintain your momentum by continuing to provide excellent service.</p>
+        </div>
+      {% else %}
+        <div class="insight-box info-box">
+          <div class="insight-header">
+            <div class="insight-badge">
+              <i class="bi bi-bullseye"></i>
+            </div>
+            <h4>Growth Opportunity</h4>
+          </div>
+          <p>There's room to grow. Focus on quality listings, responsive communication, and regular profile updates to gain a competitive edge.</p>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+
+    // Export Report Function
+    window.exportReport = function() {
+        alert('Export functionality coming soon!');
+    };
+
+})();
+</script>
+{% endblock %}

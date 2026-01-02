@@ -7,16 +7,16 @@
 
 {% block content %}
 
-<!-- Page Header -->
-<section class="page-header">
-  <div class="header-background"></div>
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
   <div class="container">
-    <div class="header-content">
-      <div class="header-icon">
+    <div class="hero-content">
+      <div class="hero-icon">
         <i class="bi bi-calendar-plus"></i>
       </div>
-      <h1 class="header-title">Schedule New Appointment</h1>
-      <p class="header-subtitle">Create and manage your appointments efficiently</p>
+      <h1 class="hero-title">Create New Appointment</h1>
+      <p class="hero-subtitle">Schedule and manage your appointments effortlessly</p>
     </div>
   </div>
 </section>
@@ -25,209 +25,142 @@
 <main class="main-content">
   <div class="container">
     
-    <!-- Back Button -->
-    <div class="navigation-bar">
-      <a href="javascript:history.back()" class="btn-back">
+    <!-- Back Navigation -->
+    <nav class="breadcrumb-nav">
+      <a href="javascript:history.back()" class="back-link">
         <i class="bi bi-arrow-left"></i>
-        <span>Back</span>
+        <span>Back to Dashboard</span>
       </a>
-    </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            <div class="alert-icon">
+              <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %}"></i>
+            </div>
+            <div class="alert-content">
+              <strong>{% if message.tags == 'success' %}Success!{% elif message.tags == 'error' %}Error{% else %}Notice{% endif %}</strong>
+              <p>{{ message }}</p>
+            </div>
+            <button class="alert-close" aria-label="Close">&times;</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
     <!-- Form Card -->
-    <div class="form-wrapper">
-      <div class="form-card">
+    <div class="form-card">
+      
+      <form method="post" class="appointment-form" novalidate>
+        {% csrf_token %}
         
-        <!-- Card Header -->
-        <div class="card-header">
-          <div class="header-icon-box">
+        <!-- Appointment Date -->
+        <div class="form-group">
+          <label for="{{ form.appointment.id_for_label }}" class="form-label">
             <i class="bi bi-calendar-event"></i>
+            <span>{{ form.appointment.label }}</span>
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            {{ form.appointment }}
           </div>
-          <div class="header-text">
-            <h2 class="card-title">Appointment Details</h2>
-            <p class="card-subtitle">Fill in the information below to schedule an appointment</p>
-          </div>
+          {% if form.appointment.errors %}
+            <div class="field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {% for error in form.appointment.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
         </div>
 
-        <!-- Messages -->
-        {% if messages %}
-          <div class="messages-container">
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}">
-                <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %}"></i>
-                <span>{{ message }}</span>
-              </div>
-            {% endfor %}
+        <!-- Appointment Type -->
+        <div class="form-group">
+          <label for="{{ form.appointment_type.id_for_label }}" class="form-label">
+            <i class="bi bi-tag"></i>
+            <span>{{ form.appointment_type.label }}</span>
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            {{ form.appointment_type }}
           </div>
-        {% endif %}
-
-        <!-- Form -->
-        <form method="post" class="appointment-form" novalidate>
-          {% csrf_token %}
-          
-          <div class="form-grid">
-            
-            <!-- Appointment Date -->
-            <div class="form-group full-width">
-              <label for="{{ form.appointment.id_for_label }}" class="form-label">
-                <i class="bi bi-calendar3"></i>
-                {{ form.appointment.label }}
-                <span class="required">*</span>
-              </label>
-              {{ form.appointment }}
-              {% if form.appointment.help_text %}
-                <small class="help-text">{{ form.appointment.help_text }}</small>
-              {% endif %}
-              {% if form.appointment.errors %}
-                <div class="error-message">
-                  {% for error in form.appointment.errors %}
-                    <span><i class="bi bi-exclamation-circle"></i> {{ error }}</span>
-                  {% endfor %}
-                </div>
-              {% endif %}
+          {% if form.appointment_type.errors %}
+            <div class="field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {% for error in form.appointment_type.errors %}{{ error }}{% endfor %}
             </div>
-
-            <!-- Appointment Type -->
-            <div class="form-group full-width">
-              <label for="{{ form.appointment_type.id_for_label }}" class="form-label">
-                <i class="bi bi-tag"></i>
-                {{ form.appointment_type.label }}
-                <span class="required">*</span>
-              </label>
-              {{ form.appointment_type }}
-              {% if form.appointment_type.help_text %}
-                <small class="help-text">{{ form.appointment_type.help_text }}</small>
-              {% endif %}
-              {% if form.appointment_type.errors %}
-                <div class="error-message">
-                  {% for error in form.appointment_type.errors %}
-                    <span><i class="bi bi-exclamation-circle"></i> {{ error }}</span>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-
-            <!-- Optional: Lead Selection (if you want to add it) -->
-            <!-- Uncomment if you pass leads in context -->
-            <!--
-            <div class="form-group full-width">
-              <label for="lead_uuid" class="form-label">
-                <i class="bi bi-person"></i>
-                Select Lead (Optional)
-              </label>
-              <select name="lead_uuid" id="lead_uuid" class="form-select">
-                <option value="">-- Select Lead --</option>
-                {% for lead in leads %}
-                  <option value="{{ lead.uuid }}">{{ lead.name }}</option>
-                {% endfor %}
-              </select>
-              <small class="help-text">Choose a lead for this appointment</small>
-            </div>
-            -->
-
-            <!-- Optional: Property Selection (if you want to add it) -->
-            <!-- Uncomment if you pass properties in context -->
-            <!--
-            <div class="form-group">
-              <label for="property_id" class="form-label">
-                <i class="bi bi-house"></i>
-                Property (Optional)
-              </label>
-              <select name="property_id" id="property_id" class="form-select">
-                <option value="">-- Select Property --</option>
-                {% for property in properties %}
-                  <option value="{{ property.id }}" data-type="{{ property.property_type }}">
-                    {{ property.name }}
-                  </option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="property_type" class="form-label">
-                <i class="bi bi-building"></i>
-                Property Type
-              </label>
-              <input type="text" name="property_type" id="property_type" class="form-input" readonly placeholder="Auto-filled">
-            </div>
-            -->
-
-            <!-- Appointment Notes -->
-            <div class="form-group full-width">
-              <label for="{{ form.note.id_for_label }}" class="form-label">
-                <i class="bi bi-pencil-square"></i>
-                {{ form.note.label }}
-              </label>
-              {{ form.note }}
-              {% if form.note.help_text %}
-                <small class="help-text">{{ form.note.help_text }}</small>
-              {% endif %}
-              {% if form.note.errors %}
-                <div class="error-message">
-                  {% for error in form.note.errors %}
-                    <span><i class="bi bi-exclamation-circle"></i> {{ error }}</span>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-
-          </div>
-
-          <!-- Form Actions -->
-          <div class="form-actions">
-            <button type="reset" class="btn-reset">
-              <i class="bi bi-x-circle"></i>
-              <span>Clear Form</span>
-            </button>
-            <button type="submit" class="btn-submit">
-              <i class="bi bi-check-circle"></i>
-              <span>Schedule Appointment</span>
-            </button>
-          </div>
-
-        </form>
-
-      </div>
-
-      <!-- Info Card -->
-      <div class="info-card">
-        <div class="info-header">
-          <i class="bi bi-info-circle"></i>
-          <h3>Quick Tips</h3>
+          {% endif %}
         </div>
-        <ul class="info-list">
-          <li>
-            <i class="bi bi-check2"></i>
-            <span>Select a future date for your appointment</span>
-          </li>
-          <li>
-            <i class="bi bi-check2"></i>
-            <span>Choose the appropriate appointment type</span>
-          </li>
-          <li>
-            <i class="bi bi-check2"></i>
-            <span>Add detailed notes for better reference</span>
-          </li>
-          <li>
-            <i class="bi bi-check2"></i>
-            <span>Review all details before submitting</span>
-          </li>
-        </ul>
-      </div>
 
+        <!-- Notes -->
+        <div class="form-group full-width">
+          <label for="{{ form.note.id_for_label }}" class="form-label">
+            <i class="bi bi-pencil"></i>
+            <span>{{ form.note.label }}</span>
+            <span class="optional">Optional</span>
+          </label>
+          <div class="input-wrapper">
+            {{ form.note }}
+            <div class="char-counter">
+              <span id="charCount">0</span> / 500 characters
+            </div>
+          </div>
+          {% if form.note.errors %}
+            <div class="field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {% for error in form.note.errors %}{{ error }}{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="reset" class="btn btn-secondary">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Reset
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <span>Schedule Appointment</span>
+            <i class="bi bi-check-circle"></i>
+          </button>
+        </div>
+
+      </form>
     </div>
 
   </div>
 </main>
 
-<!-- Optional: Property type auto-fill script -->
-<!--
 <script>
-document.getElementById('property_id').addEventListener('change', function() {
-  const selectedOption = this.options[this.selectedIndex];
-  const propertyType = selectedOption.getAttribute('data-type');
-  document.getElementById('property_type').value = propertyType || '';
+// Character counter
+const noteField = document.querySelector('textarea[name="note"]');
+const charCount = document.getElementById('charCount');
+
+if (noteField && charCount) {
+  noteField.addEventListener('input', function() {
+    charCount.textContent = this.value.length;
+  });
+}
+
+// Close alerts
+document.querySelectorAll('.alert-close').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const alert = this.closest('.alert');
+    alert.style.opacity = '0';
+    alert.style.transform = 'translateX(100px)';
+    setTimeout(() => alert.remove(), 300);
+  });
+});
+
+// Auto-hide success alerts
+document.querySelectorAll('.alert-success').forEach(alert => {
+  setTimeout(() => {
+    alert.style.opacity = '0';
+    alert.style.transform = 'translateX(100px)';
+    setTimeout(() => alert.remove(), 300);
+  }, 5000);
 });
 </script>
--->
 
 {% endblock %}

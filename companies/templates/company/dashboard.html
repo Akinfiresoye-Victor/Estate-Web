@@ -235,54 +235,61 @@
         </div>
       </div>
 
-      <!-- Management Tools -->
-      <div class="tools-section">
-        <h2 class="section-title">Management Tools</h2>
-        <div class="tools-grid">
-          
-          <a href="{% url 'company:lead-management' %}" class="tool-card">
-            <div class="tool-icon">
-              <i class="bi bi-people"></i>
-            </div>
-            <h4>Lead Management</h4>
-            <p>Manage customer inquiries</p>
-          </a>
-
-          <a href="{% url 'company:appointment' %}" class="tool-card">
-            <div class="tool-icon">
-              <i class="bi bi-calendar-event"></i>
-            </div>
-            <h4>Appointments</h4>
-            <p>Schedule viewings</p>
-          </a>
-
-          <a href="{% url 'company:documents' %}" class="tool-card">
-            <div class="tool-icon">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-            <h4>Documents</h4>
-            <p>Manage legal docs</p>
-          </a>
-
-          <a href="#" class="tool-card">
-            <div class="tool-icon">
-              <i class="bi bi-bar-chart"></i>
-            </div>
-            <h4>Reports</h4>
-            <p>Generate reports</p>
-          </a>
-
-          <a href="{% url 'company:company-settings' %}" class="tool-card">
-            <div class="tool-icon">
-              <i class="bi bi-gear"></i>
-            </div>
-            <h4>Settings</h4>
-            <p>Configure preferences</p>
-          </a>
-
+  <!-- Management Tools -->
+  <div class="tools-section">
+    <h2 class="section-title">Management Tools</h2>
+    <div class="tools-grid">
+      
+      <a href="{% url 'company:lead-management' %}" class="tool-card">
+        <div class="tool-icon">
+          <i class="bi bi-people"></i>
         </div>
+        <h4>Lead Management</h4>
+        <p>Manage customer inquiries</p>
+      </a>
+
+      <a href="{% url 'company:appointment' %}" class="tool-card">
+        <div class="tool-icon">
+          <i class="bi bi-calendar-event"></i>
+        </div>
+        <h4>Appointments</h4>
+        <p>Schedule viewings</p>
+      </a>
+
+      <div class="tool-card coming-soon">
+        <div class="coming-soon-badge">
+          <i class="bi bi-clock-history"></i>
+          <span>Coming Soon</span>
+        </div>
+        <div class="tool-icon disabled">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <h4>Documents</h4>
+        <p>Manage legal docs</p>
       </div>
 
+      <div class="tool-card coming-soon">
+        <div class="coming-soon-badge">
+          <i class="bi bi-clock-history"></i>
+          <span>Coming Soon</span>
+        </div>
+        <div class="tool-icon disabled">
+          <i class="bi bi-bar-chart"></i>
+        </div>
+        <h4>Reports</h4>
+        <p>Generate reports</p>
+      </div>
+
+      <a href="{% url 'company:company-settings' %}" class="tool-card">
+        <div class="tool-icon">
+          <i class="bi bi-gear"></i>
+        </div>
+        <h4>Settings</h4>
+        <p>Configure preferences</p>
+      </a>
+
+    </div>
+  </div>
     </main>
 
   </div>

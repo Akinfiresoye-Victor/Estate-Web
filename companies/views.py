@@ -504,7 +504,7 @@ def lead_management(request):
 
 
 def lead_detail(request, lead_id):
-    client=LeadInfo.objects.get(lead_id=lead_id)
+    client=LeadInfo.objects.get(pk=lead_id)
     if client.property_type =='Sale' :
         property=PropertyManagementSale.objects.get(pk=client.property_intrested)
     else:

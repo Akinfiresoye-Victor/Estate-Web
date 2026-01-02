@@ -5,7 +5,7 @@ from core.choices import STATES
 from django.forms import formset_factory, inlineformset_factory
 from django.core.exceptions import ValidationError
 
-# TODO add view property page to the update, appointment ets. section for companies
+
 class CompanyForm(ModelForm):
     class Meta:
         model=CompanyInformation

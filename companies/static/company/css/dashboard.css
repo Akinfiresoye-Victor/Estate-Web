@@ -706,3 +706,83 @@
     font-size: 1.3rem;
   }
 }
+/* Coming Soon Styling */
+.tool-card.coming-soon {
+  position: relative;
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+.coming-soon-badge i {
+  font-size: 12px;
+}
+
+@keyframes pulse-badge {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+  }
+}
+
+.tool-card.coming-soon .tool-icon {
+  opacity: 0.5;
+}
+
+.tool-card.coming-soon h4,
+.tool-card.coming-soon p {
+  opacity: 0.6;
+}
+
+/* Hover state for coming soon cards */
+.tool-card.coming-soon:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Alternative: If you want a tooltip on hover */
+.tool-card.coming-soon::after {
+  content: 'Feature in development';
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: #1f2937;
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.tool-card.coming-soon:hover::after {
+  opacity: 1;
+}

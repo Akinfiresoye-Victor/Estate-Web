@@ -1,0 +1,263 @@
+{% extends 'agent/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'agent/css/agent_leads.css' %}">
+{% endblock %}
+
+{% block content %}
+<a href="javascript:history.back()" class="back-btn">
+    <i class="bi bi-arrow-left"></i> Back
+</a>
+
+<!-- Quick Stats Bar -->
+<div class="quick-stats">
+  <div class="container">
+    <div class="stats-row">
+      <div class="quick-stat">
+        <div class="stat-value">{{ lead_count|default:"0" }}</div>
+        <div class="stat-label">My Leads</div>
+      </div>
+      <div class="quick-stat">
+        <div class="stat-value">{{ new_leads|default:"0" }}</div>
+        <div class="stat-label">New Today</div>
+      </div>
+      <div class="quick-stat">
+        <div class="stat-value">{{ qualified_count|default:"0" }}</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="quick-stat">
+        <div class="stat-value">{{ closed_count|default:"0" }}</div>
+        <div class="stat-label">Closed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="header-wrapper">
+      <div>
+        <h1 class="page-title">
+          <i class="bi bi-person-badge"></i>
+          My Leads
+        </h1>
+        <p class="page-desc">Manage your assigned customer inquiries</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="search-filter-section">
+  <div class="container">
+    <div class="search-filter-wrapper">
+      <!-- Search -->
+      <div class="search-container">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchLeads" placeholder="Search leads...">
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-group">
+        <select class="filter-dropdown" id="statusFilter">
+          <option value="all">All Status</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Not Contacted">Not Contacted</option>
+          <option value="Hot Lead">Hot Lead</option>
+          <option value="Warm Lead">Warm Lead</option>
+          <option value="Cold Lead">Cold Lead</option>
+        </select>
+
+        <select class="filter-dropdown" id="dateFilter">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Leads Grid -->
+<div class="leads-section">
+  <div class="container">
+    
+    {% if leads %}
+    <div class="leads-grid">
+      {% for lead in leads %}
+      <div class="lead-card" 
+           data-status="{{ lead.status }}"
+           data-date="{{ lead.date_created|date:'Y-m-d' }}">
+        
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="lead-avatar-circle">
+            {{ lead.name.0|upper }}
+          </div>
+          <div class="lead-basic-info">
+            <h3 class="lead-title">{{ lead.name }}</h3>
+            <span class="lead-id">#{{ lead.lead_id }}</span>
+          </div>
+          <span class="status-dot status-{{ lead.status|lower|cut:' ' }}"></span>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <!-- Property Info -->
+          <div class="info-row">
+            <i class="bi bi-building"></i>
+            <div class="info-content">
+              <span class="info-label">Property</span>
+              <span class="info-value">{{ lead.property_name|truncatewords:4 }}</span>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="info-row">
+            <i class="bi bi-telephone"></i>
+            <div class="info-content">
+              <span class="info-label">Phone</span>
+              <a href="tel:{{ lead.phone_no }}" class="info-link">{{ lead.phone_no }}</a>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <i class="bi bi-envelope"></i>
+            <div class="info-content">
+              <span class="info-label">Email</span>
+              <a href="mailto:{{ lead.email }}" class="info-link">{{ lead.email|truncatechars:25 }}</a>
+            </div>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="card-status">
+            <span class="status-label">{{ lead.status }}</span>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <div class="footer-date">
+            <i class="bi bi-clock"></i>
+            {{ lead.date_created|date:"M d, Y" }}
+          </div>
+          <a href="#" class="view-btn">
+            View Details <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if leads.paginator.num_pages > 1 %}
+    <div class="pagination-wrapper">
+      <nav class="pagination-nav">
+        <ul class="pagination-list">
+          {% if leads.has_previous %}
+            <li>
+              <a href="?page={{ leads.previous_page_number }}" class="page-btn">
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for i in nums %}
+            <li>
+              <a href="?page={{ forloop.counter }}" 
+                 class="page-btn {% if leads.number == forloop.counter %}active{% endif %}">
+                {{ forloop.counter }}
+              </a>
+            </li>
+          {% endfor %}
+
+          {% if leads.has_next %}
+            <li>
+              <a href="?page={{ leads.next_page_number }}" class="page-btn">
+                <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      
+      <div class="page-info">
+        Page {{ leads.number }} of {{ leads.paginator.num_pages }}
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h3>No Leads Assigned</h3>
+      <p>You don't have any leads assigned yet. Check back later for new assignments.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+
+    const searchInput = document.getElementById('searchLeads');
+    const statusFilter = document.getElementById('statusFilter');
+    const dateFilter = document.getElementById('dateFilter');
+
+    // Event Listeners
+    if (searchInput) searchInput.addEventListener('input', filterLeads);
+    if (statusFilter) statusFilter.addEventListener('change', filterLeads);
+    if (dateFilter) dateFilter.addEventListener('change', filterLeads);
+
+    function filterLeads() {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const selectedStatus = statusFilter ? statusFilter.value : 'all';
+        const selectedDate = dateFilter ? dateFilter.value : 'all';
+
+        const cards = document.querySelectorAll('.lead-card');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const cardStatus = card.dataset.status;
+            const cardDate = new Date(card.dataset.date);
+            cardDate.setHours(0, 0, 0, 0);
+
+            const matchesSearch = text.includes(searchTerm);
+            const matchesStatus = selectedStatus === 'all' || cardStatus === selectedStatus;
+
+            let matchesDate = true;
+            if (selectedDate === 'today') {
+                matchesDate = cardDate.getTime() === today.getTime();
+            } else if (selectedDate === 'week') {
+                const weekAgo = new Date(today);
+                weekAgo.setDate(today.getDate() - 7);
+                matchesDate = cardDate >= weekAgo && cardDate <= today;
+            } else if (selectedDate === 'month') {
+                const monthAgo = new Date(today);
+                monthAgo.setMonth(today.getMonth() - 1);
+                matchesDate = cardDate >= monthAgo && cardDate <= today;
+            }
+
+            if (matchesSearch && matchesStatus && matchesDate) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

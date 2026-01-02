@@ -1,0 +1,520 @@
+{% extends base_template %}
+{% load static %}
+{% load widget_tweaks %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'core/css/estate_blog.css' %}">
+{% endblock %}
+{% block content %}
+
+<!-- Hero Section -->
+<div class="blog-hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">Estate Web Blog</h1>
+      <p class="hero-subtitle">Stay informed with the latest real estate news, market trends, and expert insights</p>
+    </div>
+  </div>
+</div>
+
+<!-- Featured Post -->
+<section class="featured-section">
+  <div class="container">
+    <div class="featured-post">
+      <div class="featured-image">
+        <img src="{% static 'images/featured-post.jpg' %}" alt="Featured Post">
+        <span class="featured-badge">Featured</span>
+      </div>
+      <div class="featured-content">
+        <div class="post-meta">
+          <span class="category">Market Trends</span>
+          <span class="date">
+            <i class="bi bi-calendar3"></i>
+            January 15, 2026
+          </span>
+          <span class="read-time">
+            <i class="bi bi-clock"></i>
+            5 min read
+          </span>
+        </div>
+        <h2 class="featured-title">
+          <a href="#">Nigerian Real Estate Market: 2026 Outlook and Investment Opportunities</a>
+        </h2>
+        <p class="featured-excerpt">
+          Discover the key trends shaping Nigeria's property market this year, from emerging neighborhoods 
+          to investment hotspots that promise strong returns.
+        </p>
+        <a href="#" class="btn-read-more">
+          Read Full Article
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Category Filter -->
+<section class="filter-section">
+  <div class="container">
+    <div class="filter-bar">
+      <button class="filter-btn active" data-category="all">All Posts</button>
+      <button class="filter-btn" data-category="news">Real Estate News</button>
+      <button class="filter-btn" data-category="trends">Market Trends</button>
+      <button class="filter-btn" data-category="forecast">Market Forecast</button>
+      <button class="filter-btn" data-category="tips">Buying Tips</button>
+      <button class="filter-btn" data-category="investment">Investment Guide</button>
+      <button class="filter-btn" data-category="legal">Legal Updates</button>
+    </div>
+  </div>
+</section>
+
+<!-- Blog Posts Grid -->
+<section class="posts-section">
+  <div class="container">
+    
+    <div class="posts-grid">
+      
+      <!-- Post Card 1 -->
+      <article class="post-card" data-category="news">
+        <div class="post-image">
+          <img src="{% static 'images/post-1.jpg' %}" alt="Post Image">
+          <span class="post-category news">Real Estate News</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Jan 10, 2026
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              4 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">New Housing Policy: What Property Owners Need to Know</a>
+          </h3>
+          <p class="post-excerpt">
+            The Federal Government announces new regulations affecting property transactions 
+            across major Nigerian cities.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Victor Eze</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 2 -->
+      <article class="post-card" data-category="trends">
+        <div class="post-image">
+          <img src="{% static 'images/post-2.jpg' %}" alt="Post Image">
+          <span class="post-category trends">Market Trends</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Jan 08, 2026
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              6 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">Top 5 Emerging Neighborhoods in Lagos for 2026</a>
+          </h3>
+          <p class="post-excerpt">
+            Explore the fastest-growing areas in Lagos that offer excellent value 
+            for both homebuyers and investors.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Chioma Okafor</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 3 -->
+      <article class="post-card" data-category="forecast">
+        <div class="post-image">
+          <img src="{% static 'images/post-3.jpg' %}" alt="Post Image">
+          <span class="post-category forecast">Market Forecast</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Jan 05, 2026
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              8 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">Property Prices: Q1 2026 Forecast and Analysis</a>
+          </h3>
+          <p class="post-excerpt">
+            Expert predictions on property price movements across Nigeria's major cities 
+            for the first quarter.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Adebayo Smith</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 4 -->
+      <article class="post-card" data-category="tips">
+        <div class="post-image">
+          <img src="{% static 'images/post-4.jpg' %}" alt="Post Image">
+          <span class="post-category tips">Buying Tips</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Jan 03, 2026
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              5 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">First-Time Home Buyer's Guide: 10 Essential Steps</a>
+          </h3>
+          <p class="post-excerpt">
+            Navigate the property buying process with confidence using this comprehensive 
+            guide for first-time buyers.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Funmi Adeleke</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 5 -->
+      <article class="post-card" data-category="investment">
+        <div class="post-image">
+          <img src="{% static 'images/post-5.jpg' %}" alt="Post Image">
+          <span class="post-category investment">Investment Guide</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Dec 28, 2025
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              7 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">Real Estate vs. Stock Market: Where to Invest in 2026?</a>
+          </h3>
+          <p class="post-excerpt">
+            A detailed comparison of investment returns and risks between property 
+            and stock market investments.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Ibrahim Musa</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 6 -->
+      <article class="post-card" data-category="legal">
+        <div class="post-image">
+          <img src="{% static 'images/post-6.jpg' %}" alt="Post Image">
+          <span class="post-category legal">Legal Updates</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Dec 25, 2025
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              6 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">Understanding Land Title Documentation in Nigeria</a>
+          </h3>
+          <p class="post-excerpt">
+            Everything you need to know about Certificate of Occupancy, Governor's Consent, 
+            and other crucial documents.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Ngozi Okoro</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 7 -->
+      <article class="post-card" data-category="news">
+        <div class="post-image">
+          <img src="{% static 'images/post-7.jpg' %}" alt="Post Image">
+          <span class="post-category news">Real Estate News</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Dec 22, 2025
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              4 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">Smart Home Technology: The Future of Nigerian Real Estate</a>
+          </h3>
+          <p class="post-excerpt">
+            How smart home features are becoming the new standard in premium 
+            Nigerian properties.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Tunde Bakare</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 8 -->
+      <article class="post-card" data-category="trends">
+        <div class="post-image">
+          <img src="{% static 'images/post-8.jpg' %}" alt="Post Image">
+          <span class="post-category trends">Market Trends</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Dec 20, 2025
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              5 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">The Rise of Co-working Spaces in Nigerian Cities</a>
+          </h3>
+          <p class="post-excerpt">
+            Analyzing the growing demand for flexible workspace solutions and their 
+            impact on commercial real estate.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Amaka Nwosu</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post Card 9 -->
+      <article class="post-card" data-category="tips">
+        <div class="post-image">
+          <img src="{% static 'images/post-9.jpg' %}" alt="Post Image">
+          <span class="post-category tips">Buying Tips</span>
+        </div>
+        <div class="post-content">
+          <div class="post-meta">
+            <span class="post-date">
+              <i class="bi bi-calendar3"></i>
+              Dec 18, 2025
+            </span>
+            <span class="post-read-time">
+              <i class="bi bi-clock"></i>
+              6 min
+            </span>
+          </div>
+          <h3 class="post-title">
+            <a href="#">Property Inspection Checklist: What to Look For</a>
+          </h3>
+          <p class="post-excerpt">
+            Don't miss these critical details when viewing a property. A comprehensive 
+            inspection guide for buyers.
+          </p>
+          <div class="post-footer">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <span class="author-name">Emeka Obi</span>
+            </div>
+            <a href="#" class="post-link">
+              Read More
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Load More Button -->
+    <div class="load-more-section">
+      <button class="btn-load-more">
+        Load More Articles
+        <i class="bi bi-arrow-down-circle"></i>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+  <div class="container">
+    <div class="newsletter-card">
+      <div class="newsletter-icon">
+        <i class="bi bi-envelope-heart"></i>
+      </div>
+      <div class="newsletter-content">
+        <h2>Stay Updated</h2>
+        <p>Get the latest real estate insights delivered straight to your inbox</p>
+      </div>
+      <form class="newsletter-form">
+        <input 
+          type="email" 
+          placeholder="Enter your email address" 
+          class="newsletter-input"
+          required
+        >
+        <button type="submit" class="btn-subscribe">
+          Subscribe
+          <i class="bi bi-send"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+
+  // Category Filter
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const postCards = document.querySelectorAll('.post-card');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const category = this.dataset.category;
+      
+      // Update active state
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      this.classList.add('active');
+
+      // Filter posts
+      postCards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'block';
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 10);
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          setTimeout(() => {
+            card.style.display = 'none';
+          }, 300);
+        }
+      });
+    });
+  });
+
+  // Newsletter form submission
+  const newsletterForm = document.querySelector('.newsletter-form');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = this.querySelector('.newsletter-input').value;
+      
+      // Add your newsletter subscription logic here
+      alert('Thank you for subscribing! We will send updates to: ' + email);
+      this.reset();
+    });
+  }
+
+})();
+</script>
+{% endblock %}

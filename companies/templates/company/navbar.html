@@ -26,7 +26,7 @@
           
           <!-- Latest News -->
           <li class="nav-item">
-            <a class="nav-link" href="{%url 'articles'%}">
+            <a class="nav-link" href="{%url 'estate-blog'%}">
               <i class="bi bi-newspaper me-2"></i>Estate Blog
             </a>
           </li>
@@ -43,7 +43,7 @@
               <li><a class="dropdown-item" href="{% url 'sell-property' %}">
                 <i class="bi bi-cash-coin me-2"></i>Sell Property
               </a></li>
-              <li><a class="dropdown-item" href="{% url 'my-listings' %}">
+              <li><a class="dropdown-item" href="{% url 'company:listings' %}">
                 <i class="bi bi-list-ul me-2"></i>My Listings
               </a></li>
             </ul>
@@ -64,11 +64,16 @@
           </li>
 
           <!-- Feedback -->
+                    <li class="nav-divider"></li>
+
+          <!-- Coming Soon Section -->
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <span class="nav-link text-muted coming-soon">
               <i class="bi bi-chat-left-quote me-2"></i>Find Talents/Job Post
-            </a>
+              <span class="badge bg-secondary ms-2">Soon</span>
+            </span>
           </li>
+
 
           <li class="nav-divider"></li>
 

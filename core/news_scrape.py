@@ -6,29 +6,32 @@ import re
 
 
 try:
-    i
-    ue= UserAgent().random
-    url="https://www.nigeriahousingmarket.com/real-estate-news-nigeria/"
-    headers={"User-Agent": ue}
-    req= Request(url, headers=headers)
-    html=urlopen(req)
-    bs=BeautifulSoup(html, 'lxml')
+    komdl
+    # i
+    # ue= UserAgent().random
+    # url="https://www.nigeriahousingmarket.com/"
+    # headers={"User-Agent": ue}
+    # req= Request(url, headers=headers)
+    # html=urlopen(req)
+    # bs=BeautifulSoup(html, 'lxml')
+    # print(url)
+    # article_headline_raw=bs.find("a", class_="summary-title-link")
+    # article_headline= article_headline_raw.text
 
-    article_headline_raw=bs.find("a", class_="summary-title-link")
-    article_headline= article_headline_raw.text
-
-    headlines = [h.get_text(strip=True) for h in bs.find("a", class_="summary-title-link")]
-    article_urls = []
-    for headline in headlines:
-        slug = article_headline_raw['href']
-        full_url = f"https://www.nigeriahousingmarket.com{slug}"
-        article_urls.append(full_url)
-    for article in article_urls:
-        url=article
-        headers={"User-Agent":ue}
-        req= Request(url,headers=headers)
-    html=urlopen(req)
-    bs=BeautifulSoup(html, 'lxml')
-except:
+    # headlines = [h.get_text(strip=True) for h in bs.find("a", class_="summary-title-link")]
+    # article_urls = []
+    # for headline in headlines:
+    #     slug = article_headline_raw['href']
+    #     full_url = f"https://www.nigeriahousingmarket.com{slug}"
+    #     print(full_url)
+    #     article_urls.append(full_url)
+    # for article in article_urls:
+    #     url=article
+    #     headers={"User-Agent":ue}
+    #     req= Request(url,headers=headers)
+    # html=urlopen(req)
+    # bs=BeautifulSoup(html, 'lxml')
+except Exception as e:
+    print(e)
     article_headline= 'hello'
 

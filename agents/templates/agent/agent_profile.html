@@ -1,0 +1,386 @@
+{% extends 'agent/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'agent/css/agent_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Profile Hero Section -->
+<div class="profile-hero">
+  <div class="hero-gradient"></div>
+  <div class="container">
+    <div class="hero-content">
+      
+      <div class="agent-avatar-section">
+        <div class="avatar-wrapper">
+          {% if agent_info.profile_picture %}
+            <img src="{{ agent_info.profile_picture.url }}" alt="{{ name }}" class="agent-avatar">
+          {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ name }}&size=180&background=1a3c4e&color=fff&bold=true" alt="{{ name }}" class="agent-avatar">
+          {% endif %}
+          <span class="status-indicator"></span>
+        </div>
+        {% if agent_info.verified %}
+        <div class="verification-badge">
+          <i class="bi bi-patch-check-fill"></i>
+          <span>Verified Agent</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="agent-info-section">
+        <h1 class="agent-name">{{ name }}</h1>
+        <p class="agent-role">{{ work_type }}</p>
+        
+        <div class="agent-stats-row">
+          <div class="stat-box">
+            <span class="stat-number">4.8</span>
+            <span class="stat-text">Rating</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <span class="stat-number">127</span>
+            <span class="stat-text">Reviews</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-box">
+            <span class="stat-number">52</span>
+            <span class="stat-text">Sales</span>
+          </div>
+        </div>
+
+        <div class="agent-actions">
+          <a href="#" class="btn-primary-action">
+            <i class="bi bi-pencil-square"></i>
+            Edit Profile
+          </a>
+          <a href="#" class="btn-secondary-action">
+            <i class="bi bi-share"></i>
+            Share Profile
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Main Profile Content -->
+<div class="container profile-container">
+  
+  <div class="profile-layout">
+    
+    <!-- Left Sidebar -->
+    <aside class="profile-sidebar">
+      
+      <!-- Contact Information -->
+      <div class="profile-card">
+        <div class="card-title">
+          <i class="bi bi-person-lines-fill"></i>
+          <h3>Contact Information</h3>
+        </div>
+        <div class="card-content">
+          
+          <div class="contact-row">
+            <div class="contact-icon">
+              <i class="bi bi-envelope-fill"></i>
+            </div>
+            <div class="contact-details">
+              <span class="contact-label">Email</span>
+              <a href="mailto:{{ email }}" class="contact-value">{{ email }}</a>
+            </div>
+          </div>
+
+          <div class="contact-row">
+            <div class="contact-icon">
+              <i class="bi bi-telephone-fill"></i>
+            </div>
+            <div class="contact-details">
+              <span class="contact-label">Phone</span>
+              <a href="tel:{{ phone }}" class="contact-value">{{ phone }}</a>
+            </div>
+          </div>
+
+          <div class="contact-row">
+            <div class="contact-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="contact-details">
+              <span class="contact-label">Location</span>
+              <span class="contact-value">{{ location }}, Nigeria</span>
+            </div>
+          </div>
+
+          <div class="contact-row">
+            <div class="contact-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="contact-details">
+              <span class="contact-label">Company</span>
+              <span class="contact-value">Company Name</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="profile-card">
+        <div class="card-title">
+          <i class="bi bi-graph-up-arrow"></i>
+          <h3>Performance</h3>
+        </div>
+        <div class="card-content">
+          
+          <div class="metric-item">
+            <div class="metric-info">
+              <span class="metric-label">Active Listings</span>
+              <span class="metric-number">{{ house_count }}</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" style="width: 75%;"></div>
+            </div>
+          </div>
+
+          <div class="metric-item">
+            <div class="metric-info">
+              <span class="metric-label">New Leads</span>
+              <span class="metric-number">{{ new_lead_count }}</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" style="width: 60%;"></div>
+            </div>
+          </div>
+
+          <div class="metric-item">
+            <div class="metric-info">
+              <span class="metric-label">Total Views</span>
+              <span class="metric-number">234</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" style="width: 85%;"></div>
+            </div>
+          </div>
+
+          <div class="metric-item">
+            <div class="metric-info">
+              <span class="metric-label">Response Rate</span>
+              <span class="metric-number">96%</span>
+            </div>
+            <div class="metric-bar">
+              <div class="metric-fill" style="width: 96%;"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Social Links (if available) -->
+      <div class="profile-card">
+        <div class="card-title">
+          <i class="bi bi-link-45deg"></i>
+          <h3>Connect</h3>
+        </div>
+        <div class="card-content">
+          <div class="social-links-grid">
+            <a href="#" class="social-link-btn">
+              <i class="bi bi-facebook"></i>
+            </a>
+            <a href="#" class="social-link-btn">
+              <i class="bi bi-twitter"></i>
+            </a>
+            <a href="#" class="social-link-btn">
+              <i class="bi bi-instagram"></i>
+            </a>
+            <a href="#" class="social-link-btn">
+              <i class="bi bi-linkedin"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="profile-main">
+      
+      <!-- About Section -->
+      <section class="content-section">
+        <div class="section-header">
+          <h2 class="section-heading">
+            <i class="bi bi-person-badge"></i>
+            About Me
+          </h2>
+        </div>
+        <div class="section-body">
+          <p class="about-text">
+            Experienced real estate professional specializing in residential and commercial properties 
+            across Lagos. With {{ house_count }} active listings and a proven track record of successful 
+            transactions, I'm committed to helping clients find their perfect property match.
+          </p>
+          <div class="specialties-grid">
+            <div class="specialty-tag">Residential Sales</div>
+            <div class="specialty-tag">Commercial Leasing</div>
+            <div class="specialty-tag">Property Management</div>
+            <div class="specialty-tag">Investment Advisory</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Activity Overview -->
+      <section class="content-section">
+        <div class="section-header">
+          <h2 class="section-heading">
+            <i class="bi bi-bar-chart-line"></i>
+            Activity Overview
+          </h2>
+        </div>
+        <div class="section-body">
+          <div class="activity-grid">
+            
+            <div class="activity-card">
+              <div class="activity-card-icon blue">
+                <i class="bi bi-house-check"></i>
+              </div>
+              <div class="activity-card-content">
+                <h4>{{ house_count }}</h4>
+                <p>Active Listings</p>
+              </div>
+            </div>
+
+            <div class="activity-card">
+              <div class="activity-card-icon green">
+                <i class="bi bi-people"></i>
+              </div>
+              <div class="activity-card-content">
+                <h4>{{ lead_count }}</h4>
+                <p>Total Leads</p>
+              </div>
+            </div>
+
+            <div class="activity-card">
+              <div class="activity-card-icon orange">
+                <i class="bi bi-calendar-event"></i>
+              </div>
+              <div class="activity-card-content">
+                <h4>5</h4>
+                <p>Appointments</p>
+              </div>
+            </div>
+
+            <div class="activity-card">
+              <div class="activity-card-icon purple">
+                <i class="bi bi-trophy"></i>
+              </div>
+              <div class="activity-card-content">
+                <h4>3</h4>
+                <p>Closed Deals</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Listings -->
+      <section class="content-section">
+        <div class="section-header">
+          <h2 class="section-heading">
+            <i class="bi bi-houses"></i>
+            Recent Listings
+          </h2>
+          <a href="{% url 'my-listings' %}" class="view-all-link">View All</a>
+        </div>
+        <div class="section-body">
+          <div class="listings-showcase">
+            
+            <div class="property-card">
+              <div class="property-image">
+                <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" alt="Property">
+                <span class="property-badge sale">For Sale</span>
+              </div>
+              <div class="property-details">
+                <h4 class="property-name">Luxury 4BR Duplex</h4>
+                <p class="property-location">
+                  <i class="bi bi-geo-alt"></i> Lekki Phase 1, Lagos
+                </p>
+                <div class="property-footer">
+                  <span class="property-price">₦85M</span>
+                  <span class="property-views">
+                    <i class="bi bi-eye"></i> 234
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-card">
+              <div class="property-image">
+                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400" alt="Property">
+                <span class="property-badge rent">For Rent</span>
+              </div>
+              <div class="property-details">
+                <h4 class="property-name">Modern 3BR Apartment</h4>
+                <p class="property-location">
+                  <i class="bi bi-geo-alt"></i> Victoria Island, Lagos
+                </p>
+                <div class="property-footer">
+                  <span class="property-price">₦3.5M/yr</span>
+                  <span class="property-views">
+                    <i class="bi bi-eye"></i> 189
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="property-card">
+              <div class="property-image">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400" alt="Property">
+                <span class="property-badge sale">For Sale</span>
+              </div>
+              <div class="property-details">
+                <h4 class="property-name">Executive 5BR Villa</h4>
+                <p class="property-location">
+                  <i class="bi bi-geo-alt"></i> Banana Island, Lagos
+                </p>
+                <div class="property-footer">
+                  <span class="property-price">₦250M</span>
+                  <span class="property-views">
+                    <i class="bi bi-eye"></i> 456
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Documents Section -->
+      <section class="content-section">
+        <div class="section-header">
+          <h2 class="section-heading">
+            <i class="bi bi-file-earmark-text"></i>
+            Documents & Certifications
+          </h2>
+        </div>
+        <div class="section-body">
+          <div class="coming-soon-box">
+            <div class="coming-soon-icon">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h3>Coming Soon</h3>
+            <p>Document management and certification display will be available soon</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+</div>
+
+{% endblock %}

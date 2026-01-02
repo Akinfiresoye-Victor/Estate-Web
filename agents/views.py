@@ -9,7 +9,7 @@ from django.utils import timezone
 from core.models import PropertyManagementRent, PropertyManagementSale
 from estate.models import LeadInfo
 from datetime import datetime
-
+from datetime import date
 
 
 
@@ -197,7 +197,29 @@ def update_agent_profile(request, agent_id):
 
 
 def lead_management(request):
-    pass
+    if not request.user.is_authenticated:
+        messages.info(request, "Login Required")
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, "Agent's Only")
+        return redirect('landing')
+    try:
+        agent=AgentInformation.objects.get(user_id=request.user.id)
+        leads=LeadInfo.objects.filter(agent_id=agent.agent_uuid)
+        new_leads=leads.filter(date_created=date.today()).count()
+        qualified_count=leads.filter(status='Qualified').count()
+        closed_count=leads.filter(stages='Closed/Won').count()
+        
+        context={
+            'leads':leads,
+            'lead_count': leads.count(),
+            'new_leads': new_leads,
+            'closed_count':closed_count,
+            'qualified_count': qualified_count
+        }
+        return render(request, 'agent/agent_leads.html', context)
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
 
 
 
@@ -215,4 +237,20 @@ def agent_profile(request, agent_uuid):
         return render(request, 'estate/agent_profile.html', {'agent':agent})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e', e})
-        
+
+
+
+def analytics(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, "Agent's Only")
+        return redirect('landing')
+    try:
+        return render(request, 'agent/agent_analytics.html')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
+
+
+#FIXME Work all those back buttons to avoid confusion

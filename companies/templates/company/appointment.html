@@ -217,6 +217,7 @@
             <th>Property Type</th>
             <th>Agent</th>
             <th>Notes</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="appointmentsTableBody">
@@ -240,10 +241,15 @@
               <span>{{ appointment.property_type|default:"N/A" }}</span>
             </td>
             <td>
-              <span>{% if appointment.agent_uuid %}{{ appointment.agent_uuid|truncatechars:15 }}{% else %}N/A{% endif %}</span>
+              <span>{% if appointment.agent_uuid %}{{ appointment.agent_uuid|truncatechars:15 %}{% else %}N/A{% endif %}</span>
             </td>
             <td>
               <span class="notes-preview">{{ appointment.note|truncatewords:8 }}</span>
+            </td>
+            <td>
+              <a href="{% url 'company:lead-detail' appointment.id %}" class="action-btn view" title="View Details">
+                <i class="bi bi-eye"></i>
+              </a>
             </td>
           </tr>
           {% endfor %}
@@ -260,6 +266,8 @@
     </div>
     {% endif %}
 
+  </div>
+</div>
   </div>
 </div>
 {% endblock %}
