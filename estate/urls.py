@@ -5,7 +5,7 @@ from . import views
 
 app_name='customer'
 urlpatterns = [
-    path('properties/lease', views.rent_property, name="rent-prop"),
+    path('properties/lease', views.rent_property, name="rent-property"),
     path('users/profile', views.user_profile, name="user-profile"),
     path('properties/sale', views.buy_property, name="buy-property"),
     path('property_view/sale/<property_id>/', views.view_property_on_sale, name="view-property-s"),

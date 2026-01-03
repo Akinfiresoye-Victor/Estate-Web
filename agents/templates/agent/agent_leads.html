@@ -6,198 +6,311 @@
 {% endblock %}
 
 {% block content %}
-<a href="javascript:history.back()" class="back-btn">
-    <i class="bi bi-arrow-left"></i> Back
+<a href="{%url 'agent:dashboard'%}" class="back-btn">
+    <i class="bi bi-arrow-left-circle-fill"></i> 
+    <span>Back</span>
 </a>
 
-<!-- Quick Stats Bar -->
-<div class="quick-stats">
+<!-- Hero Header with Gradient -->
+<div class="hero-header">
   <div class="container">
-    <div class="stats-row">
-      <div class="quick-stat">
-        <div class="stat-value">{{ lead_count|default:"0" }}</div>
-        <div class="stat-label">My Leads</div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="bi bi-lightning-charge-fill"></i>
+        <span>Agent Dashboard</span>
       </div>
-      <div class="quick-stat">
-        <div class="stat-value">{{ new_leads|default:"0" }}</div>
-        <div class="stat-label">New Today</div>
+      <h1 class="hero-title">
+        <i class="bi bi-person-badge-fill"></i>
+        My Lead Pipeline
+      </h1>
+      <p class="hero-subtitle">Track and manage your assigned opportunities</p>
+    </div>
+    
+    <!-- Animated Stats Cards -->
+    <div class="stats-cards">
+      <div class="stat-card stat-primary">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="bi bi-collection-fill"></i>
+          </div>
+          <div class="stat-pulse"></div>
+        </div>
+        <div class="stat-details">
+          <div class="stat-number">{{ lead_count|default:"0" }}</div>
+          <div class="stat-label">Total Leads</div>
+        </div>
       </div>
-      <div class="quick-stat">
-        <div class="stat-value">{{ qualified_count|default:"0" }}</div>
-        <div class="stat-label">Active</div>
+      
+      <div class="stat-card stat-new">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <div class="stat-pulse"></div>
+        </div>
+        <div class="stat-details">
+          <div class="stat-number">{{ new_leads|default:"0" }}</div>
+          <div class="stat-label">New Today</div>
+          <div class="stat-trend">
+            <i class="bi bi-arrow-up"></i> Active
+          </div>
+        </div>
       </div>
-      <div class="quick-stat">
-        <div class="stat-value">{{ closed_count|default:"0" }}</div>
-        <div class="stat-label">Closed</div>
+      
+      <div class="stat-card stat-active">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="bi bi-rocket-takeoff-fill"></i>
+          </div>
+          <div class="stat-pulse"></div>
+        </div>
+        <div class="stat-details">
+          <div class="stat-number">{{ active_leads|default:"0" }}</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+      </div>
+      
+      <div class="stat-card stat-success">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="bi bi-trophy-fill"></i>
+          </div>
+          <div class="stat-pulse"></div>
+        </div>
+        <div class="stat-details">
+          <div class="stat-number">{{ closed_count|default:"0" }}</div>
+          <div class="stat-label">Closed Deals</div>
+          <div class="stat-trend success">
+            <i class="bi bi-graph-up"></i> Success
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Page Header -->
-<div class="page-header">
+<!-- Enhanced Search & Filter -->
+<div class="search-filter-container">
   <div class="container">
-    <div class="header-wrapper">
-      <div>
-        <h1 class="page-title">
-          <i class="bi bi-person-badge"></i>
-          My Leads
-        </h1>
-        <p class="page-desc">Manage your assigned customer inquiries</p>
+    <div class="search-filter-card">
+      <!-- Search with Icon -->
+      <div class="search-wrapper">
+        <div class="search-icon">
+          <i class="bi bi-search"></i>
+        </div>
+        <input type="text" id="searchLeads" placeholder="Search by name, email, or phone..." class="search-input">
+        <div class="search-clear" id="clearSearch" style="display: none;">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+      </div>
+
+      <!-- Stylish Filters -->
+      <div class="filters-wrapper">
+        <div class="filter-item">
+          <label class="filter-label">
+            <i class="bi bi-funnel-fill"></i> Status
+          </label>
+          <select class="filter-select" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Not Contacted">Not Contacted</option>
+            <option value="Hot Lead">🔥 Hot Lead</option>
+            <option value="Warm Lead">☀️ Warm Lead</option>
+            <option value="Cold Lead">❄️ Cold Lead</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label class="filter-label">
+            <i class="bi bi-calendar-event-fill"></i> Period
+          </label>
+          <select class="filter-select" id="dateFilter">
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+
+        <button class="filter-reset" id="resetFilters">
+          <i class="bi bi-arrow-clockwise"></i> Reset
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Search & Filter Bar -->
-<div class="search-filter-section">
-  <div class="container">
-    <div class="search-filter-wrapper">
-      <!-- Search -->
-      <div class="search-container">
-        <i class="bi bi-search"></i>
-        <input type="text" id="searchLeads" placeholder="Search leads...">
-      </div>
-
-      <!-- Filters -->
-      <div class="filter-group">
-        <select class="filter-dropdown" id="statusFilter">
-          <option value="all">All Status</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Not Contacted">Not Contacted</option>
-          <option value="Hot Lead">Hot Lead</option>
-          <option value="Warm Lead">Warm Lead</option>
-          <option value="Cold Lead">Cold Lead</option>
-        </select>
-
-        <select class="filter-dropdown" id="dateFilter">
-          <option value="all">All Time</option>
-          <option value="today">Today</option>
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Leads Grid -->
+<!-- Premium Leads Grid -->
 <div class="leads-section">
   <div class="container">
     
     {% if leads %}
     <div class="leads-grid">
       {% for lead in leads %}
-      <div class="lead-card" 
+      <div class="lead-card-premium" 
            data-status="{{ lead.status }}"
            data-date="{{ lead.date_created|date:'Y-m-d' }}">
         
+        <!-- Gradient Border Top -->
+        <div class="card-gradient-top"></div>
+        
+        <!-- Status Indicator Badge -->
+        <div class="status-indicator status-{{ lead.status|lower|cut:' ' }}">
+          <div class="status-pulse"></div>
+          <span>{{ lead.status }}</span>
+        </div>
+
         <!-- Card Header -->
-        <div class="card-header">
-          <div class="lead-avatar-circle">
-            {{ lead.name.0|upper }}
-          </div>
-          <div class="lead-basic-info">
-            <h3 class="lead-title">{{ lead.name }}</h3>
-            <span class="lead-id">#{{ lead.lead_id }}</span>
-          </div>
-          <span class="status-dot status-{{ lead.status|lower|cut:' ' }}"></span>
-        </div>
-
-        <!-- Card Body -->
-        <div class="card-body">
-          <!-- Property Info -->
-          <div class="info-row">
-            <i class="bi bi-building"></i>
-            <div class="info-content">
-              <span class="info-label">Property</span>
-              <span class="info-value">{{ lead.property_name|truncatewords:4 }}</span>
+        <div class="premium-card-header">
+          <div class="lead-avatar-modern">
+            <div class="avatar-inner">
+              {{ lead.name.0|upper }}
             </div>
+            <div class="avatar-ring"></div>
           </div>
-
-          <!-- Contact Info -->
-          <div class="info-row">
-            <i class="bi bi-telephone"></i>
-            <div class="info-content">
-              <span class="info-label">Phone</span>
-              <a href="tel:{{ lead.phone_no }}" class="info-link">{{ lead.phone_no }}</a>
+          <div class="lead-identity">
+            <h3 class="lead-name-modern">{{ lead.name }}</h3>
+            <div class="lead-meta">
+              <span class="lead-date-badge">
+                <i class="bi bi-clock-fill"></i>
+                {{ lead.date_created|date:"M d" }}
+              </span>
             </div>
-          </div>
-
-          <div class="info-row">
-            <i class="bi bi-envelope"></i>
-            <div class="info-content">
-              <span class="info-label">Email</span>
-              <a href="mailto:{{ lead.email }}" class="info-link">{{ lead.email|truncatechars:25 }}</a>
-            </div>
-          </div>
-
-          <!-- Status Badge -->
-          <div class="card-status">
-            <span class="status-label">{{ lead.status }}</span>
           </div>
         </div>
 
-        <!-- Card Footer -->
-        <div class="card-footer">
-          <div class="footer-date">
-            <i class="bi bi-clock"></i>
-            {{ lead.date_created|date:"M d, Y" }}
+        <!-- Card Body with Icons -->
+        <div class="premium-card-body">
+          <div class="info-block">
+            <div class="info-icon property-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="info-text">
+              <span class="info-label">Property Interest</span>
+              <span class="info-value">{{ lead.property_name|truncatewords:5 }}</span>
+            </div>
           </div>
-          <a href="#" class="view-btn">
-            View Details <i class="bi bi-arrow-right"></i>
+
+          <div class="contact-section">
+            <div class="contact-item">
+              <div class="contact-icon phone-icon">
+                <i class="bi bi-telephone-fill"></i>
+              </div>
+              <div class="contact-details">
+                <span class="contact-label">Phone</span>
+                <a href="tel:{{ lead.phone_no }}" class="contact-value">{{ lead.phone_no }}</a>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon email-icon">
+                <i class="bi bi-envelope-fill"></i>
+              </div>
+              <div class="contact-details">
+                <span class="contact-label">Email</span>
+                <a href="mailto:{{ lead.email }}" class="contact-value">{{ lead.email|truncatechars:22 }}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Card Footer -->
+        <div class="premium-card-footer">
+          <div class="footer-info">
+            <i class="bi bi-calendar2-check"></i>
+            <span>{{ lead.date_created|date:"F d, Y" }}</span>
+          </div>
+          <a href="{%url 'agent:lead-detail' lead_id=lead.lead_id%}" class="view-details-btn">
+            <span>View Details</span>
+            <i class="bi bi-arrow-right-circle-fill"></i>
           </a>
         </div>
       </div>
       {% endfor %}
     </div>
 
-    <!-- Pagination -->
+    <!-- Enhanced Pagination -->
     {% if leads.paginator.num_pages > 1 %}
-    <div class="pagination-wrapper">
-      <nav class="pagination-nav">
-        <ul class="pagination-list">
-          {% if leads.has_previous %}
-            <li>
-              <a href="?page={{ leads.previous_page_number }}" class="page-btn">
-                <i class="bi bi-chevron-left"></i>
-              </a>
-            </li>
-          {% endif %}
+    <div class="pagination-container">
+      <div class="pagination-card">
+        <nav class="pagination-nav">
+          <ul class="pagination-modern">
+            {% if leads.has_previous %}
+              <li>
+                <a href="?page=1" class="page-btn first-page" title="First Page">
+                  <i class="bi bi-chevron-double-left"></i>
+                </a>
+              </li>
+              <li>
+                <a href="?page={{ leads.previous_page_number }}" class="page-btn prev-page" title="Previous">
+                  <i class="bi bi-chevron-left"></i>
+                  <span>Prev</span>
+                </a>
+              </li>
+            {% endif %}
 
-          {% for i in nums %}
-            <li>
-              <a href="?page={{ forloop.counter }}" 
-                 class="page-btn {% if leads.number == forloop.counter %}active{% endif %}">
-                {{ forloop.counter }}
-              </a>
-            </li>
-          {% endfor %}
+            {% for i in nums %}
+              <li>
+                <a href="?page={{ forloop.counter }}" 
+                   class="page-btn page-number {% if leads.number == forloop.counter %}active{% endif %}">
+                  {{ forloop.counter }}
+                </a>
+              </li>
+            {% endfor %}
 
-          {% if leads.has_next %}
-            <li>
-              <a href="?page={{ leads.next_page_number }}" class="page-btn">
-                <i class="bi bi-chevron-right"></i>
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-      
-      <div class="page-info">
-        Page {{ leads.number }} of {{ leads.paginator.num_pages }}
+            {% if leads.has_next %}
+              <li>
+                <a href="?page={{ leads.next_page_number }}" class="page-btn next-page" title="Next">
+                  <span>Next</span>
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+              <li>
+                <a href="?page={{ leads.paginator.num_pages }}" class="page-btn last-page" title="Last Page">
+                  <i class="bi bi-chevron-double-right"></i>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+        
+        <div class="pagination-details">
+          <div class="page-indicator">
+            Page <strong>{{ leads.number }}</strong> of <strong>{{ leads.paginator.num_pages }}</strong>
+          </div>
+          <div class="results-indicator">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+            Showing leads
+          </div>
+        </div>
       </div>
     </div>
     {% endif %}
 
     {% else %}
-    <!-- Empty State -->
-    <div class="empty-state">
-      <div class="empty-icon">
-        <i class="bi bi-inbox"></i>
+    <!-- Beautiful Empty State -->
+    <div class="empty-state-modern">
+      <div class="empty-illustration">
+        <div class="empty-icon-circle">
+          <i class="bi bi-inbox"></i>
+        </div>
+        <div class="empty-particles">
+          <span class="particle"></span>
+          <span class="particle"></span>
+          <span class="particle"></span>
+        </div>
       </div>
-      <h3>No Leads Assigned</h3>
-      <p>You don't have any leads assigned yet. Check back later for new assignments.</p>
+      <h3 class="empty-title">No Leads Yet</h3>
+      <p class="empty-description">
+        You don't have any leads assigned at the moment.<br>
+        New opportunities will appear here when they're assigned to you.
+      </p>
+      <div class="empty-action">
+        <button class="refresh-btn">
+          <i class="bi bi-arrow-clockwise"></i>
+          Refresh Page
+        </button>
+      </div>
     </div>
     {% endif %}
 
@@ -214,20 +327,48 @@
     const searchInput = document.getElementById('searchLeads');
     const statusFilter = document.getElementById('statusFilter');
     const dateFilter = document.getElementById('dateFilter');
+    const clearSearch = document.getElementById('clearSearch');
+    const resetFilters = document.getElementById('resetFilters');
 
-    // Event Listeners
-    if (searchInput) searchInput.addEventListener('input', filterLeads);
+    // Show/hide clear button
+    if (searchInput && clearSearch) {
+        searchInput.addEventListener('input', function() {
+            clearSearch.style.display = this.value ? 'flex' : 'none';
+            filterLeads();
+        });
+        
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            this.style.display = 'none';
+            filterLeads();
+        });
+    }
+
+    // Filter listeners
     if (statusFilter) statusFilter.addEventListener('change', filterLeads);
     if (dateFilter) dateFilter.addEventListener('change', filterLeads);
+
+    // Reset filters
+    if (resetFilters) {
+        resetFilters.addEventListener('click', function() {
+            if (searchInput) searchInput.value = '';
+            if (statusFilter) statusFilter.value = 'all';
+            if (dateFilter) dateFilter.value = 'all';
+            if (clearSearch) clearSearch.style.display = 'none';
+            filterLeads();
+        });
+    }
 
     function filterLeads() {
         const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         const selectedStatus = statusFilter ? statusFilter.value : 'all';
         const selectedDate = dateFilter ? dateFilter.value : 'all';
 
-        const cards = document.querySelectorAll('.lead-card');
+        const cards = document.querySelectorAll('.lead-card-premium');
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
+        let visibleCount = 0;
 
         cards.forEach(card => {
             const text = card.textContent.toLowerCase();
@@ -253,11 +394,35 @@
 
             if (matchesSearch && matchesStatus && matchesDate) {
                 card.style.display = '';
+                visibleCount++;
+                // Animate in
+                setTimeout(() => card.style.opacity = '1', 10);
             } else {
-                card.style.display = 'none';
+                card.style.opacity = '0';
+                setTimeout(() => card.style.display = 'none', 300);
             }
         });
+
+        // Show empty state if no results
+        const emptyState = document.querySelector('.empty-state-modern');
+        if (emptyState && visibleCount === 0 && cards.length > 0) {
+            // Could show "no results" message
+        }
     }
+
+    // Refresh button in empty state
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            location.reload();
+        });
+    }
+
+    // Add entrance animation to cards
+    const cards = document.querySelectorAll('.lead-card-premium');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
 })();
 </script>
 {% endblock %}

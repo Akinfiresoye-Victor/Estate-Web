@@ -253,4 +253,20 @@ def analytics(request):
         return render(request, 'estate/error_page.html', {'e':e})
 
 
-#FIXME Work all those back buttons to avoid confusion
+
+
+def lead_detail(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return render('login')
+    if request.user.role != 'agent':
+        messages.info(request, "Agent's Only")
+        return redirect('landing')
+    try:
+        agent=AgentInformation.objects.get(user_id=request.user.id)
+        lead=LeadInfo.objects.get(lead_id=lead_id)
+        return render(request, 'agent/agent_lead_detail.html', {'lead':lead})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
+
+#TODO Perform proper error handling even in places you think error cant occur
