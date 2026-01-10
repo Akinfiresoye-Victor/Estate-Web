@@ -192,7 +192,8 @@ def view_property_on_sale(request, property_id):
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
             'company_info': company_in_charge,
-            'base_template':base_template
+            'base_template':base_template,
+            'role':user_role
         }
         return render(request, 'estate/view_property_s.html', context)
     except Exception as e:
@@ -224,6 +225,7 @@ def view_property_on_lease(request, property_id):
             messages.info(request, 'Corperate Listing')
         except CompanyInformation.DoesNotExist:
             agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            
             company_in_charge=None
             messages.info(request, 'Agent Listing')
         property_view_count(property_id, "Rent", request.user.id)
@@ -231,7 +233,8 @@ def view_property_on_lease(request, property_id):
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
             'company_info': company_in_charge,
-            'base_template':base_template
+            'base_template':base_template,
+            'role':user_role,
         }
         return render(request, 'estate/view_property_r.html', context)
     except Exception as e:
@@ -264,7 +267,7 @@ def user_profile(request):
     """
 def listed_properties(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
+        messages.info(request, 'Log in to g ain access')
         return redirect('login')
     try:
         model= request.user.id
@@ -642,7 +645,7 @@ def inquiry_form_rent(request, property_id):
 
 
 
-#FIXME Merge both rent and sale inquiry form 
+#TODO Merge both rent and sale inquiry form 
 def inquiry_form_sale(request, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')

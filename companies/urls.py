@@ -8,7 +8,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/fill', views.company_form, name='company_form'),
     path('profile/edit/<company_id>',views.update_company_profile, name='edit-profile'),
-    path('listings', views.manaage_listings, name='listings'),
     path('profile/view/<company_uuid>', views.company_profile, name='company_profile'),
     path('properties/<company_uuid>', views.properties_by_company, name='company-properties'),
     path('monthly/analytics', views.company_analytics, name='analytics'),

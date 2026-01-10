@@ -245,19 +245,6 @@ def update_company_profile(request, company_id):
         return redirect('login')
 
 
-def manaage_listings(request):
-    try:
-        company=CompanyInformation.objects.get(user_id=request.user.id)
-        company_uuid=company.unique_company_id
-        property_on_lease=PropertyManagementRent.objects.filter(company_uuid=company_uuid)
-        property_on_sale=PropertyManagementSale.objects.filter(company_uuid=company_uuid)
-        return render(request, 'company/company_listings.html', {'on_lease':property_on_lease,
-                                                        'on_sale':property_on_sale})
-    except Exception as e:
-        print(e)
-        return render(request, 'estate/error_page.html', {'e':e})
-
-
 def company_analytics(request):
     if not request.user.is_authenticated:
         messages.warning(request, 'login Required')
@@ -675,10 +662,13 @@ def company_profile(request, company_uuid):
 
 
 def properties_by_company(request, company_uuid):
-    if request.user.is_authenticated:
-        if request.user.role == 'company':
-            messages.info(request, 'Customer\'s only')
-            return redirect('company:dashboard')
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role !='customer':
+        messages.info(request, 'Customers Only')
+        return redirect('landing')
+    try:
         company=CompanyInformation.objects.get(unique_company_id=company_uuid)
         on_lease=PropertyManagementRent.objects.filter(company_uuid=company_uuid)
         on_sale=PropertyManagementSale.objects.filter(company_uuid=company_uuid)
@@ -687,7 +677,8 @@ def properties_by_company(request, company_uuid):
             'on_sale': on_sale,
             'company':company
         })
-        
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
 
 
 

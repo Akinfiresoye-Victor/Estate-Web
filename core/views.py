@@ -274,7 +274,7 @@ def update_property_rent(request, property_id):
                     image_form.save()
                     messages.success(request, "Property Updated Successfully")
                     print(property.base_image.url)
-                    return redirect('my-listings')
+                    return redirect('listings')
                 return render(request, 'core/update_property.html', {'property': property, 'form': prop_form, 'images': image_form, 'base_template':base_template})
             
             else:
@@ -313,7 +313,7 @@ def update_property_sale(request, property_id):
                     prop_form.save()
                     image_form.save()
                     messages.success(request, "Property Updated Successfully")
-                    return redirect('my-listings')
+                    return redirect('listings')
                 return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
             
             else:
@@ -341,11 +341,11 @@ def delete_property_on_lease(request, property_id):
                 #what does the actual deleting based on the property_id
                 property1.delete()
                 messages.success(request, ("Property deleted successfully"))
-                return redirect('my-listings')
+                return redirect('listings')
             
             else:
                 messages.warning(request, ('You Arent authorized to delete this property'))
-                return redirect('my-listings')
+                return redirect('listings')
             
         except Exception as e:
             print(f'ERROR IS{e}')
@@ -367,11 +367,11 @@ def delete_property_on_sale(request, property_id):
             if request.user.id == property1.user_id:
                 property1.delete()
                 messages.success(request, ("Property deleted successfully"))
-                return redirect('my-listings')
+                return redirect('listings')
             
             else:
                 messages.warning(request, ('You Arent authorized to delete this property'))
-                return redirect('my-listings')
+                return redirect('listings')
             
         except Exception as e:
             print(f'ERROR IS{e}')
@@ -524,3 +524,36 @@ def estate_blog(request):
     except Exception as e:
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
+
+
+def manaage_listings(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'login required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.warning(request, 'Access Restricted')
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        if request.user.role == 'company':
+            user_type=CompanyInformation.objects.get(user_id=request.user.id)
+            user_id=user_type.unique_company_id
+            property_on_lease=PropertyManagementRent.objects.filter(company_uuid=user_id)
+            property_on_sale=PropertyManagementSale.objects.filter(company_uuid=user_id)
+            role='company'
+        else:
+            user_type=AgentInformation.objects.get(user_id=request.user.id)
+            user_id=user_type.agent_uuid
+            property_on_lease=PropertyManagementRent.objects.filter(agent_uuid=user_id)
+            property_on_sale=PropertyManagementSale.objects.filter(agent_uuid=user_id)
+            role='agent'
+        
+        return render(request, 'core/listings.html', {'on_lease':property_on_lease,'role':role,
+                                                        'on_sale':property_on_sale, 'base_template':base_template})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})

@@ -68,7 +68,7 @@
         </div>
       </div>
       <div class="kpi-body">
-        <h3 class="kpi-value">{{ prop_views|intcomma }}</h3>
+        <h3 class="kpi-value">{{ listing_views|intcomma }}</h3>
         <p class="kpi-label">Total Listing Views</p>
       </div>
     </div>
@@ -130,20 +130,14 @@
               <div class="label-dot sale-dot"></div>
               <span>For Sale</span>
             </div>
-            <span class="row-value">{{ sale_view|intcomma }}</span>
+            <span class="row-value">{{ sale_views|intcomma }}</span>
           </div>
           <div class="progress-wrapper">
-            {% widthratio sale_view sale_view|add:leased_view 100 as sale_pct %}
+            {% widthratio sale_views sale_views|add:lease_views 100 as sale_pct %}
             <div class="progress-fill sale-progress" style="width: {{ sale_pct }}%">
               <span class="progress-text">{{ sale_pct }}%</span>
             </div>
           </div>
-          {% if sale_incr_perc != 0 %}
-          <p class="row-change {% if sale_incr_perc > 0 %}positive{% else %}negative{% endif %}">
-            <i class="bi bi-{% if sale_incr_perc > 0 %}arrow-up-circle-fill{% else %}arrow-down-circle-fill{% endif %}"></i>
-            {{ sale_incr_perc|floatformat:1 }}% from last month
-          </p>
-          {% endif %}
         </div>
 
         <!-- Lease Listings -->
@@ -153,34 +147,33 @@
               <div class="label-dot lease-dot"></div>
               <span>For Lease</span>
             </div>
-            <span class="row-value">{{ leased_view|intcomma }}</span>
+            <span class="row-value">{{ lease_views|intcomma }}</span>
           </div>
           <div class="progress-wrapper">
-            {% widthratio leased_view sale_view|add:leased_view 100 as lease_pct %}
+            {% widthratio lease_views sale_views|add:lease_views 100 as lease_pct %}
             <div class="progress-fill lease-progress" style="width: {{ lease_pct }}%">
               <span class="progress-text">{{ lease_pct }}%</span>
             </div>
           </div>
-          {% if lease_incr_perc != 0 %}
-          <p class="row-change {% if lease_incr_perc > 0 %}positive{% else %}negative{% endif %}">
-            <i class="bi bi-{% if lease_incr_perc > 0 %}arrow-up-circle-fill{% else %}arrow-down-circle-fill{% endif %}"></i>
-            {{ lease_incr_perc|floatformat:1 }}% from last month
-          </p>
-          {% endif %}
         </div>
 
         <!-- Quick Insight -->
         <div class="quick-insight">
           <i class="bi bi-info-circle-fill"></i>
           <div>
-            {% widthratio sale_view sale_view|add:leased_view 100 as sale_percent %}
-            {% if sale_percent > 60 %}
-              <strong>Sales Focus:</strong> Your sale listings are performing exceptionally well. Consider expanding your portfolio.
-            {% elif sale_percent < 40 %}
-              <strong>Rental Market:</strong> Lease properties are trending. This is a great time to target rental clients.
-            {% else %}
-              <strong>Balanced Portfolio:</strong> You have an excellent balance between sale and lease listings.
-            {% endif %}
+            {%if sale_pct|add:0 > lease_pct|add:0%}
+              {% if sale_pct|add:0 > 59 %}
+                <strong>Sales Focus:</strong> Your sale listings are performing exceptionally well. Consider expanding your portfolio.
+              {% else%}
+                <strong>Balanced Portfolio:</strong> You have an excellent balance between sale and lease listings.
+              {% endif %}
+            {%else%}
+              {% if lease_pct|add:0 > 59 %}
+                <strong>Rental Market:</strong> Lease properties are trending. This is a great time to target rental clients.
+              {% else%}
+                <strong>Balanced Portfolio:</strong> You have an excellent balance between sale and lease listings.
+              {% endif %}
+            {%endif%}
           </div>
         </div>
 
@@ -197,7 +190,7 @@
           </h3>
           <p class="chart-subtitle">Your most viewed properties</p>
         </div>
-        <a href="{% url 'company:listings' %}" class="see-all-link">
+        <a href="{% url 'listings' %}" class="see-all-link">
           See All <i class="bi bi-chevron-right"></i>
         </a>
       </div>

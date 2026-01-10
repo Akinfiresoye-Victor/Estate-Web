@@ -1,16 +1,21 @@
-{% extends 'company/base.html' %}
+{% extends base_template %}
 
 {% load static %}
 {%load humanize%}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'company/css/listings.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/listings.css' %}">
 {% endblock %}
 
 {% block content %}
+{%if role == company %}
 <a href="{%url 'company:dashboard'%}" class="attractive-back-button">
     &larr; Go back
 </a>
-
+{%else%}
+<a href="{%url 'agent:dashboard'%}" class="attractive-back-button">
+    &larr; Go back
+</a>
+{%endif%}
 <style>
 .attractive-back-button {
     margin-bottom: 1.5rem;

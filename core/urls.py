@@ -12,9 +12,10 @@ urlpatterns = [
     path('sell_property/', views.sell_property, name="sell-property"),
     path('lease_property/', views.lease_property, name="lease-property"),
     path('latest_news/', views.articles, name='articles'),
-    path('my_listings/', views.listed_properties, name="my-listings"),
+    path('my_listings/', views.listed_properties, name="listings"),
     path('estateweb/partners/', views.partner_with_us, name="partner-with-us"),
     path('add_schedule', views.add_schedule, name="add-schedule"),
     path('schedule_detail/<lead_id>', views.appointment_detail, name="view-schedule"),
-    path('estate/blog', views.estate_blog, name='estate-blog')
+    path('estate/blog', views.estate_blog, name='estate-blog'),
+    path('mylistings', views.manaage_listings, name='listings'),
 ]

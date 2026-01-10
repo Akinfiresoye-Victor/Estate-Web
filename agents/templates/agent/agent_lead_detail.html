@@ -168,7 +168,15 @@
             </div>
             
             <div class="property-details">
-              <h4 class="property-name">{{ property.residential }}</h4>
+              {%if property.property_category == 'Residential' %}
+                <h4>{{ property.residential }}</h4>
+              {%elif property.property_category == 'Commercial'%}
+                <h4>{{ property.commercial }}</h4>
+              {%elif property.property_category == 'Land'%}
+                <h4>{{ property.lands }}</h4>
+              {%else%}
+                <h4>Something went wrong.....</h4>
+              {%endif%}
               <p class="property-address">
                 <i class="bi bi-geo-alt-fill"></i>
                 {{ property.location }}
@@ -177,7 +185,15 @@
               <div class="property-specs">
                 <div class="spec-item">
                   <i class="bi bi-house-door-fill"></i>
-                  <span>{{ property.residential }}</span>
+                  {%if property.property_category == 'Residential' %}
+                    <span>{{ property.residential }}</span>
+                  {%elif property.property_category == 'Commercial'%}
+                    <span>{{ property.commercial }}</span>
+                  {%elif property.property_category == 'Land'%}
+                    <span>{{ property.lands }}</span>
+                  {%else%}
+                    <span>Something went wrong.....</span>
+                  {%endif%}
                 </div>
                 <div class="spec-item">
                   <i class="bi bi-door-closed-fill"></i>
@@ -200,12 +216,12 @@
                 </div>
                 
                 {% if property.price_range %}
-                  <a href="#" target="_blank" class="view-property-btn">
+                  <a href="{%url 'customer:view-property-r' property.id%}" target="_blank" class="view-property-btn">
                     <span>View Full Details</span>
                     <i class="bi bi-arrow-right-circle-fill"></i>
                   </a>
                 {% else %}
-                  <a href="#" target="_blank" class="view-property-btn">
+                  <a href="{%url 'customer:view-property-s' property.id%}" target="_blank" class="view-property-btn">
                     <span>View Full Details</span>
                     <i class="bi bi-arrow-right-circle-fill"></i>
                   </a>

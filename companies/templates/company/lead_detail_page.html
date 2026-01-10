@@ -146,7 +146,15 @@
             </div>
             
             <div class="property-info">
-              <h4>{{ property.residential }}</h4>
+              {%if property.property_category == 'Residential' %}
+                <h4>{{ property.residential }}</h4>
+              {%elif property.property_category == 'Commercial'%}
+                <h4>{{ property.commercial }}</h4>
+              {%elif property.property_category == 'Land'%}
+                <h4>{{ property.lands }}</h4>
+              {%else%}
+                <h4>Something went wrong.....</h4>
+              {%endif%}
               <p class="property-location">
                 <i class="bi bi-geo-alt"></i>
                 {{ property.location }}

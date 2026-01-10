@@ -9,13 +9,21 @@
 
 {% block content %}
 
+{%if role == 'customer' %}
 <div class="container">
   <a href="{%url 'customer:rent-property'%}" class="back-button">
     <i class="bi bi-arrow-left"></i>
     Go Back
   </a>
 </div>
-
+{%else%}
+<div class="container">
+  <a href="javascript:history.back()" class="back-button">
+    <i class="bi bi-arrow-left"></i>
+    Go Back
+  </a>
+</div>
+{%endif%}
 <div class="detail-wrapper">
   
   <!-- Property Header -->

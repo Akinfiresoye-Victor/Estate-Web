@@ -160,14 +160,19 @@
         <!-- Market Insight -->
         <div class="market-insight">
           <i class="bi bi-lightbulb-fill"></i>
-          {% widthratio sale_view sale_view|add:leased_view 100 as sale_percent %}
-          {% if sale_percent > 60 %}
-            <p><strong>Sale-focused market:</strong> Your sale properties are attracting more attention. Consider adding premium listings.</p>
-          {% elif sale_percent < 40 %}
-            <p><strong>Lease-focused market:</strong> Rental properties are trending. Great time to promote lease options.</p>
-          {% else %}
-            <p><strong>Balanced market:</strong> You have a healthy mix of sale and lease interest.</p>
-          {% endif %}
+          {%if sale_percentage|add:0 > lease_percentage|add:0%}
+            {% if sale_percentage|add:0 > 59 %}
+              <p><strong>Sale-focused market:</strong> Your sale properties are attracting more attention. Consider adding premium listings.</p>
+            {% else%}
+              <p><strong>Balanced market:</strong> You have a healthy mix of sale and lease interest.</p>
+            {% endif %}
+          {%else%}
+            {% if lease_percentage|add:0 > 59 %}
+              <p><strong>Lease-focused market:</strong> Rental properties are trending. Great time to promote lease options.</p>
+            {% else%}
+              <p><strong>Balanced market:</strong> You have a healthy mix of sale and lease interest.</p>
+            {% endif %}
+          {%endif%}
         </div>
 
       </div>
@@ -179,7 +184,7 @@
         <h3 class="card-title">
           <i class="bi bi-star-fill"></i>Top Performing Properties
         </h3>
-        <a href="{% url 'company:listings' %}" class="view-all-link">
+        <a href="{% url 'listings' %}" class="view-all-link">
           View All <i class="bi bi-arrow-right"></i>
         </a>
       </div>

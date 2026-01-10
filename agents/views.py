@@ -1,15 +1,16 @@
 from django.shortcuts import render, redirect
-from .models import AgentInformation
+from .models import AgentInformation, SessionId, AgentAnalytics
 from django.contrib import messages
 from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
 from django.db import transaction
 from members.models import User
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from core.models import PropertyManagementRent, PropertyManagementSale
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews
 from estate.models import LeadInfo
 from datetime import datetime
 from datetime import date
+from companies.views import property_views_count
 
 
 
@@ -234,6 +235,27 @@ def agent_profile(request, agent_uuid):
     
     try:
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        try:
+            profile=agent.analytics.get()
+        except:
+            analytics= AgentAnalytics.objects.create(
+                agent=agent,
+                profile_views=0,
+                ratings=0.0,
+                reviews=0
+            )
+        try:
+            session= agent.session_id.get(session_id=request.user.id)
+        except:
+            session= SessionId.objects.create(
+                agent=agent,
+                session_id=request.user.id,
+                inquires_check=0
+            )
+            view_count= agent.analytics.get()
+            view_count.profile_views+=1
+            view_count.save()
+
         return render(request, 'estate/agent_profile.html', {'agent':agent})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e', e})
@@ -248,7 +270,50 @@ def analytics(request):
         messages.info(request, "Agent's Only")
         return redirect('landing')
     try:
-        return render(request, 'agent/agent_analytics.html')
+        agent=AgentInformation.objects.get(user_id= request.user.id)
+        agent_lease_properties= PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid)
+        agent_sales_properties= PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid)
+        lease_views_list=[]
+        sale_views_list=[]
+        
+        for prop_id in agent_lease_properties:
+            view=property_views_count("Rent", prop_id.pk, reset=False)
+            lease_views_list.append(view)
+        for prop_id in agent_sales_properties:
+            view=property_views_count("Sale", prop_id.pk, reset=False)
+            sale_views_list.append(view)
+        listing_views= sum(lease_views_list) + sum(sale_views_list)
+        
+        try:
+            profile=agent.analytics.get()
+        except:
+            analytics= AgentAnalytics.objects.create(
+                agent=agent,
+                profile_views=0,
+                ratings=0.0,
+                reviews=0
+            )
+        profile_views= profile.profile_views
+        
+        total_properties= list(agent_lease_properties) + list(agent_sales_properties)
+        total_properties.sort(key=lambda x: x.total_likes, reverse=True)
+        total_properties=total_properties[:4]
+        view_list=[]
+        for prop in total_properties:
+            prop_views= PropertyViews.objects.filter(property_type=prop.property_type, property_id=prop.pk).count()
+            view_list.append(prop_views)
+        likes_views=zip(total_properties, view_list)
+        
+        
+        context={
+            "listing_views": listing_views,
+            "profile_views": profile_views,
+            "sale_views": sum(sale_views_list),
+            "lease_views": sum(lease_views_list),
+            "ranking": likes_views
+        }
+        
+        return render(request, 'agent/agent_analytics.html', context)
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 
@@ -265,8 +330,16 @@ def lead_detail(request, lead_id):
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
         lead=LeadInfo.objects.get(lead_id=lead_id)
-        return render(request, 'agent/agent_lead_detail.html', {'lead':lead})
+        if lead.property_type == 'Sale':
+            property_intrested=PropertyManagementSale.objects.get(pk=lead.property_intrested)
+        else:
+            property_intrested=PropertyManagementRent.objects.get(pk=lead.property_intrested)
+        return render(request, 'agent/agent_lead_detail.html', {'lead':lead, 'property':property_intrested})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 
 #TODO Perform proper error handling even in places you think error cant occur
+# TODO Recalculate the engagement rate and ranking information 
+# FIXME the update page, when i switch category the house type doesnt switch
+# TODO Make sure that the lead management page displays all the leads with their CORRESPONDING property name
+#FIXME Once a property is updated everything connected to the property must also be changed e.d Leads
