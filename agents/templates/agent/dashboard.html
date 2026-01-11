@@ -176,7 +176,7 @@
             <i class="bi bi-arrow-right action-arrow"></i>
           </a>
 
-          <a href="#" class="action-button">
+          <a href="{%url 'appointment'%}" class="action-button">
             <div class="action-icon">
               <i class="bi bi-calendar-check"></i>
             </div>
@@ -197,7 +197,6 @@
             </div>
             <i class="bi bi-arrow-right action-arrow"></i>
           </a>
-
           <div class="action-button disabled">
             <span class="coming-soon-label">
               <i class="bi bi-clock-history"></i>
@@ -211,6 +210,16 @@
               <p>Manage contracts</p>
             </div>
           </div>
+          <a href="{%url 'agent:settings'%}" class="action-button">
+            <div class="action-icon">
+              <i class="bi bi-gear"></i>
+            </div>
+            <div class="action-text">
+              <h3>Settings</h3>
+              <p>Configure Prefrences</p>
+            </div>
+            <i class="bi bi-arrow-right action-arrow"></i>
+          </a>
         </div>
       </section>
 
@@ -315,57 +324,58 @@
       </div>
 
       <!-- Today's Schedule -->
-      <div class="info-panel">
-        <div class="panel-header">
-          <i class="bi bi-calendar-week"></i>
-          <h3>Today's Schedule</h3>
-        </div>
-        <div class="panel-body">
-          <div class="schedule-list">
-            <div class="schedule-item">
-              <div class="schedule-time">
-                <span class="time-hour">10:00</span>
-                <span class="time-period">AM</span>
-              </div>
-              <div class="schedule-details">
-                <h4>Property Viewing</h4>
-                <p><i class="bi bi-geo-alt"></i> Ikoyi, Lagos</p>
-                <span class="schedule-status pending">Pending</span>
-              </div>
-            </div>
-
-            <div class="schedule-item">
-              <div class="schedule-time">
-                <span class="time-hour">2:30</span>
-                <span class="time-period">PM</span>
-              </div>
-              <div class="schedule-details">
-                <h4>Client Meeting</h4>
-                <p><i class="bi bi-geo-alt"></i> Estate Web Office</p>
-                <span class="schedule-status confirmed">Confirmed</span>
-              </div>
-            </div>
-
-            <div class="schedule-item">
-              <div class="schedule-time">
-                <span class="time-hour">5:00</span>
-                <span class="time-period">PM</span>
-              </div>
-              <div class="schedule-details">
-                <h4>Document Review</h4>
-                <p><i class="bi bi-geo-alt"></i> Virtual Meeting</p>
-                <span class="schedule-status confirmed">Confirmed</span>
-              </div>
-            </div>
+      {%if todays_appointment%}
+        <div class="info-panel">
+          <div class="panel-header">
+            <i class="bi bi-calendar-week"></i>
+            <h3>Today's Schedule</h3>
           </div>
-          
+          {% comment %} TODO Set time for appointments, it should have drop down for AM and PM and its variable should be timeformat and status {% endcomment %}
+        {%for appointment in todays_appointment%}
+            <div class="panel-body">
+              <div class="schedule-list">
+                <div class="schedule-item">
+                {%if appointment.time%}
+                  <div class="schedule-time">
+                    <span class="time-hour">{{appointment.time}}</span>
+                    <span class="time-period">{{appointment.timeformat}}</span>
+                  </div>
+                {%else%}
+                  <div class="schedule-time">
+                    <span class="time-hour">Any</span>
+                    <span class="time-period">time</span>
+                  </div>
+                {%endif%}
+                  <div class="schedule-details">
+                    <h4>{{appointment.appointment_type}}</h4>
+                    {%if appointment.appointment_type == 'Virtual'%}
+                      <p><i class="bi bi-geo-alt"></i> Virtual</p>
+                    {%elif appointment.appointment_type == 'Personal'%}
+                      <p><i class="bi bi-geo-alt"></i> {{appointment.location}}</p>
+                    {%elif appointment.appointment_type == 'Buisness' %}
+                      <p><i class="bi bi-geo-alt"></i> {{appointment.location}}</p>
+                    {%else%}
+                      <p><i class="bi bi-geo-alt"></i> Not Specified</p>
+                    {%endif%}
+                    <span class="schedule-status pending">{{appointment.appointment_type}}</span>
+                  </div>
+                </div>
+        {%endfor%}
+      {%else%}
+        <div class="info-panel">
+          <div class="panel-header">
+            <i class="bi bi-calendar-week"></i>
+            <h3>Today's Schedule(None For Today)</h3>
+        </div>
+        <a href="{%url 'add-schedule'%}" style="text-decoration:none;">
           <button class="btn-panel-action">
             <i class="bi bi-plus-circle"></i>
             Add Appointment
           </button>
+        </a>
         </div>
       </div>
-
+      {%endif%}
       <!-- Performance Stats -->
       <div class="info-panel">
         <div class="panel-header">

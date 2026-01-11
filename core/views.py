@@ -490,7 +490,7 @@ def add_schedule(request):
                 appointment.save()
                 
                 messages.success(request, 'Appointment scheduled successfully!')
-                return redirect('company:appointment') 
+                return redirect('appointment') 
             else:
                 messages.error(request, 'Please correct the errors below.')
         else:
@@ -510,6 +510,38 @@ def add_schedule(request):
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
 
+
+def appointment(request):
+    if not request.user.is_authenticated:
+        messages.info(request, "Login Required")
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        
+        '''Client Appointment'''
+        #user in question
+        try:
+            company= CompanyInformation.objects.get(user_id=request.user.id)
+            total_appointment= Appointments.objects.filter(company_uuid=company.unique_company_id)
+            return render(request, 'core/appointment.html', {'appointments': total_appointment, 'base_template':base_template})
+        except ObjectDoesNotExist:
+            agent= AgentInformation.objects.get(user_id=request.user.id)
+            total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
+            return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':agent.profile_name})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+#TODOSchedule appointemnt detail - Add client information 
+#TODO Add edit appointment
 
 def estate_blog(request):
     try:

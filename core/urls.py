@@ -16,6 +16,7 @@ urlpatterns = [
     path('estateweb/partners/', views.partner_with_us, name="partner-with-us"),
     path('add_schedule', views.add_schedule, name="add-schedule"),
     path('schedule_detail/<lead_id>', views.appointment_detail, name="view-schedule"),
+    path('lead/appointments', views.appointment, name='appointment'),
     path('estate/blog', views.estate_blog, name='estate-blog'),
     path('mylistings', views.manaage_listings, name='listings'),
 ]

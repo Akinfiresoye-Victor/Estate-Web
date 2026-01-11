@@ -4,7 +4,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'estate/css/wishlist.css' %}">
 {% endblock %}
-
+{%load humanize%}
 {% block content %}
 <a href="javascript:history.back()" class="back-button">
     &larr; Go Back
@@ -77,13 +77,21 @@
             {% endif %}
           </div>
           <div class="card-body">
-            <h5 class="property-title lease">{{ property.residential }}</h5>
+            {%if property.property_category == 'Commercial' %}
+              <h5 class="property-title lease">{{ property.commercial }}</h5>
+            {%elif property.property_category == 'Land'%}
+              <h5 class="property-title lease">{{ property.lands }}</h5>
+            {%elif property.property_category == 'Residential'%}
+              <h5 class="property-title lease">{{ property.residential }}</h5>
+            {%else%}
+              <h5 class="property-title lease">Something went wrong.....</h5>
+            {%endif%}
             <p class="property-location">
               <i class="fas fa-map-marker-alt lease"></i>
               {{ property.location }}, {{ property.state }}
             </p>
             <p class="property-price lease">
-              ₦{{ property.price_range }}
+              ₦{{ property.price_range|floatformat:2|intcomma }}
               <span class="price-period">/month</span>
             </p>
             <p class="property-description">{{ property.description|truncatewords:20 }}</p>
@@ -128,12 +136,20 @@
             {% endif %}
           </div>
           <div class="card-body">
-            <h5 class="property-title sale">{{ property.residential }}</h5>
+            {%if property.property_category == 'Commercial' %}
+              <h5 class="property-title sale">{{ property.commercial }}</h5>
+            {%elif property.property_category == 'Land'%}
+              <h5 class="property-title sale">{{ property.lands }}</h5>
+            {%elif property.property_category == 'Residential'%}
+              <h5 class="property-title sale">{{ property.residential }}</h5>
+            {%else%}
+              <h5 class="property-title sale">Something went wrong.....</h5>
+            {%endif%}
             <p class="property-location">
               <i class="fas fa-map-marker-alt sale"></i>
               {{ property.location }}, {{ property.state }}
             </p>
-            <p class="property-price sale">₦{{ property.price }}</p>
+            <p class="property-price sale">₦{{ property.price|floatformat|intcomma }}</p>
             <p class="property-description">{{ property.property_description|truncatewords:20 }}</p>
             <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property_id %}" 
                class="btn btn-view-property sale">

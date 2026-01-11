@@ -168,10 +168,10 @@
               
               <div class="property-price">
                 {% if property.price_range %}
-                  ₦{{ property.price_range|floatformat:0|intcomma }}
+                  ₦{{ property.price_range|floatformat:2|intcomma }}
                   <span class="price-period">/month</span>
                 {% else %}
-                  ₦{{ property.price|floatformat:0|intcomma }}
+                  ₦{{ property.price|floatformat:2|intcomma }}
                 {% endif %}
               </div>
             </div>

@@ -10,5 +10,6 @@ urlpatterns = [
     path('profile/<agent_uuid>', views.agent_profile, name='agent-profile'),
     path('lead/management', views.lead_management, name='leads'),
     path('analytics', views.analytics, name='analytics'),
-    path('lead/detail/<lead_id>', views.lead_detail, name='lead-detail')
+    path('lead/detail/<lead_id>', views.lead_detail, name='lead-detail'),
+    path('settings', views.settings, name='settings')
 ]

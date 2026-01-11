@@ -1,12 +1,16 @@
-{% extends 'company/base.html' %}
+{% extends base_template %}
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'company/css/appointment.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/appointment.css' %}">
 {% endblock %}
 
 {% block content %}
-<a href="{%url 'company:dashboard'%}" class="attractive-back-button">
+{% if request.user.role == 'company'%}
+    <a href="{%url 'company:dashboard'%}" class="attractive-back-button">
+{%else%}
+    <a href="{%url 'agent:dashboard'%}" class="attractive-back-button">
+{%endif%}
     &larr; Go back
 </a>
 
@@ -241,7 +245,7 @@
               <span>{{ appointment.property_type|default:"N/A" }}</span>
             </td>
             <td>
-              <span>{% if appointment.agent_uuid %}{{ appointment.agent_uuid|truncatechars:15 %}{% else %}N/A{% endif %}</span>
+              <span>{% if appointment.agent_uuid %}{{ agent_name|truncatechars:15 }}{% else %}N/A{% endif %}</span>
             </td>
             <td>
               <span class="notes-preview">{{ appointment.note|truncatewords:8 }}</span>

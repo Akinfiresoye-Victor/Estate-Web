@@ -255,7 +255,6 @@ def user_profile(request):
         if not request.user.role == 'customer':
             messages.info(request, 'Different account different profile')
             return redirect('landing')
-        
         return render(request, 'estate/user_profile.html', {'headline': ns.article_headline})
     except Exception as e:
         print(e)
@@ -575,144 +574,6 @@ def estate_agent_profile(request, agent_id):
 
 
 
-
-
-def inquiry_form_rent(request, property_id):
-    """
-    Inquiry form for property on lease
-    """
-    if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('login')
-    
-    if not request.user.role == 'customer':
-        messages.info(request, 'Customer Access Only')
-        return redirect('landing')
-    
-    try:
-        submitted=False
-        on_rent=PropertyManagementRent.objects.get(pk=property_id)
-        if request.method=='POST':
-            inq_form=InquiryForm(request.POST or None)
-            if inq_form.is_valid():
-                inq_form=inq_form.save(commit=False)
-                inq_form.lead_id=uuid.uuid4()
-                if on_rent.company_uuid:
-                    inq_form.company_uuid=on_rent.company_uuid
-                    appointment= Appointments.objects.create(
-                        company_uuid=on_rent.company_uuid,
-                        appointment=inq_form.schedule_tour,
-                        note="Reaching Client",
-                        appointment_type='Business',
-                        property_id=property_id,
-                        property_type='Rent',
-                        lead_uuid=inq_form.lead_id
-                    )
-                    appointment.save()
-                else:
-                    inq_form.agent_id= on_rent.agent_uuid
-                    if inq_form.schedule_tour:
-                        appointment= Appointments.objects.create(
-                            agent_uuid=on_rent.agent_uuid,
-                            appointment=inq_form.schedule_tour,
-                            note="Reaching Client",
-                            appointment_type='Business',
-                            property_id=property_id,
-                            property_type='Rent',
-                            lead_uuid=inq_form.lead_id
-                        )
-                        appointment.save()
-                
-                inq_form.property_intrested=on_rent.id
-                inq_form.agent_id=on_rent.agent_uuid
-                inq_form.property_type='Rent'
-                inq_form.property_name=on_rent.residential
-                inq_form.date_created=date.today()
-                
-                inq_form.save()
-                return HttpResponseRedirect('?submitted=True')
-            
-        else:
-            inq_form= InquiryForm()
-            
-            if 'submitted' in request.GET:
-                submitted=True
-                
-        return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted': submitted})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {e})
-
-
-
-
-#TODO Merge both rent and sale inquiry form 
-def inquiry_form_sale(request, property_id):
-    if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('landing')
-    
-    if not request.user.role == 'customer':
-        messages.info(request, 'Customer Access Only')
-        return redirect('landing')
-    
-    try:
-        submitted=False
-        on_sale=PropertyManagementSale.objects.get(pk=property_id)
-        if request.method=='POST':
-            inq_form=InquiryForm(request.POST or None)
-            if inq_form.is_valid():
-                inq_form=inq_form.save(commit=False)
-                inq_form.lead_id=uuid.uuid4()
-                if on_sale.company_uuid:
-                    inq_form.company_uuid=on_sale.company_uuid
-                    if inq_form.schedule_tour:
-                        appointment= Appointments.objects.create(
-                            company_uuid=on_sale.company_uuid,
-                            appointment=inq_form.schedule_tour,
-                            note="Reaching Client",
-                            appointment_type='Business',
-                            property_id=property_id,
-                            property_type='Sale',
-                            lead_uuid=inq_form.lead_id
-                        )
-                        appointment.save()
-                else:
-                    inq_form.agent_id= on_sale.agent_uuid
-                    if inq_form.schedule_tour:
-                            appointment= Appointments.objects.create(
-                                agent_uuid=on_sale.agent_uuid,
-                                appointment=inq_form.schedule_tour,
-                                note="Reaching Client",
-                                appointment_type='Business',
-                                property_id=property_id,
-                                property_type='Sale',
-                                lead_uuid=inq_form.lead_id
-                            )
-                            appointment.save()
-                    
-                
-                inq_form.property_intrested=on_sale.id
-                inq_form.agent_id=on_sale.agent_uuid
-                inq_form.property_type='Sale'
-                inq_form.property_name=on_sale.residential
-                inq_form.date_created=date.today()
-                        
-                
-                inq_form.save()
-                return HttpResponseRedirect('?submitted=True')
-            
-        else:
-            inq_form= InquiryForm()
-            
-            if 'submitted' in request.GET:
-                submitted=True
-                
-        return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted': submitted})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {e})
-
-
-
 def review_company(request, company_uuid):
     # Check if user is a customer
     if request.user.role != 'customer':
@@ -756,3 +617,77 @@ def review_company(request, company_uuid):
         
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
+
+
+
+def inquiry_form(request, property_type, property_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log in to gain access')
+        return redirect('login')
+    
+    if request.user.role != 'customer':
+        messages.info(request, 'Customer access only')
+        return redirect('landing')
+    
+    try:
+        submitted=False
+        if property_type == 'Sale':
+            asset= PropertyManagementSale.objects.get(pk=property_id)
+        elif property_type == 'Rent':
+            asset= PropertyManagementRent.objects.get(pk=property_id)
+        else:
+            messages.error(request, 'Something went wrong')
+            return redirect('javascript:history.back()')
+        if request.method == 'POST':
+            inq_form= InquiryForm(request.POST or None)
+            if inq_form.is_valid():
+                inq_form= inq_form.save(commit=False)
+                inq_form.lead_id=uuid.uuid4()
+                if asset.company_uuid:
+                    inq_form.company_uuid= asset.company_uuid
+                    if inq_form.schedule_tour:
+                        appointment= Appointments.objects.create(
+                            company_uuid= asset.company_uuid,
+                            appointment=inq_form.schedule_tour,
+                            note="Reaching Client",
+                            appointment_type='Buisness',
+                            property_id=property_id,
+                            property_type=asset.property_type,
+                            lead_uuid=inq_form.lead_id
+                        )
+                        appointment.save()
+                else:
+                    inq_form.company_uuid= asset.agent_uuid
+                    if inq_form.schedule_tour:
+                        appointment= Appointments.objects.create(
+                            agent_uuid= asset.agent_uuid,
+                            appointment=inq_form.schedule_tour,
+                            note="Reaching Client",
+                            appointment_type='Buisness',
+                            property_id=property_id,
+                            property_type=asset.property_type,
+                            lead_uuid=inq_form.lead_id
+                        )
+                        appointment.save()
+                inq_form.property_intrested=asset.id
+                inq_form.agent_id=asset.agent_uuid
+                inq_form.property_type=asset.property_type
+                if asset.property_category == 'Residential':
+                    inq_form.property_name=asset.residential
+                elif asset.property_category == 'Commercial':
+                    inq_form.property_name=asset.commercial
+                else:
+                    inq_form.property_name=asset.lands
+                inq_form.date_created=date.today()
+                
+                inq_form.save()
+                return HttpResponseRedirect('?submitted=True')
+        else:
+            inq_form=InquiryForm()
+            
+            if 'submitted' in request.GET:
+                submitted=True
+        
+        return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted':submitted})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})

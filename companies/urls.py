@@ -12,7 +12,6 @@ urlpatterns = [
     path('properties/<company_uuid>', views.properties_by_company, name='company-properties'),
     path('monthly/analytics', views.company_analytics, name='analytics'),
     path('lead/management', views.lead_management, name='lead-management'),
-    path('lead/appointments', views.appointment, name='appointment'),
     path('documents/storage', views.documents, name='documents'),
     path('settings', views.company_settings, name='company-settings'),
     path('lead/delete/<lead_id>', views.delete_lead, name='delete-lead'),

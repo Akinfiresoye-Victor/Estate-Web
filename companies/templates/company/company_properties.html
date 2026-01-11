@@ -153,8 +153,15 @@
         </div>
         
         <div class="property-content">
-          <h3 class="property-title">{{ property.title }}</h3>
-          
+          {%if property.property_category == 'Residential' %}
+            <h3 class="property-title">{{ property.residential }}</h3>
+          {%elif property.property_category == 'Commercial' %}
+            <h3 class="property-title">{{ property.commercial }}</h3>
+          {%elif property.property_category == 'Land' %}
+            <h3 class="property-title">{{ property.lands }}</h3>
+          {%else%}
+            <h3 class="property-title">Something went wrong.....</h3>
+          {%endif%}
           <div class="property-location">
             <i class="bi bi-geo-alt-fill"></i>
             <span>{{ property.location }}</span>
@@ -163,7 +170,13 @@
           <div class="property-specs">
             <div class="spec-item">
               <i class="bi bi-house-door"></i>
-              <span>{{ property.residential }}</span>
+              {%if property.property_category == 'Residential' %}
+                <span>{{ property.residential }}</span>
+              {%elif property.property_category == 'Commercial' %}
+                <span>{{ property.commercial }}</span>
+              {%elif property.property_category == 'Land' %}
+                <span>{{ property.lands }}</span>
+              {%endif%}
             </div>
             <div class="spec-item">
               <i class="bi bi-door-open"></i>
@@ -182,7 +195,7 @@
           <div class="property-footer">
             <div class="property-price-section">
               <span class="price-label">Price</span>
-              <span class="property-price">₦{{ property.price|floatformat:0|intcomma }}</span>
+              <span class="property-price">₦{{ property.price|floatformat:2|intcomma }}</span>
             </div>
             <a href="{% url 'customer:view-property-s' property.id %}" class="btn-view-details">
               View Details
@@ -213,7 +226,15 @@
         </div>
         
         <div class="property-content">
-          <h3 class="property-title">{{ property.title }}</h3>
+          {%if property.property_category == 'Residential' %}
+            <h3 class="property-title">{{ property.residential }}</h3>
+          {%elif property.property_category == 'Commercial' %}
+            <h3 class="property-title">{{ property.commercial }}</h3>
+          {%elif property.property_category == 'Land' %}
+            <h3 class="property-title">{{ property.lands }}</h3>
+          {%else%}
+            <h3 class="property-title">Something went wrong.....</h3>
+          {%endif%}
           
           <div class="property-location">
             <i class="bi bi-geo-alt-fill"></i>
@@ -223,7 +244,15 @@
           <div class="property-specs">
             <div class="spec-item">
               <i class="bi bi-house-door"></i>
-              <span>{{ property.residential }}</span>
+              {%if property.property_category == 'Residential' %}
+                <span>{{ property.residential }}</span>
+              {%elif property.property_category == 'Commercial' %}
+                <span>{{ property.commercial }}</span>
+              {%elif property.property_category == 'Land' %}
+                <span>{{ property.lands }}</span>
+              {%else%}
+                <span>Something went wrong.....</span>
+              {%endif%}
             </div>
             <div class="spec-item">
               <i class="bi bi-door-open"></i>
@@ -243,7 +272,7 @@
             <div class="property-price-section">
               <span class="price-label">Rent</span>
               <span class="property-price">
-                ₦{{ property.price_range|floatformat:0|intcomma }}
+                ₦{{ property.price_range|floatformat:2|intcomma }}
                 <span class="price-period">/month</span>
               </span>
             </div>

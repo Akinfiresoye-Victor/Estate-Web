@@ -407,28 +407,7 @@ def company_analytics(request):
         return render(request, 'estate/error_page.html', {'e': str(e)})
 
 
-def appointment(request):
-    if not request.user.is_authenticated:
-        messages.info(request, "Login Required")
-        return redirect('login')
-    if request.user.role != 'company':
-        messages.info(request, 'Company account only')
-        return redirect('landing')
-    try:
-        
-        '''Client Appointment'''
-        #Company in question
-        company= CompanyInformation.objects.get(user_id=request.user.id)
-        
-        total_appointment= Appointments.objects.filter(company_uuid=company.unique_company_id)
-        
-        
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
-    
-    
-    
-    return render(request, 'company/appointment.html', {'appointments': total_appointment})
+
 
 def documents(request):
     return render(request, 'company/documents.html', {})

@@ -32,7 +32,15 @@
       <i class="bi bi-key-fill"></i>
       For Rent
     </div>
-    <h1 class="property-title">{{ property.residential|default:"Bungalow" }}</h1>
+    {%if property.property_category == 'Commercial' %}
+      <h1 class="property-title">{{ property.commercial }}</h5>
+    {%elif property.property_category == 'Land'%}
+      <h1 class="property-title">{{ property.lands }}</h1>
+    {%elif property.property_category == 'Residential'%}
+      <h1 class="property-title">{{ property.residential }}</h1>
+    {%else%}
+      <h1 class="property-title">Something went wrong.....</h1>
+    {%endif%}
     <div class="property-location">
       <div class="location-item">
         <i class="bi bi-geo-alt-fill"></i>
@@ -159,13 +167,13 @@
       <!-- Price Card -->
       <div class="price-card">
         <span class="price-label">Rental Price</span>
-        <span class="price-amount">₦{{ property.price_range|default:"N/A"|floatformat:0|intcomma }}</span>
+        <span class="price-amount">₦{{ property.price_range|default:"N/A"|floatformat:2|intcomma }}</span>
         <span class="price-period">per month</span>
         
         <div class="price-divider"></div>
         
         <div class="contact-buttons">
-          <a href="{% url 'customer:inquiry-form-r' property.id %}" 
+          <a href="{% url 'customer:inquiry-form' property.property_type property.id %}" 
              class="btn-contact primary">
             <i class="bi bi-envelope-fill"></i>
             Book Property

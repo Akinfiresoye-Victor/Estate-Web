@@ -6,7 +6,7 @@ from django.db import transaction
 from members.models import User
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments
 from estate.models import LeadInfo
 from datetime import datetime
 from datetime import date
@@ -55,8 +55,9 @@ def dashboard(request):
                 new_leads= leads.filter(date_created=datetime.today())
                 
                 
+                '''Today's Appointment'''
                 
-                
+                today_appointments=Appointments.objects.filter(agent_uuid=agent_data.agent_uuid).filter(appointment=datetime.today())
                 
                 
                 
@@ -73,7 +74,8 @@ def dashboard(request):
                     'by': by,
                     'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
                     'lead_count': leads.count(),
-                    'new_lead_count': new_leads.count()
+                    'new_lead_count': new_leads.count(),
+                    'todays_appointment':today_appointments
                 })
         except AgentInformation.DoesNotExist:
             messages.error(request, 'Set up your Profile to access other pages')
@@ -337,6 +339,21 @@ def lead_detail(request, lead_id):
         return render(request, 'agent/agent_lead_detail.html', {'lead':lead, 'property':property_intrested})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+def settings(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, "Agent's Only")
+        return redirect('landing')
+    try:
+        return render(request, 'agent/settings.html')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
+
+
 
 #TODO Perform proper error handling even in places you think error cant occur
 # TODO Recalculate the engagement rate and ranking information 
