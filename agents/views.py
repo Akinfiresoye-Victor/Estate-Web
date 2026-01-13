@@ -354,9 +354,8 @@ def settings(request):
         return render(request, 'estate/error_page.html', {'e':e})
 
 
-
+#TODO Agent Form has a very critical problem with the form submission and add a logout function in that side it gave me problem and it was annoying
 #TODO Perform proper error handling even in places you think error cant occur
 # TODO Recalculate the engagement rate and ranking information 
 # FIXME the update page, when i switch category the house type doesnt switch
-# TODO Make sure that the lead management page displays all the leads with their CORRESPONDING property name
 #FIXME Once a property is updated everything connected to the property must also be changed e.d Leads

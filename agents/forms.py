@@ -18,7 +18,7 @@ class AgentInformationForm(ModelForm):
             'profile_name': 'Professional Name',
             'language': 'Language Spoken',
             'work_type': 'Nature Of Work',
-            'bio': 'About *Tip Include your years of experience',
+            'bio': 'Professional Summary',
             'profile_picture': '',
             'phone_number': 'Phone No.',
             'email': 'Email',

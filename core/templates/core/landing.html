@@ -687,23 +687,104 @@
 </nav>
 
 <!-- Alert Messages -->
-<div class="container mt-3">
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
+<style>
+    :root {
+      --primary-color: #1a3c4e;
+      --secondary-color: #c19b76;
+      --accent-color: #8b7355;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --bg-light: #f8f9fa;
+      --success-color: #28a745;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --info-color: #17a2b8;
+    }
+    /* Messages Container */
+    .messages-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 9999;
+      max-width: 400px;
+    }
+
+    .alert {
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      animation: slideInRight 0.5s ease;
+      margin-bottom: 1rem;
+      border: none;
+      display: flex;
+      align-items: center;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Main Content Container */
+    .main-content {
+      padding: 0 0 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .messages-container {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+      }
+    }
+</style>
+  <!-- Messages Container -->
+  <div class="messages-container">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'error' or message.tags == 'danger' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'warning' %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'info' %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% else %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button"="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
 
 <!-- Hero Section -->
 <section class="hero">
   <div class="container">
     <div class="hero-content">
       <h1>Welcome to Estate Web</h1>
-      <p class="hero-subtitle">Your trusted partner in property transactions. Whether you're looking to buy, sell, or rent, we connect you with the right opportunities through our modern, user-friendly platform.</p>
+      <p class="hero-subtitle">Your trusted partner in property transactions. Whether you're looking to buy, sell, or grow your buisness, we connect you with the right opportunities through our modern, user-friendly platform.</p>
       
       <div class="user-type-section">
         <h2 class="user-type-title">Choose Your Account Type</h2>
@@ -779,6 +860,14 @@
         <h3>24/7 Support</h3>
         <p>Our dedicated support team is always ready to assist you with any questions.</p>
       </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">
+          <i class="bi bi-tools"></i>
+        </div>
+        <h3>Productive Tools</h3>
+        <p>Discover all our built-in tools to assist companies and agents in growing their buisness, from lead management to appointments and many more......</p>
+      </div>
     </div>
   </div>
 </section>
@@ -794,7 +883,7 @@
       <div class="why-item">
         <div class="why-number">01</div>
         <h4>Easy to Use</h4>
-        <p>Intuitive interface designed for everyone, from first-time buyers to seasoned investors.</p>
+        <p>Intuitive interface designed for everyone, from first-time buyers to seasoned companies.</p>
       </div>
       <div class="why-item">
         <div class="why-number">02</div>

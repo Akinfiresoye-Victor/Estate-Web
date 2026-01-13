@@ -25,6 +25,97 @@
     </div>
     {% endif %}
 
+<style>
+    :root {
+      --primary-color: #1a3c4e;
+      --secondary-color: #c19b76;
+      --accent-color: #8b7355;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --bg-light: #f8f9fa;
+      --success-color: #28a745;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --info-color: #17a2b8;
+    }
+    /* Messages Container */
+    .messages-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 9999;
+      max-width: 400px;
+    }
+
+    .alert {
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      animation: slideInRight 0.5s ease;
+      margin-bottom: 1rem;
+      border: none;
+      display: flex;
+      align-items: center;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Main Content Container */
+    .main-content {
+      padding: 0 0 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .messages-container {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+      }
+    }
+</style>
+  <!-- Messages Container -->
+  <div class="messages-container">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'error' or message.tags == 'danger' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'warning' %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'info' %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% else %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button"="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
     <div class="form-wrapper">
         
         <!-- Left Side - Branding -->
@@ -193,7 +284,7 @@
                                 <textarea name="{{ form.bio.name }}" 
                                           id="{{ form.bio.id_for_label }}" 
                                           class="form-control" 
-                                          placeholder="Tell us about your professional experience..." 
+                                          placeholder="Tell us about yourself in a detailes summary...." 
                                           rows="4" 
                                           required></textarea>
                                 {% if form.bio.errors %}
@@ -308,6 +399,12 @@
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
+                        <br/>
+                        <div class="text-center">
+                        <a class= "btn btn-danger w-10" href="{%url 'logout'%}">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                        </div>
                     </div>
 
                     <!-- Step 2: Experience -->
@@ -368,6 +465,12 @@
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
+                        <br/>
+                        <div class="text-center">
+                        <a class= "btn btn-danger w-10" href="{%url 'logout'%}">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                        </div>
                     </div>
 
                     <!-- Step 3: Social Links -->
@@ -419,6 +522,12 @@
                                 <i class="bi bi-check-circle"></i>
                                 Complete Registration
                             </button>
+                        </div>
+                        <br/>
+                        <div class="text-center">
+                        <a class= "btn btn-danger w-10" href="{%url 'logout'%}">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
                         </div>
                     </div>
 

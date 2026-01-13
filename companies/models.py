@@ -54,6 +54,7 @@ class CompanyAnalytics(models.Model):
     last_month_profile_views=models.IntegerField('last month profile views',default=1)
     last_month_lease_views=models.IntegerField('last month lease views',default=1)
     last_month_sale_views=models.IntegerField('last month sale views',default=1)
+    
     competition= models.IntegerField('competition', default=0)
     def __str__(self):
         return(self.company.company_name)

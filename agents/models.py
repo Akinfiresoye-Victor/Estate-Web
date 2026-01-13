@@ -28,7 +28,7 @@ class AgentInformation(models.Model):
     email = models.EmailField('Email', blank=True, max_length=100)
     location = models.CharField('Base City', blank=False, choices=STATES)
     language = models.CharField('language Spoken', blank=False, max_length=100)
-    bio = models.TextField('Work Summary', max_length=200)
+    bio = models.TextField('Work Summary', max_length=250)
     work_type = models.CharField('Nature of work', blank=False, max_length=100)
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=agent_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
@@ -50,9 +50,9 @@ class Experience(models.Model):
     class Meta:
         unique_together = ('')
     def __str__(self):
-        return(self.agent.personal_info.first_name)
+        return(self.agent.profile_name)
     
-
+#FIXME Add js that makes sure a user doesnt input more than 200 characters
 class SocialLinks(models.Model):
     agent = models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='social')
     social_platform = models.CharField(max_length=20, choices=AGENT_SOCIAL_LINKS, default='Instagram', blank=True)

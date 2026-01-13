@@ -19,6 +19,8 @@ from core.forms import AppointmentForm
 
 
 
+
+
 def monthly_change(present_data, last_month_data):
     if last_month_data == 0 and present_data == 0:
         change=0
