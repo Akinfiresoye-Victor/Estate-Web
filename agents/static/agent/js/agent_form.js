@@ -291,3 +291,660 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
+// Add this to your agent_form.js file or in a <script> tag at the bottom of the template
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========== Multi-Step Form Navigation ==========
+    let currentStep = 1;
+    const totalSteps = 3;
+    
+    // Navigation functions
+    function showStep(stepNumber) {
+        // Hide all steps
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        // Show current step
+        const currentStepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+        if (currentStepElement) {
+            currentStepElement.classList.add('active');
+        }
+        
+        // Update progress indicators
+        document.querySelectorAll('.step').forEach((step, index) => {
+            if (index < stepNumber) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+            }
+        });
+        
+        currentStep = stepNumber;
+    }
+    
+    // Next button handlers
+    document.querySelectorAll('.btn-next').forEach(button => {
+        button.addEventListener('click', function() {
+            // Basic validation for current step
+            const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+            
+            if (isValid && currentStep < totalSteps) {
+                showStep(currentStep + 1);
+                window.scrollTo(0, 0);
+            } else if (!isValid) {
+                alert('Please fill in all required fields before proceeding.');
+            }
+        });
+    });
+    
+    // Previous button handlers
+    document.querySelectorAll('.btn-prev').forEach(button => {
+        button.addEventListener('click', function() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+                window.scrollTo(0, 0);
+            }
+        });
+    });
+    
+    // ========== Universal Agent Toggle ==========
+    const universalCheckbox = document.querySelector('input[name="universal_agent"]');
+    const universalFields = document.getElementById('universalAgentFields');
+    
+    if (universalCheckbox && universalFields) {
+        universalCheckbox.addEventListener('change', function() {
+            universalFields.style.display = this.checked ? 'contents' : 'none';
+        });
+    }
+    
+    // Agency checkbox toggle
+    const agencyCheckbox = document.getElementById('id_agency');
+    const agencyNameField = document.getElementById('agencyNameField');
+    
+    if (agencyCheckbox && agencyNameField) {
+        agencyCheckbox.addEventListener('change', function() {
+            agencyNameField.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    
+    // ========== File Upload Display ==========
+    document.querySelectorAll('.file-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const fileName = this.files[0]?.name || 'No file chosen';
+            const fileNameDisplay = this.parentElement.querySelector('.file-name');
+            if (fileNameDisplay) {
+                fileNameDisplay.textContent = fileName;
+            }
+        });
+    });
+    
+    // ========== Dynamic Formset Management ==========
+    
+    // Experience Formset
+    const addExperienceBtn = document.getElementById('addExperience');
+    if (addExperienceBtn) {
+        addExperienceBtn.addEventListener('click', function() {
+            const experienceForms = document.querySelector('.experience-forms');
+            const totalForms = document.querySelector('input[name="exp-TOTAL_FORMS"]');
+            const formNum = parseInt(totalForms.value);
+            
+            // Clone the first experience item
+            const newForm = document.querySelector('.experience-item').cloneNode(true);
+            
+            // Update form number
+            newForm.querySelector('.exp-number').textContent = formNum + 1;
+            
+            // Update form field names and IDs
+            const formRegex = new RegExp(`exp-(\\d+)-`, 'g');
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `exp-${formNum}-`);
+            
+            // Clear values
+            newForm.querySelectorAll('input, select, textarea').forEach(field => {
+                if (field.type !== 'hidden') {
+                    field.value = '';
+                }
+            });
+            
+            // Show delete button
+            const deleteBtn = newForm.querySelector('.btn-remove-exp');
+            if (deleteBtn) {
+                deleteBtn.style.display = 'block';
+            }
+            
+            // Add to DOM
+            experienceForms.appendChild(newForm);
+            
+            // Update total forms count
+            totalForms.value = formNum + 1;
+            
+            // Attach delete handler to new form
+            attachDeleteHandler(newForm.querySelector('.btn-remove-exp'));
+        });
+    }
+    
+    // Social Links Formset
+    const addSocialBtn = document.getElementById('addSocial');
+    if (addSocialBtn) {
+        addSocialBtn.addEventListener('click', function() {
+            const socialForms = document.querySelector('.social-forms');
+            const totalForms = document.querySelector('input[name="social-TOTAL_FORMS"]');
+            const formNum = parseInt(totalForms.value);
+            
+            // Clone the first social item
+            const newForm = document.querySelector('.social-item').cloneNode(true);
+            
+            // Update form number
+            newForm.querySelector('.social-number').textContent = formNum + 1;
+            
+            // Update form field names and IDs
+            const formRegex = new RegExp(`social-(\\d+)-`, 'g');
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `social-${formNum}-`);
+            
+            // Clear values
+            newForm.querySelectorAll('input, select, textarea').forEach(field => {
+                if (field.type !== 'hidden') {
+                    field.value = '';
+                }
+            });
+            
+            // Show delete button
+            const deleteBtn = newForm.querySelector('.btn-remove-social');
+            if (deleteBtn) {
+                deleteBtn.style.display = 'block';
+            }
+            
+            // Add to DOM
+            socialForms.appendChild(newForm);
+            
+            // Update total forms count
+            totalForms.value = formNum + 1;
+            
+            // Attach delete handler to new form
+            attachDeleteHandler(newForm.querySelector('.btn-remove-social'));
+        });
+    }
+    
+    // Delete form functionality
+    function attachDeleteHandler(button) {
+        if (!button) return;
+        
+        button.addEventListener('click', function() {
+            const formItem = this.closest('.experience-item, .social-item');
+            const deleteInput = formItem.querySelector('input[name$="-DELETE"]');
+            
+            if (deleteInput) {
+                // Mark for deletion if it's an existing record
+                deleteInput.value = 'on';
+                formItem.style.display = 'none';
+            } else {
+                // Just remove from DOM if it's a new form
+                formItem.remove();
+                
+                // Update form count
+                const prefix = formItem.classList.contains('experience-item') ? 'exp' : 'social';
+                const totalForms = document.querySelector(`input[name="${prefix}-TOTAL_FORMS"]`);
+                totalForms.value = parseInt(totalForms.value) - 1;
+            }
+        });
+    }
+    
+    // Attach delete handlers to existing forms
+    document.querySelectorAll('.btn-remove-exp, .btn-remove-social').forEach(button => {
+        attachDeleteHandler(button);
+    });
+    
+    // ========== Form Submission ==========
+    const agentForm = document.getElementById('agentForm');
+    if (agentForm) {
+        agentForm.addEventListener('submit', function(e) {
+            // Show loading state
+            const submitBtn = document.querySelector('.btn-submit');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Submitting...';
+            }
+        });
+    }
+    
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+// Add this to your agent_form.js file or in a <script> tag at the bottom of the template
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ========== Multi-Step Form Navigation ==========
+    let currentStep = 1;
+    const totalSteps = 3;
+    
+    // Navigation functions
+    function showStep(stepNumber) {
+        // Hide all steps
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        // Show current step
+        const currentStepElement = document.querySelector(`.form-step[data-step="${stepNumber}"]`);
+        if (currentStepElement) {
+            currentStepElement.classList.add('active');
+        }
+        
+        // Update progress indicators
+        document.querySelectorAll('.step').forEach((step, index) => {
+            if (index < stepNumber) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+            }
+        });
+        
+        currentStep = stepNumber;
+    }
+    
+    // Next button handlers
+    document.querySelectorAll('.btn-next').forEach(button => {
+        button.addEventListener('click', function() {
+            // Basic validation for current step
+            const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+            
+            if (isValid && currentStep < totalSteps) {
+                showStep(currentStep + 1);
+                window.scrollTo(0, 0);
+            } else if (!isValid) {
+                alert('Please fill in all required fields before proceeding.');
+            }
+        });
+    });
+    
+    // Previous button handlers
+    document.querySelectorAll('.btn-prev').forEach(button => {
+        button.addEventListener('click', function() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+                window.scrollTo(0, 0);
+            }
+        });
+    });
+    
+    // ========== Universal Agent Toggle ==========
+    const universalCheckbox = document.querySelector('input[name="universal_agent"]');
+    const universalFields = document.getElementById('universalAgentFields');
+    
+    if (universalCheckbox && universalFields) {
+        universalCheckbox.addEventListener('change', function() {
+            universalFields.style.display = this.checked ? 'contents' : 'none';
+        });
+    }
+    
+    // Agency checkbox toggle
+    const agencyCheckbox = document.getElementById('id_agency');
+    const agencyNameField = document.getElementById('agencyNameField');
+    
+    if (agencyCheckbox && agencyNameField) {
+        agencyCheckbox.addEventListener('change', function() {
+            agencyNameField.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    
+    // ========== File Upload Display ==========
+    document.querySelectorAll('.file-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const fileName = this.files[0]?.name || 'No file chosen';
+            const fileNameDisplay = this.parentElement.querySelector('.file-name');
+            if (fileNameDisplay) {
+                fileNameDisplay.textContent = fileName;
+            }
+        });
+    });
+    
+    // ========== Dynamic Formset Management ==========
+    
+    // Experience Formset
+    const addExperienceBtn = document.getElementById('addExperience');
+    if (addExperienceBtn) {
+        addExperienceBtn.addEventListener('click', function() {
+            const experienceForms = document.querySelector('.experience-forms');
+            const totalForms = document.querySelector('input[name="exp-TOTAL_FORMS"]');
+            const formNum = parseInt(totalForms.value);
+            
+            // Clone the first experience item
+            const newForm = document.querySelector('.experience-item').cloneNode(true);
+            
+            // Update form number
+            newForm.querySelector('.exp-number').textContent = formNum + 1;
+            
+            // Update form field names and IDs
+            const formRegex = new RegExp(`exp-(\\d+)-`, 'g');
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `exp-${formNum}-`);
+            
+            // Clear values
+            newForm.querySelectorAll('input, select, textarea').forEach(field => {
+                if (field.type !== 'hidden') {
+                    field.value = '';
+                }
+            });
+            
+            // Show delete button
+            const deleteBtn = newForm.querySelector('.btn-remove-exp');
+            if (deleteBtn) {
+                deleteBtn.style.display = 'block';
+            }
+            
+            // Add to DOM
+            experienceForms.appendChild(newForm);
+            
+            // Update total forms count
+            totalForms.value = formNum + 1;
+            
+            // Attach delete handler to new form
+            attachDeleteHandler(newForm.querySelector('.btn-remove-exp'));
+        });
+    }
+    
+    // Social Links Formset
+    const addSocialBtn = document.getElementById('addSocial');
+    if (addSocialBtn) {
+        addSocialBtn.addEventListener('click', function() {
+            const socialForms = document.querySelector('.social-forms');
+            const totalForms = document.querySelector('input[name="social-TOTAL_FORMS"]');
+            const formNum = parseInt(totalForms.value);
+            
+            // Clone the first social item
+            const newForm = document.querySelector('.social-item').cloneNode(true);
+            
+            // Update form number
+            newForm.querySelector('.social-number').textContent = formNum + 1;
+            
+            // Update form field names and IDs
+            const formRegex = new RegExp(`social-(\\d+)-`, 'g');
+            newForm.innerHTML = newForm.innerHTML.replace(formRegex, `social-${formNum}-`);
+            
+            // Clear values
+            newForm.querySelectorAll('input, select, textarea').forEach(field => {
+                if (field.type !== 'hidden') {
+                    field.value = '';
+                }
+            });
+            
+            // Show delete button
+            const deleteBtn = newForm.querySelector('.btn-remove-social');
+            if (deleteBtn) {
+                deleteBtn.style.display = 'block';
+            }
+            
+            // Add to DOM
+            socialForms.appendChild(newForm);
+            
+            // Update total forms count
+            totalForms.value = formNum + 1;
+            
+            // Attach delete handler to new form
+            attachDeleteHandler(newForm.querySelector('.btn-remove-social'));
+        });
+    }
+    
+    // Delete form functionality
+    function attachDeleteHandler(button) {
+        if (!button) return;
+        
+        button.addEventListener('click', function() {
+            const formItem = this.closest('.experience-item, .social-item');
+            const deleteInput = formItem.querySelector('input[name$="-DELETE"]');
+            
+            if (deleteInput) {
+                // Mark for deletion if it's an existing record
+                deleteInput.value = 'on';
+                formItem.style.display = 'none';
+            } else {
+                // Just remove from DOM if it's a new form
+                formItem.remove();
+                
+                // Update form count
+                const prefix = formItem.classList.contains('experience-item') ? 'exp' : 'social';
+                const totalForms = document.querySelector(`input[name="${prefix}-TOTAL_FORMS"]`);
+                totalForms.value = parseInt(totalForms.value) - 1;
+            }
+        });
+    }
+    
+    // Attach delete handlers to existing forms
+    document.querySelectorAll('.btn-remove-exp, .btn-remove-social').forEach(button => {
+        attachDeleteHandler(button);
+    });
+    
+    // ========== Form Submission ==========
+    const agentForm = document.getElementById('agentForm');
+    if (agentForm) {
+        agentForm.addEventListener('submit', function(e) {
+            // Show loading state
+            const submitBtn = document.querySelector('.btn-submit');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Submitting...';
+            }
+        });
+    }
+    
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+    
+    // ========== Word Count Limiter for Bio/Work Summary ==========
+    const bioTextarea = document.querySelector('textarea[name="bio"]');
+    
+    if (bioTextarea) {
+        // Create word counter display
+        const counterDiv = document.createElement('div');
+        counterDiv.className = 'word-counter';
+        counterDiv.style.cssText = `
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        `;
+        
+        const wordCountSpan = document.createElement('span');
+        wordCountSpan.className = 'word-count-text';
+        
+        const progressBar = document.createElement('div');
+        progressBar.style.cssText = `
+            flex-grow: 1;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            margin: 0 1rem;
+            overflow: hidden;
+        `;
+        
+        const progressFill = document.createElement('div');
+        progressFill.className = 'word-progress-fill';
+        progressFill.style.cssText = `
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: all 0.3s ease;
+        `;
+        
+        progressBar.appendChild(progressFill);
+        counterDiv.appendChild(wordCountSpan);
+        counterDiv.appendChild(progressBar);
+        
+        bioTextarea.parentElement.appendChild(counterDiv);
+        
+        // Function to count words
+        function countWords(text) {
+            const trimmed = text.trim();
+            if (trimmed === '') return 0;
+            return trimmed.split(/\s+/).length;
+        }
+        
+        // Function to update counter
+        function updateWordCount() {
+            const text = bioTextarea.value;
+            const wordCount = countWords(text);
+            const maxWords = 250;
+            const percentage = (wordCount / maxWords) * 100;
+            
+            // Update text
+            wordCountSpan.textContent = `${wordCount} / ${maxWords} words`;
+            
+            // Update progress bar
+            progressFill.style.width = `${Math.min(percentage, 100)}%`;
+            
+            // Change color based on word count
+            if (wordCount > maxWords) {
+                wordCountSpan.style.color = '#dc3545';
+                progressFill.style.background = '#dc3545';
+                bioTextarea.classList.add('error');
+            } else if (wordCount > maxWords * 0.9) {
+                wordCountSpan.style.color = '#ffc107';
+                progressFill.style.background = '#ffc107';
+                bioTextarea.classList.remove('error');
+            } else {
+                wordCountSpan.style.color = '#28a745';
+                progressFill.style.background = '#28a745';
+                bioTextarea.classList.remove('error');
+            }
+            
+            // Prevent typing if over limit
+            if (wordCount > maxWords) {
+                // Get words array
+                const words = text.trim().split(/\s+/);
+                // Keep only first 250 words
+                const limitedWords = words.slice(0, maxWords);
+                // Set textarea value to limited words
+                bioTextarea.value = limitedWords.join(' ');
+                
+                // Show warning message
+                showWordLimitWarning();
+            }
+        }
+        
+        // Function to show warning
+        function showWordLimitWarning() {
+            // Check if warning already exists
+            if (document.querySelector('.word-limit-warning')) return;
+            
+            const warning = document.createElement('div');
+            warning.className = 'word-limit-warning';
+            warning.style.cssText = `
+                background: #fff3cd;
+                border: 1px solid #ffc107;
+                color: #856404;
+                padding: 0.75rem 1rem;
+                border-radius: 6px;
+                margin-top: 0.5rem;
+                display: flex;
+                align-items: center;
+                animation: slideDown 0.3s ease;
+            `;
+            warning.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span>You've reached the 250-word limit. Additional words will be automatically removed.</span>
+            `;
+            
+            bioTextarea.parentElement.appendChild(warning);
+            
+            // Remove warning after 3 seconds
+            setTimeout(() => {
+                warning.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => warning.remove(), 300);
+            }, 3000);
+        }
+        
+        // Add keydown listener to show warning on attempt
+        bioTextarea.addEventListener('keydown', function(e) {
+            const wordCount = countWords(this.value);
+            
+            // Allow backspace, delete, arrow keys, etc.
+            const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'];
+            
+            if (wordCount >= 250 && !allowedKeys.includes(e.key) && e.key !== ' ' && !e.ctrlKey && !e.metaKey) {
+                // Check if adding this would create a new word
+                const cursorPos = this.selectionStart;
+                const textBefore = this.value.substring(0, cursorPos);
+                const textAfter = this.value.substring(cursorPos);
+                
+                // If last character before cursor is a space or we're at the start, we're starting a new word
+                if (textBefore === '' || textBefore.slice(-1) === ' ') {
+                    e.preventDefault();
+                    showWordLimitWarning();
+                }
+            }
+        });
+        
+        // Update on input
+        bioTextarea.addEventListener('input', updateWordCount);
+        
+        // Update on paste
+        bioTextarea.addEventListener('paste', function() {
+            setTimeout(updateWordCount, 0);
+        });
+        
+        // Initial count
+        updateWordCount();
+    }
+    
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});

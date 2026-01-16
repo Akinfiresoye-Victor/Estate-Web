@@ -1,409 +1,318 @@
 {% extends base_template %}
 {% load static %}
 
-{%block extra_css%}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'core/css/appointment_detail.css' %}">
-{%endblock%}
+{% endblock %}
 
-{%block content%}
-<div class="appointment-detail-container">
-    <!-- Header Section -->
-    <div class="page-header-section">
-        <div class="header-top">
-            <a href="{% url 'appointment' %}" class="back-button">
+{% block content %}
+<div class="appointment-detail-wrapper">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <a href="{% url 'appointment' %}" class="back-link">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 Back to Appointments
             </a>
-            <div class="header-actions">
-                <span class="appointment-id">#{{ appointment.pk }}</span>
+            <div class="header-main">
+                <div class="header-left">
+                    <h1 class="page-title">Appointment Details</h1>
+                    <p class="page-subtitle">ID: #{{ appointment.pk }} • {{ appointment.appointment|date:"F d, Y" }}</p>
+                </div>
+                <span class="appointment-type-badge badge-{{ appointment.appointment_type|lower }}">
+                    {{ appointment.appointment_type }}
+                </span>
             </div>
         </div>
-        <div class="header-content">
-            <h1>Appointment Details</h1>
-            <p class="header-subtitle">Complete information about your scheduled appointment</p>
-        </div>
-    </div>
+    </header>
 
-    <!-- Main Content Grid -->
-    <div class="content-layout">
-        <!-- Left Column -->
-        <div class="left-column">
-            <!-- Appointment Overview Card -->
-            <div class="card appointment-overview-card">
+    <!-- Main Content -->
+    <div class="content-grid">
+        <!-- Left Column: Main Information -->
+        <div class="main-column">
+            <!-- Appointment Information -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon appointment-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h2>Appointment Overview</h2>
-                    </div>
-                    <span class="badge badge-{{ appointment.appointment_type|lower }}">
-                        {{ appointment.appointment_type }}
-                    </span>
+                    <h2 class="card-title">Appointment Information</h2>
                 </div>
                 <div class="card-body">
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                                Scheduled Date
-                            </div>
-                            <div class="info-value">{{ appointment.appointment|date:"F d, Y" }}</div>
+                            <span class="info-label">Date</span>
+                            <span class="info-value">{{ appointment.appointment|date:"F d, Y" }}</span>
                         </div>
-
+                        <div class="info-item">
+                            <span class="info-label">Type</span>
+                            <span class="info-value">{{ appointment.appointment_type }}</span>
+                        </div>
                         {% if appointment.property_id %}
                         <div class="info-item">
-                            <div class="info-label">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Property ID
-                            </div>
-                            <div class="info-value">#{{ appointment.property_id }}</div>
+                            <span class="info-label">Property ID</span>
+                            <span class="info-value">#{{ appointment.property_id }}</span>
                         </div>
                         {% endif %}
-
                         {% if appointment.property_type %}
                         <div class="info-item">
-                            <div class="info-label">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                    <path d="M19 21V5C19 3.89543 18.1046 3 17 3H7C5.89543 3 5 3.89543 5 5V21M19 21H21M19 21H14M5 21H3M5 21H10M10 21V15C10 14.4477 10.4477 14 11 14H13C13.5523 14 14 14.4477 14 15V21M10 21H14" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                                Property Type
-                            </div>
-                            <div class="info-value">{{ appointment.property_type }}</div>
+                            <span class="info-label">Property Type</span>
+                            <span class="info-value">{{ appointment.property_type }}</span>
                         </div>
                         {% endif %}
                     </div>
 
                     {% if appointment.note and appointment.note != 'No Note Provided' %}
-                    <div class="appointment-note">
-                        <div class="note-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Appointment Note
-                        </div>
-                        <p class="note-content">{{ appointment.note }}</p>
+                    <div class="note-section">
+                        <h3 class="note-title">Notes</h3>
+                        <p class="note-text">{{ appointment.note }}</p>
                     </div>
                     {% endif %}
                 </div>
-            </div>
+            </section>
 
-            <!-- Actions Card (moved from incomplete section) -->
-            <div class="card appointment-overview-card">
+            <!-- Actions Section -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon appointment-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h2>Actions</h2>
-                    </div>
+                    <h2 class="card-title">Actions</h2>
                 </div>
                 <div class="card-body">
-                    <div class="action-buttons-grid">
-                        <button class="action-btn action-btn-primary">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <div class="action-buttons">
+                        <a href="{% url 'edit-schedule' appointment.pk %}" class="btn btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2"/>
+                                <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2"/>
                             </svg>
-                            <span>Edit Appointment</span>
-                        </button>
-                        <button class="action-btn action-btn-danger">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 6H5H21M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            Edit Appointment
+                        </a>
+                        <a href="#" class="btn btn-danger" onclick="return confirmDelete()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 6H5H21M19 6V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="currentColor" stroke-width="2"/>
+                                <path d="M10 11V17M14 11V17" stroke="currentColor" stroke-width="2"/>
                             </svg>
-                            <span>Delete Appointment</span>
-                        </button>
+                            Delete Appointment
+                        </a>
+                        {%if lead_data%}
+                        <a href="#" class="btn btn-danger" onclick="return confirmDelete()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 6H5H21M19 6V20C19 21.1046 18.1046 22 17 22H7C5.89543 22 5 21.1046 5 20V6M8 6V4C8 2.89543 8.89543 2 10 2H14C15.1046 2 16 2.89543 16 4V6" stroke="currentColor" stroke-width="2"/>
+                                <path d="M10 11V17M14 11V17" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Delete Client Information
+                        </a>
+                        {%endif%}
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Client Information Card -->
             {% if lead_data %}
-            <div class="card client-info-card">
+            <!-- Client Information -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon client-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h2>Client Information</h2>
-                    </div>
-                    <span class="badge badge-status badge-{{ lead_data.status|lower|cut:' ' }}">
-                        {{ lead_data.status }}
-                    </span>
+                    <h2 class="card-title">Client Information</h2>
+                    <span class="status-badge badge-{{ lead_data.status|lower|cut:' ' }}">{{ lead_data.status }}</span>
                 </div>
                 <div class="card-body">
-                    <div class="client-details-grid">
-                        <div class="detail-row">
-                            <span class="detail-label">Full Name</span>
-                            <span class="detail-value">{{ lead_data.name }}</span>
+                    <div class="client-info-grid">
+                        <div class="info-row">
+                            <span class="label">Full Name</span>
+                            <span class="value">{{ lead_data.name }}</span>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Phone Number</span>
-                            <span class="detail-value">
+                        <div class="info-row">
+                            <span class="label">Phone</span>
+                            <span class="value">
                                 <a href="tel:{{ lead_data.phone_no }}" class="contact-link">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M22 16.92V19.92C22 20.4797 21.5523 20.9374 20.9929 20.9491C20.7688 20.9535 20.5461 20.9319 20.33 20.8854C17.6386 20.3078 15.1194 19.1216 12.9699 17.4183C10.9763 15.8456 9.35944 13.8476 8.22558 11.57C6.48931 8.92925 5.50086 5.86218 5.35746 2.70006C5.34008 2.32187 5.4204 1.94689 5.59226 1.61059C5.76412 1.27429 6.02116 0.989104 6.33901 0.784967C6.65687 0.58083 7.02346 0.465088 7.40137 0.447787C7.77929 0.430485 8.15546 0.51218 8.48951 0.683945L11.4295 2.296C11.7552 2.46354 12.0253 2.71869 12.2075 3.03283C12.3896 3.34697 12.476 3.70658 12.456 4.06843L12.158 7.31843C12.1456 7.51592 12.0976 7.70952 12.0168 7.88966C11.9361 8.0698 11.8242 8.23331 11.6869 8.37271L10.738 9.32074" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
                                     {{ lead_data.phone_no }}
                                 </a>
                             </span>
                         </div>
                         {% if lead_data.email %}
-                        <div class="detail-row">
-                            <span class="detail-label">Email Address</span>
-                            <span class="detail-value">
+                        <div class="info-row">
+                            <span class="label">Email</span>
+                            <span class="value">
                                 <a href="mailto:{{ lead_data.email }}" class="contact-link">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
                                     {{ lead_data.email }}
                                 </a>
                             </span>
                         </div>
                         {% endif %}
-                        <div class="detail-row">
-                            <span class="detail-label">Preferred Contact</span>
-                            <span class="detail-value">
-                                <span class="contact-method">{{ lead_data.contact_type }}</span>
-                            </span>
+                        <div class="info-row">
+                            <span class="label">Contact Method</span>
+                            <span class="value">{{ lead_data.contact_type }}</span>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Current Stage</span>
-                            <span class="detail-value">
-                                <span class="badge badge-stage badge-{{ lead_data.stages|lower }}">{{ lead_data.stages }}</span>
+                        <div class="info-row">
+                            <span class="label">Stage</span>
+                            <span class="value">
+                                <span class="stage-badge badge-{{ lead_data.stages|lower }}">{{ lead_data.stages }}</span>
                             </span>
                         </div>
                         {% if lead_data.tags and lead_data.tags != 'None' %}
-                        <div class="detail-row">
-                            <span class="detail-label">Tags</span>
-                            <span class="detail-value">
-                                <span class="tag-badge">{{ lead_data.tags }}</span>
+                        <div class="info-row">
+                            <span class="label">Tags</span>
+                            <span class="value">
+                                <span class="tag-chip">{{ lead_data.tags }}</span>
                             </span>
                         </div>
                         {% endif %}
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Client Message Card -->
-            <div class="card message-card">
+            <!-- Client Message -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon message-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h2>Client Message</h2>
-                    </div>
+                    <h2 class="card-title">Client Message</h2>
                 </div>
                 <div class="card-body">
-                    <div class="message-content">
+                    <div class="message-box">
                         <p>{{ lead_data.inquiry_message }}</p>
                     </div>
                     <div class="message-meta">
-                        <span class="meta-item">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Created: {{ lead_data.date_created|date:"M d, Y" }}
-                        </span>
-                        <span class="meta-item">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            Updated: {{ lead_data.date_updated|date:"M d, Y" }}
-                        </span>
+                        <span class="meta-item">Created: {{ lead_data.date_created|date:"M d, Y" }}</span>
+                        <span class="meta-item">Updated: {{ lead_data.date_updated|date:"M d, Y" }}</span>
                     </div>
                 </div>
-            </div>
+            </section>
             {% else %}
-            <!-- No Lead Data Card -->
-            <div class="card no-lead-card">
-                <div class="no-lead-content">
-                    <div class="no-lead-icon">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </div>
+            <!-- No Client Data -->
+            <section class="card no-client-card">
+            <div class="card-body">
+                <div class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" class="empty-icon">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
                     <h3>No Client Associated</h3>
-                    <p>This appointment doesn't have any client information linked to it yet.</p>
-                    <button class="add-client-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                        Add Client Information
-                    </button>
+                    <p>This appointment doesn't have any client information linked to it.</p>
+                    
+                    <a href="{%url 'view-client' appointment.pk%}" class="btn btn-outline">Add Client Information</a>
+                    </div>
                 </div>
-            </div>
+            </section>
             {% endif %}
         </div>
 
         <!-- Right Sidebar -->
-        <div class="right-sidebar">
+        <aside class="sidebar">
             {% if lead_data %}
-            <!-- Property Interest Card -->
-            <div class="card property-card">
+            <!-- Property Interest -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon property-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <h2>Property Interest</h2>
-                    </div>
+                    <h2 class="card-title">Property Interest</h2>
                 </div>
                 <div class="card-body">
-                    <div class="property-details">
-                        <div class="property-name">{{ lead_data.property_name }}</div>
+                    <div class="property-info">
+                        <h3 class="property-name">{{ lead_data.property_name }}</h3>
                         <div class="property-meta">
-                            <span class="property-type-badge">{{ lead_data.property_type }}</span>
+                            <span class="property-type-tag">{{ lead_data.property_type }}</span>
                             <span class="property-id">#{{ lead_data.property_intrested }}</span>
                         </div>
                         {% if lead_data.schedule_tour %}
-                        <div class="tour-info">
+                        <div class="tour-date">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2"/>
                             </svg>
                             <div>
-                                <div class="tour-label">Scheduled Tour</div>
-                                <div class="tour-date">{{ lead_data.schedule_tour|date:"F d, Y" }}</div>
+                                <span class="tour-label">Tour Date</span>
+                                <span class="tour-value">{{ lead_data.schedule_tour|date:"M d, Y" }}</span>
                             </div>
                         </div>
                         {% endif %}
-                        {%if lead_data.property_type == Sale%}
-                            <a href="{% url 'customer:view-property-s' property_id=lead_data.property_intrested %}" class="view-property-btn">
-                        {%else%}
-                            <a href="{% url 'customer:view-property-r' property_id=lead_data.property_intrested %}" class="view-property-btn">
-                        {%endif%}
-                            View Property Details
+                        {% if lead_data.property_type == 'Sale' %}
+                        <a href="{% url 'customer:view-property-s' property_id=lead_data.property_intrested %}" class="btn btn-link">
+                            View Property
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"/>
                             </svg>
                         </a>
+                        {% else %}
+                        <a href="{% url 'customer:view-property-r' property_id=lead_data.property_intrested %}" class="btn btn-link">
+                            View Property
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Quick Actions Card -->
-            <div class="card actions-card">
+            <!-- Quick Actions -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon actions-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M13 10V3L4 14H11V21L20 10H13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h2>Quick Actions</h2>
-                    </div>
+                    <h2 class="card-title">Quick Actions</h2>
                 </div>
                 <div class="card-body">
-                    <div class="action-buttons-grid">
-                        <a href="tel:{{ lead_data.phone_no }}" class="action-btn action-btn-call">
+                    <div class="quick-actions">
+                        <a href="tel:{{ lead_data.phone_no }}" class="quick-action-btn call">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M22 16.92V19.92C22 20.4797 21.5523 20.9374 20.9929 20.9491C20.7688 20.9535 20.5461 20.9319 20.33 20.8854C17.6386 20.3078 15.1194 19.1216 12.9699 17.4183C10.9763 15.8456 9.35944 13.8476 8.22558 11.57C6.48931 8.92925 5.50086 5.86218 5.35746 2.70006C5.34008 2.32187 5.4204 1.94689 5.59226 1.61059C5.76412 1.27429 6.02116 0.989104 6.33901 0.784967C6.65687 0.58083 7.02346 0.465088 7.40137 0.447787C7.77929 0.430485 8.15546 0.51218 8.48951 0.683945L11.4295 2.296C11.7552 2.46354 12.0253 2.71869 12.2075 3.03283C12.3896 3.34697 12.476 3.70658 12.456 4.06843L12.158 7.31843C12.1456 7.51592 12.0976 7.70952 12.0168 7.88966C11.9361 8.0698 11.8242 8.23331 11.6869 8.37271L10.738 9.32074" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M22 16.92V19.92C22.0011 20.4875 21.5641 20.9604 21.0084 20.9931C17.0334 21.3002 13.0378 20.3064 9.61515 18.1467C6.42691 16.1696 3.83008 13.3836 2.01497 10.0311C0.0126462 6.59928 -0.652726 2.63281 0.544114 -1.00233C0.595867 -1.57769 1.02616 -2.00008 1.58 -2H4.58C5.47252 -2.00947 6.21976 -1.35617 6.34 -0.472C6.45341 0.357342 6.65802 1.22669 6.95 2.06C7.17548 2.70382 7.01855 3.42485 6.55 3.9L5.27 5.18C7.01758 8.43768 9.50608 10.9262 12.76 12.67L14.04 11.39C14.5151 10.9214 15.2362 10.7645 15.88 10.99C16.7133 11.282 17.5827 11.4866 18.412 11.6C19.3069 11.7223 19.9697 12.4884 19.96 13.39V16.39C19.96 16.9423 19.5123 17.39 18.96 17.39C18.9456 17.39 18.9312 17.3897 18.9168 17.3892L22 16.92Z" stroke="currentColor" stroke-width="2"/>
                             </svg>
-                            <span>Call Client</span>
+                            Call Client
                         </a>
                         {% if lead_data.email %}
-                        <a href="mailto:{{ lead_data.email }}" class="action-btn action-btn-email">
+                        <a href="mailto:{{ lead_data.email }}" class="quick-action-btn email">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2"/>
                             </svg>
-                            <span>Send Email</span>
+                            Send Email
                         </a>
                         {% endif %}
                         {% if lead_data.contact_type == 'Whatsapp' %}
-                        <a href="https://wa.me/{{ lead_data.phone_no }}" target="_blank" class="action-btn action-btn-whatsapp">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                <path d="M17.472 14.382C17.301 14.297 16.362 13.834 16.203 13.777C16.044 13.721 15.93 13.692 15.816 13.863C15.702 14.034 15.336 14.469 15.234 14.583C15.132 14.697 15.03 14.711 14.859 14.626C14.688 14.541 14.133 14.362 13.478 13.78C12.968 13.327 12.618 12.768 12.516 12.597C12.414 12.426 12.504 12.332 12.589 12.247C12.665 12.171 12.759 12.047 12.844 11.945C12.929 11.843 12.958 11.769 13.014 11.655C13.07 11.541 13.042 11.439 12.999 11.354C12.956 11.269 12.618 10.33 12.473 9.988C12.328 9.646 12.183 9.688 12.069 9.688C11.955 9.688 11.841 9.688 11.727 9.688C11.613 9.688 11.428 9.731 11.269 9.902C11.11 10.073 10.619 10.536 10.619 11.475C10.619 12.414 11.283 13.325 11.368 13.439C11.453 13.553 12.618 15.354 14.394 16.188C14.842 16.389 15.191 16.513 15.465 16.607C15.913 16.755 16.322 16.734 16.647 16.691C17.007 16.643 17.766 16.229 17.911 15.772C18.056 15.315 18.056 14.929 18.013 14.858C17.97 14.787 17.856 14.744 17.685 14.659L17.472 14.382Z" fill="currentColor"/>
-                                <path d="M20.52 3.449C18.241 1.169 15.243 0 12 0C5.371 0 0 5.371 0 12C0 14.127 0.586 16.166 1.689 17.943L0.582 21.443C0.514 21.663 0.583 21.902 0.762 22.054C0.879 22.156 1.024 22.207 1.17 22.207C1.243 22.207 1.316 22.195 1.387 22.171L5.099 20.989C6.804 22.011 8.757 22.558 10.757 22.558H12C18.629 22.558 24 17.187 24 10.558C24 7.315 22.799 4.729 20.52 3.449ZM12 20.679C10.227 20.679 8.498 20.167 6.997 19.197C6.886 19.127 6.757 19.091 6.627 19.091C6.555 19.091 6.483 19.103 6.414 19.127L3.891 19.954L4.644 17.543C4.707 17.348 4.674 17.136 4.554 16.969C3.497 15.408 2.94 13.598 2.94 11.742C2.94 6.992 6.811 3.121 11.561 3.121C13.865 3.121 16.023 4.019 17.657 5.653C19.291 7.287 20.189 9.445 20.189 11.749C20.189 16.499 16.318 20.37 11.568 20.37L12 20.679Z" fill="currentColor"/>
+                        <a href="https://wa.me/{{ lead_data.phone_no }}" target="_blank" class="quick-action-btn whatsapp">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                             </svg>
-                            <span>WhatsApp</span>
+                            WhatsApp
                         </a>
                         {% endif %}
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Lead Timeline Card -->
-            <div class="card timeline-card">
+            <!-- Activity Timeline -->
+            <section class="card">
                 <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon timeline-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h2>Activity Timeline</h2>
-                    </div>
+                    <h2 class="card-title">Timeline</h2>
                 </div>
                 <div class="card-body">
                     <div class="timeline">
                         <div class="timeline-item">
-                            <div class="timeline-dot"></div>
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
-                                <div class="timeline-title">Lead Created</div>
-                                <div class="timeline-date">{{ lead_data.date_created|date:"M d, Y " }}</div>
+                                <span class="timeline-title">Lead Created</span>
+                                <span class="timeline-date">{{ lead_data.date_created|date:"M d, Y" }}</span>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-dot"></div>
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
-                                <div class="timeline-title">Last Updated</div>
-                                <div class="timeline-date">{{ lead_data.date_updated|date:"M d, Y" }}</div>
+                                <span class="timeline-title">Last Updated</span>
+                                <span class="timeline-date">{{ lead_data.date_updated|date:"M d, Y" }}</span>
                             </div>
                         </div>
-                        <div class="timeline-item">
-                            <div class="timeline-dot active"></div>
+                        <div class="timeline-item active">
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
-                                <div class="timeline-title">Appointment Scheduled</div>
-                                <div class="timeline-date">{{ appointment.appointment|date:"M d, Y" }}</div>
+                                <span class="timeline-title">Appointment</span>
+                                <span class="timeline-date">{{ appointment.appointment|date:"M d, Y" }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% else %}
-            <!-- Appointment Only Actions (when no lead_data) -->
-            <div class="card actions-card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="title-icon actions-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M13 10V3L4 14H11V21L20 10H13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h2>Quick Actions</h2>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted text-small">No quick actions available without client information.</p>
-                </div>
-            </div>
+            </section>
             {% endif %}
-        </div>
+        </aside>
     </div>
 </div>
-{%endblock%}
+
+<script>
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
+        //TODO Add delete functionality here 
+        window.location.href = "#";
+    }
+}
+</script>
+{% endblock %}

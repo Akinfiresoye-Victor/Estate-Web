@@ -85,81 +85,124 @@ def dashboard(request):
 
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.db import transaction
+from .models import AgentInformation, UniversalAgent
+from .forms import AgentInformationForm, ExperienceFormSet, SocialLinksFormSet
+
 def agent_form(request):
+    # Check authentication
     if not request.user.is_authenticated:
-        messages.info(request, 'You must be logged in to access this page ')
+        messages.info(request, 'You must be logged in to access this page')
         return redirect('landing')
-    if not request.user.role == 'agent':
-        messages.info(request, 'Account must be an Agent account to access this page')
+    
+    # Check if user is an agent
+    if request.user.role != 'agent':
+        messages.danger(request, 'Account must be an Agent account to access this page')
         return redirect('landing')
     
     try:
         # Check if agent already has a profile
-        try:
-            existing_agent = AgentInformation.objects.get(user_id=request.user.id)
-            messages.info(request, 'Form has been filled go into edit mode to edit details')
+        if AgentInformation.objects.filter(user_id=request.user.id).exists():
+            messages.info(request, 'Form has been filled. Go into edit mode to edit details')
             return redirect('agent:dashboard')
-        except AgentInformation.DoesNotExist:
-            messages.info(request, 'Complete Form To gain full access')
         
         submitted = False
         
         if request.method == 'POST':
-            
+            # Initialize forms with POST data
             form = AgentInformationForm(request.POST, request.FILES)
+            exp_link = ExperienceFormSet(request.POST, prefix='exp')
+            soc_form = SocialLinksFormSet(request.POST, prefix='social')
             
-            if not form.is_valid():
-                print("Form errors:", form.errors)
-                messages.error(request, f'Form errors: {form.errors}')
+            # Validate all forms
+            form_valid = form.is_valid()
+            exp_valid = exp_link.is_valid()
+            soc_valid = soc_form.is_valid()
             
-            if form.is_valid():
-                with transaction.atomic():
-                    # Save the main agent form first
-                    agent = form.save(commit=False)
-                    agent.user_id = request.user.id
-                    agent.save()
-                    
-                    # Now save the formsets with the agent instance
-                    exp_link = ExperienceFormSet(request.POST, instance=agent)
-                    soc_form = SocialLinksFormSet(request.POST, instance=agent)
-                    
-                    # DEBUG: Check formset errors
-                    if not exp_link.is_valid():
-                        print("Experience formset errors:", exp_link.errors)
-                    if not soc_form.is_valid():
-                        print("Social formset errors:", soc_form.errors)
-                    
-                    if exp_link.is_valid() and soc_form.is_valid():
-                        exp_link.save()
-                        soc_form.save()
-                        print("Formsets saved successfully")
+            # Debug: Print errors if any
+            if not form_valid:
+                print("Main form errors:", form.errors)
+                messages.error(request, f'Main form errors: {form.errors}')
+            
+            if not exp_valid:
+                print("Experience formset errors:", exp_link.errors)
+                messages.error(request, f'Experience errors: {exp_link.errors}')
+            
+            if not soc_valid:
+                print("Social formset errors:", soc_form.errors)
+                messages.error(request, f'Social links errors: {soc_form.errors}')
+            
+            # If all forms are valid, save them
+            if form_valid and exp_valid and soc_valid:
+                try:
+                    with transaction.atomic():
+                        # Save the main agent form
+                        agent = form.save(commit=False)
+                        agent.user_id = request.user.id
+                        agent.users = request.user
                         
-                        # Handle Universal Agent data if checkbox is checked
-                        if request.POST.get('universal_agent'):
-                            from .models import UniversalAgent
+                        # Handle universal_agent checkbox
+                        agent.universal_agent = request.POST.get('universal_agent') == 'on'
+                        
+                        agent.save()
+                        print(f"Agent saved with ID: {agent.id}")
+                        
+                        # Save experience formset
+                        experiences = exp_link.save(commit=False)
+                        for exp in experiences:
+                            exp.agent = agent
+                            exp.save()
+                        
+                        # Handle deleted experiences
+                        for exp in exp_link.deleted_objects:
+                            exp.delete()
+                        
+                        print(f"Saved {len(experiences)} experiences")
+                        
+                        # Save social links formset
+                        socials = soc_form.save(commit=False)
+                        for social in socials:
+                            social.agent = agent
+                            social.save()
+                        
+                        # Handle deleted social links
+                        for social in soc_form.deleted_objects:
+                            social.delete()
+                        
+                        print(f"Saved {len(socials)} social links")
+                        
+                        # Handle Universal Agent data if checkbox was checked
+                        if agent.universal_agent:
+                            years_exp = request.POST.get('years_experience', '0-1')
+                            is_agency = request.POST.get('agency') == 'on'
+                            agency_name = request.POST.get('agency_name', 'Not With Agency')
+                            
                             UniversalAgent.objects.create(
                                 agent=agent,
-                                years_experience=request.POST.get('years_experience', '0-1'),
-                                agency=request.POST.get('agency') == 'on',
-                                agency_name=request.POST.get('agency_name', 'Not With Agency')
+                                years_experience=years_exp,
+                                agency=is_agency,
+                                agency_name=agency_name if is_agency else 'Not With Agency'
                             )
                             print("Universal agent data saved")
                         
                         messages.success(request, 'Profile created successfully!')
-                        return HttpResponseRedirect('?submitted=True')
-                    else:
-                        # If formsets are invalid, delete the agent
-                        agent.delete()
-                        messages.error(request, 'Please check the experience and social links sections.')
-                        exp_link = ExperienceFormSet(request.POST)
-                        soc_form = SocialLinksFormSet(request.POST)
-            else:
-                exp_link = ExperienceFormSet(request.POST)
-                soc_form = SocialLinksFormSet(request.POST)
+                        return HttpResponseRedirect(f"{request.path}?submitted=True")
+                        
+                except Exception as e:
+                    print(f"Error saving agent data: {str(e)}")
+                    messages.error(request, f'Error saving data: {str(e)}')
+                    # Forms will be re-rendered with the POST data below
+        
         else:
+            # GET request - initialize empty forms
             form = AgentInformationForm()
-            exp_link = ExperienceFormSet()
-            soc_form = SocialLinksFormSet()
+            exp_link = ExperienceFormSet(prefix='exp')
+            soc_form = SocialLinksFormSet(prefix='social')
+            
+            # Check if we're showing the success page
             if 'submitted' in request.GET:
                 submitted = True
         
@@ -171,6 +214,7 @@ def agent_form(request):
         })
         
     except Exception as e:
+        print(f"Unexpected error: {str(e)}")
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
 
@@ -179,7 +223,7 @@ def update_agent_profile(request, agent_id):
         messages.info(request, 'You have to be logged in to access this page')
         return redirect('landing')
     if request.user.role != 'agent':
-        messages.info(request, 'Open an agent account to access this page')
+        messages.danger(request, 'Open an agent account to access this page')
         return redirect('landing')
     try:
         agent_information=AgentInformation.objects.get(pk=agent_id)
@@ -204,7 +248,7 @@ def lead_management(request):
         messages.info(request, "Login Required")
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, "Agent's Only")
+        messages.danger(request, "Agent's Only")
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
@@ -232,7 +276,7 @@ def agent_profile(request, agent_uuid):
         messages.info(request, 'Login Required')
         return redirect('landing')
     if not request.user.role == 'customer':
-        messages.info(request, 'Customer Access Only')
+        messages.danger(request, 'Customer Access Only')
         return redirect('landing')
     
     try:
@@ -269,7 +313,7 @@ def analytics(request):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, "Agent's Only")
+        messages.danger(request, "Agent's Only")
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id= request.user.id)
@@ -327,7 +371,7 @@ def lead_detail(request, lead_id):
         messages.info(request, 'Login Required')
         return render('login')
     if request.user.role != 'agent':
-        messages.info(request, "Agent's Only")
+        messages.danger(request, "Agent's Only")
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
@@ -346,7 +390,7 @@ def settings(request):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, "Agent's Only")
+        messages.danger(request, "Agent's Only")
         return redirect('landing')
     try:
         return render(request, 'agent/settings.html')
@@ -354,8 +398,10 @@ def settings(request):
         return render(request, 'estate/error_page.html', {'e':e})
 
 
-#TODO Agent Form has a very critical problem with the form submission and add a logout function in that side it gave me problem and it was annoying
 #TODO Perform proper error handling even in places you think error cant occur
-# TODO Recalculate the engagement rate and ranking information 
-# FIXME the update page, when i switch category the house type doesnt switch
-#FIXME Once a property is updated everything connected to the property must also be changed e.d Leads
+
+
+
+
+
+

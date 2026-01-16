@@ -1,0 +1,209 @@
+{% extends base_template %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'core/css/lead_list.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Filter Bar -->
+<section class="filter-bar-section">
+  <div class="container">
+    <div class="filter-controls">
+      <div class="filter-group">
+        <label class="filter-label">Status:</label>
+        <select class="filter-select" id="statusFilter">
+          <option value="all">All Status</option>
+          <option value="Not Contacted">Not Contacted</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Qualified">Qualified</option>
+          <option value="Negotiation">Negotiation</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Stage:</label>
+        <select class="filter-select" id="stageFilter">
+          <option value="all">All Stages</option>
+          <option value="New">New</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Qualified">Qualified</option>
+          <option value="Proposal">Proposal</option>
+          <option value="Negotiation">Negotiation</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Property Type:</label>
+        <select class="filter-select" id="propertyFilter">
+          <option value="all">All Types</option>
+          <option value="Sale">For Sale</option>
+          <option value="Rent">For Rent</option>
+        </select>
+      </div>
+
+      <div class="search-group">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          class="search-input" 
+          id="searchInput"
+          placeholder="Search by name, phone, or property..."
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Leads List -->
+<section class="leads-section">
+  <div class="container">
+    
+    {% if leads %}
+    <div class="leads-list">
+      
+      {% for lead in leads %}
+      <div class="lead-item" 
+           data-status="{{ lead.status }}" 
+           data-stage="{{ lead.stages }}"
+           data-property-type="{{ lead.property_type }}"
+           data-search="{{ lead.name|lower }} {{ lead.phone_no }} {{ lead.property_name|lower }}">
+        
+        <div class="lead-main-info">
+          <div class="lead-avatar">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          
+          <div class="lead-details">
+            <h3 class="lead-name">{{ lead.name }}</h3>
+            <div class="lead-meta">
+              <span class="meta-item">
+                <i class="bi bi-telephone"></i>
+                {{ lead.phone_no }}
+              </span>
+              {% if lead.email %}
+              <span class="meta-item">
+                <i class="bi bi-envelope"></i>
+                {{ lead.email }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="lead-property-info">
+          <div class="property-detail">
+            <i class="bi bi-house-door"></i>
+            <span class="property-name">{{ lead.property_name }}</span>
+          </div>
+          <span class="property-type-badge {{ lead.property_type|lower }}">
+            {{ lead.property_type }}
+          </span>
+        </div>
+
+        <div class="lead-status-section">
+          <span class="status-badge {{ lead.status|lower|cut:' ' }}">
+            {{ lead.status }}
+          </span>
+          <span class="stage-badge {{ lead.stages|lower }}">
+            {{ lead.stages }}
+          </span>
+        </div>
+
+        <div class="lead-date-info">
+          <div class="date-item">
+            <i class="bi bi-calendar-plus"></i>
+            <span>{{ lead.date_created|date:"M d, Y" }}</span>
+          </div>
+          <div class="contact-method">
+            <i class="bi bi-{{ lead.contact_type|lower }}"></i>
+            <span>{{ lead.contact_type }}</span>
+          </div>
+        </div>
+
+        <div class="lead-actions">
+          <a href="{%url 'add-client' lead.lead_id appointment_id%}" class="action-btn schedule-btn" title="Add Client">
+            <i class="bi bi-plus-circle"></i>
+          </a>
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- Pagination (if needed later) -->
+    <div class="pagination-section">
+      <button class="pagination-btn" disabled>
+        <i class="bi bi-chevron-left"></i>
+        Previous
+      </button>
+      <span class="pagination-info">Page 1 of 1</span>
+      <button class="pagination-btn" disabled>
+        Next
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h3>No Leads Available</h3>
+      <p>Consider optimizing your listings to attract more leads. Make sure your property descriptions are complete and visibility is maximized.</p>
+      <a href="#" class="btn-add-lead">
+        <i class="bi bi-plus-circle"></i>
+        Add Your First Lead
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+
+  // Filter functionality
+  const statusFilter = document.getElementById('statusFilter');
+  const stageFilter = document.getElementById('stageFilter');
+  const propertyFilter = document.getElementById('propertyFilter');
+  const searchInput = document.getElementById('searchInput');
+
+  function filterLeads() {
+    const statusValue = statusFilter ? statusFilter.value : 'all';
+    const stageValue = stageFilter ? stageFilter.value : 'all';
+    const propertyValue = propertyFilter ? propertyFilter.value : 'all';
+    const searchValue = searchInput ? searchInput.value.toLowerCase() : '';
+
+    const leads = document.querySelectorAll('.lead-item');
+
+    leads.forEach(lead => {
+      const matchesStatus = statusValue === 'all' || lead.dataset.status === statusValue;
+      const matchesStage = stageValue === 'all' || lead.dataset.stage === stageValue;
+      const matchesProperty = propertyValue === 'all' || lead.dataset.propertyType === propertyValue;
+      const matchesSearch = searchValue === '' || lead.dataset.search.includes(searchValue);
+
+      if (matchesStatus && matchesStage && matchesProperty && matchesSearch) {
+        lead.style.display = 'flex';
+      } else {
+        lead.style.display = 'none';
+      }
+    });
+  }
+
+  if (statusFilter) statusFilter.addEventListener('change', filterLeads);
+  if (stageFilter) stageFilter.addEventListener('change', filterLeads);
+  if (propertyFilter) propertyFilter.addEventListener('change', filterLeads);
+  if (searchInput) searchInput.addEventListener('input', filterLeads);
+
+})();
+</script>
+{% endblock %}

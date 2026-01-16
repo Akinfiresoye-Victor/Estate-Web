@@ -19,4 +19,7 @@ urlpatterns = [
     path('lead/appointments', views.appointment, name='appointment'),
     path('estate/blog', views.estate_blog, name='estate-blog'),
     path('mylistings', views.manaage_listings, name='listings'),
+    path('edit_schedule/<appointment_id>', views.edit_appointment, name='edit-schedule'),
+    path('lead_list/<appointment_id>', views.view_client, name='view-client'),
+    path('add_client/<lead_uuid>/<appointment_id>', views.add_client, name='add-client')
 ]

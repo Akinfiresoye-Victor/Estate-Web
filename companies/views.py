@@ -78,7 +78,7 @@ def dashboard(request):
         return redirect('landing')
         
     if request.user.role != 'company':
-        messages.info(request, 'Company account only')
+        messages.danger(request, 'Company account only')
         return redirect('landing')
 
     try:
@@ -271,7 +271,7 @@ def dashboard(request):
 def company_form(request):
     if request.user.is_authenticated:
         if not request.user.role == 'company':
-            messages.info(request, 'Company account only')
+            messages.danger(request, 'Company account only')
             return redirect('landing')
         try:
             submitted=False
@@ -342,7 +342,7 @@ def update_company_profile(request, company_id):
             print(f'Error is {e}')
             return render(request, 'estate/error_page.html', {'e': e})
     else:
-        messages.success(request, 'Log in to gain access')
+        messages.info(request, 'Log in to gain access')
         return redirect('login')
 
 
@@ -353,7 +353,7 @@ def company_analytics(request):
         return redirect('login')
         
     if request.user.role != 'company':
-        messages.info(request, 'Company account only')
+        messages.danger(request, 'Company account only')
         return redirect('landing')
 
     try:
@@ -491,13 +491,13 @@ def company_analytics(request):
         )
         
         # Calculate market position (Top X%)
-        if total_companies_eng:
+        if total_companies_eng and len(total_companies_eng) > 1:
             # Sort companies by engagement (descending)
             sorted_eng = sorted(total_companies_eng, reverse=True)
             # Find current company's rank
-            company_rank = sorted_eng.index(analytics.competition) + 1 if analytics.competition in sorted_eng else len(sorted_eng)
+            companies_above= sum(1 for eng in sorted_eng if eng > analytics.competition)
             # Calculate percentile
-            market_position = (company_rank / len(sorted_eng)) * 100
+            market_position = (companies_above / len(sorted_eng)) * 100
             # Determine if top 1%, 5%, 10%, etc.
             if market_position <= 1:
                 top_performer = "Top 1%"
@@ -588,7 +588,7 @@ def lead_management(request):
             messages.info(request, 'You have to be logged in to access this page')
             return redirect('landing')
         if not request.user.role == 'company':
-            messages.info(request, 'You have to open a company account to access this page')
+            messages.danger(request, 'You have to open a company account to access this page')
             return redirect('landing')
         company_uuid=CompanyInformation.objects.get(user_id=request.user.id).unique_company_id    
         general_leads=LeadInfo.objects.filter(company_uuid=company_uuid)
@@ -633,7 +633,7 @@ def lead_management(request):
 
 
 def lead_detail(request, lead_id):
-    client=LeadInfo.objects.get(pk=lead_id)
+    client=LeadInfo.objects.get(lead_id=lead_id)
     if client.property_type =='Sale' :
         property=PropertyManagementSale.objects.get(pk=client.property_intrested)
     else:
@@ -824,4 +824,3 @@ def properties_by_company(request, company_uuid):
 
 
 
-# FIXME Flash messages x problem 

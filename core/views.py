@@ -449,7 +449,7 @@ def add_schedule(request):
         return redirect('login')
     
     if request.user.role == 'customer':
-        messages.info(request, 'Access Denied')
+        messages.danger(request, 'Access Denied')
         return redirect('landing')
     
     try:
@@ -516,7 +516,7 @@ def appointment(request):
         messages.info(request, "Login Required")
         return redirect('login')
     if request.user.role == 'customer':
-        messages.info(request, 'Access Denied')
+        messages.danger(request, 'Access Denied')
         return redirect('landing')
     try:
         user_role=request.user.role
@@ -540,8 +540,7 @@ def appointment(request):
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
-#TODOSchedule appointemnt detail - Add client information 
-#TODO Add edit appointment
+
 
 def estate_blog(request):
     try:
@@ -589,3 +588,142 @@ def manaage_listings(request):
                                                         'on_sale':property_on_sale, 'base_template':base_template})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+def edit_appointment(request, appointment_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log In required')
+        return redirect('login')
+    
+    if request.user.role == 'customer':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    
+    try:
+        user_role = request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template = 'estate/base.html'
+        
+        # Get the appointment based on user role
+        if request.user.role == 'company':
+            company = CompanyInformation.objects.get(user_id=request.user.id)
+            appointment = Appointments.objects.filter(
+                company_uuid=company.unique_company_id
+            ).get(pk=appointment_id)
+        else:
+            agent = AgentInformation.objects.get(user_id=request.user.id)
+            appointment = Appointments.objects.filter(
+                agent_uuid=agent.agent_uuid
+            ).get(pk=appointment_id)
+        #TODO Implement security measures in situations where update is critical
+        # Get lead information if exists
+        lead = None
+        try:
+            if appointment.lead_uuid:
+                lead = LeadInfo.objects.get(lead_id=appointment.lead_uuid)
+        except ObjectDoesNotExist:
+            pass
+        
+        # Handle POST request (form submission)
+        if request.method == 'POST':
+            try:
+                # Update appointment fields
+                appointment.appointment = request.POST.get('appointment_date')
+                appointment.note = request.POST.get('note', 'No Note Provided')
+                appointment.appointment_type = request.POST.get('appointment_type')
+                
+                # Update property fields if provided
+                property_id = request.POST.get('property_id')
+                if property_id:
+                    appointment.property_id = int(property_id)
+                
+                property_type = request.POST.get('property_type')
+                if property_type:
+                    appointment.property_type = property_type
+                
+                appointment.save()
+                
+                messages.success(request, 'Appointment updated successfully!')
+                return redirect('view-schedule', lead_id=appointment_id)
+                
+            except Exception as e:
+                messages.error(request, f'Error updating appointment: {str(e)}')
+        
+        # Get appointment types for the dropdown
+        appointment_types = dict(APPOINTMENT_TYPE)
+        
+        context = {
+            'appointment': appointment,
+            'lead_data': lead,
+            'base_template': base_template,
+            'appointment_types': appointment_types,
+        }
+        
+        return render(request, 'core/edit_appointment.html', context)
+        
+    except Appointments.DoesNotExist:
+        messages.error(request, 'Appointment not found')
+        return redirect('appointments_list')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+
+def view_client(request, appointment_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.danger(request, 'Access Denied')
+        return redirect('landing')
+    user_role = request.user.role
+    if user_role == 'company':
+        base_template = 'company/base.html'
+    elif user_role == 'agent':
+        base_template = 'agent/base.html'
+    else:
+        base_template = 'estate/base.html'
+    try:
+        try:
+            company=CompanyInformation.objects.get(user_id= request.user.id)
+            leads=LeadInfo.objects.filter(company_uuid=company.unique_company_id)
+        except:
+            agent= AgentInformation.objects.get(user_id=request.user.id)
+            leads= LeadInfo.objects.filter(agent_id=agent.agent_uuid)
+        return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_id})
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+def add_client(request, lead_uuid, appointment_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.danger(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        appointment_data= Appointments.objects.get(pk=appointment_id)
+        lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
+        appointment_data.lead_uuid= lead_data.lead_id
+        appointment_data.save()
+        return redirect('view-schedule', appointment_id)
+    except Exception as e:
+        return render(request, 'estate/error_page', {'e':e})
+    
+    
+def delete_client(request, appointment_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.danger(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        pass
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})

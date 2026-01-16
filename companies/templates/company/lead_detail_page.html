@@ -215,66 +215,6 @@
         </div>
       </div>
 
-      <!-- Notes Section -->
-      <div class="detail-card">
-        <div class="card-header">
-          <h3>
-            <i class="bi bi-sticky"></i>
-            Notes
-          </h3>
-          <button class="btn-add" onclick="toggleNoteForm()">
-            <i class="bi bi-plus-circle"></i>
-            Add Note
-          </button>
-        </div>
-        <div class="card-body">
-          
-          <!-- Note Form -->
-          <div class="note-form" id="noteForm" style="display: none;">
-            <textarea placeholder="Add a note about this lead..." rows="3"></textarea>
-            <div class="form-actions">
-              <button class="btn-secondary" onclick="toggleNoteForm()">Cancel</button>
-              <button class="btn-primary" onclick="saveNote()">
-                <i class="bi bi-check-circle"></i>
-                Save Note
-              </button>
-            </div>
-          </div>
-
-          <!-- Notes List -->
-          <div class="notes-list">
-            
-            <div class="note-item">
-              <div class="note-header">
-                <div class="author-avatar">JD</div>
-                <div class="author-info">
-                  <h5>John Doe</h5>
-                  <span class="note-time">2 hours ago</span>
-                </div>
-              </div>
-              <div class="note-content">
-                Called the client. Very interested in the property. Will schedule viewing for next week.
-              </div>
-            </div>
-
-            <div class="note-item">
-              <div class="note-header">
-                <div class="author-avatar">SJ</div>
-                <div class="author-info">
-                  <h5>Sarah Johnson</h5>
-                  <span class="note-time">1 day ago</span>
-                </div>
-              </div>
-              <div class="note-content">
-                Sent property details via WhatsApp. Client requested payment plan information.
-              </div>
-            </div>
-            
-          </div>
-
-        </div>
-      </div>
-
     </main>
 
     <!-- Sidebar -->
@@ -369,69 +309,6 @@
         </div>
       </div>
 
-      <!-- Tags -->
-      <div class="detail-card">
-        <div class="card-header">
-          <h3>
-            <i class="bi bi-tags"></i>
-            Tags
-          </h3>
-        </div>
-        <div class="card-body">
-          
-          <div class="tag-input-group">
-            <input 
-              type="text" 
-              class="tag-input" 
-              id="tagInput" 
-              placeholder="Add tags..."
-              onkeypress="handleTagInput(event)"
-            >
-            <button class="btn-icon" onclick="addTag()">
-              <i class="bi bi-plus-lg"></i>
-            </button>
-          </div>
-
-          <div class="tags-list">
-            <span class="tag">
-              First Time Buyer
-              <i class="bi bi-x" onclick="removeTag(this)"></i>
-            </span>
-            <span class="tag">
-              Budget: High
-              <i class="bi bi-x" onclick="removeTag(this)"></i>
-            </span>
-            <span class="tag">
-              Urgent
-              <i class="bi bi-x" onclick="removeTag(this)"></i>
-            </span>
-            <span class="tag">
-              Cash Buyer
-              <i class="bi bi-x" onclick="removeTag(this)"></i>
-            </span>
-          </div>
-
-          <div class="suggested-tags">
-            <label>Suggested</label>
-            <div class="suggested-list">
-              <button class="suggested-tag" onclick="addSuggestedTag('Investor')">
-                <i class="bi bi-plus-circle"></i>Investor
-              </button>
-              <button class="suggested-tag" onclick="addSuggestedTag('Returning Client')">
-                <i class="bi bi-plus-circle"></i>Returning Client
-              </button>
-              <button class="suggested-tag" onclick="addSuggestedTag('Family')">
-                <i class="bi bi-plus-circle"></i>Family
-              </button>
-              <button class="suggested-tag" onclick="addSuggestedTag('Relocating')">
-                <i class="bi bi-plus-circle"></i>Relocating
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
       <!-- Assigned Agent -->
       <div class="detail-card">
         <div class="card-header">
@@ -441,17 +318,9 @@
           </h3>
         </div>
         <div class="card-body">
-          <div class="agent-card">
-            <div class="agent-avatar">
-              <img src="https://ui-avatars.com/api/?name=John+Doe&background=1a3c4e&color=fff" alt="Agent">
-            </div>
-            <div class="agent-info">
-              <h5>John Doe</h5>
-              <p>Senior Agent</p>
-            </div>
-            <button class="btn-icon" onclick="openReassignModal()">
-              <i class="bi bi-arrow-left-right"></i>
-            </button>
+          <div class="coming-soon-message">
+            <i class="bi bi-clock-history"></i>
+            <p>Coming Soon</p>
           </div>
         </div>
       </div>
@@ -469,14 +338,6 @@
             <button class="action-item" onclick="scheduleFollowUp()">
               <i class="bi bi-calendar-plus"></i>
               Schedule Follow-up
-            </button>
-            <button class="action-item" onclick="createTask()">
-              <i class="bi bi-check-square"></i>
-              Create Task
-            </button>
-            <button class="action-item" onclick="sendDocument()">
-              <i class="bi bi-file-earmark-pdf"></i>
-              Send Document
             </button>
             <button class="action-item danger" onclick="deleteLead()">
               <i class="bi bi-trash"></i>

@@ -6,48 +6,62 @@ from .models import *
 
 
 
-# forms.py
-class AgentInformationForm(ModelForm):
+from django import forms
+from django.forms import inlineformset_factory
+from .models import AgentInformation, Experience, SocialLinks
+
+class AgentInformationForm(forms.ModelForm):
+    """Main agent information form"""
+    
     class Meta:
         model = AgentInformation
-        fields = (
-            'profile_name','language', 'work_type', 'bio','profile_picture', 'phone_number',
-            'email', 'location','certificate','government_id', 'universal_agent'
-        )
-        labels = {
-            'profile_name': 'Professional Name',
-            'language': 'Language Spoken',
-            'work_type': 'Nature Of Work',
-            'bio': 'Professional Summary',
-            'profile_picture': '',
-            'phone_number': 'Phone No.',
-            'email': 'Email',
-            'location': 'Base City',
-            'certificate': 'Certificate To prove yourself',
-            'government_id': 'ID Card, Passport, Drivers Liscence,NIN Slip',
-            'universal_agent': 'Are you walking alone?'
-        }
+        fields = [
+            'profile_name', 'phone_number', 'email', 'location', 
+            'language', 'work_type', 'bio', 'profile_picture', 
+            'government_id', 'certificate'
+        ]
         widgets = {
-            'profile_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your full name'}),
-            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter phone number'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter email address'}),
-            'location': forms.Select(attrs={'class': 'form-control'}),
-            'language': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g English, French'}),
-            'bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Professional Summary'}),
-            'work_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g Realtor, Consultant'}),
+            'profile_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your full name'
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter email address'
+            }),
+            'location': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'language': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. English, French'
+            }),
+            'work_type': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Realtor, Consultant'
+            }),
+            'bio': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Tell us about yourself...',
+                'rows': 4
+            }),
+            'profile_picture': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': 'image/*'
+            }),
+            'government_id': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': '.pdf,.jpg,.jpeg,.png'
+            }),
+            'certificate': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': '.pdf,.jpg,.jpeg,.png'
+            }),
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Clear initial values for new forms
-        if not self.instance.pk:
-            self.fields['profile_name'].initial = ''
-            self.fields['phone_number'].initial = ''
-            self.fields['email'].initial = ''
-            self.fields['language'].initial = ''
-            self.fields['bio'].initial = ''
-            self.fields['work_type'].initial = ''
-            self.fields['location'].initial = ''
             
 
 class UniversalAgentForm(ModelForm):
@@ -84,16 +98,45 @@ class ExperienceForm(ModelForm):
 
 '''formset'''
 ExperienceFormSet = inlineformset_factory(
-    AgentInformation, 
-    Experience,        
-    form= ExperienceForm,
-    can_delete=True,
-    
+    AgentInformation,
+    Experience,
+    fields=['company', 'title', 'start_date', 'end_date'],
+    extra=1,  # Show 1 empty form by default
+    can_delete=True,  # Allow deletion of forms
+    widgets={
+        'company': forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Company name'
+        }),
+        'title': forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Job title'
+        }),
+        'start_date': forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+        'end_date': forms.DateInput(attrs={
+            'class': 'form-control',
+            'type': 'date'
+        }),
+    }
 )
 
-SocialLinksFormSet= inlineformset_factory(
+# Social Links Formset Configuration
+SocialLinksFormSet = inlineformset_factory(
     AgentInformation,
     SocialLinks,
-    fields=('social_platform', 'link_to_social'),
-    can_delete=True
+    fields=['social_platform', 'link_to_social'],
+    extra=1,  # Show 1 empty form by default
+    can_delete=True,  # Allow deletion of forms
+    widgets={
+        'social_platform': forms.Select(attrs={
+            'class': 'form-control'
+        }),
+        'link_to_social': forms.URLInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'https://example.com/profile'
+        }),
+    }
 )

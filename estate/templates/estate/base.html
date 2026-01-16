@@ -71,6 +71,22 @@
       border: none;
       display: flex;
       align-items: center;
+      gap: 1rem;
+      transition: opacity 0.5s ease;
+    }
+
+    .alert .btn-close {
+      width: 1.5rem !important;
+      height: 1.5rem !important;
+      min-width: 1.5rem !important;
+      min-height: 1.5rem !important;
+      padding: 0.3rem !important;
+      flex-shrink: 0 !important;
+      background-size: 1rem !important;
+    }
+
+    .alert.fade:not(.show) {
+      opacity: 0;
     }
 
     @keyframes slideInRight {
@@ -132,7 +148,7 @@
           <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             {{ message }}
-            <button type="button"="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         {% endif %}
       {% endfor %}

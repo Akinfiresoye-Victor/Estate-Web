@@ -161,14 +161,63 @@
       </div>
 
       <!-- Section 3: Work Experience -->
-      <div class="form-section">
-        <div class="section-header">
-          <span class="section-number">3</span>
-          <div class="section-info">
-            <h2 class="section-title">Work Experience</h2>
-            <p class="section-description">Add your professional experience</p>
-          </div>
-        </div>
+      <div id="experienceSection">
+    {{ exp_form.management_form }}
+    <div class="experience-forms">
+        {% for form in exp_form %}
+            <div class="experience-item">
+                <div class="experience-header">
+                    <h4>Experience #<span class="exp-number">{{ forloop.counter }}</span></h4>
+                    {% if not forloop.first %}
+                        <button type="button" class="btn-remove-exp">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <div class="form-grid">
+                    <!-- Hidden fields for formset management -->
+                    {{ form.id }}
+                    {% if form.DELETE %}
+                        <div style="display:none;">{{ form.DELETE }}</div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        {{ form.company }}
+                        {% if form.company.errors %}
+                            <span class="error-text">{{ form.company.errors }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Position/Title</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <span class="error-text">{{ form.title.errors }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        {{ form.start_date }}
+                        {% if form.start_date.errors %}
+                            <span class="error-text">{{ form.start_date.errors }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>End Date</label>
+                        {{ form.end_date }}
+                        {% if form.end_date.errors %}
+                            <span class="error-text">{{ form.end_date.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 
         <div class="section-body">
           <!-- Management Form -->
@@ -271,21 +320,47 @@
           </div>
 
           <!-- Social Forms Container -->
-          <div id="social-container" class="formset-container">
-            {% for form in soc_form %}
-              <div class="formset-item social-form" data-form-index="{{ forloop.counter0 }}">
-                <div class="formset-header">
-                  <h4 class="formset-title">
-                    <i class="bi bi-share me-2"></i>
-                    Social Link #<span class="form-number">{{ forloop.counter }}</span>
-                  </h4>
-                  {% if forloop.counter0 > 0 %}
-                    <button type="button" class="btn-remove-form" data-formset="social">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  {% endif %}
+          <div id="socialSection">
+    {{ social.management_form }}
+    <div class="social-forms">
+        {% for form in social %}
+            <div class="social-item">
+                <div class="social-header">
+                    <h4>Social Link #<span class="social-number">{{ forloop.counter }}</span></h4>
+                    {% if not forloop.first %}
+                        <button type="button" class="btn-remove-social">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    {% endif %}
                 </div>
-
+                
+                <div class="form-grid">
+                    <!-- Hidden fields for formset management -->
+                    {{ form.id }}
+                    {% if form.DELETE %}
+                        <div style="display:none;">{{ form.DELETE }}</div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label>Platform</label>
+                        {{ form.social_platform }}
+                        {% if form.social_platform.errors %}
+                            <span class="error-text">{{ form.social_platform.errors }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Profile URL</label>
+                        {{ form.link_to_social }}
+                        {% if form.link_to_social.errors %}
+                            <span class="error-text">{{ form.link_to_social.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
                 <div class="formset-body">
                   <div class="form-grid-two">
                     <div class="form-group">

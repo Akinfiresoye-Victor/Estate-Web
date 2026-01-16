@@ -251,7 +251,7 @@
               <span class="notes-preview">{{ appointment.note|truncatewords:8 }}</span>
             </td>
             <td>
-              <a href="{% url 'company:lead-detail' appointment.id %}" class="action-btn view" title="View Details">
+              <a href="{% url 'view-schedule' appointment.id %}" class="action-btn view" title="View Details">
                 <i class="bi bi-eye"></i>
               </a>
             </td>
