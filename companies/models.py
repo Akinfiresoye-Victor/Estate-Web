@@ -51,10 +51,9 @@ class CompanyAnalytics(models.Model):
     property_views_s=models.IntegerField('Listed Property views Sale', default=0)
     property_views_l=models.IntegerField('Listed Property views Lease', default=0)
     last_reset_date = models.DateTimeField('last reset date',default=timezone.now)
-    last_month_profile_views=models.IntegerField('last month profile views',default=1)
-    last_month_lease_views=models.IntegerField('last month lease views',default=1)
-    last_month_sale_views=models.IntegerField('last month sale views',default=1)
-    
+    average_profile_views=models.IntegerField('last month profile views',default=1)
+    average_lease_views=models.IntegerField('last month lease views',default=1)
+    average_sale_views=models.IntegerField('last month sale views',default=1)
     competition= models.IntegerField('competition', default=0)
     def __str__(self):
         return(self.company.company_name)

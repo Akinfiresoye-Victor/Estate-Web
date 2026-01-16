@@ -51,7 +51,7 @@ def wishlist_generator(properties_list, user_id):
 
 
 
-def property_view_count(property_id, property_type, users_id):
+def property_view_count(property_id, property_type, users_id, users_uuid):
     """
     Tracks Property Views
     """
@@ -65,6 +65,7 @@ def property_view_count(property_id, property_type, users_id):
             user_id=users_id,
             property_type=property_type,
             property_id=property_id,
+            uuid=users_uuid
         )
         new_object.save()
 
@@ -183,11 +184,12 @@ def view_property_on_sale(request, property_id):
             company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
             agent_in_charge=None
             messages.info(request, 'Corperate Listing')
+            property_view_count(property_id, "Sale", request.user.id,company_in_charge.unique_company_id)
         except CompanyInformation.DoesNotExist:
             agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
             company_in_charge=None
             messages.info(request, 'Agent Listing')
-        property_view_count(property_id, "Sale", request.user.id)
+            property_view_count(property_id, "Sale", request.user.id, agent_in_charge.agent_uuid)
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
@@ -223,12 +225,13 @@ def view_property_on_lease(request, property_id):
             company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
             agent_in_charge=None
             messages.info(request, 'Corperate Listing')
+            property_view_count(property_id, "Rent", request.user.id, company_in_charge.unique_company_id)
         except CompanyInformation.DoesNotExist:
             agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
             
             company_in_charge=None
             messages.info(request, 'Agent Listing')
-        property_view_count(property_id, "Rent", request.user.id)
+            property_view_count(property_id, "Rent", request.user.id, agent_in_charge.agent_uuid)
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
@@ -618,8 +621,8 @@ def review_company(request, company_uuid):
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
-
-
+#TODO Answer inquiry questions 
+#TODO Company and agent  profiles
 def inquiry_form(request, property_type, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')

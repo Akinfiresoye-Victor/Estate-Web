@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<a href="{%url 'company:dashboard'%}" class="back-button">
+<a href="{% url 'company:dashboard' %}" class="back-button">
     <i class="bi bi-arrow-left"></i>
     <span>Back</span>
 </a>
@@ -45,10 +45,12 @@
       <div class="metric-data">
         <p class="metric-label">Profile Views</p>
         <h3 class="metric-value">{{ profile_views|intcomma }}</h3>
+        {% if profile_incr_perc != 0 %}
         <div class="metric-trend {% if profile_incr_perc > 0 %}positive{% else %}negative{% endif %}">
           <i class="bi bi-arrow-{% if profile_incr_perc > 0 %}up{% else %}down{% endif %}"></i>
           <span>{{ profile_incr_perc|floatformat:1 }}%</span>
         </div>
+        {% endif %}
       </div>
     </div>
 
@@ -60,24 +62,36 @@
       <div class="metric-data">
         <p class="metric-label">Total Property Views</p>
         <h3 class="metric-value">{{ prop_views|intcomma }}</h3>
+        {% if total_prop_incr_perc != 0 %}
         <div class="metric-trend {% if total_prop_incr_perc > 0 %}positive{% else %}negative{% endif %}">
           <i class="bi bi-arrow-{% if total_prop_incr_perc > 0 %}up{% else %}down{% endif %}"></i>
           <span>{{ total_prop_incr_perc|floatformat:1 }}%</span>
         </div>
+        {% endif %}
       </div>
     </div>
 
-    <!-- Competition Score -->
+    <!-- Market Ranking -->
     <div class="metric-card">
-      <div class="metric-icon competition-icon">
-        <i class="bi bi-trophy-fill"></i>
+      <div class="metric-icon competition-icon {% if market_position < 10 %}elite{% elif market_position < 25 %}strong{% endif %}">
+        <i class="bi bi-{% if market_position < 1 %}trophy-fill{% elif market_position < 5 %}award-fill{% elif market_position < 25 %}star-fill{% else %}graph-up{% endif %}"></i>
       </div>
       <div class="metric-data">
-        <p class="metric-label">Market Performance</p>
-        <h3 class="metric-value">{{ competition|floatformat:1 }}%</h3>
-        <div class="metric-trend {% if competition > 0 %}positive{% else %}negative{% endif %}">
-          <i class="bi bi-{% if competition > 0 %}award{% else %}dash-circle{% endif %}"></i>
-          <span>{% if competition > 0 %}Above{% else %}Below{% endif %} Average</span>
+        <p class="metric-label">Market Ranking</p>
+        <h3 class="metric-value">{{ competition }}</h3>
+        <div class="metric-trend {% if market_position < 25 %}positive{% else %}neutral{% endif %}">
+          <i class="bi bi-{% if market_position < 10 %}arrow-up-circle-fill{% elif market_position < 25 %}dash-circle-fill{% else %}arrow-right-circle{% endif %}"></i>
+          <span>
+            {% if market_position < 1 %}Elite Performer
+            {% elif market_position < 5 %}Top Tier
+            {% elif market_position < 10 %}Excellent Standing
+            {% elif market_position < 25 %}Above Average
+            {% elif market_position < 50 %}Average Performance
+            {% else %}Growing Market Presence{% endif %}
+          </span>
+        </div>
+        <div class="percentile-indicator">
+          <small>Ranked {{ market_position|floatformat:1 }}th percentile</small>
         </div>
       </div>
     </div>
@@ -111,6 +125,9 @@
       </div>
       <div class="card-body">
         
+        {% widthratio sale_view sale_view|add:leased_view 100 as sale_percentage %}
+        {% widthratio leased_view sale_view|add:leased_view 100 as lease_percentage %}
+        
         <!-- Sale Properties -->
         <div class="property-breakdown">
           <div class="breakdown-header">
@@ -121,7 +138,6 @@
             <span class="breakdown-value">{{ sale_view|intcomma }}</span>
           </div>
           <div class="progress-bar-wrapper">
-            {% widthratio sale_view sale_view|add:leased_view 100 as sale_percentage %}
             <div class="progress-bar sale-bar" style="width: {{ sale_percentage }}%">
               <span class="progress-label">{{ sale_percentage }}%</span>
             </div>
@@ -144,7 +160,6 @@
             <span class="breakdown-value">{{ leased_view|intcomma }}</span>
           </div>
           <div class="progress-bar-wrapper">
-            {% widthratio leased_view sale_view|add:leased_view 100 as lease_percentage %}
             <div class="progress-bar lease-bar" style="width: {{ lease_percentage }}%">
               <span class="progress-label">{{ lease_percentage }}%</span>
             </div>
@@ -160,19 +175,19 @@
         <!-- Market Insight -->
         <div class="market-insight">
           <i class="bi bi-lightbulb-fill"></i>
-          {%if sale_percentage|add:0 > lease_percentage|add:0%}
-            {% if sale_percentage|add:0 > 59 %}
+          {% if sale_percentage > lease_percentage %}
+            {% if sale_percentage > 59 %}
               <p><strong>Sale-focused market:</strong> Your sale properties are attracting more attention. Consider adding premium listings.</p>
-            {% else%}
+            {% else %}
               <p><strong>Balanced market:</strong> You have a healthy mix of sale and lease interest.</p>
             {% endif %}
-          {%else%}
-            {% if lease_percentage|add:0 > 59 %}
+          {% else %}
+            {% if lease_percentage > 59 %}
               <p><strong>Lease-focused market:</strong> Rental properties are trending. Great time to promote lease options.</p>
-            {% else%}
+            {% else %}
               <p><strong>Balanced market:</strong> You have a healthy mix of sale and lease interest.</p>
             {% endif %}
-          {%endif%}
+          {% endif %}
         </div>
 
       </div>
@@ -197,13 +212,9 @@
             
             <div class="property-info">
               <h5 class="property-name">
-                {% if rank.property_category == "Residential" %}
-                  {{ rank.residential }}
-                {% elif rank.property_category == "Commercial" %}
-                  {{ rank.commercial }}
-                {% else %}
-                  {{ rank.lands }}
-                {% endif %}
+                {% if rank.property_category == "Residential" %}{{ rank.residential }}
+                {% elif rank.property_category == "Commercial" %}{{ rank.commercial }}
+                {% else %}{{ rank.lands }}{% endif %}
               </h5>
               <p class="property-details">
                 <i class="bi bi-tag"></i>{{ rank.property_category }}
@@ -318,15 +329,25 @@
         </div>
       {% endif %}
 
-      <!-- Competition Insight -->
-      {% if competition > 0 %}
+      <!-- Market Ranking Insight -->
+      {% if market_position < 10 %}
+        <div class="insight-card success-card">
+          <div class="insight-icon">
+            <i class="bi bi-trophy-fill"></i>
+          </div>
+          <div class="insight-content">
+            <h4>Elite Performance</h4>
+            <p>You're in the <strong>{{ competition }}</strong> of companies. Outstanding work!</p>
+          </div>
+        </div>
+      {% elif market_position < 25 %}
         <div class="insight-card success-card">
           <div class="insight-icon">
             <i class="bi bi-award"></i>
           </div>
           <div class="insight-content">
-            <h4>Market Leader</h4>
-            <p>You're performing <strong>{{ competition|floatformat:1 }}%</strong> better than competitors. Excellent work!</p>
+            <h4>Strong Market Position</h4>
+            <p>You're in the <strong>{{ competition }}</strong>. Keep pushing to reach the top tier!</p>
           </div>
         </div>
       {% else %}
@@ -336,7 +357,7 @@
           </div>
           <div class="insight-content">
             <h4>Room for Growth</h4>
-            <p>Competitors are gaining traction. Focus on quality listings and consistent updates to improve your position.</p>
+            <p>Focus on quality listings and consistent updates to climb from <strong>{{ competition }}</strong> to a higher tier.</p>
           </div>
         </div>
       {% endif %}
@@ -355,8 +376,21 @@
 
     // Export Report Function
     window.exportReport = function() {
-        alert('Export functionality will be implemented soon!');
+        // Create print-friendly view
+        window.print();
     };
+
+    // Animate progress bars on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 100);
+        });
+    });
 
 })();
 </script>

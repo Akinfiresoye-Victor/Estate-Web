@@ -155,12 +155,15 @@
           </div>
 
           <div class="stat-card">
-            <div class="stat-icon views">
-              <i class="bi bi-eye"></i>
+            <div class="stat-icon views {% if market_position <= 10 %}top-performer{% elif market_position <= 25 %}above-average{% endif %}">
+              <i class="bi bi-{% if market_position <= 1 %}trophy-fill{% elif market_position <= 5 %}award-fill{% elif market_position <= 25 %}star-fill{% else %}graph-up{% endif %}"></i>
             </div>
             <div class="stat-data">
-              <h3>{{ total_views|default:"0" }}</h3>
-              <p>Profile Views</p>
+              <h3>{{ competition }}</h3>
+              <p>Market Ranking</p>
+              {% if market_position <= 25 %}
+                <small class="ranking-badge">{{ market_position|floatformat:"1" }}th percentile</small>
+              {% endif %}
             </div>
           </div>
 

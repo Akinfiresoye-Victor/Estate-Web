@@ -786,3 +786,22 @@
 .tool-card.coming-soon:hover::after {
   opacity: 1;
 }
+/* Dashboard stat card enhancements */
+.stat-icon.top-performer {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.stat-icon.above-average {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.ranking-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 12px;
+  color: #4CAF50;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}

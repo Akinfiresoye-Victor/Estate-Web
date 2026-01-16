@@ -105,6 +105,7 @@ class PropertyViews(models.Model):
     user_id=models.IntegerField('Users ID', default=1, blank=False, null=False)
     property_type=models.CharField('Property Type', default="Rent", blank=False, null=False)
     property_id=models.IntegerField('Property ID Viewed', default=1, blank=False, null=False)
+    uuid=models.CharField('UUID',blank=False, null=False, default='da5dac64-3448-48a7-a209-4c84010d9ad2')
 
 
 class Appointments(models.Model):
