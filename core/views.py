@@ -331,57 +331,55 @@ def update_property_sale(request, property_id):
 
 #view to delete listings
 def delete_property_on_lease(request, property_id):
-    if request.user.is_authenticated:
-        
-        try:
-            #deleting using th property id
-            property1= PropertyManagementRent.objects.get(pk=property_id)
-            #protects against other user deleting ones property
-            if request.user.id == property1.user_id:
-                #what does the actual deleting based on the property_id
-                property1.delete()
-                messages.success(request, ("Property deleted successfully"))
-                return redirect('listings')
-            
-            else:
-                messages.warning(request, ('You Arent authorized to delete this property'))
-                return redirect('listings')
-            
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e})
-        
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.error(request, 'Access Denied')
         return redirect('landing')
-
+    try:
+        #deleting using th property id
+        property1= PropertyManagementRent.objects.get(pk=property_id)
+        #protects against other user deleting ones property
+        if request.user.id == property1.user_id:
+            #what does the actual deleting based on the property_id
+            property1.delete()
+            messages.success(request, ("Property deleted successfully"))
+            return redirect('listings')
+        
+        else:
+            messages.error(request, ('Access Denied'))
+            return redirect('listings')
+        
+    except Exception as e:
+        print(f'ERROR IS{e}')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 #view to delete listings
 def delete_property_on_sale(request, property_id):
-    if request.user.is_authenticated:
-        
-        try:
-            property1= PropertyManagementSale.objects.get(pk=property_id)
-            
-            #Additional layer of security
-            if request.user.id == property1.user_id:
-                property1.delete()
-                messages.success(request, ("Property deleted successfully"))
-                return redirect('listings')
-            
-            else:
-                messages.warning(request, ('You Arent authorized to delete this property'))
-                return redirect('listings')
-            
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e})
-        
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.error(request, 'Access Denied')
         return redirect('landing')
-
-
+    try:
+        property1= PropertyManagementSale.objects.get(pk=property_id)
+        
+        #Additional layer of security
+        if request.user.id == property1.user_id:
+            property1.delete()
+            messages.success(request, ("Property deleted successfully"))
+            return redirect('listings')
+        
+        else:
+            messages.warning(request, ('Access Denied'))
+            return redirect('listings')
+        
+    except Exception as e:
+        print(f'ERROR IS{e}')
+        return render(request, 'estate/error_page.html', {'e': e})
+# FIXME Delete Problem if a property is deleted everything must be deleted alongside with it 
 #view handling users listings
 def listed_properties(request):
     if request.user.is_authenticated:
@@ -449,7 +447,7 @@ def add_schedule(request):
         return redirect('login')
     
     if request.user.role == 'customer':
-        messages.danger(request, 'Access Denied')
+        messages.error(request, 'Access Denied')
         return redirect('landing')
     
     try:
@@ -516,7 +514,7 @@ def appointment(request):
         messages.info(request, "Login Required")
         return redirect('login')
     if request.user.role == 'customer':
-        messages.danger(request, 'Access Denied')
+        messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
         user_role=request.user.role
@@ -678,7 +676,7 @@ def view_client(request, appointment_id):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.danger(request, 'Access Denied')
+        messages.error(request, 'Access Denied')
         return redirect('landing')
     user_role = request.user.role
     if user_role == 'company':
@@ -704,13 +702,14 @@ def add_client(request, lead_uuid, appointment_id):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.danger(request, 'Access Denied')
+        messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
         appointment_data= Appointments.objects.get(pk=appointment_id)
         lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
         appointment_data.lead_uuid= lead_data.lead_id
         appointment_data.save()
+        messages.success(request, 'Client Added')
         return redirect('view-schedule', appointment_id)
     except Exception as e:
         return render(request, 'estate/error_page', {'e':e})
@@ -721,9 +720,40 @@ def delete_client(request, appointment_id):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.danger(request, 'Access Denied')
+        messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
-        pass
+        appointment=Appointments.objects.get(pk=appointment_id)
+        if request.user.role == 'company':
+            try:
+                company= CompanyInformation.objects.get(user_id=request.user.id)
+                if appointment.company_uuid == company.unique_company_id:
+                    appointment.lead_uuid = None
+                    appointment.save()
+                    messages.success(request, 'Client Info Removed')
+                    return redirect('view-schedule', appointment_id)
+                else:
+                    messages.error(request, 'Access Denied')
+                    return redirect('landing')
+            except ObjectDoesNotExist:
+                messages.error(request, 'An error occured')
+                return redirect('landing')
+        elif request.user.role == 'agent':
+            try:
+                agent=AgentInformation.objects.get(user_id=request.user.id)
+                if appointment.agent_uuid == agent.agent_uuid:
+                    appointment.lead_uuid = None
+                    appointment.save()
+                    messages.success(request, 'Client Info Removed')
+                    return redirect('view-schedule', appointment_id)
+                else:
+                    messages.error(request, 'Access Denied')
+                    return redirect('landing')
+            except ObjectDoesNotExist:
+                messages.error(request, 'An error occured')
+                return redirect('landing')
+        else:
+            messages.error(request, 'Access Denied')
+            return redirect('landing')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})

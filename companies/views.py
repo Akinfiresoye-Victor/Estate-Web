@@ -78,7 +78,7 @@ def dashboard(request):
         return redirect('landing')
         
     if request.user.role != 'company':
-        messages.danger(request, 'Company account only')
+        messages.error(request, 'Company account only')
         return redirect('landing')
 
     try:
@@ -271,7 +271,7 @@ def dashboard(request):
 def company_form(request):
     if request.user.is_authenticated:
         if not request.user.role == 'company':
-            messages.danger(request, 'Company account only')
+            messages.error(request, 'Company account only')
             return redirect('landing')
         try:
             submitted=False
@@ -353,7 +353,7 @@ def company_analytics(request):
         return redirect('login')
         
     if request.user.role != 'company':
-        messages.danger(request, 'Company account only')
+        messages.error(request, 'Company account only')
         return redirect('landing')
 
     try:
@@ -588,7 +588,7 @@ def lead_management(request):
             messages.info(request, 'You have to be logged in to access this page')
             return redirect('landing')
         if not request.user.role == 'company':
-            messages.danger(request, 'You have to open a company account to access this page')
+            messages.error(request, 'You have to open a company account to access this page')
             return redirect('landing')
         company_uuid=CompanyInformation.objects.get(user_id=request.user.id).unique_company_id    
         general_leads=LeadInfo.objects.filter(company_uuid=company_uuid)
@@ -644,7 +644,11 @@ def lead_detail(request, lead_id):
 
 
 def delete_lead(request, lead_id):
-    if not request.user.is_authenticated and request.user.role == 'company':
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.error(request, 'Access denied')
         return redirect('landing')
     try:
         company= CompanyInformation.objects.get(user_id=request.user.id)
@@ -654,7 +658,7 @@ def delete_lead(request, lead_id):
             messages.success(request, "Lead Deleted")
             return redirect('company:lead-management')
         else:
-            messages.warning(request, "You aren't authorized to perform that action")
+            messages.error(request, "Access Denied")
             return redirect('landing')
     except Exception as e:
         return render(request, 'estate/error_page', {e})

@@ -21,5 +21,6 @@ urlpatterns = [
     path('mylistings', views.manaage_listings, name='listings'),
     path('edit_schedule/<appointment_id>', views.edit_appointment, name='edit-schedule'),
     path('lead_list/<appointment_id>', views.view_client, name='view-client'),
-    path('add_client/<lead_uuid>/<appointment_id>', views.add_client, name='add-client')
+    path('add_client/<lead_uuid>/<appointment_id>', views.add_client, name='add-client'),
+    path('del_client_info/<appointment_id>', views.delete_client, name='delete-client-info')
 ]

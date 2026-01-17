@@ -12,6 +12,28 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 <div id="lead_id_data" data-lead-id="{{ lead.id }}" data-update-url="{% url 'company:update-lead-status' lead.id %}" style="display: none;"></div>
 
+
+<!-- Delete Confirmation Modal-->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="delete-modal-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this lead? This action cannot be undone and all associated data will be permanently removed.</p>
+        <div class="delete-modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+            </button>
+            <a href="#" id="confirmDeleteBtn" class="modal-btn modal-btn-delete">
+                <i class="bi bi-trash me-2"></i>Yes, Delete
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- Page Header -->
 <div class="lead-header">
   <div class="container-fluid">
@@ -339,7 +361,7 @@
               <i class="bi bi-calendar-plus"></i>
               Schedule Follow-up
             </button>
-            <button class="action-item danger" onclick="deleteLead()">
+            <button class="action-item danger" onclick="showDeleteModal('{%url 'company:delete-lead' lead.lead_id%}')" title= "Delete">
               <i class="bi bi-trash"></i>
               Delete Lead
             </button>
@@ -487,5 +509,38 @@
     };
 
 })();
+
+// Delete Modal Functions
+function showDeleteModal(deleteUrl) {
+  const modal= document.getElementById('deleteModal');
+  const confirmBtn= document.getElementById('confirmDeleteBtn');
+
+  if (modal && confirmBtn) {
+    confirmBtn.href= deleteUrl;
+    modal.classList.add('active');
+  }
+}
+
+function closeDeleteModal(){
+  const modal= document.getElementById('deleteModal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+document.addEventListener('click', function(e){
+  const modal= document.getElementById('deleteModal');
+  if (e.target === modal) {
+    closeDeleteModal();
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') {
+    closeDeleteModal();
+  }
+});
+
+
 </script>
 {% endblock %}

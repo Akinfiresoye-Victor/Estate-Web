@@ -11,5 +11,6 @@ urlpatterns = [
     path('lead/management', views.lead_management, name='leads'),
     path('analytics', views.analytics, name='analytics'),
     path('lead/detail/<lead_id>', views.lead_detail, name='lead-detail'),
-    path('settings', views.settings, name='settings')
+    path('settings', views.settings, name='settings'),
+    path('lead/delete/<lead_id>', views.delete_lead, name='delete-lead')
 ]

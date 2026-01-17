@@ -100,7 +100,7 @@ def agent_form(request):
     
     # Check if user is an agent
     if request.user.role != 'agent':
-        messages.danger(request, 'Account must be an Agent account to access this page')
+        messages.error(request, 'Account must be an Agent account to access this page')
         return redirect('landing')
     
     try:
@@ -223,7 +223,7 @@ def update_agent_profile(request, agent_id):
         messages.info(request, 'You have to be logged in to access this page')
         return redirect('landing')
     if request.user.role != 'agent':
-        messages.danger(request, 'Open an agent account to access this page')
+        messages.error(request, 'Open an agent account to access this page')
         return redirect('landing')
     try:
         agent_information=AgentInformation.objects.get(pk=agent_id)
@@ -248,7 +248,7 @@ def lead_management(request):
         messages.info(request, "Login Required")
         return redirect('login')
     if request.user.role != 'agent':
-        messages.danger(request, "Agent's Only")
+        messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
@@ -276,7 +276,7 @@ def agent_profile(request, agent_uuid):
         messages.info(request, 'Login Required')
         return redirect('landing')
     if not request.user.role == 'customer':
-        messages.danger(request, 'Customer Access Only')
+        messages.error(request, 'Customer Access Only')
         return redirect('landing')
     
     try:
@@ -313,7 +313,7 @@ def analytics(request):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.danger(request, "Agent's Only")
+        messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id= request.user.id)
@@ -323,10 +323,10 @@ def analytics(request):
         sale_views_list=[]
         
         for prop_id in agent_lease_properties:
-            view=property_views_count("Rent", prop_id.pk, reset=False)
+            view=property_views_count("Rent", prop_id.pk)
             lease_views_list.append(view)
         for prop_id in agent_sales_properties:
-            view=property_views_count("Sale", prop_id.pk, reset=False)
+            view=property_views_count("Sale", prop_id.pk)
             sale_views_list.append(view)
         listing_views= sum(lease_views_list) + sum(sale_views_list)
         
@@ -371,7 +371,7 @@ def lead_detail(request, lead_id):
         messages.info(request, 'Login Required')
         return render('login')
     if request.user.role != 'agent':
-        messages.danger(request, "Agent's Only")
+        messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
@@ -390,12 +390,35 @@ def settings(request):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.danger(request, "Agent's Only")
+        messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
         return render(request, 'agent/settings.html')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+
+def delete_lead(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.error(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        agent= AgentInformation.objects.get(user_id=request.user.id)
+        lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
+        if agent.agent_uuid == lead_to_delete.agent_id:
+            lead_to_delete.delete()
+            messages.success(request, "Lead Deleted")
+            return redirect('agent:leads')
+        else:
+            messages.error(request, "Access Denied")
+            return redirect('landing')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
+
+
+
 
 
 #TODO Perform proper error handling even in places you think error cant occur
