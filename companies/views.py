@@ -619,8 +619,6 @@ def lead_management(request):
         unqualified=general_leads.filter(status= 'Unqualified')
 
 
-
-
         context= {'lead_count':lead_count, 'new_leads': new_leads, 'leads':leads,'potential':potential_friend,
                     'potential_count': potential_friend.count(),'true_friend': true_friend,'true_friend_count':true_friend.count(),
                     'contracted':contracted,'contracted_count':contracted.count(),'closed':closed,'closed_count':closed.count(),
@@ -828,3 +826,5 @@ def properties_by_company(request, company_uuid):
 
 
 
+def delete_company():
+    pass

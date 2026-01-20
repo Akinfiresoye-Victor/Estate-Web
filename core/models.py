@@ -4,7 +4,7 @@ import django
 from .validators import validate_image
 from django.utils import timezone
 from members.models import User 
-
+import uuid
 
 
 
@@ -117,5 +117,6 @@ class Appointments(models.Model):
     appointment_type=models.CharField('Appointment type',choices=APPOINTMENT_TYPE, default='Personal', blank=False, null=False)
     property_id=models.IntegerField('Property ID', default=None, blank=True, null=True)
     property_type=models.CharField('Property Type', default=None, blank=True, null=True)
+    appointment_uuid=models.CharField('UUID', default=uuid.uuid4(), blank=False, null=False, unique=True)
     def __str__(self):
         return f'Appointment: {self.pk}- {self.note}'

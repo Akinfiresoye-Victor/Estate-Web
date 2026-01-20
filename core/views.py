@@ -31,220 +31,202 @@ def about_page(request):
 
 '''Users Feedbacks'''
 def feedbacks(request):
-    if request.user.is_authenticated:
-        try:
-            submitted = False
-            user_role=request.user.role
-            if user_role == 'company':
-                base_template = 'company/base.html'
-            elif user_role == 'agent':
-                base_template = 'agent/base.html'
-            else:
-                base_template='estate/base.html'
-            if request.method == 'POST':
-                messages.success(request, 'Thanks For your feedback....')
-                form = FeedbackForm(request.POST)
-                if form.is_valid():
-                    form.save()
-                    submitted=True
-                    return redirect('feedback')
-            else:
-                form = FeedbackForm()
-                if 'submitted' in request.GET:
-                    submitted = True
-            return render(request, 'core/feedback.html', {'form': form, 'submitted': submitted, 'base_template':base_template})
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e}, {e})
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('landing')
-    
-    
-    
+    try:
+        submitted = False
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        if request.method == 'POST':
+            messages.success(request, 'Thanks For your feedback....')
+            form = FeedbackForm(request.POST)
+            if form.is_valid():
+                form.save()
+                submitted=True
+                return redirect('feedback')
+        else:
+            form = FeedbackForm()
+            if 'submitted' in request.GET:
+                submitted = True
+        return render(request, 'core/feedback.html', {'form': form, 'submitted': submitted, 'base_template':base_template})
+    except Exception as e:
+        messages.error(request, 'Tell us the Error')
+        return render(request, 'estate/error_page.html', {'e': e})
 '''Property Management'''
 
 #listing properties for sale
 def sell_property(request):
-    if request.user.is_authenticated:
-        
-        #user must have an email before he/she can list a property
-        if (request.user.role == 'customer' and request.user.email) or (request.user.role == 'company' or request.user.role == 'agent'):
-            
-            try:
-                user_role=request.user.role
-                if user_role == 'company':
-                    base_template = 'company/base.html'
-                elif user_role == 'agent':
-                    base_template = 'agent/base.html'
-                else:
-                    base_template='estate/base.html'
-                submitted= False
-
-                if request.method== 'POST':
-                    prop_form=SellForm(request.POST or None, request.FILES or None)
-                    image_form=SaleImageFormSet(request.POST or None, request.FILES or None)
-                    if prop_form.is_valid() and image_form.is_valid():
-                        with transaction.atomic():
-                            landlord= prop_form.save(commit=False)
-                            category = prop_form.cleaned_data.get('property_category')
-                            # Clear the non-selected fields
-                            if category == 'Residential':
-                                landlord.commercial = ''
-                                landlord.lands = ''
-                            elif category == 'Commercial':
-                                landlord.residential = ''
-                                landlord.lands = ''
-                            elif category == 'Land':
-                                landlord.residential = ''
-                                landlord.commercial = ''
-                            try:
-                                company= CompanyInformation.objects.get(user_id= request.user.id)
-                                landlord.company_uuid= company.unique_company_id
-                                landlord.user_id= request.user.id
-                                landlord.time_stamp=timezone.now()
-                                landlord.save()
-                                image_form.instance=landlord
-                                image_form.save()
-                            except CompanyInformation.DoesNotExist:
-                                agent=AgentInformation.objects.get(user_id=request.user.id)
-                                landlord.agent_uuid=str(agent.agent_uuid)
-                                if agent.company_uuid:
-                                    landlord.company_uuid = agent.company_uuid
-                                landlord.user_id= request.user.id
-                                landlord.time_stamp= timezone.now()
-                                landlord.save()
-                                image_form.instance=landlord
-                                image_form.save()
-                        return HttpResponseRedirect('?submitted=True')
-                    else:
-                        return render(request, 'estate/error_page.html', {'e': prop_form.errors})
-                else:
-                    prop_form= SellForm()
-                    image_form=SaleImageFormSet()
-                    
-                    if 'submitted' in request.GET:
-                        submitted=True
-                
-                return render(request, 'core/sell_property.html', {'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template})
-            
-            except Exception as e:
-                print(f'ERROR IS{e}')
-                return render(request, 'estate/error_page.html', {'e': e})
-        
-        else:
-                messages.info(request, 'Verify your email to start listing with us')
-                return redirect('customer:update-profile', user_id=request.user.id)
-    else:
-        messages.info(request, ('Join us Now to start'))
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login in required')
         return redirect('login')
+    #user must have an email before he/she can list a property
+    if request.user.role == 'customer':
+        messages.info(request, 'Feature Coming Out Soon')
+        return redirect('landing')
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        submitted= False
 
+        if request.method== 'POST':
+            prop_form=SellForm(request.POST or None, request.FILES or None)
+            image_form=SaleImageFormSet(request.POST or None, request.FILES or None)
+            if prop_form.is_valid() and image_form.is_valid():
+                with transaction.atomic():
+                    landlord= prop_form.save(commit=False)
+                    category = prop_form.cleaned_data.get('property_category')
+                    # Clear the non-selected fields
+                    if category == 'Residential':
+                        landlord.commercial = ''
+                        landlord.lands = ''
+                    elif category == 'Commercial':
+                        landlord.residential = ''
+                        landlord.lands = ''
+                    elif category == 'Land':
+                        landlord.residential = ''
+                        landlord.commercial = ''
+                    try:
+                        company= CompanyInformation.objects.get(user_id= request.user.id)
+                        landlord.company_uuid= company.unique_company_id
+                        landlord.user_id= request.user.id
+                        landlord.time_stamp=timezone.now()
+                        landlord.save()
+                        image_form.instance=landlord
+                        image_form.save()
+                    except CompanyInformation.DoesNotExist:
+                        agent=AgentInformation.objects.get(user_id=request.user.id)
+                        landlord.agent_uuid=str(agent.agent_uuid)
+                        if agent.company_uuid:
+                            landlord.company_uuid = agent.company_uuid
+                        landlord.user_id= request.user.id
+                        landlord.time_stamp= timezone.now()
+                        landlord.save()
+                        image_form.instance=landlord
+                        image_form.save()
+                return HttpResponseRedirect('?submitted=True')
+            else:
+                return render(request, 'estate/error_page.html', {'e': prop_form.errors})
+        else:
+            prop_form= SellForm()
+            image_form=SaleImageFormSet()
+            
+            if 'submitted' in request.GET:
+                submitted=True
+        context={'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template}
+        return render(request, 'core/sell_property.html', context)
+    
+    except Exception as e:
+        messages.error(request, 'Tell us the Error')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 #listing properties for rent
 def lease_property(request):
-    if request.user.is_authenticated:
-        
-        #user must have an email befre he/she can list with us
-        if (request.user.role == 'customer' and request.user.email) or (request.user.role == 'company' or request.user.role == 'agent'):
-            
-            try:
-                submitted= False
-                user_role=request.user.role
-                if user_role == 'company':
-                    base_template = 'company/base.html'
-                elif user_role == 'agent':
-                    base_template = 'agent/base.html'
-                else:
-                    base_template='estate/base.html'
-                if request.method== 'POST':
-                    prop_form=LeaseForm(request.POST or None, request.FILES or None) #request.FILES to handle the images 
-                    image_form=RentImageFormSet(request.POST or None, request.FILES or None)
-                    if prop_form.is_valid() and image_form.is_valid():
-                        with transaction.atomic():
-                            landlord= prop_form.save(commit=False)
-                            category = prop_form.cleaned_data.get('property_category')
-                            
-                            # Clear the non-selected fields
-                            if category == 'Residential':
-                                landlord.commercial = ''
-                                landlord.lands = ''
-                            elif category == 'Commercial':
-                                landlord.residential = ''
-                                landlord.lands = ''
-                            elif category == 'Land':
-                                landlord.residential = ''
-                                landlord.commercial = ''
-                            try:
-                                company= CompanyInformation.objects.get(user_id= request.user.id)
-                                landlord.company_uuid= company.unique_company_id
-                                landlord.user_id= request.user.id
-                                landlord.time_stamp= timezone.now()
-                                landlord.save()
-                                image_form.instance=landlord
-                                image_form.save()
-                            except CompanyInformation.DoesNotExist:
-                                agent= AgentInformation.objects.get(user_id=request.user.id)
-                                landlord.agent_uuid= agent.agent_uuid
-                                if agent.company_uuid != None:
-                                    landlord.company_uuid= agent.company_uuid
-                                landlord.user_id= request.user.id
-                                landlord.time_stamp= timezone.now()
-                                landlord.save()
-                                image_form.instance=landlord
-                                image_form.save()
-                            #making sure form is submitted once
-                            return HttpResponseRedirect('?submitted=True')
-                    else:
-                        return render(request, 'estate/error_page.html', {'e': prop_form.errors})
-                else:
-                    prop_form= LeaseForm()
-                    image_form=RentImageFormSet()
-                    if 'submitted' in request.GET:
-                        submitted=True
-                        
-                return render(request, 'core/lease_property.html', {'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template})
-            
-            except Exception as e:
-                print(f'ERROR IS {e}')
-                return render(request, 'estate/error_page.html', {'e': e})
-            
-        else:
-            messages.info(request, 'Verify email to start listing with us')
-            return redirect('customer:update-profile', user_id=request.user.id)
-
-    else:
-        messages.info(request, ('Join us Now to start'))
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
         return redirect('login')
+    #user must have an email befre he/she can list with us
+    if request.user.role == 'customer':
+        messages.info(request, 'Coming out soon')
+        return redirect('landing')
+        
+    try:
+        submitted= False
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        if request.method== 'POST':
+            prop_form=LeaseForm(request.POST or None, request.FILES or None) #request.FILES to handle the images 
+            image_form=RentImageFormSet(request.POST or None, request.FILES or None)
+            if prop_form.is_valid() and image_form.is_valid():
+                with transaction.atomic():
+                    landlord= prop_form.save(commit=False)
+                    category = prop_form.cleaned_data.get('property_category')
+                    
+                    # Clear the non-selected fields
+                    if category == 'Residential':
+                        landlord.commercial = ''
+                        landlord.lands = ''
+                    elif category == 'Commercial':
+                        landlord.residential = ''
+                        landlord.lands = ''
+                    elif category == 'Land':
+                        landlord.residential = ''
+                        landlord.commercial = ''
+                    try:
+                        company= CompanyInformation.objects.get(user_id= request.user.id)
+                        landlord.company_uuid= company.unique_company_id
+                        landlord.user_id= request.user.id
+                        landlord.time_stamp= timezone.now()
+                        landlord.save()
+                        image_form.instance=landlord
+                        image_form.save()
+                    except CompanyInformation.DoesNotExist:
+                        agent= AgentInformation.objects.get(user_id=request.user.id)
+                        landlord.agent_uuid= agent.agent_uuid
+                        if agent.company_uuid != None:
+                            landlord.company_uuid= agent.company_uuid
+                        landlord.user_id= request.user.id
+                        landlord.time_stamp= timezone.now()
+                        landlord.save()
+                        image_form.instance=landlord
+                        image_form.save()
+                    #making sure form is submitted once
+                    return HttpResponseRedirect('?submitted=True')
+            else:
+                return render(request, 'estate/error_page.html', {'e': prop_form.errors})
+        else:
+            prop_form= LeaseForm()
+            image_form=RentImageFormSet()
+            if 'submitted' in request.GET:
+                submitted=True
+        context={'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template}
+        return render(request, 'core/lease_property.html', context)
+    except Exception as e:
+        messages.error(request, 'Tell us the Error')
+        return render(request, 'estate/error_page.html', {'e': e})
+        
 
 
 '''News Blog Automation'''
 def articles(request):
-    if request.user.is_authenticated:
-        try:
-            user_role=request.user.role
-            if user_role == 'company':
-                base_template = 'company/base.html'
-            elif user_role == 'agent':
-                base_template = 'agent/base.html'
-            else:
-                base_template='estate/base.html'
-            #news headlines
-            headlines= ns.bs.find('div', class_="blog-item-title")
-            headlines=headlines.text
-            #estate article content
-            article= ns.bs.find('div', class_="blog-item-content e-content")
-            article=article.text
-            full_article= "https://www.nigeriahousingmarket.com/"
-            return render(request,'core/article.html', {'headline':headlines,
-                                                        'article':article,
-                                                        "full_article":full_article,
-                                                        'base_template':base_template})
-        except:
-            messages.error(request, ns.error)
-            return redirect('customer:user-profile')
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('landing')
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        #news headlines
+        headlines= ns.bs.find('div', class_="blog-item-title")
+        headlines=headlines.text
+        #estate article content
+        article= ns.bs.find('div', class_="blog-item-content e-content")
+        article=article.text
+        full_article= "https://www.nigeriahousingmarket.com/"
+        return render(request,'core/article.html', {'headline':headlines,
+                                                    'article':article,
+                                                    "full_article":full_article,
+                                                    'base_template':base_template})
+    except Exception as e:
+        messages.error(request, 'Tell us the Error')
+        e=f'News:{e}-- {ns.error}'
+        return render(request, 'estate/error_page.html',{'e': e} )
 
 
 
@@ -252,81 +234,77 @@ def articles(request):
 
 #view to update listed property on rent
 def update_property_rent(request, property_id):
-    if request.user.is_authenticated:
-        
-        try:
-            #gets the particular listing that needs to be updated using the property id
-            property=PropertyManagementRent.objects.get(pk= property_id)
-            user_role=request.user.role
-            if user_role == 'company':
-                base_template = 'company/base.html'
-            elif user_role == 'agent':
-                base_template = 'agent/base.html'
-            else:
-                base_template='estate/base.html'
-            #limiting update property acess to the owner of listing
-            if property.user_id == request.user.id:
-                prop_form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
-                image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property)
-
-                if prop_form.is_valid() and image_form.is_valid():
-                    prop_form.save()
-                    image_form.save()
-                    messages.success(request, "Property Updated Successfully")
-                    print(property.base_image.url)
-                    return redirect('listings')
-                return render(request, 'core/update_property.html', {'property': property, 'form': prop_form, 'images': image_form, 'base_template':base_template})
-            
-            else:
-                messages.warning(request, 'You do not have access to this page')
-                return redirect('customer:user-profile')
-            
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e})
-        
-    else:
-        messages.info(request, ('You need to be logged in to accesss this page'))
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login required')
         return redirect('landing')
+    if not request.user.role == 'customer':
+        messages.info(request, 'Coming out soon')
+        return redirect('landing')
+    try:
+        #gets the particular listing that needs to be updated using the property id
+        property=PropertyManagementRent.objects.get(pk= property_id)
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        #limiting update property acess to the owner of listing
+        if property.user_id != request.user.id:
+            messages.warning(request, 'ACCESS DENIED')
+            return redirect('landing')
+        prop_form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
+        image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property)
+
+        if prop_form.is_valid() and image_form.is_valid():
+            prop_form.save()
+            image_form.save()
+            messages.success(request, "Property Updated Successfully")
+            return redirect('listings')
+        return render(request, 'core/update_property.html', {'property': property, 'form': prop_form, 'images': image_form, 'base_template':base_template})
+        
+        
+    except Exception as e:
+        messages.error(request, 'Tell us the Error')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 #view to update listed property on rent
 def update_property_sale(request, property_id):
-    if request.user.is_authenticated:
-        
-        try:
-            #updating the particular listing that needs to be updated using the property id
-            property=PropertyManagementSale.objects.get(pk= property_id)
-            user_role=request.user.role
-            if user_role == 'company':
-                base_template = 'company/base.html'
-            elif user_role == 'agent':
-                base_template = 'agent/base.html'
-            else:
-                base_template='estate/base.html'
-            #limiting update access to owner of listings
-            if property.user_id == request.user.id:
-                prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
-                image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
-                
-                if prop_form.is_valid() and image_form.is_valid():
-                    prop_form.save()
-                    image_form.save()
-                    messages.success(request, "Property Updated Successfully")
-                    return redirect('listings')
-                return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
-            
-            else:
-                messages.warning(request, 'You do not have access to this page')
-                return redirect('customer:user-profile')
-            
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e})
-        
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.info(request, 'Coming out soon')
         return redirect('landing')
+    try:
+        #updating the particular listing that needs to be updated using the property id
+        property=PropertyManagementSale.objects.get(pk= property_id)
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        #limiting update access to owner of listings
+        if property.user_id != request.user.id:
+            messages.warning(request, 'ACCESS DENIED')
+            return redirect('landing')
+        prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
+        image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
+        
+        if prop_form.is_valid() and image_form.is_valid():
+            prop_form.save()
+            image_form.save()
+            messages.success(request, "Property Updated Successfully")
+            return redirect('listings')
+        return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
+        
+    except Exception as e:
+        messages.error(request, 'Tell us the Error')
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 #view to delete listings
@@ -341,18 +319,16 @@ def delete_property_on_lease(request, property_id):
         #deleting using th property id
         property1= PropertyManagementRent.objects.get(pk=property_id)
         #protects against other user deleting ones property
-        if request.user.id == property1.user_id:
-            #what does the actual deleting based on the property_id
-            property1.delete()
-            messages.success(request, ("Property deleted successfully"))
-            return redirect('listings')
-        
-        else:
-            messages.error(request, ('Access Denied'))
-            return redirect('listings')
-        
+        if request.user.id != property1.user_id:
+            messages.warning(request, 'ACCESS DENIED')
+            return redirect('landing')
+        #what does the actual deleting based on the property_id
+        property1.delete()
+        messages.success(request, ("Property deleted successfully"))
+        return redirect('listings')
+        # TODO Come back here to make sure its deleted properly(Lead, other related items)
     except Exception as e:
-        print(f'ERROR IS{e}')
+        messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
 
 #view to delete listings
@@ -361,47 +337,25 @@ def delete_property_on_sale(request, property_id):
         messages.info(request, 'Login Required')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.warning(request, 'Access Denied')
         return redirect('landing')
     try:
         property1= PropertyManagementSale.objects.get(pk=property_id)
         
         #Additional layer of security
-        if request.user.id == property1.user_id:
-            property1.delete()
-            messages.success(request, ("Property deleted successfully"))
-            return redirect('listings')
-        
-        else:
-            messages.warning(request, ('Access Denied'))
-            return redirect('listings')
-        
+        if request.user.id != property1.user_id:
+            messages.warning(request, 'Access Denied')
+            return redirect()
+        property1.delete()
+        messages.success(request, ("Property deleted successfully"))
+        return redirect('listings')
+        # TODO Come back here to make sure its deleted properly(Lead, other related items)
     except Exception as e:
-        print(f'ERROR IS{e}')
+        messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
 # FIXME Delete Problem if a property is deleted everything must be deleted alongside with it 
 #view handling users listings
-def listed_properties(request):
-    if request.user.is_authenticated:
-        try:
-            user_role=request.user.role
-            if user_role == 'company':
-                base_template = 'company/base.html'
-            elif user_role == 'agent':
-                base_template = 'agent/base.html'
-            else:
-                base_template='estate/base.html'
-            model= request.user.id
-            property1= PropertyManagementRent.objects.filter(user_id=model).order_by('-listed_date')
-            property2= PropertyManagementSale.objects.filter(user_id=model).order_by('-listed_date')
-            return render(request, 'core/my_listings.html', {'property1':property1, 'property2':property2, 'base_template':base_template})
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e})
-        
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('landing')
+
 
 
 def partner_with_us(request):
@@ -411,7 +365,7 @@ def partner_with_us(request):
 
 #TODO Cross check all authentication side to affect loss of data 
 
-def appointment_detail(request,lead_id):
+def appointment_detail(request,appt_uuid):
     if not request.user.is_authenticated:
         messages.info(request, 'Log In required')
         return redirect('login')
@@ -428,10 +382,18 @@ def appointment_detail(request,lead_id):
             base_template='estate/base.html'
         if request.user.role == 'company':
             company=CompanyInformation.objects.get(user_id=request.user.id)
-            appointment= Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=lead_id)
+            sample= Appointments.objects.get(appointment_uuid=appt_uuid)
+            if company.unique_company_id != sample.company_uuid:
+                messages.warning(request, 'Unauthorized Access')
+                return redirect('appointment')
+            appointment=sample
         else:
             agent=AgentInformation.objects.get(user_id=request.user.id)
-            appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(pk=lead_id)
+            sample= Appointments.objects.get(appointment_uuid=appt_uuid)
+            if agent.agent_uuid != sample.agent_uuid:
+                messages.warning(request, 'Unauthorized Access')
+                return redirect('appointment')
+            appointment=sample
         try:
             lead=LeadInfo.objects.get(lead_id=appointment.lead_uuid)
             return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'lead_data': lead, 'base_template':base_template})
@@ -439,6 +401,7 @@ def appointment_detail(request,lead_id):
             return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'base_template':base_template})
         
     except Exception as e:
+        messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
 
 def add_schedule(request):
@@ -505,7 +468,7 @@ def add_schedule(request):
         return render(request, 'core/add_schedule.html', context)
         
     except Exception as e:
-        messages.error(request, f'An error occurred: {str(e)}')
+        messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -536,11 +499,15 @@ def appointment(request):
             total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
             return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':agent.profile_name})
     except Exception as e:
+        messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
 
 def estate_blog(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
     try:
         user_role=request.user.role
         if user_role == 'company':
@@ -551,16 +518,17 @@ def estate_blog(request):
             base_template='estate/base.html'
         return render(request, 'core/estate_blog.html', {'base_template': base_template})
     except Exception as e:
-        messages.error(request, f'An error occurred: {str(e)}')
+        messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
-def manaage_listings(request):
+def manage_listings(request):
     if not request.user.is_authenticated:
         messages.info(request, 'login required')
         return redirect('login')
     if request.user.role == 'customer':
         messages.warning(request, 'Access Restricted')
+        return redirect('landing')
     try:
         user_role=request.user.role
         if user_role == 'company':
@@ -569,25 +537,28 @@ def manaage_listings(request):
             base_template = 'agent/base.html'
         else:
             base_template='estate/base.html'
+            #TODO instead of trying to get an objdoesnotexist error just check if they are a company reduces risk...
         if request.user.role == 'company':
             user_type=CompanyInformation.objects.get(user_id=request.user.id)
             user_id=user_type.unique_company_id
             property_on_lease=PropertyManagementRent.objects.filter(company_uuid=user_id)
             property_on_sale=PropertyManagementSale.objects.filter(company_uuid=user_id)
             role='company'
-        else:
+        elif request.user.role == 'agent':
             user_type=AgentInformation.objects.get(user_id=request.user.id)
             user_id=user_type.agent_uuid
             property_on_lease=PropertyManagementRent.objects.filter(agent_uuid=user_id)
             property_on_sale=PropertyManagementSale.objects.filter(agent_uuid=user_id)
             role='agent'
-        
+        else:
+            messages.error(request, 'An error occured')
+            return redirect('landing')
         return render(request, 'core/listings.html', {'on_lease':property_on_lease,'role':role,
                                                         'on_sale':property_on_sale, 'base_template':base_template})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 
-
+#TODO Continue from here
 def edit_appointment(request, appointment_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log In required')
@@ -609,9 +580,7 @@ def edit_appointment(request, appointment_id):
         # Get the appointment based on user role
         if request.user.role == 'company':
             company = CompanyInformation.objects.get(user_id=request.user.id)
-            appointment = Appointments.objects.filter(
-                company_uuid=company.unique_company_id
-            ).get(pk=appointment_id)
+            appointment = Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=appointment_id)
         else:
             agent = AgentInformation.objects.get(user_id=request.user.id)
             appointment = Appointments.objects.filter(

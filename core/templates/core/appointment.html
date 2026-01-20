@@ -251,7 +251,7 @@
               <span class="notes-preview">{{ appointment.note|truncatewords:8 }}</span>
             </td>
             <td>
-              <a href="{% url 'view-schedule' appointment.id %}" class="action-btn view" title="View Details">
+              <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="action-btn view" title="View Details">
                 <i class="bi bi-eye"></i>
               </a>
             </td>
@@ -291,7 +291,8 @@
             propertyId: {% if appointment.property_id %}{{ appointment.property_id }}{% else %}null{% endif %},
             propertyType: '{{ appointment.property_type|default:"N/A" }}',
             agentUuid: '{% if appointment.agent_uuid %}{{ appointment.agent_uuid }}{% else %}N/A{% endif %}',
-            leadUuid: '{% if appointment.lead_uuid %}{{ appointment.lead_uuid }}{% else %}null{% endif %}'
+            leadUuid: '{% if appointment.lead_uuid %}{{ appointment.lead_uuid }}{% else %}null{% endif %}',
+            aptUuid: '{{ appointment.appointment_uuid }}'
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -426,7 +427,7 @@
                       <div class="appointment-actions">
                           <button class="action-btn view"
                                   title="View Details"
-                                  onclick="window.location.href = '/schedule_detail/${apt.id}'">
+                                  onclick="window.location.href = '/schedule_detail/${apt.aptUuid}'">
                               <i class="bi bi-eye"></i>
                           </button>
                       </div>
