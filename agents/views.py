@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import AgentInformation, SessionId, AgentAnalytics
+from .models import AgentInformation, SessionId, AgentAnalytics, UniversalAgent
 from django.contrib import messages
 from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
 from django.db import transaction
@@ -11,8 +11,11 @@ from estate.models import LeadInfo
 from datetime import datetime
 from datetime import date
 from companies.views import property_views_count
-
-
+from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.http import require_POST
+from .quotes import get_random_quote
+from django.db.models import Sum, Avg, Count
+from .utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
 
 
 
@@ -37,16 +40,14 @@ def dashboard(request):
                 current_hour=raw_time.hour
                 if current_hour >= 0 and current_hour < 12:
                     greeting='Good Morning'
-                    tips='Success in Real estate starts when you are worthy of it'
-                    by='Michael Ferrara'
                 elif current_hour >= 12 and current_hour < 16:
                     greeting='Good Afternoon'
-                    tips="To be consistent in real estate, you must always and consistently put your clients'best Intrest First"
-                    by= 'Anthony Hitt'
                 else:
                     greeting='Good Evening'
-                    tips='Real Estate is the purest form of Entrepreneurship'
-                    by='brian Bufini'
+                    
+                quote = get_random_quote()
+                tips = quote['tips']
+                by = quote['by']
                 agent_prop_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
                 agent_prop_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
                 
@@ -85,12 +86,7 @@ def dashboard(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.db import transaction
-from .models import AgentInformation, UniversalAgent
-from .forms import AgentInformationForm, ExperienceFormSet, SocialLinksFormSet
+
 
 def agent_form(request):
     # Check authentication
@@ -280,31 +276,66 @@ def agent_profile(request, agent_uuid):
         return redirect('landing')
     
     try:
-        agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
-        try:
-            profile=agent.analytics.get()
-        except:
-            analytics= AgentAnalytics.objects.create(
-                agent=agent,
-                profile_views=0,
-                ratings=0.0,
-                reviews=0
-            )
-        try:
-            session= agent.session_id.get(session_id=request.user.id)
-        except:
-            session= SessionId.objects.create(
-                agent=agent,
-                session_id=request.user.id,
-                inquires_check=0
-            )
-            view_count= agent.analytics.get()
-            view_count.profile_views+=1
-            view_count.save()
-
-        return render(request, 'estate/agent_profile.html', {'agent':agent})
+        user_role = request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template = 'estate/base.html'
+        
+        agent = AgentInformation.objects.get(agent_uuid=agent_uuid)
+        
+        # FIX 1: Use get_or_create instead of try/except with create
+        profile, created = AgentAnalytics.objects.get_or_create(
+            agent=agent,
+            defaults={
+                'profile_views': 0,
+                'property_views_l': 0,
+                'property_views_s': 0,
+                'average_profile_views': 0,
+                'average_lease_views': 0,
+                'average_sale_views': 0,
+                'ratings': 0.0,
+                'reviews': 0,
+                'competition': 0.0
+            }
+        )
+        
+        # FIX 2: Use get_or_create for session tracking too
+        session, session_created = SessionId.objects.get_or_create(
+            agent=agent,
+            session_id=request.user.id,
+            defaults={
+                'inquires_check': 0
+            }
+        )
+        
+        # Only increment profile views if this is a NEW session
+        if session_created:
+            profile.profile_views += 1
+            profile.save()
+#TODO do the same analytics calculation for company analytics victors Claude
+        return render(request, 'estate/agent_profile.html', {
+            'agent': agent,
+            'base_template': base_template
+        })
+        
+    except AgentInformation.DoesNotExist:
+        messages.error(request, 'Agent not found')
+        return redirect('landing')
+        
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e', e})
+        print(f"Error in agent_profile: {e}")  # Debug logging
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+
+
+
+
+
+
 
 
 
@@ -315,56 +346,177 @@ def analytics(request):
     if request.user.role != 'agent':
         messages.error(request, "Agent's Only")
         return redirect('landing')
+    
     try:
-        agent=AgentInformation.objects.get(user_id= request.user.id)
-        agent_lease_properties= PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid)
-        agent_sales_properties= PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid)
-        lease_views_list=[]
-        sale_views_list=[]
+        current_agent = AgentInformation.objects.get(user_id=request.user.id)
         
-        for prop_id in agent_lease_properties:
-            view=property_views_count("Rent", prop_id.pk)
-            lease_views_list.append(view)
-        for prop_id in agent_sales_properties:
-            view=property_views_count("Sale", prop_id.pk)
-            sale_views_list.append(view)
-        listing_views= sum(lease_views_list) + sum(sale_views_list)
+        analytics_data, created = AgentAnalytics.objects.get_or_create(
+            agent=current_agent,
+            defaults={
+                'profile_views': 0,
+                'property_views_l': 0,
+                'property_views_s': 0,
+                'average_profile_views': 0,
+                'average_lease_views': 0,
+                'average_sale_views': 0,
+                'ratings': 0.0,
+                'reviews': 0,
+                'competition': 0.0
+            }
+        )
         
-        try:
-            profile=agent.analytics.get()
-        except:
-            analytics= AgentAnalytics.objects.create(
-                agent=agent,
-                profile_views=0,
-                ratings=0.0,
-                reviews=0
+        # Calculate property views for CURRENT agent only
+        lease_views = PropertyViews.objects.filter(
+            property_type='Rent',
+            property_id__in=PropertyManagementRent.objects.filter(
+                agent_uuid=current_agent.agent_uuid
+            ).values_list('pk', flat=True)
+        ).count()
+        
+        sale_views = PropertyViews.objects.filter(
+            property_type='Sale',
+            property_id__in=PropertyManagementSale.objects.filter(
+                agent_uuid=current_agent.agent_uuid
+            ).values_list('pk', flat=True)
+        ).count()
+        
+        # Save the new counts for CURRENT agent
+        analytics_data.property_views_l = lease_views
+        analytics_data.property_views_s = sale_views
+        analytics_data.save()
+        
+        # Reset monthly tracking if needed
+        reset_button(analytics_data, current_agent.agent_uuid, lease_views, sale_views)
+        
+        # Calculate percentage changes
+        lease_views_change = monthly_change(analytics_data.property_views_l, analytics_data.average_lease_views)
+        sale_views_change = monthly_change(analytics_data.property_views_s, analytics_data.average_sale_views)
+        profile_views_change = monthly_change(analytics_data.profile_views, analytics_data.average_profile_views)
+        total_prop_incr_perc = (sale_views_change + lease_views_change) / 2
+        
+        # ========================================
+        # 2. CALCULATE COMPETITION (READ-ONLY)
+        # ========================================
+        
+        # Get ALL agents' analytics in one query (READ ONLY - don't modify!)
+        all_analytics = AgentAnalytics.objects.select_related('agent').all()
+        
+        total_agents_eng = []
+        
+        for record in all_analytics:
+            # Calculate engagement for each agent using EXISTING data
+            ag_rent_likes = PropertyManagementRent.objects.filter(
+                agent_uuid=record.agent.agent_uuid
+            ).aggregate(total=Sum('total_likes'))['total'] or 0
+            
+            ag_sale_likes = PropertyManagementSale.objects.filter(
+                agent_uuid=record.agent.agent_uuid
+            ).aggregate(total=Sum('total_likes'))['total'] or 0
+            
+            ag_total_likes = ag_rent_likes + ag_sale_likes
+            ag_rating_score = (record.ratings or 0) * (record.reviews or 0)
+            ag_avg_prop_views = record.average_sale_views + record.average_lease_views
+            
+            # Calculate engagement score
+            ag_eng_rate = engagement_rate(
+                ag_total_likes,
+                ag_avg_prop_views,
+                record.average_profile_views,
+                ag_rating_score
             )
-        profile_views= profile.profile_views
+            
+            total_agents_eng.append(ag_eng_rate)
+            
+            # If this is the current agent, save their score
+            if record.agent.id == current_agent.id:
+                analytics_data.competition = ag_eng_rate
+                analytics_data.save()
         
-        total_properties= list(agent_lease_properties) + list(agent_sales_properties)
-        total_properties.sort(key=lambda x: x.total_likes, reverse=True)
-        total_properties=total_properties[:4]
-        view_list=[]
-        for prop in total_properties:
-            prop_views= PropertyViews.objects.filter(property_type=prop.property_type, property_id=prop.pk).count()
-            view_list.append(prop_views)
-        likes_views=zip(total_properties, view_list)
+        # ========================================
+        # 3. CALCULATE MARKET POSITION
+        # ========================================
+        current_agent_score = analytics_data.competition
         
+        if total_agents_eng and len(total_agents_eng) > 1:
+            sorted_eng = sorted(total_agents_eng, reverse=True)
+            agents_above = sum(1 for score in sorted_eng if score > current_agent_score)
+            market_position = (agents_above / len(sorted_eng)) * 100
+            
+            if market_position <= 1:
+                top_performer = "Top 1%"
+            elif market_position <= 5:
+                top_performer = "Top 5%"
+            elif market_position <= 10:
+                top_performer = "Top 10%"
+            elif market_position <= 25:
+                top_performer = "Top 25%"
+            else:
+                top_performer = f"Top {int(market_position)}%"
+        else:
+            top_performer = "New Agent"
+            market_position = 100
         
-        context={
-            "listing_views": listing_views,
-            "profile_views": profile_views,
-            "sale_views": sum(sale_views_list),
-            "lease_views": sum(lease_views_list),
-            "ranking": likes_views
+        # Calculate competition metrics
+        total_eng_sum = sum(total_agents_eng)
+        avg_prop_views = analytics_data.average_lease_views + analytics_data.average_sale_views
+        
+        calculated_engagement = total_agents_engagement_calculator(
+            total_eng_sum,
+            current_agent_score,
+            current_agent.agent_uuid,
+            avg_prop_views
+        )
+        
+        competition_pct = calculated_engagement[0]
+        inq_conv_rate = calculated_engagement[1]
+        
+        # ========================================
+        # 4. GET TOP PROPERTIES
+        # ========================================
+        agent_props_rent = PropertyManagementRent.objects.filter(agent_uuid=current_agent.agent_uuid)
+        agent_props_sale = PropertyManagementSale.objects.filter(agent_uuid=current_agent.agent_uuid)
+        
+        all_properties = list(agent_props_rent) + list(agent_props_sale)
+        all_properties.sort(key=lambda x: x.total_likes, reverse=True)
+        top_properties = all_properties[:4]
+        
+        # Get views for top 4 properties
+        view_list = []
+        for prop in top_properties:
+            cnt = PropertyViews.objects.filter(
+                property_id=prop.pk,
+                property_type=prop.property_type
+            ).count()
+            view_list.append(cnt)
+        
+        likes_views = zip(top_properties, view_list)
+        
+        # ========================================
+        # 5. RETURN CONTEXT
+        # ========================================
+        context = {
+            'profile_views': analytics_data.profile_views,
+            'listing_views': analytics_data.property_views_l + analytics_data.property_views_s,
+            'lease_views': analytics_data.property_views_l,
+            'sale_views': analytics_data.property_views_s,
+            'profile_incr_perc': profile_views_change,
+            'lease_incr_perc': lease_views_change,
+            'sale_incr_perc': sale_views_change,
+            'total_prop_incr_perc': total_prop_incr_perc,
+            'competition': market_position,
+            'inq_rate': inq_conv_rate,
+            'ranking': likes_views
         }
         
         return render(request, 'agent/agent_analytics.html', context)
+        
+    except AgentInformation.DoesNotExist:
+        messages.error(request, 'Agent profile not found.')
+        return redirect('landing')
+        
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
-
-
-
+        print(f"Error in analytics view: {e}")  # Debug logging
+        return render(request, 'estate/error_page.html', {'e': str(e)})
 
 def lead_detail(request, lead_id):
     if not request.user.is_authenticated:
@@ -383,6 +535,69 @@ def lead_detail(request, lead_id):
         return render(request, 'agent/agent_lead_detail.html', {'lead':lead, 'property':property_intrested})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+@require_POST
+def agent_update_lead_status(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'log in to access this page')
+        return redirect('landing')
+    if request.user.role != 'agent':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        try:
+            agent = AgentInformation.objects.get(user_id=request.user.id)
+            lead = LeadInfo.objects.get(pk=lead_id)
+            
+            new_status = request.POST.get('new_status')
+            if not new_status:
+                messages.error(request, 'Status Missing')
+                return redirect('agent:leads')
+            
+            lead.status = new_status
+            lead.date_updated = timezone.now()
+            lead.save()
+            
+            messages.success(request, 'Status Updated Successfully')
+            return redirect('agent:lead-detail', lead_id=lead_id)
+        except ObjectDoesNotExist:
+            messages.error(request, 'Lead Not found')
+            return redirect('agent:leads')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+@require_POST
+def agent_update_lead_stage(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log in to gain access')
+        return redirect('landing')
+    if request.user.role != 'agent':
+        messages.info(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        try:
+            agent = AgentInformation.objects.get(user_id=request.user.id)
+            lead = LeadInfo.objects.get(pk=lead_id)
+            
+            new_stage = request.POST.get('new_stage')
+            if not new_stage:
+                messages.error(request, 'Stage Missing')
+                return redirect('agent:leads')
+            
+            lead.stages = new_stage
+            lead.date_updated = timezone.now()
+            lead.save()
+            
+            messages.success(request, 'Stage Updated Successfully')
+            return redirect('agent:lead-detail', lead_id=lead_id)
+        except ObjectDoesNotExist:
+            messages.error(request, 'Lead Not found')
+            return redirect('agent:leads')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
 
 
 def settings(request):
@@ -426,5 +641,17 @@ def delete_lead(request, lead_id):
 
 
 
+# TODO try to add the mini scraper 
 
-
+def job_listings(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, 'Agents Only')
+        return redirect('lnding')
+    
+    try:
+        return render(request, 'agent/job_listings.html')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})

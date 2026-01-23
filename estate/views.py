@@ -115,51 +115,48 @@ def buy_property(request):
         return render(request, 'estate/buy_property.html',context)
     
     except Exception as e:
-        print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
 
 def rent_property(request):
-        """
-        Lists all the properties on rent
-        """
-        if not request.user.is_authenticated:
-            messages.info(request, 'login Required')
-            return redirect('login')
-        if not request.user.role == 'customer':
-            messages.error(request, 'Customer Access Only')
-            return redirect('landing')
-        try:
-            rent_qs=PropertyManagementRent.objects.all().order_by('-listed_date')
-            #Filtering
-            myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
-            if myfilter.qs:
-                rent_qs=myfilter.qs
-            else:
-                rent_qs=[]
-            p=Paginator(rent_qs, 9)
-            page= request.GET.get('page')
-            on_lease= p.get_page(page)
-            nums= "a" * on_lease.paginator.num_pages
-            
-            properties_list=[]
-            for prop in rent_qs:
-                properties_list.append(prop)
-            in_wishlist=wishlist_generator(properties_list, request.user.id)
-            properties_with_wishlist=zip(on_lease, in_wishlist)
-            print(in_wishlist)
-            context={
-                'nums':nums,
-                'on_lease': properties_with_wishlist,
-                'leased':on_lease,
-                'rentfilter':myfilter
-            }
-            return render(request, 'estate/rent_property.html', context)
+    """
+    Lists all the properties on rent
+    """
+    if not request.user.is_authenticated:
+        messages.info(request, 'login Required')
+        return redirect('login')
+    if not request.user.role == 'customer':
+        messages.error(request, 'Customer Access Only')
+        return redirect('landing')
+    try:
+        rent_qs=PropertyManagementRent.objects.all().order_by('-listed_date')
+        #Filtering
+        myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
+        if myfilter.qs:
+            rent_qs=myfilter.qs
+        else:
+            rent_qs=[]
+        p=Paginator(rent_qs, 9)
+        page= request.GET.get('page')
+        on_lease= p.get_page(page)
+        nums= "a" * on_lease.paginator.num_pages
         
-        except Exception as e:
-            print(f'ERROR IS{e}')
-            return render(request, 'estate/error_page.html', {'e': e})
+        properties_list=[]
+        for prop in rent_qs:
+            properties_list.append(prop)
+        in_wishlist=wishlist_generator(properties_list, request.user.id)
+        properties_with_wishlist=zip(on_lease, in_wishlist)
+        context={
+            'nums':nums,
+            'on_lease': properties_with_wishlist,
+            'leased':on_lease,
+            'rentfilter':myfilter
+        }
+        return render(request, 'estate/rent_property.html', context)
+    
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 
@@ -257,7 +254,7 @@ def user_profile(request):
             return redirect('landing')
         return render(request, 'estate/user_profile.html', {'headline': ns.article_headline})
     except Exception as e:
-        print(e)
+        return render(request, 'estate/error_page.html', {'e':e})
 
 
 
@@ -319,7 +316,6 @@ def toggle_wishlist_rent(request, property_id):
         else:
             return redirect('customer:rent-property')
     except Exception as e:
-        print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -359,7 +355,6 @@ def toggle_wishlist_buy(request, property_id):
             return redirect('customer:buy-property')
     
     except Exception as e:
-        print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -401,7 +396,6 @@ def wishlist(request):
         return render(request, 'estate/wishlist.html', context)
     
     except Exception as e:
-        print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -442,7 +436,6 @@ def update_profile(request, user_id):
         return render(request, 'estate/update_profile.html',context)
     
     except Exception as e:
-        print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -475,7 +468,6 @@ def change_password(request):
             return render(request, 'estate/change_passw.html', {'form': form})
         
     except Exception as e:
-        print(f'ERROR IS{e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -493,7 +485,6 @@ def change_password_success(request):
         return render(request, 'estate/succ_pass.html')
     
     except Exception as e:
-        print(f'ERROR IS {e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -512,7 +503,6 @@ def profile_settings(request):
         return render(request, 'estate/settings.html')
     
     except Exception as e:
-        print(f'ERROR IS {e}')
         return render(request, 'estate/error_page.html', {'e': e})
     
 
@@ -544,13 +534,11 @@ def delete_account(request):
             
         except Exception as e:
             messages.error(request, 'There was an error, Try again later.....')
-            print(e)
             return redirect('customer:user-profile')
         messages.success(request, 'Account has been deleted Successfully')
         return redirect('landing')
     
     except Exception as e:
-        print(f'ERROR IS {e}')
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -567,7 +555,6 @@ def estate_agent_profile(request, agent_id):
                                                             'experience':agent_experience,
                                                             'network': agent_social})
     except Exception as e:
-        print(e)
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -689,3 +676,5 @@ def inquiry_form(request, property_type, property_id):
         return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted':submitted})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+    
+#todo make sure after a user ad something to wishlist it doesnt reload the page 

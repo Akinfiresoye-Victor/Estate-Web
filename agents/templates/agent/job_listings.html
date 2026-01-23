@@ -1,0 +1,379 @@
+{% extends 'agent/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'agent/css/job_listings.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="jobs-container">
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Job Openings</h1>
+      <p class="page-subtitle">Find opportunities in real estate and tech</p>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="jobType" class="filter-label">Job Type</label>
+        <select class="filter-select" id="jobType">
+          <option value="">All Job Types</option>
+          <option value="full-time">Full Time</option>
+          <option value="part-time">Part Time</option>
+          <option value="contract">Contract</option>
+          <option value="internship">Internship</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="location" class="filter-label">Location</label>
+        <select class="filter-select" id="location">
+          <option value="">All Locations</option>
+          <option value="lagos">Lagos</option>
+          <option value="abuja">Abuja</option>
+          <option value="ibadan">Ibadan</option>
+          <option value="port-harcourt">Port Harcourt</option>
+          <option value="remote">Remote</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="category" class="filter-label">Category</label>
+        <select class="filter-select" id="category">
+          <option value="">All Categories</option>
+          <option value="sales">Sales & Marketing</option>
+          <option value="tech">Technology</option>
+          <option value="management">Property Management</option>
+          <option value="support">Customer Support</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Listings -->
+  <div class="job-listings">
+    
+    <!-- Job Card 1 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">RC</div>
+          <div class="company-details">
+            <h2 class="job-title">Real Estate Agent</h2>
+            <p class="company-name">Royal Chambers Properties</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Full Time</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Lagos
+        </span>
+      </div>
+
+      <p class="job-description">
+        Seeking experienced agents to manage property listings, client relationships, and close deals in the Lagos area.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦150,000 - ₦300,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          2 days ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 2 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">LP</div>
+          <div class="company-details">
+            <h2 class="job-title">Django Developer</h2>
+            <p class="company-name">Lagos PropTech Ltd</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Full Time</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Remote
+        </span>
+      </div>
+
+      <p class="job-description">
+        Build and maintain Django-based real estate platform. Experience with REST APIs and database optimization required.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦200,000 - ₦400,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          5 days ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 3 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">NH</div>
+          <div class="company-details">
+            <h2 class="job-title">Property Manager</h2>
+            <p class="company-name">Naija Homes</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Full Time</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Abuja
+        </span>
+      </div>
+
+      <p class="job-description">
+        Oversee residential properties, handle tenant relations, coordinate maintenance, and ensure property compliance.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦180,000 - ₦350,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          1 week ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 4 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">VE</div>
+          <div class="company-details">
+            <h2 class="job-title">Marketing Intern</h2>
+            <p class="company-name">Virtue Estates</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Internship</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Ibadan
+        </span>
+      </div>
+
+      <p class="job-description">
+        Learn digital marketing, social media management, and content creation for real estate campaigns.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦50,000 - ₦80,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          3 days ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 5 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">DS</div>
+          <div class="company-details">
+            <h2 class="job-title">Data Analyst</h2>
+            <p class="company-name">DataSpace Realty</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Contract</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Remote
+        </span>
+      </div>
+
+      <p class="job-description">
+        Analyze property market trends, build predictive models, and generate insights for strategic decisions.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦250,000 - ₦450,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          4 days ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 6 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">AH</div>
+          <div class="company-details">
+            <h2 class="job-title">Customer Support Agent</h2>
+            <p class="company-name">Apex Homes</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Part Time</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Lagos
+        </span>
+      </div>
+
+      <p class="job-description">
+        Handle customer inquiries, resolve issues, and provide excellent service via phone, email, and chat.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦80,000 - ₦120,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          6 days ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 7 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">PM</div>
+          <div class="company-details">
+            <h2 class="job-title">Sales Executive</h2>
+            <p class="company-name">Prime Mansions</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Full Time</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Port Harcourt
+        </span>
+      </div>
+
+      <p class="job-description">
+        Drive property sales, develop client relationships, and achieve monthly sales targets in the Port Harcourt market.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦120,000 - ₦250,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          1 day ago
+        </span>
+      </div>
+    </div>
+
+    <!-- Job Card 8 -->
+    <div class="job-card">
+      <div class="job-header">
+        <div class="company-info">
+          <div class="company-logo">TI</div>
+          <div class="company-details">
+            <h2 class="job-title">Frontend Developer</h2>
+            <p class="company-name">TechInvest Properties</p>
+          </div>
+        </div>
+        <a href="#" class="view-btn" aria-label="View job details">
+          <i class="bi bi-eye"></i>
+        </a>
+      </div>
+      
+      <div class="job-tags">
+        <span class="job-tag type">Contract</span>
+        <span class="job-tag location">
+          <i class="bi bi-geo-alt"></i>
+          Remote
+        </span>
+      </div>
+
+      <p class="job-description">
+        Create responsive, user-friendly interfaces for property listing platform. Strong HTML, CSS, and JavaScript skills required.
+      </p>
+
+      <div class="job-footer">
+        <span class="salary">
+          <i class="bi bi-cash"></i>
+          ₦180,000 - ₦350,000/month
+        </span>
+        <span class="posted-date">
+          <i class="bi bi-clock"></i>
+          2 weeks ago
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

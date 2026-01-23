@@ -230,7 +230,6 @@ def all_properties(request):
                 
                 
         except Exception as e:
-            print(f'ERROR IS{e}')
             messages.error(f"an error occured {e}")
             return redirect('executive')
         

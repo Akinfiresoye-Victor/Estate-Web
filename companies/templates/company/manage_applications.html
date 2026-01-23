@@ -1,0 +1,583 @@
+{% extends 'company/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'company/css/manage_applications.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="job-management-container">
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">Job Management</h1>
+        <p class="page-subtitle">Post vacancies and manage applicants</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-post-job" id="openPostJobModal">
+          <i class="bi bi-plus-circle"></i>
+          <span>Post New Job</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-overview">
+    <div class="stat-card">
+      <div class="stat-icon active">
+        <i class="bi bi-briefcase"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Active Jobs</span>
+        <h3 class="stat-value">8</h3>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon applications">
+        <i class="bi bi-people"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total Applicants</span>
+        <h3 class="stat-value">127</h3>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon pending">
+        <i class="bi bi-clock-history"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Pending Review</span>
+        <h3 class="stat-value">34</h3>
+        <span class="stat-badge">New</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon shortlisted">
+        <i class="bi bi-star"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Shortlisted</span>
+        <h3 class="stat-value">19</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button class="tab-btn active" data-tab="active-jobs">
+      <i class="bi bi-briefcase"></i>
+      <span>Active Jobs</span>
+      <span class="tab-count">8</span>
+    </button>
+    <button class="tab-btn" data-tab="applicants">
+      <i class="bi bi-people"></i>
+      <span>All Applicants</span>
+      <span class="tab-count">127</span>
+    </button>
+    <button class="tab-btn" data-tab="closed-jobs">
+      <i class="bi bi-archive"></i>
+      <span>Closed Jobs</span>
+      <span class="tab-count">12</span>
+    </button>
+  </div>
+
+  <!-- Active Jobs Tab -->
+  <div class="tab-content active" id="active-jobs">
+    <div class="jobs-list">
+
+      <!-- Job Card 1 -->
+      <div class="job-listing-card">
+        <div class="job-card-header">
+          <div class="job-card-info">
+            <h3 class="job-card-title">Real Estate Agent</h3>
+            <div class="job-card-meta">
+              <span class="meta-tag">
+                <i class="bi bi-geo-alt"></i>
+                Lagos
+              </span>
+              <span class="meta-tag">
+                <i class="bi bi-briefcase"></i>
+                Full Time
+              </span>
+              <span class="meta-tag posted">
+                <i class="bi bi-clock"></i>
+                Posted 5 days ago
+              </span>
+            </div>
+          </div>
+          <div class="job-card-actions">
+            <button class="btn-icon" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn-icon danger" title="Close Job">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <p class="job-card-description">
+          Seeking experienced agents to manage property listings, client relationships, and close deals in the Lagos area.
+        </p>
+
+        <div class="job-card-stats">
+          <div class="stat-item">
+            <i class="bi bi-people"></i>
+            <span><strong>23</strong> Applicants</span>
+          </div>
+          <div class="stat-item">
+            <i class="bi bi-clock-history"></i>
+            <span><strong>8</strong> Pending</span>
+          </div>
+          <div class="stat-item">
+            <i class="bi bi-star"></i>
+            <span><strong>5</strong> Shortlisted</span>
+          </div>
+        </div>
+
+        <div class="job-card-footer">
+          <span class="salary-range">
+            <i class="bi bi-cash"></i>
+            ₦150,000 - ₦300,000/month
+          </span>
+          <a href="#" class="btn-view-applicants">
+            View Applicants
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Job Card 2 -->
+      <div class="job-listing-card">
+        <div class="job-card-header">
+          <div class="job-card-info">
+            <h3 class="job-card-title">Property Manager</h3>
+            <div class="job-card-meta">
+              <span class="meta-tag">
+                <i class="bi bi-geo-alt"></i>
+                Abuja
+              </span>
+              <span class="meta-tag">
+                <i class="bi bi-briefcase"></i>
+                Full Time
+              </span>
+              <span class="meta-tag posted">
+                <i class="bi bi-clock"></i>
+                Posted 1 week ago
+              </span>
+            </div>
+          </div>
+          <div class="job-card-actions">
+            <button class="btn-icon" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn-icon danger" title="Close Job">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <p class="job-card-description">
+          Oversee residential properties, handle tenant relations, coordinate maintenance, and ensure property compliance.
+        </p>
+
+        <div class="job-card-stats">
+          <div class="stat-item">
+            <i class="bi bi-people"></i>
+            <span><strong>31</strong> Applicants</span>
+          </div>
+          <div class="stat-item">
+            <i class="bi bi-clock-history"></i>
+            <span><strong>12</strong> Pending</span>
+          </div>
+          <div class="stat-item">
+            <i class="bi bi-star"></i>
+            <span><strong>7</strong> Shortlisted</span>
+          </div>
+        </div>
+
+        <div class="job-card-footer">
+          <span class="salary-range">
+            <i class="bi bi-cash"></i>
+            ₦180,000 - ₦350,000/month
+          </span>
+          <a href="#" class="btn-view-applicants">
+            View Applicants
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Job Card 3 -->
+      <div class="job-listing-card">
+        <div class="job-card-header">
+          <div class="job-card-info">
+            <h3 class="job-card-title">Marketing Coordinator</h3>
+            <div class="job-card-meta">
+              <span class="meta-tag">
+                <i class="bi bi-geo-alt"></i>
+                Remote
+              </span>
+              <span class="meta-tag">
+                <i class="bi bi-briefcase"></i>
+                Contract
+              </span>
+              <span class="meta-tag posted">
+                <i class="bi bi-clock"></i>
+                Posted 3 days ago
+              </span>
+            </div>
+          </div>
+          <div class="job-card-actions">
+            <button class="btn-icon" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn-icon danger" title="Close Job">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+        </div>
+
+        <p class="job-card-description">
+          Plan and execute marketing campaigns, manage social media, and create content for property listings.
+        </p>
+
+        <div class="job-card-stats">
+          <div class="stat-item">
+            <i class="bi bi-people"></i>
+            <span><strong>45</strong> Applicants</span>
+          </div>
+          <div class="stat-item">
+            <i class="bi bi-clock-history"></i>
+            <span><strong>14</strong> Pending</span>
+          </div>
+          <div class="stat-item">
+            <i class="bi bi-star"></i>
+            <span><strong>4</strong> Shortlisted</span>
+          </div>
+        </div>
+
+        <div class="job-card-footer">
+          <span class="salary-range">
+            <i class="bi bi-cash"></i>
+            ₦120,000 - ₦200,000/month
+          </span>
+          <a href="#" class="btn-view-applicants">
+            View Applicants
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- All Applicants Tab -->
+  <div class="tab-content" id="applicants">
+    <div class="filters-bar">
+      <div class="filter-group">
+        <select class="filter-select">
+          <option value="">All Jobs</option>
+          <option value="agent">Real Estate Agent</option>
+          <option value="manager">Property Manager</option>
+          <option value="marketing">Marketing Coordinator</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <select class="filter-select">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search applicants...">
+      </div>
+    </div>
+
+    <div class="applicants-list">
+
+      <!-- Applicant Card 1 -->
+      <div class="applicant-card">
+        <div class="applicant-header">
+          <div class="applicant-avatar">
+            <img src="https://ui-avatars.com/api/?name=Chioma+Adeyemi&size=60&background=1a3c4e&color=fff&bold=true" alt="Chioma Adeyemi">
+          </div>
+          <div class="applicant-info">
+            <h4 class="applicant-name">Chioma Adeyemi</h4>
+            <p class="applicant-position">Applied for: Real Estate Agent</p>
+            <div class="applicant-meta">
+              <span class="meta-item">
+                <i class="bi bi-geo-alt"></i>
+                Lagos
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-briefcase"></i>
+                5 years experience
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-clock"></i>
+                2 days ago
+              </span>
+            </div>
+          </div>
+          <div class="applicant-status">
+            <span class="status-badge pending">Pending</span>
+          </div>
+        </div>
+
+        <p class="applicant-summary">
+          Experienced real estate professional with proven track record in residential and commercial property sales...
+        </p>
+
+        <div class="applicant-actions">
+          <button class="btn-action primary">
+            <i class="bi bi-eye"></i>
+            View Profile
+          </button>
+          <button class="btn-action success">
+            <i class="bi bi-star"></i>
+            Shortlist
+          </button>
+          <button class="btn-action danger">
+            <i class="bi bi-x"></i>
+            Reject
+          </button>
+        </div>
+      </div>
+
+      <!-- Applicant Card 2 -->
+      <div class="applicant-card">
+        <div class="applicant-header">
+          <div class="applicant-avatar">
+            <img src="https://ui-avatars.com/api/?name=Ibrahim+Musa&size=60&background=1a3c4e&color=fff&bold=true" alt="Ibrahim Musa">
+          </div>
+          <div class="applicant-info">
+            <h4 class="applicant-name">Ibrahim Musa</h4>
+            <p class="applicant-position">Applied for: Property Manager</p>
+            <div class="applicant-meta">
+              <span class="meta-item">
+                <i class="bi bi-geo-alt"></i>
+                Abuja
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-briefcase"></i>
+                8 years experience
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-clock"></i>
+                1 day ago
+              </span>
+            </div>
+          </div>
+          <div class="applicant-status">
+            <span class="status-badge shortlisted">Shortlisted</span>
+          </div>
+        </div>
+
+        <p class="applicant-summary">
+          Property management expert specializing in residential and commercial portfolios. Strong tenant relations...
+        </p>
+
+        <div class="applicant-actions">
+          <button class="btn-action primary">
+            <i class="bi bi-eye"></i>
+            View Profile
+          </button>
+          <button class="btn-action info">
+            <i class="bi bi-envelope"></i>
+            Contact
+          </button>
+          <button class="btn-action danger">
+            <i class="bi bi-x"></i>
+            Reject
+          </button>
+        </div>
+      </div>
+
+      <!-- Applicant Card 3 -->
+      <div class="applicant-card">
+        <div class="applicant-header">
+          <div class="applicant-avatar">
+            <img src="https://ui-avatars.com/api/?name=Blessing+Okonkwo&size=60&background=1a3c4e&color=fff&bold=true" alt="Blessing Okonkwo">
+          </div>
+          <div class="applicant-info">
+            <h4 class="applicant-name">Blessing Okonkwo</h4>
+            <p class="applicant-position">Applied for: Marketing Coordinator</p>
+            <div class="applicant-meta">
+              <span class="meta-item">
+                <i class="bi bi-geo-alt"></i>
+                Lagos
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-briefcase"></i>
+                3 years experience
+              </span>
+              <span class="meta-item">
+                <i class="bi bi-clock"></i>
+                5 hours ago
+              </span>
+            </div>
+          </div>
+          <div class="applicant-status">
+            <span class="status-badge pending">Pending</span>
+          </div>
+        </div>
+
+        <p class="applicant-summary">
+          Creative marketing professional with expertise in digital campaigns, social media management, and content creation...
+        </p>
+
+        <div class="applicant-actions">
+          <button class="btn-action primary">
+            <i class="bi bi-eye"></i>
+            View Profile
+          </button>
+          <button class="btn-action success">
+            <i class="bi bi-star"></i>
+            Shortlist
+          </button>
+          <button class="btn-action danger">
+            <i class="bi bi-x"></i>
+            Reject
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Closed Jobs Tab -->
+  <div class="tab-content" id="closed-jobs">
+    <div class="empty-state">
+      <i class="bi bi-archive"></i>
+      <h3>No Closed Jobs Yet</h3>
+      <p>Jobs you close will appear here</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Post Job Modal (Basic Structure) -->
+<div class="modal" id="postJobModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Post New Job</h2>
+      <button class="modal-close" id="closeModal">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form class="job-form">
+        
+        <div class="form-group">
+          <label for="jobTitle">Job Title</label>
+          <input type="text" id="jobTitle" placeholder="e.g., Real Estate Agent" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="jobType">Job Type</label>
+            <select id="jobType" required>
+              <option value="">Select Type</option>
+              <option value="full-time">Full Time</option>
+              <option value="part-time">Part Time</option>
+              <option value="contract">Contract</option>
+              <option value="internship">Internship</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location</label>
+            <select id="location" required>
+              <option value="">Select Location</option>
+              <option value="lagos">Lagos</option>
+              <option value="abuja">Abuja</option>
+              <option value="ibadan">Ibadan</option>
+              <option value="remote">Remote</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="minSalary">Minimum Salary (₦)</label>
+            <input type="number" id="minSalary" placeholder="150000" required>
+          </div>
+
+          <div class="form-group">
+            <label for="maxSalary">Maximum Salary (₦)</label>
+            <input type="number" id="maxSalary" placeholder="300000" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="jobDescription">Job Description</label>
+          <textarea id="jobDescription" rows="5" placeholder="Describe the role, responsibilities, and requirements..." required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn-submit">
+            <i class="bi bi-check-circle"></i>
+            Post Job
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-tab');
+      
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+
+  // Modal functionality
+  const modal = document.getElementById('postJobModal');
+  const openModalBtn = document.getElementById('openPostJobModal');
+  const closeModalBtn = document.getElementById('closeModal');
+  const cancelBtn = document.getElementById('cancelBtn');
+  
+  openModalBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+  });
+  
+  closeModalBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+  
+  cancelBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+  
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+</script>
+
+{% endblock %}

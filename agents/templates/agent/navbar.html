@@ -26,9 +26,10 @@
           
           <!-- Latest News -->
           <li class="nav-item">
-            <a class="nav-link" href="{%url 'articles'%}">
+            <span class="nav-link text-muted coming-soon">
               <i class="bi bi-newspaper me-2"></i>Estate Blog
-            </a>
+              <span class="badge bg-secondary ms-2">Soon</span>
+            </span>
           </li>
 
           <!-- Property Management Dropdown -->
@@ -62,14 +63,12 @@
               <i class="bi bi-person-circle me-2"></i>Dashboard
             </a>
           </li>
-
-          <!-- Coming Soon Section -->
           <li class="nav-item">
-            <span class="nav-link text-muted coming-soon">
-              <i class="bi bi-chat-left-quote me-2"></i>Jobs
-              <span class="badge bg-secondary ms-2">Soon</span>
-            </span>
+            <a class="nav-link" href="{%url 'agent:job-listings'%}">
+              <i class="bi bi-chat-left-quote me-2"></i>jobs
+            </a>
           </li>
+
 
           <li class="nav-divider"></li>
 

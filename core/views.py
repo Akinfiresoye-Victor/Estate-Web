@@ -580,15 +580,25 @@ def edit_appointment(request, appointment_id):
         # Get the appointment based on user role
         if request.user.role == 'company':
             company = CompanyInformation.objects.get(user_id=request.user.id)
-            appointment = Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=appointment_id)
+            item= Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=appointment_id)
+            if item.company_uuid == company.unique_company_id:
+                appointment=item
+            else:
+                messages.warning(request, 'Access Denied')
+                return redirect('landing')
         else:
             agent = AgentInformation.objects.get(user_id=request.user.id)
-            appointment = Appointments.objects.filter(
-                agent_uuid=agent.agent_uuid
-            ).get(pk=appointment_id)
+            item = Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(pk=appointment_id)
+            if item.agent_uuid == agent.agent_uuid:
+                appointment= item
+            else:
+                messages.warning(request, 'Access Denied')
+                return redirect('landing')
+            
         #TODO Implement security measures in situations where update is critical
         # Get lead information if exists
         lead = None
+        
         try:
             if appointment.lead_uuid:
                 lead = LeadInfo.objects.get(lead_id=appointment.lead_uuid)
@@ -634,7 +644,7 @@ def edit_appointment(request, appointment_id):
         
     except Appointments.DoesNotExist:
         messages.error(request, 'Appointment not found')
-        return redirect('appointments_list')
+        return redirect('appointment')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
@@ -657,10 +667,20 @@ def view_client(request, appointment_id):
     try:
         try:
             company=CompanyInformation.objects.get(user_id= request.user.id)
-            leads=LeadInfo.objects.filter(company_uuid=company.unique_company_id)
+            lead_item=LeadInfo.objects.filter(company_uuid=company.unique_company_id).first()
+            if lead_item.company_uuid == company.unique_company_id:
+                leads=LeadInfo.objects.filter(company_uuid=company.unique_company_id)
+            else:
+                messages.warning(request, 'Access Denied')
+                return redirect('landing')
         except:
             agent= AgentInformation.objects.get(user_id=request.user.id)
-            leads= LeadInfo.objects.filter(agent_id=agent.agent_uuid)
+            lead_item= LeadInfo.objects.filter(agent_id=agent.agent_uuid).first()
+            if lead_item.agent_id == agent.agent_uuid:
+                leads= LeadInfo.objects.filter(agent_id=agent.agent_uuid)
+            else:
+                messages.warning(request, 'Access Denied')
+                return redirect('landing')
         return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_id})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
@@ -674,8 +694,29 @@ def add_client(request, lead_uuid, appointment_id):
         messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
-        appointment_data= Appointments.objects.get(pk=appointment_id)
-        lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
+        if request.user.role == 'company':
+            company= CompanyInformation.objects.get(user_id=request.user.id)
+            raw_data= Appointments.objects.get(pk=appointment_id)
+            raw_lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
+            if raw_data.company_uuid == company.unique_company_id and raw_lead_data.company_uuid == company.unique_company_id:
+                appointment_data= raw_data
+                lead_data= raw_lead_data
+            else:
+                messages.warning(request, 'Restricted Action')
+                return redirect('landing')
+        elif request.user.role == 'agent':
+            agent= AgentInformation.objects.get(user_id=request.user.id)
+            raw_data= Appointments.objects.get(pk=appointment_id)
+            raw_lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
+            if raw_data.agent_uuid == agent.agent_uuid and raw_lead_data.agent_id == agent.agent_uuid:
+                appointment_data=raw_data
+                lead_data= raw_lead_data
+            else:
+                messages.warning(request, 'Restricted Action')
+                return redirect('landing')
+        else:
+            return redirect('landing')
+        
         appointment_data.lead_uuid= lead_data.lead_id
         appointment_data.save()
         messages.success(request, 'Client Added')

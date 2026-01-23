@@ -1,0 +1,521 @@
+{% extends 'company/base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'company/css/find_talents.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="talents-container">
+  
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Find Talents</h1>
+      <p class="page-subtitle">Discover skilled real estate agents on Estate Web</p>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-grid">
+      
+      <div class="filter-group">
+        <label for="location" class="filter-label">Location</label>
+        <select class="filter-select" id="location">
+          <option value="">All Locations</option>
+          <option value="lagos">Lagos</option>
+          <option value="abuja">Abuja</option>
+          <option value="ibadan">Ibadan</option>
+          <option value="port-harcourt">Port Harcourt</option>
+          <option value="kano">Kano</option>
+          <option value="enugu">Enugu</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="workType" class="filter-label">Nature of Work</label>
+        <select class="filter-select" id="workType">
+          <option value="">All Work Types</option>
+          <option value="residential">Residential Sales</option>
+          <option value="commercial">Commercial Properties</option>
+          <option value="rentals">Property Rentals</option>
+          <option value="property-manager">Property Management</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="experience" class="filter-label">Experience</label>
+        <select class="filter-select" id="experience">
+          <option value="">All Experience Levels</option>
+          <option value="0-1">0-1 years</option>
+          <option value="1-3">1-3 years</option>
+          <option value="3-5">3-5 years</option>
+          <option value="5-10">5-10 years</option>
+          <option value="10+">10+ years</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="verification" class="filter-label">Status</label>
+        <select class="filter-select" id="verification">
+          <option value="">All Agents</option>
+          <option value="verified">Verified Only</option>
+          <option value="universal">Universal Agents</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Agent Listings -->
+  <div class="agent-listings">
+    
+    <!-- Agent Card 1 -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar">
+          <img src="https://ui-avatars.com/api/?name=Chukwudi+Okafor&size=80&background=1a3c4e&color=fff&bold=true" alt="Chukwudi Okafor">
+        </div>
+        <div class="agent-info">
+          <div class="agent-title-row">
+            <h2 class="agent-name">Chukwudi Okafor</h2>
+            <span class="verified-badge">
+              <i class="bi bi-patch-check-fill"></i>
+            </span>
+          </div>
+          <p class="agent-work-type">Residential & Commercial Sales</p>
+          <div class="agent-meta">
+            <span class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              Lagos
+            </span>
+            <span class="meta-divider">•</span>
+            <span class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              5-10 years
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat-item">
+          <i class="bi bi-eye-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">1,247</span>
+            <span class="stat-label">Profile Views</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-star-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">4.9</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-chat-dots"></i>
+          <div class="stat-content">
+            <span class="stat-value">89</span>
+            <span class="stat-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-language">
+        <i class="bi bi-translate"></i>
+        <span>English, Igbo, Yoruba</span>
+      </div>
+
+      <p class="agent-bio">
+        Experienced professional helping clients find quality properties across Lagos. Strong negotiation skills and deep understanding of the local real estate market.
+      </p>
+
+      <div class="agent-actions">
+        <a href="#" class="btn-primary">
+          <i class="bi bi-person-check"></i>
+          <span>View Profile</span>
+        </a>
+        <a href="#" class="btn-secondary">
+          <i class="bi bi-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Agent Card 2 -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar">
+          <img src="https://ui-avatars.com/api/?name=Amaka+Nwosu&size=80&background=1a3c4e&color=fff&bold=true" alt="Amaka Nwosu">
+        </div>
+        <div class="agent-info">
+          <div class="agent-title-row">
+            <h2 class="agent-name">Amaka Nwosu</h2>
+            <span class="verified-badge">
+              <i class="bi bi-patch-check-fill"></i>
+            </span>
+          </div>
+          <p class="agent-work-type">Property Rentals Specialist</p>
+          <div class="agent-meta">
+            <span class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              Abuja
+            </span>
+            <span class="meta-divider">•</span>
+            <span class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              3-5 years
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat-item">
+          <i class="bi bi-eye-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">892</span>
+            <span class="stat-label">Profile Views</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-star-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">4.8</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-chat-dots"></i>
+          <div class="stat-content">
+            <span class="stat-value">67</span>
+            <span class="stat-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-language">
+        <i class="bi bi-translate"></i>
+        <span>English, Igbo</span>
+      </div>
+
+      <p class="agent-bio">
+        Passionate about matching families with their ideal rental homes in Abuja. Known for excellent customer service and attention to client needs.
+      </p>
+
+      <div class="agent-actions">
+        <a href="#" class="btn-primary">
+          <i class="bi bi-person-check"></i>
+          <span>View Profile</span>
+        </a>
+        <a href="#" class="btn-secondary">
+          <i class="bi bi-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Agent Card 3 -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar">
+          <img src="https://ui-avatars.com/api/?name=Tunde+Adeyemi&size=80&background=1a3c4e&color=fff&bold=true" alt="Tunde Adeyemi">
+        </div>
+        <div class="agent-info">
+          <div class="agent-title-row">
+            <h2 class="agent-name">Tunde Adeyemi</h2>
+            <span class="verified-badge">
+              <i class="bi bi-patch-check-fill"></i>
+            </span>
+            <span class="universal-badge">
+              <i class="bi bi-star-fill"></i>
+            </span>
+          </div>
+          <p class="agent-work-type">Commercial Properties Expert</p>
+          <div class="agent-meta">
+            <span class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              Lagos
+            </span>
+            <span class="meta-divider">•</span>
+            <span class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              10+ years
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat-item">
+          <i class="bi bi-eye-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">2,156</span>
+            <span class="stat-label">Profile Views</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-star-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">5.0</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-chat-dots"></i>
+          <div class="stat-content">
+            <span class="stat-value">112</span>
+            <span class="stat-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-language">
+        <i class="bi bi-translate"></i>
+        <span>English, Yoruba, Hausa</span>
+      </div>
+
+      <p class="agent-bio">
+        Veteran commercial real estate specialist with extensive network in Lagos business districts. Focus on office spaces, retail locations, and investment properties.
+      </p>
+
+      <div class="agent-actions">
+        <a href="#" class="btn-primary">
+          <i class="bi bi-person-check"></i>
+          <span>View Profile</span>
+        </a>
+        <a href="#" class="btn-secondary">
+          <i class="bi bi-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Agent Card 4 -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar">
+          <img src="https://ui-avatars.com/api/?name=Blessing+Ibrahim&size=80&background=1a3c4e&color=fff&bold=true" alt="Blessing Ibrahim">
+        </div>
+        <div class="agent-info">
+          <div class="agent-title-row">
+            <h2 class="agent-name">Blessing Ibrahim</h2>
+          </div>
+          <p class="agent-work-type">Residential Sales Agent</p>
+          <div class="agent-meta">
+            <span class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              Port Harcourt
+            </span>
+            <span class="meta-divider">•</span>
+            <span class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              1-3 years
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat-item">
+          <i class="bi bi-eye-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">534</span>
+            <span class="stat-label">Profile Views</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-star-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">4.7</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-chat-dots"></i>
+          <div class="stat-content">
+            <span class="stat-value">34</span>
+            <span class="stat-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-language">
+        <i class="bi bi-translate"></i>
+        <span>English, Pidgin</span>
+      </div>
+
+      <p class="agent-bio">
+        Energetic agent helping people find quality homes in Port Harcourt. Known for responsiveness, transparency, and dedication to client satisfaction.
+      </p>
+
+      <div class="agent-actions">
+        <a href="#" class="btn-primary">
+          <i class="bi bi-person-check"></i>
+          <span>View Profile</span>
+        </a>
+        <a href="#" class="btn-secondary">
+          <i class="bi bi-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Agent Card 5 -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar">
+          <img src="https://ui-avatars.com/api/?name=Emeka+Eze&size=80&background=1a3c4e&color=fff&bold=true" alt="Emeka Eze">
+        </div>
+        <div class="agent-info">
+          <div class="agent-title-row">
+            <h2 class="agent-name">Emeka Eze</h2>
+            <span class="verified-badge">
+              <i class="bi bi-patch-check-fill"></i>
+            </span>
+            <span class="universal-badge">
+              <i class="bi bi-star-fill"></i>
+            </span>
+          </div>
+          <p class="agent-work-type">Property Management</p>
+          <div class="agent-meta">
+            <span class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              Lagos
+            </span>
+            <span class="meta-divider">•</span>
+            <span class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              5-10 years
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat-item">
+          <i class="bi bi-eye-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">1,673</span>
+            <span class="stat-label">Profile Views</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-star-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">4.9</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-chat-dots"></i>
+          <div class="stat-content">
+            <span class="stat-value">56</span>
+            <span class="stat-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-language">
+        <i class="bi bi-translate"></i>
+        <span>English, Igbo, Yoruba</span>
+      </div>
+
+      <p class="agent-bio">
+        Professional property manager overseeing multiple residential and commercial portfolios. Expertise in tenant relations and property maintenance coordination.
+      </p>
+
+      <div class="agent-actions">
+        <a href="#" class="btn-primary">
+          <i class="bi bi-person-check"></i>
+          <span>View Profile</span>
+        </a>
+        <a href="#" class="btn-secondary">
+          <i class="bi bi-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Agent Card 6 -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-avatar">
+          <img src="https://ui-avatars.com/api/?name=Fatima+Yusuf&size=80&background=1a3c4e&color=fff&bold=true" alt="Fatima Yusuf">
+        </div>
+        <div class="agent-info">
+          <div class="agent-title-row">
+            <h2 class="agent-name">Fatima Yusuf</h2>
+            <span class="verified-badge">
+              <i class="bi bi-patch-check-fill"></i>
+            </span>
+          </div>
+          <p class="agent-work-type">Residential & Rental Properties</p>
+          <div class="agent-meta">
+            <span class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              Kano
+            </span>
+            <span class="meta-divider">•</span>
+            <span class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              3-5 years
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-stats">
+        <div class="stat-item">
+          <i class="bi bi-eye-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">1,023</span>
+            <span class="stat-label">Profile Views</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-star-fill"></i>
+          <div class="stat-content">
+            <span class="stat-value">4.8</span>
+            <span class="stat-label">Rating</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <i class="bi bi-chat-dots"></i>
+          <div class="stat-content">
+            <span class="stat-value">78</span>
+            <span class="stat-label">Reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-language">
+        <i class="bi bi-translate"></i>
+        <span>English, Hausa</span>
+      </div>
+
+      <p class="agent-bio">
+        Dedicated agent helping clients find homes and rental properties in Kano. Strong local market knowledge and commitment to client satisfaction.
+      </p>
+
+      <div class="agent-actions">
+        <a href="#" class="btn-primary">
+          <i class="bi bi-person-check"></i>
+          <span>View Profile</span>
+        </a>
+        <a href="#" class="btn-secondary">
+          <i class="bi bi-envelope"></i>
+          <span>Contact</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

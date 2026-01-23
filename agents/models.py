@@ -3,6 +3,7 @@ from core.choices import STATES, AGENT_SOCIAL_LINKS, YEARS_OF_EXPERINCE
 from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
+from django.utils import timezone
 
 
 
@@ -68,12 +69,20 @@ class UniversalAgent(models.Model):
 
 
 class AgentAnalytics(models.Model):
-    agent=models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='analytics')
-    profile_views=models.IntegerField('Companies That viewed your profile', default=0, null=False, blank=True)
-    ratings=models.FloatField('Agents Rating', default=0.0, blank=True, null=True)
-    reviews=models.IntegerField('Number Of Reviews', default=0, blank=True, null= True)
+    agent = models.OneToOneField(AgentInformation, on_delete=models.CASCADE, related_name='analytics')
+    profile_views = models.IntegerField('Profile Views', default=0, null=False, blank=True)
+    property_views_l = models.IntegerField('Lease Property Views', default=0, null=False, blank=True)
+    property_views_s = models.IntegerField('Sale Property Views', default=0, null=False, blank=True)
+    average_profile_views = models.IntegerField('Average Profile Views', default=0, null=False, blank=True)
+    average_lease_views = models.IntegerField('Average Lease Views', default=0, null=False, blank=True)
+    average_sale_views = models.IntegerField('Average Sale Views', default=0, null=False, blank=True)
+    last_reset_date = models.DateTimeField('Last Reset Date', default=timezone.now)
+    competition = models.FloatField('Engagement Score', default=0.0, blank=True, null=True)
+    ratings = models.FloatField('Agent Rating', default=0.0, blank=True, null=True)
+    reviews = models.IntegerField('Number Of Reviews', default=0, blank=True, null=True)
+    
     def __str__(self):
-        return(self.agent.profile_name)
+        return f"{self.agent.profile_name} - Analytics"
 
 class SessionId(models.Model):
     agent=models.ForeignKey(AgentInformation, on_delete= models.CASCADE, related_name='session_id')

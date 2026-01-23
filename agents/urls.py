@@ -12,5 +12,8 @@ urlpatterns = [
     path('analytics', views.analytics, name='analytics'),
     path('lead/detail/<lead_id>', views.lead_detail, name='lead-detail'),
     path('settings', views.settings, name='settings'),
-    path('lead/delete/<lead_id>', views.delete_lead, name='delete-lead')
+    path('lead/delete/<lead_id>', views.delete_lead, name='delete-lead'),
+    path('lead/update_status/<int:lead_id>/', views.agent_update_lead_status, name='agent-update-lead-status'),
+    path('lead/update_stage/<int:lead_id>/', views.agent_update_lead_stage, name='agent-update-lead-stage'),
+    path('jobs/listings', views.job_listings, name='job-listings'),
 ]

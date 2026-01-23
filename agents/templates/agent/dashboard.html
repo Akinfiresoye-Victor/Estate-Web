@@ -10,395 +10,328 @@
 
 <div class="dashboard-container">
   
-  <!-- Welcome Banner -->
-  <div class="welcome-banner">
-    <div class="banner-content">
-      <div class="agent-info-section">
-        <div class="agent-avatar">
-          {% if agent_info.profile_picture %}
-            <img src="{{ agent_info.profile_picture.url }}" alt="{{ name }}">
-          {% else %}
-            <img src="https://ui-avatars.com/api/?name={{ name }}&size=120&background=1a3c4e&color=fff&bold=true" alt="{{ name }}">
-          {% endif %}
-          <span class="status-indicator"></span>
-        </div>
-        <div class="agent-details">
-          <h1 class="greeting-text">{{ greeting }}, {{ first_name }}!</h1>
-          <p class="agent-role">{{ work_type }}</p>
-          {% if agent_info.verified %}
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-              Verified Agent
-            </span>
-          {% endif %}
-        </div>
+  <!-- Welcome Header -->
+  <div class="welcome-header">
+    <div class="header-left">
+      <div class="agent-avatar">
+        {% if agent_info.profile_picture %}
+          <img src="{{ agent_info.profile_picture.url }}" alt="{{ name }}">
+        {% else %}
+          <img src="https://ui-avatars.com/api/?name={{ name }}&size=80&background=1a3c4e&color=fff&bold=true" alt="{{ name }}">
+        {% endif %}
+        <span class="online-dot"></span>
       </div>
-      
-      <div class="banner-actions">
-        <div class="rating-display">
-          <div class="rating-stars">
-            <i class="bi bi-star-fill"></i>
-            <span class="rating-value">4.8</span>
-          </div>
-          <span class="rating-label">127 Reviews</span>
-        </div>
-        <button class="btn-notification">
-          <i class="bi bi-bell"></i>
-          <span class="notification-badge">3</span>
-        </button>
+      <div class="greeting-section">
+        <h1 class="greeting-title">{{ greeting }}, {{ first_name }}!</h1>
+        <p class="greeting-subtitle">{{ work_type }}</p>
+        {% if agent_info.verified %}
+        <span class="verified-tag">
+          <i class="bi bi-patch-check-fill"></i>
+          Verified
+        </span>
+        {% endif %}
       </div>
     </div>
     
-    <div class="daily-tip">
-      <i class="bi bi-lightbulb"></i>
-      <div class="tip-content">
-        <p class="tip-text">{{ tips }}</p>
-        <span class="tip-author">by: {{ by }}</span>
-      </div>
+    <div class="header-right">
+      <button class="header-icon-btn">
+        <i class="bi bi-bell"></i>
+        <span class="notification-count">3</span>
+      </button>
+      <button class="header-icon-btn">
+        <i class="bi bi-chat-dots"></i>
+      </button>
     </div>
   </div>
 
-  <!-- Key Metrics Grid -->
+  <!-- Daily Tip Banner -->
+  <div class="tip-banner">
+    <div class="tip-icon">
+      <i class="bi bi-lightbulb-fill"></i>
+    </div>
+    <div class="tip-content">
+      <p class="tip-text">"{{ tips }}"</p>
+      <span class="tip-author">— {{ by }}</span>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
   <div class="metrics-grid">
+    
     <div class="metric-card">
-      <div class="metric-header">
-        <div class="metric-icon blue">
-          <i class="bi bi-house-check"></i>
-        </div>
+      <div class="metric-icon blue">
+        <i class="bi bi-house-check"></i>
+      </div>
+      <div class="metric-content">
         <span class="metric-label">Active Listings</span>
-      </div>
-      <h2 class="metric-value">{{ house_count }}</h2>
-      <div class="metric-footer">
-        <span class="metric-change positive">
-          <i class="bi bi-arrow-up"></i> 12%
-        </span>
-        <span class="metric-period">vs last month</span>
+        <h2 class="metric-value">{{ house_count }}</h2>
       </div>
     </div>
 
     <div class="metric-card">
-      <div class="metric-header">
-        <div class="metric-icon green">
-          <i class="bi bi-people"></i>
-        </div>
-        <span class="metric-label">Active Leads</span>
+      <div class="metric-icon green">
+        <i class="bi bi-people"></i>
       </div>
-      <h2 class="metric-value">{{ lead_count }}</h2>
-      <div class="metric-footer">
-        <span class="metric-badge new">{{ new_lead_count }} New</span>
-      </div>
-    </div>
-
-    <div class="metric-card">
-      <div class="metric-header">
-        <div class="metric-icon orange">
-          <i class="bi bi-calendar-event"></i>
-        </div>
-        <span class="metric-label">Appointments</span>
-      </div>
-      <h2 class="metric-value">5</h2>
-      <div class="metric-footer">
-        <span class="metric-period">This week</span>
+      <div class="metric-content">
+        <span class="metric-label">Total Leads</span>
+        <h2 class="metric-value">{{ lead_count }}</h2>
+        {% if new_lead_count > 0 %}
+        <span class="metric-badge">+{{ new_lead_count }} New</span>
+        {% endif %}
       </div>
     </div>
 
     <div class="metric-card">
-      <div class="metric-header">
-        <div class="metric-icon purple">
-          <i class="bi bi-trophy"></i>
-        </div>
-        <span class="metric-label">Total Sales</span>
+      <div class="metric-icon orange">
+        <i class="bi bi-calendar-event"></i>
       </div>
-      <h2 class="metric-value">52</h2>
-      <div class="metric-footer">
-        <span class="metric-change positive">
-          <i class="bi bi-arrow-up"></i> 8%
-        </span>
-        <span class="metric-period">vs last month</span>
+      <div class="metric-content">
+        <span class="metric-label">Today's Appointments</span>
+        <h2 class="metric-value">{{ todays_appointment|length }}</h2>
       </div>
     </div>
+
+    <div class="metric-card">
+      <div class="metric-icon purple">
+        <i class="bi bi-star"></i>
+      </div>
+      <div class="metric-content">
+        <span class="metric-label">Rating</span>
+        <h2 class="metric-value">4.8</h2>
+        <span class="metric-subtext">127 reviews</span>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Main Content Area -->
-  <div class="content-layout">
+  <!-- Main Layout -->
+  <div class="main-layout">
     
-    <!-- Primary Column -->
-    <div class="primary-content">
-      
-      <!-- Quick Actions Section -->
-      <section class="dashboard-section">
-        <div class="section-header">
-          <h2 class="section-title">Quick Actions</h2>
-        </div>
-        
-        <div class="quick-actions-grid">
-          <a href="{% url 'lease-property' %}" class="action-button primary">
-            <div class="action-icon">
-              <i class="bi bi-house-add"></i>
-            </div>
-            <div class="action-text">
-              <h3>Lease Property</h3>
-              <p>List new rental</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-
-          <a href="{% url 'sell-property' %}" class="action-button primary">
-            <div class="action-icon">
-              <i class="bi bi-house-add"></i>
-            </div>
-            <div class="action-text">
-              <h3>Sell Property</h3>
-              <p>List for sale</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-
-          <a href="{% url 'listings' %}" class="action-button">
-            <div class="action-icon">
-              <i class="bi bi-grid-3x3-gap"></i>
-            </div>
-            <div class="action-text">
-              <h3>My Portfolio</h3>
-              <p>View all listings</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-
-          <a href="{% url 'agent:leads' %}" class="action-button">
-            <div class="action-icon">
-              <i class="bi bi-person-badge"></i>
-            </div>
-            <div class="action-text">
-              <h3>Manage Leads</h3>
-              <p>Track clients</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-
-          <a href="{%url 'appointment'%}" class="action-button">
-            <div class="action-icon">
-              <i class="bi bi-calendar-check"></i>
-            </div>
-            <div class="action-text">
-              <h3>View Schedule</h3>
-              <p>Track Bookings</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-
-          <a href="{%url 'agent:analytics'%}" class="action-button">
-            <div class="action-icon">
-              <i class="bi bi-graph-up-arrow"></i>
-            </div>
-            <div class="action-text">
-              <h3>Analytics</h3>
-              <p>View insights</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-          <div class="action-button disabled">
-            <span class="coming-soon-label">
-              <i class="bi bi-clock-history"></i>
-              Coming Soon
-            </span>
-            <div class="action-icon">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-            <div class="action-text">
-              <h3>Documents</h3>
-              <p>Manage contracts</p>
-            </div>
-          </div>
-          <a href="{%url 'agent:settings'%}" class="action-button">
-            <div class="action-icon">
-              <i class="bi bi-gear"></i>
-            </div>
-            <div class="action-text">
-              <h3>Settings</h3>
-              <p>Configure Prefrences</p>
-            </div>
-            <i class="bi bi-arrow-right action-arrow"></i>
-          </a>
-        </div>
-      </section>
-
-      <!-- Recent Activity -->
-      <section class="dashboard-section">
-        <div class="section-header">
-          <h2 class="section-title">Recent Activity</h2>
-          <a href="#" class="view-all-link">View All</a>
-        </div>
-        
-        <div class="activity-timeline">
-          <div class="timeline-item">
-            <div class="timeline-marker blue"></div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <h4>New property listed in Victoria Island</h4>
-                <span class="timeline-time">2 hours ago</span>
-              </div>
-              <p class="timeline-description">Successfully added 3-bedroom apartment</p>
-            </div>
-          </div>
-
-          <div class="timeline-item">
-            <div class="timeline-marker green"></div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <h4>Client meeting completed</h4>
-                <span class="timeline-time">5 hours ago</span>
-              </div>
-              <p class="timeline-description">Met with John Doe for property viewing</p>
-            </div>
-          </div>
-
-          <div class="timeline-item">
-            <div class="timeline-marker orange"></div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <h4>New inquiry received</h4>
-                <span class="timeline-time">1 day ago</span>
-              </div>
-              <p class="timeline-description">Interest in 3-bedroom apartment</p>
-            </div>
-          </div>
-
-          <div class="timeline-item">
-            <div class="timeline-marker purple"></div>
-            <div class="timeline-content">
-              <div class="timeline-header">
-                <h4>Contract signed</h4>
-                <span class="timeline-time">2 days ago</span>
-              </div>
-              <p class="timeline-description">Property sale completed in Lekki</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </div>
-
-    <!-- Secondary Column -->
-    <aside class="secondary-content">
-      
-      <!-- Agent Info Card -->
-      <div class="info-panel">
-        <div class="panel-header">
-          <i class="bi bi-person-circle"></i>
-          <h3>Agent Information</h3>
-        </div>
-        <div class="panel-body">
-          <div class="info-group">
-            <i class="bi bi-envelope"></i>
-            <div class="info-text">
-              <span class="info-label">Email</span>
-              <span class="info-value">{{ email }}</span>
-            </div>
-          </div>
-          
-          <div class="info-group">
-            <i class="bi bi-telephone"></i>
-            <div class="info-text">
-              <span class="info-label">Phone</span>
-              <span class="info-value">{{ phone }}</span>
-            </div>
-          </div>
-          
-          <div class="info-group">
-            <i class="bi bi-geo-alt"></i>
-            <div class="info-text">
-              <span class="info-label">Location</span>
-              <span class="info-value">{{ location }}, Nigeria</span>
-            </div>
-          </div>
-          
-          <div class="info-group">
-            <i class="bi bi-building"></i>
-            <div class="info-text">
-              <span class="info-label">Company</span>
-              <span class="info-value">Company Name</span>
-            </div>
-          </div>
-        </div>
+    <!-- Quick Actions -->
+    <section class="actions-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="bi bi-lightning-charge"></i>
+          Quick Actions
+        </h2>
       </div>
-
-      <!-- Today's Schedule -->
-      {%if todays_appointment%}
-        <div class="info-panel">
-          <div class="panel-header">
-            <i class="bi bi-calendar-week"></i>
-            <h3>Today's Schedule</h3>
+      
+      <div class="actions-grid">
+        
+        <a href="{% url 'lease-property' %}" class="action-card primary">
+          <div class="action-icon">
+            <i class="bi bi-house-add"></i>
           </div>
-          {% comment %} TODO Set time for appointments, it should have drop down for AM and PM and its variable should be timeformat and status {% endcomment %}
-        {%for appointment in todays_appointment%}
-            <div class="panel-body">
-              <div class="schedule-list">
-                <div class="schedule-item">
-                {%if appointment.time%}
-                  <div class="schedule-time">
-                    <span class="time-hour">{{appointment.time}}</span>
-                    <span class="time-period">{{appointment.timeformat}}</span>
-                  </div>
-                {%else%}
-                  <div class="schedule-time">
-                    <span class="time-hour">Any</span>
-                    <span class="time-period">time</span>
-                  </div>
-                {%endif%}
-                  <div class="schedule-details">
-                    <h4>{{appointment.appointment_type}}</h4>
-                    {%if appointment.appointment_type == 'Virtual'%}
-                      <p><i class="bi bi-geo-alt"></i> Virtual</p>
-                    {%elif appointment.appointment_type == 'Personal'%}
-                      <p><i class="bi bi-geo-alt"></i> {{appointment.location}}</p>
-                    {%elif appointment.appointment_type == 'Buisness' %}
-                      <p><i class="bi bi-geo-alt"></i> {{appointment.location}}</p>
-                    {%else%}
-                      <p><i class="bi bi-geo-alt"></i> Not Specified</p>
-                    {%endif%}
-                    <span class="schedule-status pending">{{appointment.appointment_type}}</span>
-                  </div>
-                </div>
-        {%endfor%}
-      {%else%}
-        <div class="info-panel">
-          <div class="panel-header">
-            <i class="bi bi-calendar-week"></i>
-            <h3>Today's Schedule(None For Today)</h3>
-        </div>
-        <a href="{%url 'add-schedule'%}" style="text-decoration:none;">
-          <button class="btn-panel-action">
-            <i class="bi bi-plus-circle"></i>
-            Add Appointment
-          </button>
+          <div class="action-info">
+            <h3>Lease Property</h3>
+            <p>List new rental</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
         </a>
-        </div>
-      </div>
-      {%endif%}
-      <!-- Performance Stats -->
-      <div class="info-panel">
-        <div class="panel-header">
-          <i class="bi bi-bar-chart"></i>
-          <h3>Performance</h3>
-        </div>
-        <div class="panel-body">
-          <div class="stat-row">
-            <span class="stat-label">Profile Views</span>
-            <span class="stat-number">98</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Inquiries</span>
-            <span class="stat-number">23</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Closed Deals</span>
-            <span class="stat-number">3</span>
-          </div>
-        </div>
-      </div>
 
-    </aside>
+        <a href="{% url 'sell-property' %}" class="action-card primary">
+          <div class="action-icon">
+            <i class="bi bi-house-add"></i>
+          </div>
+          <div class="action-info">
+            <h3>Sell Property</h3>
+            <p>List for sale</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
+        </a>
+
+        <a href="{% url 'listings' %}" class="action-card">
+          <div class="action-icon">
+            <i class="bi bi-grid-3x3-gap"></i>
+          </div>
+          <div class="action-info">
+            <h3>My Portfolio</h3>
+            <p>View all listings</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
+        </a>
+
+        <a href="{% url 'agent:leads' %}" class="action-card">
+          <div class="action-icon">
+            <i class="bi bi-person-badge"></i>
+          </div>
+          <div class="action-info">
+            <h3>Manage Leads</h3>
+            <p>Track clients</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
+        </a>
+
+        <a href="{% url 'appointment' %}" class="action-card">
+          <div class="action-icon">
+            <i class="bi bi-calendar-check"></i>
+          </div>
+          <div class="action-info">
+            <h3>Appointments</h3>
+            <p>View schedule</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
+        </a>
+
+        <a href="{% url 'agent:analytics' %}" class="action-card">
+          <div class="action-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <div class="action-info">
+            <h3>Analytics</h3>
+            <p>View insights</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
+        </a>
+
+        <div class="action-card disabled">
+          <span class="coming-soon-badge">
+            <i class="bi bi-clock-history"></i>
+            Coming Soon
+          </span>
+          <div class="action-icon">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <div class="action-info">
+            <h3>Documents</h3>
+            <p>Manage contracts</p>
+          </div>
+        </div>
+
+        <a href="{% url 'agent:settings' %}" class="action-card">
+          <div class="action-icon">
+            <i class="bi bi-gear"></i>
+          </div>
+          <div class="action-info">
+            <h3>Settings</h3>
+            <p>Configure preferences</p>
+          </div>
+          <i class="bi bi-arrow-right-short action-arrow"></i>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Today's Schedule -->
+    {% if todays_appointment %}
+    <section class="schedule-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="bi bi-calendar-day"></i>
+          Today's Schedule
+        </h2>
+        <a href="{% url 'add-schedule' %}" class="add-btn">
+          <i class="bi bi-plus-circle"></i>
+          Add Appointment
+        </a>
+      </div>
+      
+      <div class="schedule-grid">
+        {% for appointment in todays_appointment %}
+        <div class="schedule-card">
+          <div class="schedule-time-block">
+            {% if appointment.time %}
+              <span class="time-value">{{ appointment.time }}</span>
+              <span class="time-period">{{ appointment.timeformat }}</span>
+            {% else %}
+              <span class="time-value">Any</span>
+              <span class="time-period">Time</span>
+            {% endif %}
+          </div>
+          
+          <div class="schedule-info">
+            <h3 class="schedule-title">{{ appointment.appointment_type }}</h3>
+            <p class="schedule-location">
+              <i class="bi bi-geo-alt"></i>
+              {% if appointment.appointment_type == 'Virtual' %}
+                Virtual Meeting
+              {% elif appointment.location %}
+                {{ appointment.location }}
+              {% else %}
+                Not Specified
+              {% endif %}
+            </p>
+            <span class="schedule-type {{ appointment.appointment_type|lower }}">
+              {{ appointment.appointment_type }}
+            </span>
+          </div>
+          
+          <a href="#" class="schedule-action">
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% else %}
+    <section class="schedule-section empty">
+      <div class="empty-schedule">
+        <div class="empty-icon">
+          <i class="bi bi-calendar-x"></i>
+        </div>
+        <h3>No Appointments Today</h3>
+        <p>Your schedule is clear. Time to focus on other tasks!</p>
+        <a href="{% url 'add-schedule' %}" class="btn-add-schedule">
+          <i class="bi bi-plus-circle"></i>
+          Schedule an Appointment
+        </a>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Contact Info -->
+    <section class="info-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="bi bi-person-circle"></i>
+          Your Information
+        </h2>
+      </div>
+      
+      <div class="info-grid">
+        
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="bi bi-envelope"></i>
+          </div>
+          <div class="info-text">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ email }}</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="bi bi-telephone"></i>
+          </div>
+          <div class="info-text">
+            <span class="info-label">Phone</span>
+            <span class="info-value">{{ phone }}</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="bi bi-geo-alt"></i>
+          </div>
+          <div class="info-text">
+            <span class="info-label">Location</span>
+            <span class="info-value">{{ location }}, Nigeria</span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <i class="bi bi-building"></i>
+          </div>
+          <div class="info-text">
+            <span class="info-label">Company</span>
+            <span class="info-value">Company Name</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
   </div>
 

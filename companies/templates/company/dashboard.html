@@ -235,6 +235,14 @@
             </div>
           </a>
 
+      <a href="{% url 'company:manage-company' %}" class="tool-card">
+        <div class="tool-icon">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <h4>Employee Management</h4>
+        <p>Know Whats going on in your company</p>
+      </a>
+      
         </div>
       </div>
 
@@ -245,10 +253,17 @@
       
       <a href="{% url 'company:lead-management' %}" class="tool-card">
         <div class="tool-icon">
-          <i class="bi bi-people"></i>
+          <i class="bi bi-person-lines-fill"></i>
         </div>
         <h4>Lead Management</h4>
         <p>Manage customer inquiries</p>
+      </a>
+      <a href="{% url 'company:application-management' %}" class="tool-card">
+        <div class="tool-icon">
+          <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <h4>Applicant Tracking</h4>
+        <p>Manage Job Applications</p>
       </a>
 
       <a href="{% url 'appointment' %}" class="tool-card">
