@@ -1,66 +1,96 @@
-{% extends 'agent/base.html' %}
-
+{% extends base_template %}
 {% load static %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'agent/css/agent_profile.css' %}">
+  <link rel="stylesheet" href="{% static 'estate/css/agent_profile.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<!-- Profile Hero Section -->
-<div class="profile-hero">
-  <div class="hero-gradient"></div>
-  <div class="container">
-    <div class="hero-content">
+<!-- Agent Profile Hero -->
+<div class="agent-hero">
+  <div class="hero-background"></div>
+  <div class="container"> 
+    <div class="hero-wrapper">
       
-      <div class="agent-avatar-section">
-        <div class="avatar-wrapper">
-          {% if agent_info.profile_picture %}
-            <img src="{{ agent_info.profile_picture.url }}" alt="{{ name }}" class="agent-avatar">
+      <div class="agent-profile-card">
+        <div class="profile-avatar-section">
+          {% if agent.profile_picture %}
+            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.profile_name }}" class="profile-avatar">
           {% else %}
-            <img src="https://ui-avatars.com/api/?name={{ name }}&size=180&background=1a3c4e&color=fff&bold=true" alt="{{ name }}" class="agent-avatar">
+            <div class="avatar-placeholder">
+              <i class="bi bi-person"></i>
+            </div>
           {% endif %}
-          <span class="status-indicator"></span>
-        </div>
-        {% if agent_info.verified %}
-        <div class="verification-badge">
-          <i class="bi bi-patch-check-fill"></i>
-          <span>Verified Agent</span>
-        </div>
-        {% endif %}
-      </div>
-
-      <div class="agent-info-section">
-        <h1 class="agent-name">{{ name }}</h1>
-        <p class="agent-role">{{ work_type }}</p>
-        
-        <div class="agent-stats-row">
-          <div class="stat-box">
-            <span class="stat-number">4.8</span>
-            <span class="stat-text">Rating</span>
+          
+          {% if agent.verified %}
+          <div class="verified-badge">
+            <i class="bi bi-patch-check-fill"></i>
           </div>
-          <div class="stat-divider"></div>
-          <div class="stat-box">
-            <span class="stat-number">127</span>
-            <span class="stat-text">Reviews</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-box">
-            <span class="stat-number">52</span>
-            <span class="stat-text">Sales</span>
-          </div>
+          {% endif %}
         </div>
 
-        <div class="agent-actions">
-          <a href="#" class="btn-primary-action">
-            <i class="bi bi-pencil-square"></i>
-            Edit Profile
-          </a>
-          <a href="#" class="btn-secondary-action">
-            <i class="bi bi-share"></i>
-            Share Profile
-          </a>
+        <div class="profile-info-section">
+          <h1 class="agent-name">{{ agent.profile_name }}</h1>
+          <p class="agent-work-type">{{ agent.work_type }}</p>
+          
+          <div class="agent-rating-display">
+            <div class="stars">
+              {% if total_reviews > 0 %}
+                {% for i in "12345" %}
+                  {% if forloop.counter <= average_rating|floatformat:0 %}
+                    <i class="bi bi-star-fill"></i>
+                  {% elif forloop.counter <= average_rating|add:"0.5"|floatformat:0 %}
+                    <i class="bi bi-star-half"></i>
+                  {% else %}
+                    <i class="bi bi-star"></i>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <i class="bi bi-star"></i>
+                <i class="bi bi-star"></i>
+                <i class="bi bi-star"></i>
+                <i class="bi bi-star"></i>
+                <i class="bi bi-star"></i>
+              {% endif %}
+            </div>
+            <span class="rating-number">{{ average_rating|floatformat:1 }}</span>
+            <span class="rating-count">({{ total_reviews }} review{{ total_reviews|pluralize }})</span>
+          </div>
+
+          <div class="agent-meta-info">
+            <div class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              <span>{{ agent.location }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="bi bi-translate"></i>
+              <span>{{ agent.language }}</span>
+            </div>
+            {% if agent.universal_agent %}
+            <div class="meta-item">
+              <i class="bi bi-briefcase-fill"></i>
+              <span>{{ universal_info.years_experience }} Years Experience</span>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="agent-contact-actions">
+            <a href="tel:{{ agent.phone_number }}" class="btn-contact primary">
+              <i class="bi bi-telephone-fill"></i>
+              Call Agent
+            </a>
+            <a href="mailto:{{ agent.email }}" class="btn-contact secondary">
+              <i class="bi bi-envelope-fill"></i>
+              Email
+            </a>
+            {% if agent.phone_number %}
+            <a href="https://wa.me/{{ agent.phone_number }}" target="_blank" class="btn-contact whatsapp">
+              <i class="bi bi-whatsapp"></i>
+              WhatsApp
+            </a>
+            {% endif %}
+          </div>
         </div>
       </div>
 
@@ -68,319 +98,480 @@
   </div>
 </div>
 
-<!-- Main Profile Content -->
+<!-- Main Content -->
 <div class="container profile-container">
   
-  <div class="profile-layout">
+  <div class="profile-grid">
     
-    <!-- Left Sidebar -->
-    <aside class="profile-sidebar">
-      
-      <!-- Contact Information -->
-      <div class="profile-card">
-        <div class="card-title">
-          <i class="bi bi-person-lines-fill"></i>
-          <h3>Contact Information</h3>
-        </div>
-        <div class="card-content">
-          
-          <div class="contact-row">
-            <div class="contact-icon">
-              <i class="bi bi-envelope-fill"></i>
-            </div>
-            <div class="contact-details">
-              <span class="contact-label">Email</span>
-              <a href="mailto:{{ email }}" class="contact-value">{{ email }}</a>
-            </div>
-          </div>
-
-          <div class="contact-row">
-            <div class="contact-icon">
-              <i class="bi bi-telephone-fill"></i>
-            </div>
-            <div class="contact-details">
-              <span class="contact-label">Phone</span>
-              <a href="tel:{{ phone }}" class="contact-value">{{ phone }}</a>
-            </div>
-          </div>
-
-          <div class="contact-row">
-            <div class="contact-icon">
-              <i class="bi bi-geo-alt-fill"></i>
-            </div>
-            <div class="contact-details">
-              <span class="contact-label">Location</span>
-              <span class="contact-value">{{ location }}, Nigeria</span>
-            </div>
-          </div>
-
-          <div class="contact-row">
-            <div class="contact-icon">
-              <i class="bi bi-building"></i>
-            </div>
-            <div class="contact-details">
-              <span class="contact-label">Company</span>
-              <span class="contact-value">Company Name</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Performance Metrics -->
-      <div class="profile-card">
-        <div class="card-title">
-          <i class="bi bi-graph-up-arrow"></i>
-          <h3>Performance</h3>
-        </div>
-        <div class="card-content">
-          
-          <div class="metric-item">
-            <div class="metric-info">
-              <span class="metric-label">Active Listings</span>
-              <span class="metric-number">{{ house_count }}</span>
-            </div>
-            <div class="metric-bar">
-              <div class="metric-fill" style="width: 75%;"></div>
-            </div>
-          </div>
-
-          <div class="metric-item">
-            <div class="metric-info">
-              <span class="metric-label">New Leads</span>
-              <span class="metric-number">{{ new_lead_count }}</span>
-            </div>
-            <div class="metric-bar">
-              <div class="metric-fill" style="width: 60%;"></div>
-            </div>
-          </div>
-
-          <div class="metric-item">
-            <div class="metric-info">
-              <span class="metric-label">Total Views</span>
-              <span class="metric-number">234</span>
-            </div>
-            <div class="metric-bar">
-              <div class="metric-fill" style="width: 85%;"></div>
-            </div>
-          </div>
-
-          <div class="metric-item">
-            <div class="metric-info">
-              <span class="metric-label">Response Rate</span>
-              <span class="metric-number">96%</span>
-            </div>
-            <div class="metric-bar">
-              <div class="metric-fill" style="width: 96%;"></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Social Links (if available) -->
-      <div class="profile-card">
-        <div class="card-title">
-          <i class="bi bi-link-45deg"></i>
-          <h3>Connect</h3>
-        </div>
-        <div class="card-content">
-          <div class="social-links-grid">
-            <a href="#" class="social-link-btn">
-              <i class="bi bi-facebook"></i>
-            </a>
-            <a href="#" class="social-link-btn">
-              <i class="bi bi-twitter"></i>
-            </a>
-            <a href="#" class="social-link-btn">
-              <i class="bi bi-instagram"></i>
-            </a>
-            <a href="#" class="social-link-btn">
-              <i class="bi bi-linkedin"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="profile-main">
+    <!-- Main Column -->
+    <main class="main-content">
       
       <!-- About Section -->
-      <section class="content-section">
-        <div class="section-header">
-          <h2 class="section-heading">
+      <section class="content-card">
+        <div class="card-header">
+          <h2 class="card-title">
             <i class="bi bi-person-badge"></i>
-            About Me
+            About {{ agent.profile_name }}
           </h2>
         </div>
-        <div class="section-body">
-          <p class="about-text">
-            Experienced real estate professional specializing in residential and commercial properties 
-            across Lagos. With {{ house_count }} active listings and a proven track record of successful 
-            transactions, I'm committed to helping clients find their perfect property match.
-          </p>
-          <div class="specialties-grid">
-            <div class="specialty-tag">Residential Sales</div>
-            <div class="specialty-tag">Commercial Leasing</div>
-            <div class="specialty-tag">Property Management</div>
-            <div class="specialty-tag">Investment Advisory</div>
-          </div>
+        <div class="card-body">
+          <p class="bio-text">{{ agent.bio }}</p>
         </div>
       </section>
 
-      <!-- Activity Overview -->
-      <section class="content-section">
-        <div class="section-header">
-          <h2 class="section-heading">
-            <i class="bi bi-bar-chart-line"></i>
-            Activity Overview
+      <!-- Experience Section -->
+      {% if experiences %}
+      <section class="content-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="bi bi-briefcase"></i>
+            Professional Experience
           </h2>
         </div>
-        <div class="section-body">
-          <div class="activity-grid">
+        <div class="card-body">
+          <div class="experience-timeline">
             
-            <div class="activity-card">
-              <div class="activity-card-icon blue">
-                <i class="bi bi-house-check"></i>
+            {% for exp in experiences %}
+            <div class="experience-item">
+              <div class="exp-date-badge">
+                <span class="year-start">{{ exp.start_date|date:"Y" }}</span>
+                {% if exp.end_date %}
+                <span class="year-separator">-</span>
+                <span class="year-end">{{ exp.end_date|date:"Y" }}</span>
+                {% else %}
+                <span class="year-separator">-</span>
+                <span class="year-end current">Present</span>
+                {% endif %}
               </div>
-              <div class="activity-card-content">
-                <h4>{{ house_count }}</h4>
-                <p>Active Listings</p>
-              </div>
-            </div>
-
-            <div class="activity-card">
-              <div class="activity-card-icon green">
-                <i class="bi bi-people"></i>
-              </div>
-              <div class="activity-card-content">
-                <h4>{{ lead_count }}</h4>
-                <p>Total Leads</p>
-              </div>
-            </div>
-
-            <div class="activity-card">
-              <div class="activity-card-icon orange">
-                <i class="bi bi-calendar-event"></i>
-              </div>
-              <div class="activity-card-content">
-                <h4>5</h4>
-                <p>Appointments</p>
+              <div class="exp-details">
+                <h3 class="exp-title">{{ exp.title }}</h3>
+                <p class="exp-company">
+                  <i class="bi bi-building"></i>
+                  {{ exp.company }}
+                </p>
+                <p class="exp-description">{{ exp.past_experence }}</p>
               </div>
             </div>
-
-            <div class="activity-card">
-              <div class="activity-card-icon purple">
-                <i class="bi bi-trophy"></i>
-              </div>
-              <div class="activity-card-content">
-                <h4>3</h4>
-                <p>Closed Deals</p>
-              </div>
-            </div>
+            {% endfor %}
 
           </div>
         </div>
       </section>
+      {% endif %}
 
-      <!-- Recent Listings -->
-      <section class="content-section">
-        <div class="section-header">
-          <h2 class="section-heading">
-            <i class="bi bi-houses"></i>
-            Recent Listings
+      <!-- Ratings & Reviews Section -->
+      <section class="content-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="bi bi-star"></i>
+            Ratings & Reviews
           </h2>
-          <a href="{% url 'listings' %}" class="view-all-link">View All</a>
+          
+          {% if user.is_authenticated and not user_has_reviewed %}
+            <button class="btn-write-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+              <i class="bi bi-pencil-square"></i>
+              Write a Review
+            </button>
+          {% elif user_has_reviewed %}
+            <button class="btn-write-review" disabled style="opacity: 0.6; cursor: not-allowed;">
+              <i class="bi bi-check-circle"></i>
+              Already Reviewed
+            </button>
+          {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn-write-review">
+              <i class="bi bi-pencil-square"></i>
+              Login to Review
+            </a>
+          {% endif %}
         </div>
-        <div class="section-body">
-          <div class="listings-showcase">
-            
-            <div class="property-card">
-              <div class="property-image">
-                <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" alt="Property">
-                <span class="property-badge sale">For Sale</span>
+        <div class="card-body">
+          
+          <!-- Rating Summary -->
+          {% if total_reviews > 0 %}
+          <div class="rating-summary">
+            <div class="rating-score">
+              <div class="score-number">{{ average_rating|floatformat:1 }}</div>
+              <div class="score-stars">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= average_rating|floatformat:0 %}
+                    <i class="bi bi-star-fill"></i>
+                  {% elif forloop.counter <= average_rating|add:"0.5"|floatformat:0 %}
+                    <i class="bi bi-star-half"></i>
+                  {% else %}
+                    <i class="bi bi-star"></i>
+                  {% endif %}
+                {% endfor %}
               </div>
-              <div class="property-details">
-                <h4 class="property-name">Luxury 4BR Duplex</h4>
-                <p class="property-location">
-                  <i class="bi bi-geo-alt"></i> Lekki Phase 1, Lagos
-                </p>
-                <div class="property-footer">
-                  <span class="property-price">₦85M</span>
-                  <span class="property-views">
-                    <i class="bi bi-eye"></i> 234
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div class="property-card">
-              <div class="property-image">
-                <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400" alt="Property">
-                <span class="property-badge rent">For Rent</span>
-              </div>
-              <div class="property-details">
-                <h4 class="property-name">Modern 3BR Apartment</h4>
-                <p class="property-location">
-                  <i class="bi bi-geo-alt"></i> Victoria Island, Lagos
-                </p>
-                <div class="property-footer">
-                  <span class="property-price">₦3.5M/yr</span>
-                  <span class="property-views">
-                    <i class="bi bi-eye"></i> 189
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div class="property-card">
-              <div class="property-image">
-                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400" alt="Property">
-                <span class="property-badge sale">For Sale</span>
-              </div>
-              <div class="property-details">
-                <h4 class="property-name">Executive 5BR Villa</h4>
-                <p class="property-location">
-                  <i class="bi bi-geo-alt"></i> Banana Island, Lagos
-                </p>
-                <div class="property-footer">
-                  <span class="property-price">₦250M</span>
-                  <span class="property-views">
-                    <i class="bi bi-eye"></i> 456
-                  </span>
-                </div>
-              </div>
+              <p class="score-text">Based on {{ total_reviews }} review{{ total_reviews|pluralize }}</p>
             </div>
 
           </div>
-        </div>
-      </section>
+          {% endif %}
 
-      <!-- Documents Section -->
-      <section class="content-section">
-        <div class="section-header">
-          <h2 class="section-heading">
-            <i class="bi bi-file-earmark-text"></i>
-            Documents & Certifications
-          </h2>
-        </div>
-        <div class="section-body">
-          <div class="coming-soon-box">
-            <div class="coming-soon-icon">
-              <i class="bi bi-hourglass-split"></i>
-            </div>
-            <h3>Coming Soon</h3>
-            <p>Document management and certification display will be available soon</p>
+          <!-- Reviews List -->
+          <div class="reviews-list">
+            {% if reviews %}
+              {% for review in reviews %}
+              <div class="review-item">
+                <div class="review-header">
+                  <div class="reviewer-avatar">
+                    <i class="bi bi-person-circle"></i>
+                  </div>
+                  <div class="reviewer-info">
+                    <h4 class="reviewer-name">{{ review.user.username }}</h4>
+                    <div class="review-stars">
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <span class="review-date">{{ review.created_at|timesince }} ago</span>
+                </div>
+                <div class="review-body">
+                  <p class="review-text">{{ review.comment }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="no-reviews-message">
+                <i class="bi bi-chat-left-text"></i>
+                <p>No reviews yet. Be the first to review {{ agent.profile_name }}!</p>
+              </div>
+            {% endif %}
           </div>
+
         </div>
       </section>
 
     </main>
 
+    <!-- Sidebar -->
+    <aside class="sidebar-content">
+      
+      <!-- Contact Card -->
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-title">
+            <i class="bi bi-telephone"></i>
+            Contact Information
+          </h3>
+        </div>
+        <div class="sidebar-card-body">
+          
+          <div class="contact-info-item">
+            <i class="bi bi-telephone-fill"></i>
+            <div class="contact-details">
+              <span class="contact-label">Phone</span>
+              <a href="tel:{{ agent.phone_number }}" class="contact-value">{{ agent.phone_number }}</a>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <i class="bi bi-envelope-fill"></i>
+            <div class="contact-details">
+              <span class="contact-label">Email</span>
+              <a href="mailto:{{ agent.email }}" class="contact-value">{{ agent.email }}</a>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <div class="contact-details">
+              <span class="contact-label">Location</span>
+              <span class="contact-value">{{ agent.location }}, Nigeria</span>
+            </div>
+          </div>
+
+          {% if universal_info and universal_info.agency %}
+          <div class="contact-info-item">
+            <i class="bi bi-building"></i>
+            <div class="contact-details">
+              <span class="contact-label">Agency</span>
+              <span class="contact-value">{{ universal_info.agency_name }}</span>
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      {% if social_links %}
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-title">
+            <i class="bi bi-share"></i>
+            Connect
+          </h3>
+        </div>
+        <div class="sidebar-card-body">
+          <div class="social-links">
+            {% for link in social_links %}
+            <a href="{{ link.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
+              <i class="bi bi-{{ link.social_platform|lower }}"></i>
+              <span>{{ link.social_platform }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+
+      <!-- Quick Inquiry -->
+      <div class="sidebar-card inquiry-card">
+        <div class="sidebar-card-header">
+          <h3 class="sidebar-title">
+            <i class="bi bi-chat-dots"></i>
+            Quick Inquiry
+          </h3>
+        </div>
+        <div class="sidebar-card-body">
+          <p class="inquiry-text">Interested in working with {{ agent.profile_name }}?</p>
+          <a href="mailto:{{ agent.email }}" class="btn-inquiry" target='_blank'>
+            <i class="bi bi-send"></i>
+            Send an Email
+          </a>
+        </div>
+      </div>
+
+    </aside>
+
   </div>
 
 </div>
 
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reviewModalLabel">
+          <i class="bi bi-star-fill me-2"></i>Write a Review for {{ agent.profile_name }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% if user.is_authenticated %}
+          {% if user_has_reviewed %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              You have already submitted a review for this agent.
+            </div>
+          {% else %}
+            <form id="reviewForm" method="post" action="{% url 'customer:review-agent' agent.agent_uuid %}">
+              {% csrf_token %}
+              
+              <div class="mb-4">
+                <label class="form-label">Your Rating *</label>
+                <div class="star-rating-input">
+                  <input type="radio" name="rating" value="5" id="star5" required>
+                  <label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="4" id="star4">
+                  <label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="3" id="star3">
+                  <label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="2" id="star2">
+                  <label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                  
+                  <input type="radio" name="rating" value="1" id="star1">
+                  <label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                </div>
+                <div class="rating-text text-center mt-2">
+                  <span id="ratingText" class="text-muted">Select a rating</span>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Your Review *</label>
+                <textarea name="comment" class="form-control" rows="5" required 
+                          placeholder="Share your experience working with {{ agent.profile_name }}..."></textarea>
+                <small class="text-muted">Minimum 10 characters</small>
+              </div>
+              
+              <button type="submit" class="btn-submit-review">
+                <i class="bi bi-check-circle-fill me-2"></i>Submit Review
+              </button>
+            </form>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to write a review.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  'use strict';
+
+  // Star rating interaction in modal
+  const starInputs = document.querySelectorAll('.star-rating-input input[type="radio"]');
+  const starLabels = document.querySelectorAll('.star-rating-input label');
+  const ratingText = document.getElementById('ratingText');
+  
+  const ratingDescriptions = {
+    '5': '⭐ Excellent - 5 stars',
+    '4': '⭐ Very Good - 4 stars',
+    '3': '⭐ Good - 3 stars',
+    '2': '⭐ Fair - 2 stars',
+    '1': '⭐ Poor - 1 star'
+  };
+  
+  // Handle star selection
+  starInputs.forEach((input) => {
+    input.addEventListener('change', function() {
+      const rating = this.value;
+      if (ratingText) {
+        ratingText.textContent = ratingDescriptions[rating];
+        ratingText.style.color = '#ffc107';
+        ratingText.style.fontWeight = '600';
+      }
+    });
+  });
+  
+  // Hover effects for star rating
+  starLabels.forEach((label) => {
+    label.addEventListener('mouseenter', function() {
+      const value = this.previousElementSibling.value;
+      if (!document.querySelector('.star-rating-input input:checked') && ratingText) {
+        ratingText.textContent = ratingDescriptions[value];
+        ratingText.style.color = '#6c757d';
+      }
+    });
+  });
+  
+  // Reset text on mouse leave if no selection
+  const starRatingContainer = document.querySelector('.star-rating-input');
+  if (starRatingContainer) {
+    starRatingContainer.addEventListener('mouseleave', function() {
+      const checkedInput = document.querySelector('.star-rating-input input:checked');
+      if (!checkedInput && ratingText) {
+        ratingText.textContent = 'Select a rating';
+        ratingText.style.color = '';
+        ratingText.style.fontWeight = '';
+      }
+    });
+  }
+  
+  // Form validation
+  const reviewForm = document.getElementById('reviewForm');
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', function(e) {
+      const ratingChecked = document.querySelector('.star-rating-input input:checked');
+      const commentField = document.querySelector('textarea[name="comment"]');
+      
+      if (!ratingChecked) {
+        e.preventDefault();
+        alert('Please select a star rating');
+        return false;
+      }
+      
+      if (commentField && commentField.value.trim().length < 10) {
+        e.preventDefault();
+        alert('Please write at least 10 characters in your review');
+        commentField.focus();
+        return false;
+      }
+      
+      return true;
+    });
+  }
+})();
+</script>
+
+<style>
+/* Additional styles for review modal */
+.star-rating-input {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.star-rating-input input[type="radio"] {
+  display: none;
+}
+
+.star-rating-input label {
+  cursor: pointer;
+  font-size: 2.5rem;
+  color: #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.star-rating-input label:hover,
+.star-rating-input label:hover ~ label,
+.star-rating-input input[type="radio"]:checked ~ label {
+  color: #ffc107;
+  transform: scale(1.1);
+}
+
+.rating-text {
+  min-height: 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-submit-review {
+  width: 100%;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #1a3c4e 0%, #2d5a73 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+}
+
+.btn-submit-review:hover {
+  background: linear-gradient(135deg, #2d5a73 0%, #1a3c4e 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 60, 78, 0.3);
+}
+
+.no-reviews-message {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.no-reviews-message i {
+  font-size: 4rem;
+  color: #cbd5e0;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.no-reviews-message p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin: 0;
+}
+</style>
 {% endblock %}

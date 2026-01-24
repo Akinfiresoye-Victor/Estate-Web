@@ -11,10 +11,14 @@ from django.core.paginator import Paginator
 from .filters import *
 from members.models import User
 from datetime import date
-from agents.models import AgentInformation
+from agents.models import AgentInformation, AgentRating
 from core.models import *
 from companies.models import CompanyInformation, CompanyRating
 import uuid
+from django.db.models import Avg, Count
+
+
+
 
 '''Algorithms Start👇'''
 
@@ -543,19 +547,6 @@ def delete_account(request):
 
 
 
-def estate_agent_profile(request, agent_id):
-    if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('login')
-    try:
-        agent_info= AgentInformation.objects.get(user_id=agent_id)
-        agent_experience= agent_info.experiences.all()
-        agent_social= agent_info.social.all()
-        return render(request, 'estate/agent_profile.html', {'information': agent_info,
-                                                            'experience':agent_experience,
-                                                            'network': agent_social})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
 
 
 
@@ -581,7 +572,7 @@ def review_company(request, company_uuid):
             return redirect('company:company-profile', company_uuid=company_uuid)
         
         if request.method == 'POST':
-            form = ReviewForm(request.POST)
+            form = ReviewFormCompany(request.POST)
             if form.is_valid():
                 review = form.save(commit=False)
                 review.company_uuid = company.unique_company_id
@@ -590,21 +581,73 @@ def review_company(request, company_uuid):
                 # Ensure rating is between 1 and 5
                 if not (1 <= review.rating <= 5):
                     messages.error(request, 'Rating must be between 1 and 5 stars')
-                    return redirect('company:company_profile', company_uuid=company_uuid)
+                    return redirect('company:company-profile', company_uuid=company_uuid)
                 
                 review.save()
-                messages.success(request, 'Thank you for your review!')
-                return redirect('company:company_profile', company_uuid=company_uuid)
+                messages.success(request, 'Thank you for your review!!!')
+                return redirect('company:company-profile', company_uuid=company_uuid)
             else:
                 messages.error(request, 'Please correct the errors below')
         
-        return redirect('company:company_profile', company_uuid=company_uuid)
+        return redirect('company:company-profile', company_uuid=company_uuid)
         
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
+
+def review_agent(request, agent_uuid):
+    """Handle agent review submission"""
+    # Check role
+    if hasattr(request.user, 'role') and request.user.role != 'customer':
+        messages.error(request, 'Only Customers can submit reviews')
+        return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+    
+    # Check authentication
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    
+    try:
+        agent = get_object_or_404(AgentInformation, agent_uuid=agent_uuid)
+        
+        # Check for existing review
+        existing_review = AgentRating.objects.filter(
+            agent_uuid=agent_uuid,
+            user=request.user
+        ).first()
+        
+        if existing_review:
+            messages.warning(request, 'Review already submitted')
+            return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+        
+        if request.method == 'POST':
+            form = ReviewFormAgent(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.agent_uuid = agent.agent_uuid
+                review.user = request.user
+                
+                # Validate rating range
+                if not (1 <= review.rating <= 5):
+                    messages.error(request, 'Rating must be between 1 and 5 stars')
+                    return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+                
+                review.save()
+                messages.success(request, 'Thanks for your review!!!')
+                return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+            else:
+                messages.error(request, 'Please correct the errors below')
+        
+        return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+        
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+
+
+
 #TODO Answer inquiry questions 
-#TODO Company and agent  profiles
 def inquiry_form(request, property_type, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
@@ -676,5 +719,5 @@ def inquiry_form(request, property_type, property_id):
         return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted':submitted})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
-    
+
 #todo make sure after a user ad something to wishlist it doesnt reload the page 

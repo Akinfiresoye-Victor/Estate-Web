@@ -363,7 +363,6 @@ def partner_with_us(request):
 
 
 
-#TODO Cross check all authentication side to affect loss of data 
 
 def appointment_detail(request,appt_uuid):
     if not request.user.is_authenticated:
@@ -537,7 +536,6 @@ def manage_listings(request):
             base_template = 'agent/base.html'
         else:
             base_template='estate/base.html'
-            #TODO instead of trying to get an objdoesnotexist error just check if they are a company reduces risk...
         if request.user.role == 'company':
             user_type=CompanyInformation.objects.get(user_id=request.user.id)
             user_id=user_type.unique_company_id
@@ -558,7 +556,7 @@ def manage_listings(request):
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 
-#TODO Continue from here
+
 def edit_appointment(request, appointment_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log In required')
@@ -595,7 +593,6 @@ def edit_appointment(request, appointment_id):
                 messages.warning(request, 'Access Denied')
                 return redirect('landing')
             
-        #TODO Implement security measures in situations where update is critical
         # Get lead information if exists
         lead = None
         

@@ -88,3 +88,19 @@ class SessionId(models.Model):
     agent=models.ForeignKey(AgentInformation, on_delete= models.CASCADE, related_name='session_id')
     session_id= models.IntegerField('Users Session ID', default=None)
     inquires_check=models.IntegerField('inq', default=0)
+
+
+class AgentRating(models.Model):
+    agent_uuid=models.CharField('Agent UUID', max_length=255, blank=False, null=False)
+    user= models.ForeignKey(User, on_delete=models.CASCADE,related_name='agent_reviews')
+    rating= models.FloatField('Rating', blank=False, default=0.0)
+    comment=models.TextField('Review Comment', blank=True, null=True)
+    created_at= models.DateTimeField(auto_now_add=True)
+    updated_at= models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together= ('agent_uuid', 'user')
+        ordering= ['-created_at']
+        
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.rating} stars" 

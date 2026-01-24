@@ -97,8 +97,8 @@
       </div>
       <div class="metric-content">
         <span class="metric-label">Rating</span>
-        <h2 class="metric-value">4.8</h2>
-        <span class="metric-subtext">127 reviews</span>
+        <h2 class="metric-value">{{avg_rating|default:"0.0"|floatformat:'2'}}</h2>
+        <span class="metric-subtext">{{total_reviews|default:"None"}} reviews</span>
       </div>
     </div>
 
@@ -256,7 +256,7 @@
             </span>
           </div>
           
-          <a href="#" class="schedule-action">
+          <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="schedule-action">
             <i class="bi bi-arrow-right"></i>
           </a>
         </div>

@@ -69,7 +69,7 @@ class SessionId(models.Model):
 
 class CompanyRating(models.Model):
     company_uuid = models.CharField('Companies UUID', max_length=255, blank=False, null=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='company_reviews')
+    user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='company_reviews')
     rating = models.FloatField('Rating', blank=False, default=0.0)
     comment = models.TextField('Review Comment', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

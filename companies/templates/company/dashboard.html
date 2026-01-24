@@ -182,7 +182,7 @@
               <i class="bi bi-star"></i>
             </div>
             <div class="stat-data">
-              <h3>{{ average_rating|default:"0.0" }}</h3>
+              <h3>{{ average_rating|default:"0.0"|floatformat:'2'}}</h3>
               <p>Avg Rating</p>
             </div>
           </div>
@@ -225,23 +225,17 @@
             </div>
           </a>
 
-          <a href="{% url 'company:analytics' %}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-graph-up-arrow"></i>
-            </div>
-            <div class="action-content">
-              <h4>Analytics</h4>
-              <p>Track performance</p>
-            </div>
-          </a>
 
-      <a href="{% url 'company:manage-company' %}" class="tool-card">
-        <div class="tool-icon">
-          <i class="bi bi-people-fill"></i>
-        </div>
-        <h4>Employee Management</h4>
-        <p>Know Whats going on in your company</p>
-      </a>
+
+  <a href="{% url 'company:manage-company' %}" class="action-card">
+    <div class="action-icon">
+      <i class="bi bi-people-fill"></i>
+    </div>
+    <div class="action-content">
+      <h4>Employee Management</h4>
+      <p>Manage your team</p>
+    </div>
+  </a>
       
         </div>
       </div>
@@ -273,12 +267,21 @@
         <h4>Appointments</h4>
         <p>Schedule viewings</p>
       </a>
-
+          <a href="{% url 'company:analytics' %}" class="action-card">
+            <div class="action-icon">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="action-content">
+              <h4>Analytics</h4>
+              <p>Track performance</p>
+            </div>
+          </a>
       <div class="tool-card coming-soon">
         <div class="coming-soon-badge">
           <i class="bi bi-clock-history"></i>
           <span>Coming Soon</span>
         </div>
+
         <div class="tool-icon disabled">
           <i class="bi bi-file-earmark-text"></i>
         </div>

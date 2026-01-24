@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .models import AgentInformation, SessionId, AgentAnalytics, UniversalAgent
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import AgentInformation, SessionId, AgentAnalytics, UniversalAgent, AgentRating
 from django.contrib import messages
 from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
 from django.db import transaction
@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from .quotes import get_random_quote
 from django.db.models import Sum, Avg, Count
-from .utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
+from core.utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
 
 
 
@@ -59,7 +59,14 @@ def dashboard(request):
                 '''Today's Appointment'''
                 
                 today_appointments=Appointments.objects.filter(agent_uuid=agent_data.agent_uuid).filter(appointment=datetime.today())
-                
+                rating_data = AgentRating.objects.filter(
+                    agent_uuid=agent_data.agent_uuid
+                ).aggregate(
+                    avg_rating=Avg('rating'),
+                    total_reviews=Count('id')
+                )
+                average_rating = rating_data['avg_rating'] or 0.0
+                total_reviews = rating_data['total_reviews']
                 
                 
                 return render(request, 'agent/dashboard.html', {
@@ -76,7 +83,9 @@ def dashboard(request):
                     'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
                     'lead_count': leads.count(),
                     'new_lead_count': new_leads.count(),
-                    'todays_appointment':today_appointments
+                    'todays_appointment':today_appointments,
+                    'avg_rating': average_rating,
+                    'total_reviews': total_reviews
                 })
         except AgentInformation.DoesNotExist:
             messages.error(request, 'Set up your Profile to access other pages')
@@ -266,69 +275,70 @@ def lead_management(request):
 
 
 
-
 def agent_profile(request, agent_uuid):
-    if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
-        return redirect('landing')
-    if not request.user.role == 'customer':
-        messages.error(request, 'Customer Access Only')
-        return redirect('landing')
-    
+    """Display agent profile with reviews"""
     try:
-        user_role = request.user.role
+        user_role=request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
         else:
-            base_template = 'estate/base.html'
+            base_template='estate/base.html'
+        agent = get_object_or_404(AgentInformation, agent_uuid=agent_uuid)
         
-        agent = AgentInformation.objects.get(agent_uuid=agent_uuid)
+        # Get reviews
+        reviews = AgentRating.objects.filter(
+            agent_uuid=agent_uuid
+        ).select_related('user').order_by('-created_at')[:10]  # Latest 10 reviews
         
-        # FIX 1: Use get_or_create instead of try/except with create
-        profile, created = AgentAnalytics.objects.get_or_create(
-            agent=agent,
-            defaults={
-                'profile_views': 0,
-                'property_views_l': 0,
-                'property_views_s': 0,
-                'average_profile_views': 0,
-                'average_lease_views': 0,
-                'average_sale_views': 0,
-                'ratings': 0.0,
-                'reviews': 0,
-                'competition': 0.0
-            }
+        # Calculate rating statistics
+        rating_data = AgentRating.objects.filter(
+            agent_uuid=agent_uuid
+        ).aggregate(
+            average=Avg('rating'),
+            total=Count('id')
         )
         
-        # FIX 2: Use get_or_create for session tracking too
-        session, session_created = SessionId.objects.get_or_create(
-            agent=agent,
-            session_id=request.user.id,
-            defaults={
-                'inquires_check': 0
-            }
-        )
+        average_rating = rating_data['average'] or 0.0
+        total_reviews = rating_data['total'] or 0
         
-        # Only increment profile views if this is a NEW session
-        if session_created:
-            profile.profile_views += 1
-            profile.save()
-#TODO do the same analytics calculation for company analytics victors Claude
-        return render(request, 'estate/agent_profile.html', {
+        # Check if current user has reviewed
+        user_has_reviewed = False
+        if request.user.is_authenticated:
+            user_has_reviewed = AgentRating.objects.filter(
+                agent_uuid=agent_uuid,
+                user=request.user
+            ).exists()
+        
+        # Get agent's other data (adjust based on your models)
+        house_count = agent.properties.count() if hasattr(agent, 'properties') else 0
+        lead_count = agent.leads.count() if hasattr(agent, 'leads') else 0
+        new_lead_count = agent.leads.filter(status='new').count() if hasattr(agent, 'leads') else 0
+        
+        context = {
             'agent': agent,
-            'base_template': base_template
-        })
+            'name': agent.profile_name if hasattr(agent, 'profile_name') else agent.user.get_full_name(),
+            'work_type': agent.work_type if hasattr(agent, 'work_type') else 'Real Estate Agent',
+            'email': agent.email if hasattr(agent, 'email') else agent.user.email,
+            'phone': agent.phone_number if hasattr(agent, 'phone_number') else '',
+            'location': agent.location if hasattr(agent, 'location') else '',
+            'house_count': house_count,
+            'lead_count': lead_count,
+            'new_lead_count': new_lead_count,
+            'base_template': base_template,
+            
+            # Review context
+            'reviews': reviews,
+            'average_rating': average_rating,
+            'total_reviews': total_reviews,
+            'user_has_reviewed': user_has_reviewed,
+        }
         
-    except AgentInformation.DoesNotExist:
-        messages.error(request, 'Agent not found')
-        return redirect('landing')
+        return render(request, 'agent/agent_profile.html', context)
         
     except Exception as e:
-        print(f"Error in agent_profile: {e}")  # Debug logging
         return render(request, 'estate/error_page.html', {'e': e})
-
 
 
 

@@ -15,63 +15,15 @@ from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Count, Sum
-
-
-
-
-def monthly_change(present_data, last_month_data):
-    if last_month_data == 0:
-        return 100 if present_data > 0 else 0
-    return ((present_data - last_month_data) / last_month_data) * 100
-
-
-def engagement_rate(total_liked_prop, total_company_listings_views, profile_views, ratings):
-    total_engagements = total_liked_prop + total_company_listings_views + profile_views + ratings
-    user_count = User.objects.count()
-    return (total_engagements / user_count) * 100 if user_count > 0 else 0
-
-
-def get_total_likes(property_type, properties):
-    return properties.aggregate(total=Sum('total_likes'))['total'] or 0
-
-
-def total_companies_engagement_calculator(total_rate, personal_rate, personal_uuid, property_views):
-    total_company_competition = (personal_rate / total_rate) * 100 if total_rate > 0 else 0
-    
-    total_impression = LeadInfo.objects.filter(company_uuid=personal_uuid).count()
-    expression_rate = (total_impression / property_views) * 100 if property_views > 0 else 0
-    
-    return [total_company_competition, expression_rate]
-
-
-def reset_button(general_data, company_uuid, lease_views, sale_views):
-    days_since_reset = (timezone.now() - general_data.last_reset_date).days
-    
-    if days_since_reset >= 30:
-        general_data.average_profile_views = (general_data.profile_views + general_data.average_profile_views) / 2
-        general_data.average_lease_views = (lease_views + general_data.average_lease_views) / 2
-        general_data.average_sale_views = (sale_views + general_data.average_sale_views) / 2
-        general_data.profile_views = 0
-        general_data.property_views_l = 0
-        general_data.property_views_s = 0
-        general_data.last_reset_date = timezone.now()
-        general_data.save()
-        
-        PropertyViews.objects.filter(uuid=company_uuid).delete()
-        SessionId.objects.all().delete()
-
-
-def property_views_count(property_type, property_id):
-    return PropertyViews.objects.filter(
-        property_type=property_type,
-        property_id=property_id
-    ).count()
+from core.utils import *
 
 
 
 
 
-#Companies dashboard
+
+
+
 def dashboard(request):
     if not request.user.is_authenticated:
         messages.info(request, 'log in to access page')
@@ -85,7 +37,7 @@ def dashboard(request):
         company = CompanyInformation.objects.get(user_id=request.user.id)
         social_links = company.social.all()
         
-        # Get or create analytics
+        # Get or create analytics for CURRENT company
         analytics, _ = CompanyAnalytics.objects.get_or_create(
             company=company,
             defaults={
@@ -100,7 +52,7 @@ def dashboard(request):
         
         profile_views = analytics.profile_views
         
-        # Calculate property views in bulk
+        # Calculate property views for CURRENT company
         lease_views = PropertyViews.objects.filter(
             property_type='Rent',
             property_id__in=PropertyManagementRent.objects.filter(
@@ -115,21 +67,22 @@ def dashboard(request):
             ).values_list('pk', flat=True)
         ).count()
         
-        # Update analytics
+        # Update analytics for CURRENT company
         analytics.property_views_l = lease_views
         analytics.property_views_s = sale_views
         analytics.save()
         
+        # Reset monthly tracking if needed
         reset_button(analytics, company.unique_company_id, lease_views, sale_views)
         
-        # Get counts efficiently
+        # Get counts efficiently for CURRENT company
         total_prop = (
             PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).count() +
             PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).count()
         )
         total_inq = LeadInfo.objects.filter(company_uuid=company.unique_company_id).count()
         
-        # Get rating data
+        # Get rating data for CURRENT company
         rating_data = CompanyRating.objects.filter(
             company_uuid=company.unique_company_id
         ).aggregate(
@@ -139,7 +92,7 @@ def dashboard(request):
         average_rating = rating_data['avg_rating'] or 0.0
         total_reviews = rating_data['total_reviews']
         
-        # Calculate engagement for current company
+        # Calculate engagement for CURRENT company
         prop_rent = PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
         prop_sale = PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
         
@@ -147,36 +100,29 @@ def dashboard(request):
         sale_likes = prop_sale.aggregate(total=Sum('total_likes'))['total'] or 0
         total_liked_prop = rent_likes + sale_likes
         
-        averg_rating = average_rating * total_reviews
+        rating_score = average_rating * total_reviews
         avg_property_view = analytics.average_lease_views + analytics.average_sale_views
         
         eng_rate = engagement_rate(
             total_liked_prop,
             avg_property_view,
             analytics.average_profile_views,
-            averg_rating
+            rating_score
         )
+        
+        # Save engagement score for CURRENT company
         analytics.competition = eng_rate
         analytics.save()
         
-        # Calculate competition scores for all companies
-        total_eng = []
-        companies = CompanyInformation.objects.prefetch_related('analytics').all()
+        # Get ALL companies' analytics in one query (READ ONLY - don't modify!)
+        all_analytics = CompanyAnalytics.objects.select_related('company').all()
         
-        for comp in companies:
-            comp_analytics, _ = CompanyAnalytics.objects.get_or_create(
-                company=comp,
-                defaults={
-                    'profile_views': 0,
-                    'property_views_l': 0,
-                    'property_views_s': 0,
-                    'average_profile_views': 0,
-                    'average_lease_views': 0,
-                    'average_sale_views': 0,
-                }
-            )
+        total_eng = []
+        
+        for comp_analytics in all_analytics:
+            comp = comp_analytics.company
             
-            # Get likes in bulk
+            # Calculate engagement using EXISTING data (don't modify!)
             comp_rent_likes = PropertyManagementRent.objects.filter(
                 company_uuid=comp.unique_company_id
             ).aggregate(total=Sum('total_likes'))['total'] or 0
@@ -196,20 +142,22 @@ def dashboard(request):
             )
             comp_avg_rating = comp_rating_data['avg_rating'] or 0.0
             comp_total_reviews = comp_rating_data['total_reviews']
-            avg_rating = comp_avg_rating * comp_total_reviews
+            comp_rating_score = comp_avg_rating * comp_total_reviews
             
-            avg_prop_views = comp_analytics.average_sale_views + comp_analytics.average_lease_views
+            comp_avg_prop_views = comp_analytics.average_sale_views + comp_analytics.average_lease_views
             
+            # Calculate engagement score
             comp_eng_rate = engagement_rate(
                 comp_total_likes,
-                avg_prop_views,
+                comp_avg_prop_views,
                 comp_analytics.average_profile_views,
-                avg_rating
+                comp_rating_score
             )
             
             total_eng.append(comp_eng_rate)
+            
+            # If this is the current company, we already saved their score above
         
-        # Calculate competition
         total_eng_sum = sum(total_eng)
         calculated_engagement = total_companies_engagement_calculator(
             total_eng_sum,
@@ -220,31 +168,28 @@ def dashboard(request):
         
         # Calculate market position (Top X%)
         if total_eng and len(total_eng) > 1:
-            # Sort companies by engagement (descending)
             sorted_eng = sorted(total_eng, reverse=True)
-            # Count how many companies have higher engagement
             companies_above = sum(1 for eng in sorted_eng if eng > analytics.competition)
-            # Calculate percentile (what % of companies you're better than)
-            market_position = ((companies_above) / len(sorted_eng)) * 100
+            market_position = (companies_above / len(sorted_eng)) * 100
             
-            # Determine if top 1%, 5%, 10%, etc.
-            if market_position < 1:
+            if market_position <= 1:
                 top_performer = "Top 1%"
-            elif market_position < 5:
+            elif market_position <= 5:
                 top_performer = "Top 5%"
-            elif market_position < 10:
+            elif market_position <= 10:
                 top_performer = "Top 10%"
-            elif market_position < 25:
+            elif market_position <= 25:
                 top_performer = "Top 25%"
-            elif market_position < 50:
+            elif market_position <= 50:
                 top_performer = "Top 50%"
             else:
-                top_performer = f"Top {int(market_position + 1)}%"
+                top_performer = f"Top {int(market_position)}%"
         else:
             top_performer = "New Listing"
-            market_position = 0
+            market_position = 100
         
-        competition = calculated_engagement[0]
+        competition_pct = calculated_engagement[0]
+        
         
         context = {
             'company': company,
@@ -253,8 +198,10 @@ def dashboard(request):
             'total_views': profile_views,
             'total_inquiries': total_inq,
             'average_rating': average_rating,
+            'total_reviews': total_reviews,
             'competition': top_performer,
-            'market_position': round(market_position, 1)
+            'market_position': round(market_position, 1),
+            'engagement_rate': analytics.competition
         }
         
         return render(request, 'company/dashboard.html', context)
@@ -264,6 +211,7 @@ def dashboard(request):
         return redirect('company:company_form')
         
     except Exception as e:
+        print(f"Error in company dashboard: {e}")  # Debug logging
         return render(request, 'estate/error_page.html', {'e': e})
 
 
@@ -348,7 +296,6 @@ def update_company_profile(request, company_id):
         return render(request, 'estate/error_page.html', {'e': e})
 
 
-
 def company_analytics(request):
     if not request.user.is_authenticated:
         messages.warning(request, 'login Required')
@@ -361,8 +308,6 @@ def company_analytics(request):
     try:
         messages.info(request, 'Numbers might seem low since we just launched')
         company = CompanyInformation.objects.get(user_id=request.user.id)
-        
-        # Get or create analytics
         analytics, _ = CompanyAnalytics.objects.get_or_create(
             company=company,
             defaults={
@@ -375,7 +320,7 @@ def company_analytics(request):
             }
         )
         
-        # Get rating data efficiently
+        # Get rating data for CURRENT company
         rating_data = CompanyRating.objects.filter(
             company_uuid=company.unique_company_id
         ).aggregate(
@@ -385,7 +330,7 @@ def company_analytics(request):
         average_rating = rating_data['avg_rating'] or 0.0
         total_reviews = rating_data['total_reviews']
         
-        # Calculate property views in bulk
+        # Calculate property views for CURRENT company
         lease_views = PropertyViews.objects.filter(
             property_type='Rent',
             property_id__in=PropertyManagementRent.objects.filter(
@@ -400,20 +345,21 @@ def company_analytics(request):
             ).values_list('pk', flat=True)
         ).count()
         
-        # Update analytics
+        # Update analytics for CURRENT company
         analytics.property_views_l = lease_views
         analytics.property_views_s = sale_views
         analytics.save()
         
+        # Reset monthly tracking if needed
         reset_button(analytics, company.unique_company_id, lease_views, sale_views)
         
-        # Calculate changes
+        # Calculate percentage changes
         lease_views_change = monthly_change(analytics.property_views_l, analytics.average_lease_views)
         sale_views_change = monthly_change(analytics.property_views_s, analytics.average_sale_views)
         profile_views_change = monthly_change(analytics.profile_views, analytics.average_profile_views)
         total_prop_incr_perc = (sale_views_change + lease_views_change) / 2
         
-        # Calculate engagement for current company
+        # Calculate engagement for CURRENT company
         prop_rent = PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
         prop_sale = PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
         
@@ -422,35 +368,27 @@ def company_analytics(request):
         total_liked_prop = rent_likes + sale_likes
         
         avg_prop_views = analytics.average_lease_views + analytics.average_sale_views
-        averg_rating = average_rating * total_reviews
+        rating_score = average_rating * total_reviews
         
         eng_rate = engagement_rate(
             total_liked_prop,
             avg_prop_views,
             analytics.average_profile_views,
-            averg_rating
+            rating_score
         )
         analytics.competition = eng_rate
         analytics.save()
         
-        # Calculate competition scores for all companies
-        total_companies_eng = []
-        companies = CompanyInformation.objects.prefetch_related('analytics').all()
         
-        for comp in companies:
-            comp_analytics, _ = CompanyAnalytics.objects.get_or_create(
-                company=comp,
-                defaults={
-                    'profile_views': 0,
-                    'property_views_l': 0,
-                    'property_views_s': 0,
-                    'average_profile_views': 0,
-                    'average_lease_views': 0,
-                    'average_sale_views': 0,
-                }
-            )
+        # Get ALL companies' analytics in one query (READ ONLY)
+        all_analytics = CompanyAnalytics.objects.select_related('company').all()
+        
+        total_companies_eng = []
+        
+        for comp_analytics in all_analytics:
+            comp = comp_analytics.company
             
-            # Get likes in bulk
+            # Calculate engagement using EXISTING data (don't modify!)
             comp_rent_likes = PropertyManagementRent.objects.filter(
                 company_uuid=comp.unique_company_id
             ).aggregate(total=Sum('total_likes'))['total'] or 0
@@ -470,7 +408,7 @@ def company_analytics(request):
             )
             comp_avg_rating = comp_rating_data['avg_rating'] or 0.0
             comp_total_reviews = comp_rating_data['total_reviews']
-            comp_averg_rating = comp_avg_rating * comp_total_reviews
+            comp_rating_score = comp_avg_rating * comp_total_reviews
             
             comp_avg_prop_views = comp_analytics.average_sale_views + comp_analytics.average_lease_views
             
@@ -478,12 +416,14 @@ def company_analytics(request):
                 comp_total_likes,
                 comp_avg_prop_views,
                 comp_analytics.average_profile_views,
-                comp_averg_rating
+                comp_rating_score
             )
             
             total_companies_eng.append(comp_eng_rate)
+            
+            # If this is the current company, we already saved their score above
         
-        # Calculate competition
+        
         total_eng_sum = sum(total_companies_eng)
         calculated_engagement = total_companies_engagement_calculator(
             total_eng_sum,
@@ -494,13 +434,10 @@ def company_analytics(request):
         
         # Calculate market position (Top X%)
         if total_companies_eng and len(total_companies_eng) > 1:
-            # Sort companies by engagement (descending)
             sorted_eng = sorted(total_companies_eng, reverse=True)
-            # Find current company's rank
-            companies_above= sum(1 for eng in sorted_eng if eng > analytics.competition)
-            # Calculate percentile
+            companies_above = sum(1 for eng in sorted_eng if eng > analytics.competition)
             market_position = (companies_above / len(sorted_eng)) * 100
-            # Determine if top 1%, 5%, 10%, etc.
+            
             if market_position <= 1:
                 top_performer = "Top 1%"
             elif market_position <= 5:
@@ -515,38 +452,22 @@ def company_analytics(request):
             top_performer = "New Listing"
             market_position = 100
         
-        competition = calculated_engagement[0]
+        competition_pct = calculated_engagement[0]
         inq_conv_rate = calculated_engagement[1]
         
-        # Get most liked properties with views
+        
         all_properties = list(prop_rent) + list(prop_sale)
         all_properties.sort(key=lambda x: x.total_likes, reverse=True)
         top_properties = all_properties[:4]
         
-        # Get views for top properties in bulk
-        rent_ids = [p.pk for p in top_properties if p.property_type == 'Rent']
-        sale_ids = [p.pk for p in top_properties if p.property_type == 'Sale']
-        
-        rent_view_counts = PropertyViews.objects.filter(
-            property_type='Rent',
-            property_id__in=rent_ids
-        ).values('property_id').annotate(count=Count('id'))
-        
-        sale_view_counts = PropertyViews.objects.filter(
-            property_type='Sale',
-            property_id__in=sale_ids
-        ).values('property_id').annotate(count=Count('id'))
-        
-        # Create lookup dictionaries
-        rent_views_dict = {v['property_id']: v['count'] for v in rent_view_counts}
-        sale_views_dict = {v['property_id']: v['count'] for v in sale_view_counts}
-        
+        # Get views for top 4 properties efficiently
         view_list = []
         for prop in top_properties:
-            if prop.property_type == 'Rent':
-                view_list.append(rent_views_dict.get(prop.pk, 0))
-            else:
-                view_list.append(sale_views_dict.get(prop.pk, 0))
+            cnt = PropertyViews.objects.filter(
+                property_id=prop.pk,
+                property_type=prop.property_type
+            ).count()
+            view_list.append(cnt)
         
         likes_views = zip(top_properties, view_list)
         
@@ -571,7 +492,9 @@ def company_analytics(request):
         return redirect('landing')
         
     except Exception as e:
+        print(f"Error in company_analytics: {e}")  # Debug logging
         return render(request, 'estate/error_page.html', {'e': str(e)})
+
 
 
 def documents(request):
@@ -897,7 +820,6 @@ def manage_company(request):
         return render(request, 'company/manage_company.html')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
-
 
 
 

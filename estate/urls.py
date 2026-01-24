@@ -19,7 +19,8 @@ urlpatterns = [
     path('users/profile/settings', views.profile_settings, name="settings"),
     path('users/account/deletion/', views.delete_account, name="delete-account"),
     path('form/inquiry/<property_type>/<property_id>', views.inquiry_form, name='inquiry-form'),
-    path('review/<str:company_uuid>/', views.review_company, name='review-company'),
+    path('review_company/<str:company_uuid>/', views.review_company, name='review-company'),
+    path('review_agent/<str:agent_uuid>/', views.review_agent, name='review-agent'),
 ]
 
 

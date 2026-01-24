@@ -3,10 +3,1012 @@
 {% load static %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'agent/css/settings.css' %}">
+<link rel="stylesheet" href="{% static 'agent/css/agent_settings.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1> Settings <h1>
 
-{%endblock%}
+<!-- Back Button -->
+<a href="{% url 'agent:dashboard' %}" class="modern-back-link">
+    <i class="bi bi-arrow-left-circle-fill"></i>
+    <span>Back to Dashboard</span>
+</a>
+
+<!-- Page Header -->
+<div class="settings-hero">
+    <div class="hero-background">
+        <div class="background-pattern"></div>
+    </div>
+    <div class="container-fluid">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <i class="bi bi-gear-fill"></i>
+                    Account Settings
+                </h1>
+                <p class="hero-description">Customize your profile and manage your preferences</p>
+            </div>
+            <div class="hero-actions">
+                <button class="action-btn primary" onclick="saveAllSettings()">
+                    <i class="bi bi-save"></i>
+                    <span>Save All</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid settings-container">
+    
+    <!-- Tab Navigation -->
+    <div class="tabs-navigation">
+        <button class="tab-btn active" data-tab="personal-info">
+            <i class="bi bi-person-circle"></i>
+            <span>Personal Info</span>
+        </button>
+        <button class="tab-btn" data-tab="professional">
+            <i class="bi bi-briefcase-fill"></i>
+            <span>Professional</span>
+        </button>
+        <button class="tab-btn" data-tab="security">
+            <i class="bi bi-shield-fill-check"></i>
+            <span>Security</span>
+        </button>
+        <button class="tab-btn" data-tab="notifications">
+            <i class="bi bi-bell-fill"></i>
+            <span>Notifications</span>
+        </button>
+        <button class="tab-btn" data-tab="preferences">
+            <i class="bi bi-sliders"></i>
+            <span>Preferences</span>
+        </button>
+        <button class="tab-btn" data-tab="subscription">
+            <i class="bi bi-credit-card-fill"></i>
+            <span>Subscription</span>
+        </button>
+        <button class="tab-btn danger-tab" data-tab="account-actions">
+            <i class="bi bi-exclamation-octagon-fill"></i>
+            <span>Account Actions</span>
+        </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tabs-content">
+        
+        <!-- Personal Info Tab -->
+        <div class="tab-pane active" id="personal-info">
+            <div class="content-grid">
+                
+                <!-- Profile Picture Section -->
+                <div class="content-card featured">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-image"></i>
+                            Profile Picture
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="profile-upload-area">
+                            <div class="profile-preview">
+                                <div class="avatar-circle">
+                                    <img src="{% static 'estate/images/default-avatar.png' %}" alt="Profile" id="avatarPreview">
+                                    <div class="upload-overlay">
+                                        <i class="bi bi-camera-fill"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="upload-controls">
+                                <h4>Update your photo</h4>
+                                <p>Recommended: Square image, at least 400x400px</p>
+                                <div class="upload-buttons">
+                                    <button class="upload-btn" type="button" onclick="document.getElementById('avatarInput').click()">
+                                        <i class="bi bi-upload"></i>
+                                        Upload Photo
+                                    </button>
+                                    <input type="file" id="avatarInput" accept="image/*" hidden>
+                                    <button class="remove-btn" type="button">
+                                        <i class="bi bi-trash"></i>
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-person-badge"></i>
+                            Basic Information
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Full Name</label>
+                                <input type="text" class="input-field" placeholder="John Doe" value="Michael Johnson">
+                            </div>
+                            <div class="input-group">
+                                <label>Agent License Number</label>
+                                <input type="text" class="input-field" placeholder="AG-123456" value="AG-789456">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Email Address</label>
+                                <input type="email" class="input-field" placeholder="email@example.com" value="michael.j@realty.com">
+                            </div>
+                            <div class="input-group">
+                                <label>Phone Number</label>
+                                <input type="tel" class="input-field" placeholder="+234 800 000 0000" value="+234 802 555 7890">
+                            </div>
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Professional Bio</label>
+                            <textarea class="input-field textarea" rows="4" placeholder="Tell clients about your experience and expertise...">Award-winning real estate agent with 8+ years of experience in luxury properties across Lagos. Specialized in residential sales and investment properties.</textarea>
+                            <span class="character-counter">145 / 500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            Location & Contact
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Office Location</label>
+                                <input type="text" class="input-field" placeholder="City, State" value="Lagos, Nigeria">
+                            </div>
+                            <div class="input-group">
+                                <label>Service Areas</label>
+                                <input type="text" class="input-field" placeholder="Areas you cover" value="Lekki, VI, Ikoyi">
+                            </div>
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Office Address</label>
+                            <input type="text" class="input-field" placeholder="Full office address" value="12 Adeola Odeku Street, Victoria Island, Lagos">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-share"></i>
+                            Social Media Links
+                        </h3>
+                        <p class="card-subtitle">Connect your social profiles to increase visibility</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="social-grid">
+                            <div class="social-item">
+                                <div class="social-icon facebook">
+                                    <i class="bi bi-facebook"></i>
+                                </div>
+                                <input type="url" class="input-field" placeholder="Facebook profile URL" value="https://facebook.com/michaeljohnson">
+                            </div>
+                            <div class="social-item">
+                                <div class="social-icon twitter">
+                                    <i class="bi bi-twitter-x"></i>
+                                </div>
+                                <input type="url" class="input-field" placeholder="Twitter profile URL">
+                            </div>
+                            <div class="social-item">
+                                <div class="social-icon instagram">
+                                    <i class="bi bi-instagram"></i>
+                                </div>
+                                <input type="url" class="input-field" placeholder="Instagram profile URL" value="https://instagram.com/mike_realty">
+                            </div>
+                            <div class="social-item">
+                                <div class="social-icon linkedin">
+                                    <i class="bi bi-linkedin"></i>
+                                </div>
+                                <input type="url" class="input-field" placeholder="LinkedIn profile URL">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Save Actions -->
+            <div class="section-actions">
+                <button class="action-btn secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Discard Changes
+                </button>
+                <button class="action-btn primary">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Save Personal Info
+                </button>
+            </div>
+        </div>
+
+        <!-- Professional Tab -->
+        <div class="tab-pane" id="professional">
+            <div class="content-grid">
+                
+                <!-- Experience -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-trophy"></i>
+                            Professional Experience
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Years of Experience</label>
+                                <select class="input-field">
+                                    <option>Less than 1 year</option>
+                                    <option>1-3 years</option>
+                                    <option>3-5 years</option>
+                                    <option>5-10 years</option>
+                                    <option selected>10+ years</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Specialization</label>
+                                <input type="text" class="input-field" placeholder="e.g., Luxury Residential" value="Luxury Residential">
+                            </div>
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Agency/Brokerage</label>
+                            <input type="text" class="input-field" placeholder="Current agency name" value="Elite Properties Lagos">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-award-fill"></i>
+                            Certifications & Licenses
+                        </h3>
+                        <button class="add-btn">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Certificate
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div class="certification-list">
+                            <div class="certification-item">
+                                <div class="cert-icon">
+                                    <i class="bi bi-file-earmark-check-fill"></i>
+                                </div>
+                                <div class="cert-info">
+                                    <h4>Real Estate License</h4>
+                                    <p>Nigerian Institute of Estate Surveyors</p>
+                                    <span class="cert-date">Issued: Jan 2020 • Valid until: Jan 2025</span>
+                                </div>
+                                <div class="cert-actions">
+                                    <button class="icon-btn">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="icon-btn danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Languages -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-translate"></i>
+                            Languages
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group full-width">
+                            <label>Languages Spoken</label>
+                            <input type="text" class="input-field" placeholder="e.g., English, Yoruba, Hausa" value="English, Yoruba, French">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section-actions">
+                <button class="action-btn secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </button>
+                <button class="action-btn primary">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Save Professional Info
+                </button>
+            </div>
+        </div>
+
+        <!-- Security Tab -->
+        <div class="tab-pane" id="security">
+            <div class="content-grid">
+                
+                <!-- Account Security Status -->
+                <div class="content-card status-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-shield-fill-check"></i>
+                            Security Status
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="security-status-grid">
+                            <div class="status-item verified">
+                                <div class="status-icon">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </div>
+                                <div class="status-info">
+                                    <h4>Email Verified</h4>
+                                    <p>Your email is confirmed and secure</p>
+                                </div>
+                            </div>
+                            <div class="status-item pending">
+                                <div class="status-icon">
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                </div>
+                                <div class="status-info">
+                                    <h4>Two-Factor Authentication</h4>
+                                    <p>Not enabled - Recommended for security</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two-Factor Authentication -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-phone-fill"></i>
+                            Two-Factor Authentication (2FA)
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="feature-toggle">
+                            <div class="toggle-info">
+                                <h4>Enable 2FA</h4>
+                                <p>Add an extra layer of security by requiring a code from your phone in addition to your password</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-key-fill"></i>
+                            Change Password
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label>Current Password</label>
+                            <div class="password-input">
+                                <input type="password" class="input-field" placeholder="Enter current password" id="currentPwd">
+                                <button class="toggle-password" type="button" onclick="togglePassword('currentPwd')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>New Password</label>
+                            <div class="password-input">
+                                <input type="password" class="input-field" placeholder="Enter new password" id="newPwd">
+                                <button class="toggle-password" type="button" onclick="togglePassword('newPwd')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Confirm New Password</label>
+                            <div class="password-input">
+                                <input type="password" class="input-field" placeholder="Confirm new password" id="confirmPwd">
+                                <button class="toggle-password" type="button" onclick="togglePassword('confirmPwd')">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="password-strength">
+                            <h5>Password Requirements:</h5>
+                            <ul class="requirements-list">
+                                <li class="requirement">
+                                    <i class="bi bi-circle"></i>
+                                    <span>At least 8 characters long</span>
+                                </li>
+                                <li class="requirement">
+                                    <i class="bi bi-circle"></i>
+                                    <span>Contains uppercase letter</span>
+                                </li>
+                                <li class="requirement">
+                                    <i class="bi bi-circle"></i>
+                                    <span>Contains lowercase letter</span>
+                                </li>
+                                <li class="requirement">
+                                    <i class="bi bi-circle"></i>
+                                    <span>Contains number</span>
+                                </li>
+                                <li class="requirement">
+                                    <i class="bi bi-circle"></i>
+                                    <span>Contains special character</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Sessions -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-display"></i>
+                            Active Sessions
+                        </h3>
+                        <p class="card-subtitle">Manage devices where you're currently signed in</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="session-list">
+                            <div class="session-item current">
+                                <div class="session-icon">
+                                    <i class="bi bi-laptop-fill"></i>
+                                </div>
+                                <div class="session-details">
+                                    <h4>Windows PC <span class="current-badge">Current</span></h4>
+                                    <p>Lagos, Nigeria • Chrome Browser</p>
+                                    <span class="session-time">Active now</span>
+                                </div>
+                            </div>
+                            <div class="session-item">
+                                <div class="session-icon">
+                                    <i class="bi bi-phone-fill"></i>
+                                </div>
+                                <div class="session-details">
+                                    <h4>iPhone 14 Pro</h4>
+                                    <p>Lagos, Nigeria • Safari</p>
+                                    <span class="session-time">2 hours ago</span>
+                                </div>
+                                <button class="revoke-btn">
+                                    <i class="bi bi-x-circle"></i>
+                                    Revoke
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section-actions">
+                <button class="action-btn secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </button>
+                <button class="action-btn primary">
+                    <i class="bi bi-shield-check"></i>
+                    Update Security
+                </button>
+            </div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div class="tab-pane" id="notifications">
+            <div class="content-grid">
+                
+                <!-- Email Notifications -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-envelope-fill"></i>
+                            Email Notifications
+                        </h3>
+                        <p class="card-subtitle">Choose what updates you receive via email</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>New Leads & Inquiries</h4>
+                                <p>Get notified when potential clients inquire about properties</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Property Views</h4>
+                                <p>Receive updates when your listings are viewed</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Messages from Clients</h4>
+                                <p>Instant alerts for new client messages</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Weekly Performance Report</h4>
+                                <p>Summary of your activity and analytics every week</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Marketing Tips & Updates</h4>
+                                <p>Best practices and platform news</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Push Notifications -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-app-indicator"></i>
+                            Push Notifications
+                        </h3>
+                        <p class="card-subtitle">Real-time alerts on your device</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Instant Lead Alerts</h4>
+                                <p>Get push notifications for new inquiries immediately</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Appointment Reminders</h4>
+                                <p>Alerts for upcoming property viewings</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Platform Updates</h4>
+                                <p>Important announcements and new features</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMS Notifications -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-chat-dots-fill"></i>
+                            SMS Notifications
+                        </h3>
+                        <p class="card-subtitle">Text message alerts to your phone</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="notification-item">
+                            <div class="notification-info">
+                                <h4>Critical Alerts Only</h4>
+                                <p>Urgent inquiries and important updates via SMS</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section-actions">
+                <button class="action-btn secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </button>
+                <button class="action-btn primary">
+                    <i class="bi bi-bell-fill"></i>
+                    Save Notification Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Preferences Tab -->
+        <div class="tab-pane" id="preferences">
+            <div class="content-grid">
+                
+                <!-- Display Settings -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-palette-fill"></i>
+                            Display & Appearance
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="feature-toggle">
+                            <div class="toggle-info">
+                                <h4>Dark Mode</h4>
+                                <p>Switch to a darker color scheme for comfortable viewing</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="feature-toggle">
+                            <div class="toggle-info">
+                                <h4>Compact View</h4>
+                                <p>Display more information in less space</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language & Region -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-globe"></i>
+                            Language & Region
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Language</label>
+                                <select class="input-field">
+                                    <option selected>English</option>
+                                    <option>Yoruba</option>
+                                    <option>Hausa</option>
+                                    <option>Igbo</option>
+                                    <option>French</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Timezone</label>
+                                <select class="input-field">
+                                    <option selected>West Africa Time (WAT)</option>
+                                    <option>Greenwich Mean Time (GMT)</option>
+                                    <option>Central European Time (CET)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Date Format</label>
+                            <select class="input-field">
+                                <option>DD/MM/YYYY</option>
+                                <option selected>MM/DD/YYYY</option>
+                                <option>YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-eye-fill"></i>
+                            Privacy Settings
+                        </h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="feature-toggle">
+                            <div class="toggle-info">
+                                <h4>Public Profile</h4>
+                                <p>Allow your profile to be visible to all platform users</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="feature-toggle">
+                            <div class="toggle-info">
+                                <h4>Show Contact Information</h4>
+                                <p>Display your phone and email on public listings</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                        <div class="feature-toggle">
+                            <div class="toggle-info">
+                                <h4>Activity Status</h4>
+                                <p>Let others see when you're online</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section-actions">
+                <button class="action-btn secondary">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </button>
+                <button class="action-btn primary">
+                    <i class="bi bi-check-circle-fill"></i>
+                    Save Preferences
+                </button>
+            </div>
+        </div>
+
+        <!-- Subscription Tab -->
+        <div class="tab-pane" id="subscription">
+            <div class="content-grid">
+                
+                <!-- Current Plan -->
+                <div class="content-card plan-card">
+                    <div class="plan-badge">Current Plan</div>
+                    <div class="card-content">
+                        <div class="plan-details">
+                            <h3 class="plan-name">Professional Agent</h3>
+                            <p class="plan-description">Unlimited listings • Advanced analytics • Priority support</p>
+                            <div class="plan-pricing">
+                                <span class="price-amount">₦15,000</span>
+                                <span class="price-period">per month</span>
+                            </div>
+                            <button class="upgrade-btn">
+                                <i class="bi bi-arrow-up-circle-fill"></i>
+                                Upgrade to Premium
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-credit-card"></i>
+                            Payment Method
+                        </h3>
+                        <button class="add-btn">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Card
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div class="payment-method-item">
+                            <div class="card-icon visa">
+                                <i class="bi bi-credit-card-fill"></i>
+                            </div>
+                            <div class="card-details">
+                                <h4>Visa •••• 4242</h4>
+                                <p>Expires 12/2025</p>
+                            </div>
+                            <span class="default-badge">Default</span>
+                            <button class="icon-btn">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing History -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-receipt"></i>
+                            Billing History
+                        </h3>
+                        <button class="text-btn">
+                            View All
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div class="billing-list">
+                            <div class="billing-row">
+                                <div class="billing-info">
+                                    <h4>Professional Plan</h4>
+                                    <p>Invoice #INV-2024-0045</p>
+                                </div>
+                                <div class="billing-meta">
+                                    <span class="billing-date">Jan 15, 2024</span>
+                                    <span class="billing-amount">₦15,000</span>
+                                    <span class="status-tag paid">Paid</span>
+                                    <button class="icon-btn">
+                                        <i class="bi bi-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="billing-row">
+                                <div class="billing-info">
+                                    <h4>Professional Plan</h4>
+                                    <p>Invoice #INV-2023-0234</p>
+                                </div>
+                                <div class="billing-meta">
+                                    <span class="billing-date">Dec 15, 2023</span>
+                                    <span class="billing-amount">₦15,000</span>
+                                    <span class="status-tag paid">Paid</span>
+                                    <button class="icon-btn">
+                                        <i class="bi bi-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="section-actions">
+                <button class="action-btn secondary">
+                    <i class="bi bi-question-circle"></i>
+                    Billing Support
+                </button>
+                <button class="action-btn primary">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Manage Subscription
+                </button>
+            </div>
+        </div>
+
+        <!-- Account Actions Tab -->
+        <div class="tab-pane" id="account-actions">
+            <div class="content-grid">
+                
+                <!-- Warning Card -->
+                <div class="content-card warning-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            Account Actions
+                        </h3>
+                        <p class="card-subtitle danger-text">These actions are permanent and cannot be undone</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="danger-action-item">
+                            <div class="danger-icon">
+                                <i class="bi bi-pause-circle-fill"></i>
+                            </div>
+                            <div class="danger-info">
+                                <h4>Deactivate Account</h4>
+                                <p>Temporarily disable your account. You can reactivate it anytime by logging back in.</p>
+                                <ul class="consequence-list">
+                                    <li>Your profile will be hidden from search</li>
+                                    <li>Listings will remain but won't be promoted</li>
+                                    <li>You'll stop receiving notifications</li>
+                                    <li>You can reactivate anytime</li>
+                                </ul>
+                            </div>
+                            <button class="danger-btn deactivate">
+                                <i class="bi bi-pause-circle"></i>
+                                Deactivate Account
+                            </button>
+                        </div>
+
+                        <div class="danger-divider"></div>
+
+                        <div class="danger-action-item critical">
+                            <div class="danger-icon">
+                                <i class="bi bi-trash-fill"></i>
+                            </div>
+                            <div class="danger-info">
+                                <h4>Delete Account Permanently</h4>
+                                <p>This will completely remove your account and all associated data. This action is irreversible.</p>
+                                <ul class="consequence-list">
+                                    <li>All your listings will be deleted</li>
+                                    <li>Your profile will be permanently removed</li>
+                                    <li>All leads and messages will be lost</li>
+                                    <li>This cannot be undone</li>
+                                </ul>
+                            </div>
+                            <button class="danger-btn delete">
+                                <i class="bi bi-trash"></i>
+                                Delete Account Forever
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    
+</div>
+
+<!-- Include Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab Navigation
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const targetTab = this.getAttribute('data-tab');
+        
+        // Update active button
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update active content
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.getElementById(targetTab).classList.add('active');
+    });
+});
+
+// Password Toggle
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+
+// Save All Settings
+function saveAllSettings() {
+    alert('All settings saved successfully!');
+}
+</script>
+{% endblock %}
