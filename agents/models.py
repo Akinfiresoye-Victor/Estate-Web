@@ -55,8 +55,8 @@ class Experience(models.Model):
     
 class SocialLinks(models.Model):
     agent = models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='social')
-    social_platform = models.CharField(max_length=20, choices=AGENT_SOCIAL_LINKS, default='Instagram', blank=True)
-    link_to_social = models.URLField(max_length=200, blank=True)
+    social_platform = models.CharField(max_length=20, choices=AGENT_SOCIAL_LINKS, blank=False)
+    link_to_social = models.URLField(max_length=200, blank=False)
     def __str__(self):
         return(self.agent.profile_name)
 

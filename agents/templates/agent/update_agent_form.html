@@ -1,0 +1,604 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Agent Profile - Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'agent/css/update_agent_form.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Messages Container -->
+<div class="messages-container">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' or message.tags == 'danger' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% elif message.tags == 'info' %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% else %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Header Section -->
+<div class="update-header">
+  <div class="container">
+    <a href="{% url 'agent:settings' %}" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Back to Settings
+    </a>
+    <h1>Update Agent Profile</h1>
+    <p>Keep your agent information up to date</p>
+  </div>
+</div>
+
+<!-- Main Form Container -->
+<div class="form-container">
+  <form method="POST" enctype="multipart/form-data" id="agentUpdateForm">
+    {% csrf_token %}
+
+    <!-- Basic Information Section -->
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-person-badge"></i>
+        Basic Information
+      </h3>
+      <p class="section-description">Update your personal and professional details</p>
+
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="{{ form.profile_name.id_for_label }}">
+            {{ form.profile_name.label }}
+            {% if form.profile_name.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.profile_name }}
+          {% if form.profile_name.errors %}
+            <span class="error-text">{{ form.profile_name.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.phone_number.id_for_label }}">
+            {{ form.phone_number.label }}
+            {% if form.phone_number.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.phone_number }}
+          {% if form.phone_number.errors %}
+            <span class="error-text">{{ form.phone_number.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.email.id_for_label }}">
+            {{ form.email.label }}
+            {% if form.email.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <span class="error-text">{{ form.email.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.location.id_for_label }}">
+            {{ form.location.label }}
+            {% if form.location.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.location }}
+          {% if form.location.errors %}
+            <span class="error-text">{{ form.location.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.language.id_for_label }}">
+            {{ form.language.label }}
+            {% if form.language.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.language }}
+          {% if form.language.errors %}
+            <span class="error-text">{{ form.language.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group full-width">
+          <label for="{{ form.work_type.id_for_label }}">
+            {{ form.work_type.label }}
+            {% if form.work_type.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.work_type }}
+          {% if form.work_type.errors %}
+            <span class="error-text">{{ form.work_type.errors }}</span>
+          {% endif %}
+        </div>
+
+        <div class="form-group full-width">
+          <label for="{{ form.bio.id_for_label }}">
+            {{ form.bio.label }}
+            {% if form.bio.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.bio }}
+          {% if form.bio.errors %}
+            <span class="error-text">{{ form.bio.errors }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Profile Picture Upload -->
+        {% if form.profile_picture %}
+        <div class="form-group full-width">
+          <label for="{{ form.profile_picture.id_for_label }}">
+            Profile Picture
+          </label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="{{ form.profile_picture.id_for_label }}" 
+                   name="{{ form.profile_picture.name }}" 
+                   accept="image/*" class="file-input">
+            <label for="{{ form.profile_picture.id_for_label }}" class="file-label">
+              <i class="bi bi-camera"></i>
+              <span>Choose profile picture</span>
+            </label>
+            <span class="file-name"></span>
+          </div>
+          {% if form.profile_picture.errors %}
+            <span class="error-text">{{ form.profile_picture.errors }}</span>
+          {% endif %}
+          
+          {% if form.instance.profile_picture %}
+          <div class="current-image">
+            <img src="{{ form.instance.profile_picture.url }}" alt="Current Profile Picture">
+            <div class="current-image-info">
+              <strong>Current Profile Picture</strong>
+              <span>Upload a new file to replace</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Government ID Upload -->
+        {% if form.government_id %}
+        <div class="form-group full-width">
+          <label for="{{ form.government_id.id_for_label }}">
+            {{ form.government_id.label }}
+            {% if form.government_id.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="{{ form.government_id.id_for_label }}" 
+                   name="{{ form.government_id.name }}" 
+                   accept=".pdf,.jpg,.jpeg,.png" class="file-input">
+            <label for="{{ form.government_id.id_for_label }}" class="file-label">
+              <i class="bi bi-file-earmark-text"></i>
+              <span>Upload government ID (PDF, JPG, PNG)</span>
+            </label>
+            <span class="file-name"></span>
+          </div>
+          {% if form.government_id.errors %}
+            <span class="error-text">{{ form.government_id.errors }}</span>
+          {% endif %}
+          
+          {% if form.instance.government_id %}
+          <div class="current-image">
+            <i class="bi bi-file-earmark-check" style="font-size: 3rem; color: var(--success-color);"></i>
+            <div class="current-image-info">
+              <strong>Government ID Uploaded</strong>
+              <span>Upload a new file to replace</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Certificate Upload -->
+        {% if form.certificate %}
+        <div class="form-group full-width">
+          <label for="{{ form.certificate.id_for_label }}">
+            {{ form.certificate.label }}
+          </label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="{{ form.certificate.id_for_label }}" 
+                   name="{{ form.certificate.name }}" 
+                   accept=".pdf,.jpg,.jpeg,.png" class="file-input">
+            <label for="{{ form.certificate.id_for_label }}" class="file-label">
+              <i class="bi bi-award"></i>
+              <span>Upload certificate (PDF, JPG, PNG)</span>
+            </label>
+            <span class="file-name"></span>
+          </div>
+          {% if form.certificate.errors %}
+            <span class="error-text">{{ form.certificate.errors }}</span>
+          {% endif %}
+          
+          {% if form.instance.certificate %}
+          <div class="current-image">
+            <i class="bi bi-file-earmark-check" style="font-size: 3rem; color: var(--success-color);"></i>
+            <div class="current-image-info">
+              <strong>Certificate Uploaded</strong>
+              <span>Upload a new file to replace</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Experience Section -->
+    {% if exp_form %}
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-briefcase"></i>
+        Professional Experience
+      </h3>
+      <p class="section-description">Add or update your work history and experience</p>
+
+      <div id="experienceSection">
+        {{ exp_form.management_form }}
+        <div class="experience-forms">
+          {% for form in exp_form %}
+            <div class="experience-item">
+              <div class="experience-header">
+                <h4>Experience #<span class="exp-number">{{ forloop.counter }}</span></h4>
+                {% if not forloop.first %}
+                  <button type="button" class="btn-remove-exp">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                {% endif %}
+              </div>
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Company Name</label>
+                  {{ form.company }}
+                </div>
+                <div class="form-group">
+                  <label>Position/Title</label>
+                  {{ form.title }}
+                </div>
+                <div class="form-group">
+                  <label>Start Date</label>
+                  {{ form.start_date }}
+                </div>
+                <div class="form-group">
+                  <label>End Date</label>
+                  {{ form.end_date }}
+                </div>
+              </div>
+              {{ form.id }}
+              {{ form.DELETE }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="button" class="btn-add-more" id="addExperience">
+        <i class="bi bi-plus-circle"></i>
+        Add Another Experience
+      </button>
+    </div>
+    {% endif %}
+
+    <!-- Social Links Section -->
+    {% if social_form %}
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-share"></i>
+        Social Media Links
+      </h3>
+      <p class="section-description">Connect your professional social media profiles</p>
+
+      <div id="socialSection">
+        {{ social_form.management_form }}
+        <div class="social-forms">
+          {% for form in social_form %}
+            <div class="social-item">
+              <div class="social-header">
+                <h4>Social Link #<span class="social-number">{{ forloop.counter }}</span></h4>
+                {% if not forloop.first %}
+                  <button type="button" class="btn-remove-social">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                {% endif %}
+              </div>
+              
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Platform</label>
+                  {{ form.social_platform }}
+                </div>
+                <div class="form-group">
+                  <label>Profile URL</label>
+                  {{ form.link_to_social }}
+                </div>
+              </div>
+              {{ form.id }}
+              {{ form.DELETE }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="button" class="btn-add-more" id="addSocial">
+        <i class="bi bi-plus-circle"></i>
+        Add Another Social Link
+      </button>
+    </div>
+    {% endif %}
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <a href="{% url 'agent:settings' %}" class="btn-cancel">
+        <i class="bi bi-x-circle"></i>
+        Cancel
+      </a>
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-check-circle"></i>
+        Save Changes
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<!-- Inline JavaScript - Same pattern as working agent form -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // ===================================
+  // AUTO-DISMISS ALERTS
+  // ===================================
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(function(alert) {
+    setTimeout(function() {
+      alert.classList.remove('show');
+      setTimeout(function() {
+        alert.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // ===================================
+  // FILE INPUT DISPLAY
+  // ===================================
+  const fileInputs = document.querySelectorAll('.file-input');
+  fileInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      const fileName = this.files[0]?.name || 'No file chosen';
+      const fileNameDisplay = this.parentElement.querySelector('.file-name');
+      if (fileNameDisplay) {
+        fileNameDisplay.textContent = fileName;
+      }
+    });
+  });
+
+  // ===================================
+  // EXPERIENCE FORMSET - EXACT SAME PATTERN AS REGISTRATION
+  // ===================================
+  const experienceSection = document.getElementById('experienceSection');
+  const addExperienceBtn = document.getElementById('addExperience');
+  
+  if (experienceSection && addExperienceBtn) {
+    const experienceContainer = experienceSection.querySelector('.experience-forms');
+    const totalFormsExp = experienceSection.querySelector('input[name$="-TOTAL_FORMS"]');
+    
+    if (totalFormsExp && experienceContainer) {
+      // Add Experience
+      addExperienceBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const formCount = experienceContainer.querySelectorAll('.experience-item').length;
+        const firstForm = experienceContainer.querySelector('.experience-item');
+        
+        if (!firstForm) return;
+        
+        const newForm = firstForm.cloneNode(true);
+        const formsetPrefix = totalFormsExp.name.replace('-TOTAL_FORMS', '');
+        
+        // Update form fields
+        newForm.querySelectorAll('input, select, textarea').forEach(function(field) {
+          if (field.name) {
+            field.name = field.name.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
+            field.id = field.id.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
+            
+            // Clear values except for hidden fields (they'll be empty for new records)
+            if (field.type === 'checkbox') {
+              field.checked = false;
+            } else if (field.type === 'hidden' && field.name.includes('-id')) {
+              // Remove value from ID field for new records
+              field.value = '';
+            } else if (field.type !== 'hidden') {
+              field.value = '';
+            }
+          }
+        });
+        
+        // Update number
+        const expNumber = newForm.querySelector('.exp-number');
+        if (expNumber) {
+          expNumber.textContent = formCount + 1;
+        }
+        
+        // Show remove button
+        const removeBtn = newForm.querySelector('.btn-remove-exp');
+        if (removeBtn) {
+          removeBtn.style.display = 'flex';
+        } else {
+          const header = newForm.querySelector('.experience-header');
+          if (header) {
+            const newRemoveBtn = document.createElement('button');
+            newRemoveBtn.type = 'button';
+            newRemoveBtn.className = 'btn-remove-exp';
+            newRemoveBtn.innerHTML = '<i class="bi bi-trash"></i>';
+            header.appendChild(newRemoveBtn);
+          }
+        }
+        
+        experienceContainer.appendChild(newForm);
+        totalFormsExp.value = parseInt(totalFormsExp.value) + 1;
+      });
+      
+      // Remove Experience
+      experienceContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-exp')) {
+          e.preventDefault();
+          
+          const experienceItem = e.target.closest('.experience-item');
+          const deleteCheckbox = experienceItem.querySelector('input[name$="-DELETE"]');
+          
+          if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            experienceItem.style.display = 'none';
+          } else {
+            experienceItem.remove();
+            totalFormsExp.value = parseInt(totalFormsExp.value) - 1;
+          }
+          
+          // Update numbers
+          const visibleItems = experienceContainer.querySelectorAll('.experience-item:not([style*="display: none"])');
+          visibleItems.forEach(function(item, index) {
+            const numberSpan = item.querySelector('.exp-number');
+            if (numberSpan) {
+              numberSpan.textContent = index + 1;
+            }
+          });
+        }
+      });
+    }
+  }
+
+  // ===================================
+  // SOCIAL FORMSET - EXACT SAME PATTERN AS REGISTRATION
+  // ===================================
+  const socialSection = document.getElementById('socialSection');
+  const addSocialBtn = document.getElementById('addSocial');
+  
+  if (socialSection && addSocialBtn) {
+    const socialContainer = socialSection.querySelector('.social-forms');
+    const totalFormsSocial = socialSection.querySelector('input[name$="-TOTAL_FORMS"]');
+    
+    if (totalFormsSocial && socialContainer) {
+      // Add Social
+      addSocialBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const formCount = socialContainer.querySelectorAll('.social-item').length;
+        const firstForm = socialContainer.querySelector('.social-item');
+        
+        if (!firstForm) return;
+        
+        const newForm = firstForm.cloneNode(true);
+        const formsetPrefix = totalFormsSocial.name.replace('-TOTAL_FORMS', '');
+        
+        // Update form fields
+        newForm.querySelectorAll('input, select, textarea').forEach(function(field) {
+          if (field.name) {
+            field.name = field.name.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
+            field.id = field.id.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
+            
+            // Clear values except for hidden fields (they'll be empty for new records)
+            if (field.type === 'checkbox') {
+              field.checked = false;
+            } else if (field.type === 'hidden' && field.name.includes('-id')) {
+              // Remove value from ID field for new records
+              field.value = '';
+            } else if (field.type !== 'hidden') {
+              field.value = '';
+            }
+          }
+        });
+        
+        // Update number
+        const socialNumber = newForm.querySelector('.social-number');
+        if (socialNumber) {
+          socialNumber.textContent = formCount + 1;
+        }
+        
+        // Show remove button
+        const removeBtn = newForm.querySelector('.btn-remove-social');
+        if (removeBtn) {
+          removeBtn.style.display = 'flex';
+        } else {
+          const header = newForm.querySelector('.social-header');
+          if (header) {
+            const newRemoveBtn = document.createElement('button');
+            newRemoveBtn.type = 'button';
+            newRemoveBtn.className = 'btn-remove-social';
+            newRemoveBtn.innerHTML = '<i class="bi bi-trash"></i>';
+            header.appendChild(newRemoveBtn);
+          }
+        }
+        
+        socialContainer.appendChild(newForm);
+        totalFormsSocial.value = parseInt(totalFormsSocial.value) + 1;
+      });
+      
+      // Remove Social
+      socialContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-social')) {
+          e.preventDefault();
+          
+          const socialItem = e.target.closest('.social-item');
+          const deleteCheckbox = socialItem.querySelector('input[name$="-DELETE"]');
+          
+          if (deleteCheckbox) {
+            deleteCheckbox.checked = true;
+            socialItem.style.display = 'none';
+          } else {
+            socialItem.remove();
+            totalFormsSocial.value = parseInt(totalFormsSocial.value) - 1;
+          }
+          
+          // Update numbers
+          const visibleItems = socialContainer.querySelectorAll('.social-item:not([style*="display: none"])');
+          visibleItems.forEach(function(item, index) {
+            const numberSpan = item.querySelector('.social-number');
+            if (numberSpan) {
+              numberSpan.textContent = index + 1;
+            }
+          });
+        }
+      });
+    }
+  }
+
+});
+</script>
+
+{% endblock %}

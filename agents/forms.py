@@ -101,7 +101,7 @@ ExperienceFormSet = inlineformset_factory(
     AgentInformation,
     Experience,
     fields=['company', 'title', 'start_date', 'end_date'],
-    extra=1,  # Show 1 empty form by default
+    extra=0,  # Show 1 empty form by default
     can_delete=True,  # Allow deletion of forms
     widgets={
         'company': forms.TextInput(attrs={
@@ -128,7 +128,7 @@ SocialLinksFormSet = inlineformset_factory(
     AgentInformation,
     SocialLinks,
     fields=['social_platform', 'link_to_social'],
-    extra=1,  # Show 1 empty form by default
+    extra=0,  # Show 1 empty form by default
     can_delete=True,  # Allow deletion of forms
     widgets={
         'social_platform': forms.Select(attrs={

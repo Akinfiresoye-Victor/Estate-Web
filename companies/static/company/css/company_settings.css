@@ -968,3 +968,29 @@ textarea.form-control {
     justify-content: center;
   }
 }
+
+
+/* Change Password Link Button */
+.btn-change-password {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.btn-change-password:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(193, 155, 118, 0.3);
+  color: #fff;
+}
+
+.btn-change-password i {
+  font-size: 1.1rem;
+}

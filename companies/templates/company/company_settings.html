@@ -14,9 +14,6 @@
 <style>
 .attractive-back-button {
     margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
     display: inline-flex;
     align-items: center;
     padding: 0.7rem 1.5rem;
@@ -30,18 +27,17 @@
     transition: all 0.3s ease;
 }
 
-/* Hover Effect: Changes appearance on mouse over */
 .attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
+    background-color: #1a3c4e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    color: #fff;
 }
 
-/* Active Effect: Simulates a press */
 .attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
+    background-color: #0a0a0aff;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
 
@@ -54,11 +50,6 @@
           <i class="bi bi-gear me-3"></i>Settings
         </h1>
         <p class="page-subtitle">Manage your company profile and platform preferences</p>
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        <button class="btn-save-all">
-          <i class="bi bi-check-circle me-2"></i>Save All Changes
-        </button>
       </div>
     </div>
   </div>
@@ -109,129 +100,247 @@
     <!-- Settings Content -->
     <div class="col-xl-9 col-lg-8">
       
-      <!-- Public Profile Section -->
-      <div class="settings-section active" id="profile">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-person-circle me-2"></i>Public Profile</h3>
-              <p>This information will be displayed publicly on your company profile</p>
-            </div>
+<!-- Public Profile Section -->
+<div class="settings-section active" id="profile">
+  <div class="settings-card">
+    <div class="card-header-settings">
+      <div>
+        <h3><i class="bi bi-person-circle me-2"></i>Public Profile</h3>
+        <p>This information will be displayed publicly on your company profile</p>
+      </div>
+      <span class="readonly-badge">Read Only</span>
+    </div>
+    <div class="card-body-settings">
+      
+      <!-- Company Logo -->
+      <div class="form-group">
+        <label>Company Logo</label>
+        <div class="logo-upload-section">
+          <div class="current-logo">
+            {% if company.company_logo %}
+              <img src="{{ company.company_logo.url }}" alt="Company Logo" id="logoPreview">
+            {% else %}
+              <img src="{% static 'estate/images/default-company.png' %}" alt="Company Logo" id="logoPreview">
+            {% endif %}
           </div>
-          <div class="card-body-settings">
-            
-            <!-- Company Logo -->
-            <div class="form-group">
-              <label>Company Logo</label>
-              <div class="logo-upload-section">
-                <div class="current-logo">
-                  <img src="{% static 'estate/images/logo.png' %}" alt="Company Logo" id="logoPreview">
-                </div>
-                <div class="logo-upload-controls">
-                  <button class="btn-upload-logo" type="button">
-                    <i class="bi bi-cloud-upload me-2"></i>Upload New Logo
-                  </button>
-                  <input type="file" id="logoInput" accept="image/*" hidden>
-                  <button class="btn-remove-logo" type="button">
-                    <i class="bi bi-trash me-2"></i>Remove
-                  </button>
-                  <p class="upload-hint">JPG, PNG or GIF. Max size 2MB. Recommended 500x500px</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Company Name -->
-            <div class="form-group">
-              <label for="companyName">Company Name</label>
-              <input type="text" class="form-control" id="companyName" placeholder="Enter company name" value="Estate Solutions Ltd">
-            </div>
-
-            <!-- Company Bio -->
-            <div class="form-group">
-              <label for="companyBio">Company Bio</label>
-              <textarea class="form-control" id="companyBio" rows="4" placeholder="Tell us about your company...">Leading real estate company specializing in luxury properties across Lagos and surrounding areas.</textarea>
-              <span class="char-count">120 / 500 characters</span>
-            </div>
-
-            <!-- Contact Information -->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="phoneNumber">Phone Number</label>
-                  <input type="tel" class="form-control" id="phoneNumber" placeholder="+234" value="+234 801 234 5678">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="emailAddress">Email Address</label>
-                  <input type="email" class="form-control" id="emailAddress" placeholder="email@company.com" value="info@estatesolutions.com">
-                </div>
-              </div>
-            </div>
-
-            <!-- Address -->
-            <div class="form-group">
-              <label for="address">Office Address</label>
-              <input type="text" class="form-control" id="address" placeholder="Enter full address" value="45 Admiralty Way, Lekki Phase 1, Lagos">
-            </div>
-
-            <!-- Service Areas -->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="serviceAreas">Service Areas</label>
-                  <select class="form-control" id="serviceAreas">
-                    <option>Lagos</option>
-                    <option>Abuja</option>
-                    <option>Port Harcourt</option>
-                    <option>Ibadan</option>
-                    <option>Kano</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="specialization">Specialization</label>
-                  <input type="text" class="form-control" id="specialization" placeholder="e.g., Residential, Commercial" value="Luxury Residential">
-                </div>
-              </div>
-            </div>
-
-            <!-- Social Links -->
-            <div class="form-group">
-              <label>Social Media Links</label>
-              <div class="social-links-inputs">
-                <div class="social-input-group">
-                  <i class="bi bi-facebook"></i>
-                  <input type="url" class="form-control" placeholder="Facebook URL" value="https://facebook.com/estatesolutions">
-                </div>
-                <div class="social-input-group">
-                  <i class="bi bi-twitter"></i>
-                  <input type="url" class="form-control" placeholder="Twitter URL" value="https://twitter.com/estatesolutions">
-                </div>
-                <div class="social-input-group">
-                  <i class="bi bi-instagram"></i>
-                  <input type="url" class="form-control" placeholder="Instagram URL" value="https://instagram.com/estatesolutions">
-                </div>
-                <div class="social-input-group">
-                  <i class="bi bi-linkedin"></i>
-                  <input type="url" class="form-control" placeholder="LinkedIn URL">
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn-cancel" type="button">Cancel</button>
-              <button class="btn-save" type="button">
-                <i class="bi bi-check-circle me-2"></i>Save Changes
-              </button>
-            </div>
-
+          <div class="logo-upload-controls">
+            <p class="upload-hint" style="margin: 0; color: #6c757d;">
+              <i class="bi bi-info-circle me-1"></i>Logo managed through company profile settings
+            </p>
           </div>
         </div>
       </div>
 
-      <!-- Account Security Section -->
+      <!-- Company Name -->
+      <div class="form-group">
+        <label for="companyName">Company Name</label>
+        <input type="text" class="form-control" id="companyName" value="{{ company.company_name }}" readonly>
+      </div>
+
+      <!-- Company Bio -->
+      <div class="form-group">
+        <label for="companyBio">Company Bio</label>
+        <textarea class="form-control" id="companyBio" rows="4" readonly>{{ company.company_bio }}</textarea>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="tel" class="form-control" id="phoneNumber" value="{{ company.phone_number }}" readonly>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="emailAddress">Email Address</label>
+            <input type="email" class="form-control" id="emailAddress" value="{{ company.email }}" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div class="form-group">
+        <label for="address">Office Address</label>
+        <input type="text" class="form-control" id="address" value="{{ company.address }}" readonly>
+      </div>
+
+      <!-- Service Areas & Principal Broker -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="serviceAreas">Service Areas</label>
+            <input type="text" class="form-control" id="serviceAreas" value="{{ company.service_areas }}" readonly>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="principalBroker">Principal Broker</label>
+            <input type="text" class="form-control" id="principalBroker" value="{{ company.principal_broker }}" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Year Established & Verification Status -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="yearEstablished">Year Established</label>
+            <input type="text" class="form-control" id="yearEstablished" value="{{ company.year_established }}" readonly>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Verification Status</label>
+            <div class="verification-status">
+              {% if company.verified %}
+              <span class="status-badge verified">
+                <i class="bi bi-check-circle-fill"></i> Verified
+              </span>
+              {% else %}
+              <span class="status-badge pending">
+                <i class="bi bi-clock-fill"></i> Pending Verification
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="form-group">
+        <label>Social Media Links</label>
+        {% if company.social.all %}
+        <div class="social-links-inputs">
+          {% for social in company.social.all %}
+          <div class="social-input-group">
+            <i class="bi bi-{% if social.social_platform == 'Facebook' %}facebook{% elif social.social_platform == 'Twitter' %}twitter{% elif social.social_platform == 'Instagram' %}instagram{% elif social.social_platform == 'LinkedIn' %}linkedin{% elif social.social_platform == 'Company Website' %}globe{% else %}link-45deg{% endif %}"></i>
+            <input type="url" class="form-control" placeholder="{{ social.social_platform }}" value="{{ social.link_to_social }}" readonly>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #6c757d; padding: 1rem; background: #f8f9fa; border-radius: 6px; margin: 0;">
+          <i class="bi bi-info-circle me-1"></i>No social links added yet
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <i class="bi bi-info-circle"></i>
+        <span>To update your company information, use the "Update Profile" button below</span>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'company:dashboard' %}" class="btn-cancel">
+          <i class="bi bi-arrow-left-circle me-2"></i>Back to Dashboard
+        </a>
+        <a href="{% url 'company:edit-profile' company.unique_company_id %}" class="btn-save">
+          <i class="bi bi-pencil-square me-2"></i>Update Profile
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* Read-only badge styling */
+.readonly-badge {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  background: #6c757d;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Read-only input styling */
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+.form-control[readonly]:focus {
+  box-shadow: none;
+  border-color: #dee2e6;
+  background-color: #f8f9fa;
+}
+
+/* Verification status styling */
+.verification-status {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-top: 0.5rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-badge.verified {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Info box styling */
+.info-box {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #e7f3ff;
+  border-left: 4px solid #c19b76;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #004085;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-box i {
+  color: #c19b76;
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+/* Logo upload section for read-only */
+.logo-upload-section .upload-hint {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Adjust button styling for links */
+.form-actions a.btn-cancel,
+.form-actions a.btn-save {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Social links styling for empty state */
+.social-links-inputs .social-input-group input[readonly] {
+  pointer-events: none;
+}
+</style>
+<!-- Account Security Section -->
       <div class="settings-section" id="account">
         <div class="settings-card">
           <div class="card-header-settings">
@@ -264,7 +373,7 @@
                 <i class="bi bi-shield-check"></i>
               </div>
               <div class="security-content">
-                <h4>Two-Factor Authentication</h4>
+                <h4>Two-Factor Authentication * Coming Soon *</h4>
                 <p>Add an extra layer of security to your account</p>
               </div>
               <div class="security-status">
@@ -275,52 +384,27 @@
               </div>
             </div>
 
-            <!-- Change Password -->
-            <div class="form-section">
-              <h4 class="section-title">Change Password</h4>
-              <div class="form-group">
-                <label for="currentPassword">Current Password</label>
-                <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+            <!-- Change Password Link -->
+            <div class="security-item">
+              <div class="security-icon">
+                <i class="bi bi-key-fill"></i>
               </div>
-              <div class="form-group">
-                <label for="newPassword">New Password</label>
-                <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+              <div class="security-content">
+                <h4>Change Password</h4>
+                <p>Update your account password</p>
               </div>
-              <div class="form-group">
-                <label for="confirmPassword">Confirm New Password</label>
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+              <div class="security-status">
+                <a href="{%url 'customer:change-password'%}" class="btn-change-password">
+                  <i class="bi bi-arrow-right-circle-fill"></i>
+                  Change Password
+                </a>
               </div>
-              <div class="password-requirements">
-                <p><strong>Password must contain:</strong></p>
-                <ul>
-                  <li class="requirement" data-requirement="length">
-                    <i class="bi bi-x-circle"></i> At least 8 characters
-                  </li>
-                  <li class="requirement" data-requirement="uppercase">
-                    <i class="bi bi-x-circle"></i> One uppercase letter
-                  </li>
-                  <li class="requirement" data-requirement="lowercase">
-                    <i class="bi bi-x-circle"></i> One lowercase letter
-                  </li>
-                  <li class="requirement" data-requirement="number">
-                    <i class="bi bi-x-circle"></i> One number
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn-cancel" type="button">Cancel</button>
-              <button class="btn-save" type="button">
-                <i class="bi bi-check-circle me-2"></i>Update Security
-              </button>
             </div>
 
           </div>
         </div>
       </div>
-
-      <!-- Notifications Section -->
+              <!-- Notifications Section -->
       <div class="settings-section" id="notifications">
         <div class="settings-card">
           <div class="card-header-settings">
@@ -411,82 +495,193 @@
         </div>
       </div>
 
-      <!-- Preferences Section -->
-      <div class="settings-section" id="preferences">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-sliders me-2"></i>Platform Preferences</h3>
-              <p>Customize your experience on Estate Web</p>
-            </div>
+ <!-- Preferences Section -->
+<div class="settings-section" id="preferences">
+  <div class="settings-card">
+    <div class="card-header-settings">
+      <div>
+        <h3><i class="bi bi-sliders me-2"></i>Platform Preferences</h3>
+        <p>Customize your experience on Estate Web</p>
+      </div>
+    </div>
+    <div class="card-body-settings">
+      
+      <!-- Coming Soon Message -->
+      <div class="coming-soon-container">
+        <div class="coming-soon-icon">
+          <i class="bi bi-gear-fill"></i>
+          <div class="icon-pulse"></div>
+        </div>
+        <h3 class="coming-soon-title">Preferences Coming Soon</h3>
+        <p class="coming-soon-text">
+          We're working on bringing you advanced customization options including dark mode, 
+          language preferences, and display settings. Stay tuned!
+        </p>
+        <div class="coming-soon-features">
+          <div class="feature-badge">
+            <i class="bi bi-moon-stars"></i>
+            <span>Dark Mode</span>
           </div>
-          <div class="card-body-settings">
-            
-            <!-- Language & Region -->
-            <div class="form-section">
-              <h4 class="section-title">Language & Region</h4>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="language">Language</label>
-                    <select class="form-control" id="language">
-                      <option>English</option>
-                      <option>Yoruba</option>
-                      <option>Hausa</option>
-                      <option>Igbo</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="timezone">Timezone</label>
-                    <select class="form-control" id="timezone">
-                      <option>West Africa Time (WAT)</option>
-                      <option>GMT</option>
-                      <option>EST</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Display Preferences -->
-            <div class="form-section">
-              <h4 class="section-title">Display Preferences</h4>
-              
-              <div class="preference-item">
-                <div class="preference-info">
-                  <h5>Dark Mode</h5>
-                  <p>Switch to dark theme for better viewing at night</p>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-
-              <div class="preference-item">
-                <div class="preference-info">
-                  <h5>Public Profile</h5>
-                  <p>Make your profile visible to everyone on Estate Web</p>
-                </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" checked>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button class="btn-cancel" type="button">Cancel</button>
-              <button class="btn-save" type="button">
-                <i class="bi bi-check-circle me-2"></i>Save Preferences
-              </button>
-            </div>
-
+          <div class="feature-badge">
+            <i class="bi bi-translate"></i>
+            <span>Multi-Language</span>
+          </div>
+          <div class="feature-badge">
+            <i class="bi bi-sliders"></i>
+            <span>Custom Settings</span>
           </div>
         </div>
+        <button class="notify-btn" type="button">
+          <i class="bi bi-bell"></i>
+          Notify Me When Available
+        </button>
       </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add this CSS to your stylesheet -->
+<style>
+/* Coming Soon Container */
+.coming-soon-container {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.coming-soon-icon {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  color: white;
+  box-shadow: 0 10px 30px rgba(193, 155, 118, 0.3);
+}
+
+.icon-pulse {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 3px solid var(--secondary-color);
+  opacity: 0;
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+.coming-soon-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.coming-soon-text {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+
+.coming-soon-features {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.feature-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-light);
+  border: 2px solid #e1e8ed;
+  border-radius: 50px;
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.feature-badge i {
+  color: var(--secondary-color);
+  font-size: 1.2rem;
+}
+
+.notify-btn {
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notify-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(193, 155, 118, 0.4);
+}
+
+.notify-btn i {
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .coming-soon-container {
+    padding: 3rem 1.5rem;
+  }
+
+  .coming-soon-icon {
+    width: 100px;
+    height: 100px;
+    font-size: 3rem;
+  }
+
+  .coming-soon-title {
+    font-size: 1.75rem;
+  }
+
+  .coming-soon-text {
+    font-size: 1rem;
+  }
+
+  .coming-soon-features {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .feature-badge {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+}
+</style>
 
       <!-- Billing Section -->
       <div class="settings-section" id="billing">
@@ -591,3 +786,303 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 {% endblock %}
+
+{%block extra_js%}
+<script>
+// ============================================
+// SETTINGS NAVIGATION
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.settings-section');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const targetSection = this.getAttribute('data-section');
+
+            // Remove active class from all nav items
+            navItems.forEach(nav => nav.classList.remove('active'));
+            
+            // Add active class to clicked nav item
+            this.classList.add('active');
+
+            // Hide all sections
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Show target section
+            const activeSection = document.getElementById(targetSection);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                
+                // Smooth scroll to top of content on mobile
+                if (window.innerWidth <= 992) {
+                    activeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    });
+});
+
+// ============================================
+// LOGO UPLOAD PREVIEW
+// ============================================
+const logoInput = document.getElementById('logoInput');
+const logoPreview = document.getElementById('logoPreview');
+const uploadLogoBtn = document.querySelector('.btn-upload-logo');
+const removeLogoBtn = document.querySelector('.btn-remove-logo');
+
+if (uploadLogoBtn && logoInput) {
+    uploadLogoBtn.addEventListener('click', function() {
+        logoInput.click();
+    });
+}
+
+if (logoInput && logoPreview) {
+    logoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                logoPreview.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+if (removeLogoBtn && logoPreview) {
+    removeLogoBtn.addEventListener('click', function() {
+        // Reset to default logo
+        logoPreview.src = '/static/estate/images/logo.png';
+        if (logoInput) {
+            logoInput.value = '';
+        }
+    });
+}
+
+// ============================================
+// CHARACTER COUNTER
+// ============================================
+const companyBio = document.getElementById('companyBio');
+const charCount = document.querySelector('.char-count');
+
+if (companyBio && charCount) {
+    companyBio.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        const maxLength = 500;
+        charCount.textContent = `${currentLength} / ${maxLength} characters`;
+        
+        // Change color when approaching limit
+        if (currentLength > maxLength * 0.9) {
+            charCount.style.color = '#dc3545';
+        } else if (currentLength > maxLength * 0.7) {
+            charCount.style.color = '#ffc107';
+        } else {
+            charCount.style.color = '#6c757d';
+        }
+    });
+}
+
+// ============================================
+// PASSWORD VALIDATION
+// ============================================
+const newPassword = document.getElementById('newPassword');
+const requirements = document.querySelectorAll('.requirement');
+
+if (newPassword && requirements.length > 0) {
+    newPassword.addEventListener('input', function() {
+        const password = this.value;
+        
+        // Check each requirement
+        const checks = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password)
+        };
+        
+        // Update UI for each requirement
+        requirements.forEach(req => {
+            const type = req.getAttribute('data-requirement');
+            const icon = req.querySelector('i');
+            
+            if (checks[type]) {
+                req.classList.add('valid');
+                icon.classList.remove('bi-x-circle');
+                icon.classList.add('bi-check-circle');
+            } else {
+                req.classList.remove('valid');
+                icon.classList.remove('bi-check-circle');
+                icon.classList.add('bi-x-circle');
+            }
+        });
+    });
+}
+
+// ============================================
+// PASSWORD CONFIRMATION VALIDATION
+// ============================================
+const confirmPassword = document.getElementById('confirmPassword');
+
+if (newPassword && confirmPassword) {
+    confirmPassword.addEventListener('input', function() {
+        if (this.value && this.value !== newPassword.value) {
+            this.style.borderColor = '#dc3545';
+        } else {
+            this.style.borderColor = '';
+        }
+    });
+}
+
+// ============================================
+// SAVE ALL CHANGES BUTTON
+// ============================================
+const saveAllBtn = document.querySelector('.btn-save-all');
+
+if (saveAllBtn) {
+    saveAllBtn.addEventListener('click', function() {
+        // Get active section
+        const activeSection = document.querySelector('.settings-section.active');
+        
+        if (activeSection) {
+            const saveBtn = activeSection.querySelector('.btn-save');
+            if (saveBtn) {
+                saveBtn.click();
+            } else {
+                // If no save button in section, show general success
+                alert('All changes saved successfully!');
+            }
+        }
+    });
+}
+
+
+// ============================================
+// TOGGLE SWITCHES
+// ============================================
+const toggleSwitches = document.querySelectorAll('.toggle-switch input[type="checkbox"]');
+
+toggleSwitches.forEach(toggle => {
+    toggle.addEventListener('change', function() {
+        console.log('Toggle changed:', this.checked);
+        // Add your toggle change logic here
+    });
+});
+
+// ============================================
+// DANGER ZONE ACTIONS
+// ============================================
+const deactivateBtn = document.querySelector('.btn-danger-action:not(.critical)');
+const deleteBtn = document.querySelector('.btn-danger-action.critical');
+
+if (deactivateBtn) {
+    deactivateBtn.addEventListener('click', function() {
+        const confirmed = confirm('Are you sure you want to deactivate your account? You can reactivate it anytime by logging back in.');
+        
+        if (confirmed) {
+            console.log('Deactivating account...');
+            // Add deactivation logic here
+            alert('Account deactivated successfully');
+        }
+    });
+}
+
+if (deleteBtn) {
+    deleteBtn.addEventListener('click', function() {
+        const firstConfirm = confirm('WARNING: This will permanently delete your account and all data. This action CANNOT be undone!');
+        
+        if (firstConfirm) {
+            const secondConfirm = confirm('Are you absolutely sure? Type DELETE to confirm');
+            
+            if (secondConfirm) {
+                const finalConfirm = prompt('Type DELETE in capital letters to confirm deletion:');
+                
+                if (finalConfirm === 'DELETE') {
+                    console.log('Deleting account...');
+                    // Add deletion logic here
+                    alert('Account deletion initiated');
+                } else {
+                    alert('Deletion cancelled - text did not match');
+                }
+            }
+        }
+    });
+}
+
+// ============================================
+// FORM VALIDATION
+// ============================================
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function validatePhone(phone) {
+    const re = /^\+?[0-9]{10,14}$/;
+    return re.test(phone.replace(/\s/g, ''));
+}
+
+// Add validation on blur
+const emailInput = document.getElementById('emailAddress');
+const phoneInput = document.getElementById('phoneNumber');
+
+if (emailInput) {
+    emailInput.addEventListener('blur', function() {
+        if (this.value && !validateEmail(this.value)) {
+            this.style.borderColor = '#dc3545';
+            // You could show an error message here
+        } else {
+            this.style.borderColor = '';
+        }
+    });
+}
+
+if (phoneInput) {
+    phoneInput.addEventListener('blur', function() {
+        if (this.value && !validatePhone(this.value)) {
+            this.style.borderColor = '#dc3545';
+            // You could show an error message here
+        } else {
+            this.style.borderColor = '';
+        }
+    });
+}
+
+// ============================================
+// AUTO-SAVE INDICATOR (OPTIONAL)
+// ============================================
+let saveTimeout;
+const formInputs = document.querySelectorAll('.form-control');
+
+formInputs.forEach(input => {
+    input.addEventListener('input', function() {
+        // Clear existing timeout
+        clearTimeout(saveTimeout);
+        
+        // Show "unsaved changes" indicator
+        // You could add a visual indicator here
+        
+        // Set new timeout for auto-save
+        saveTimeout = setTimeout(() => {
+            console.log('Auto-saving...');
+            // Add auto-save logic here
+        }, 2000); // Auto-save after 2 seconds of inactivity
+    });
+});
+
+// ============================================
+// SMOOTH SCROLL FOR MOBILE
+// ============================================
+if (window.innerWidth <= 768) {
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Scroll to top of content area on mobile
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+}
+</script>
+{%endblock%}

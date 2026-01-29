@@ -451,10 +451,14 @@ def change_password(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain acess')
         return redirect('login')
-    if not request.user.role == 'customer':
-        messages.error(request, 'Customer Access Only')
-        return redirect('landing')
     try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
         if request.method == 'POST':
             form= PasswordChangeForm(request.user, request.POST)
             if form.is_valid():
@@ -469,7 +473,7 @@ def change_password(request):
             
         else:
             form= PasswordChangeForm(request.user)
-            return render(request, 'estate/change_passw.html', {'form': form})
+            return render(request, 'estate/change_passw.html', {'form': form, 'base_template':base_template})
         
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
@@ -483,10 +487,15 @@ def change_password_success(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
         return redirect('login')
-    if not request.user.role == 'customer':
-        messages.info(request, 'Congrats after messing around youve seen the green button')
     try:
-        return render(request, 'estate/succ_pass.html')
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        return render(request, 'estate/succ_pass.html', {'base_template': base_template})
     
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
@@ -529,19 +538,20 @@ def delete_account(request):
         property2= PropertyManagementSale.objects.filter(user_id=request.user.id)
         
         user_id=User.objects.get(pk=request.user.id)
-        
-        
-        try:
-            property1.delete()
-            property2.delete()
-            user_id.delete()
+        if request.user == user_id:
             
-        except Exception as e:
-            messages.error(request, 'There was an error, Try again later.....')
-            return redirect('customer:user-profile')
-        messages.success(request, 'Account has been deleted Successfully')
+            try:
+                property1.delete()
+                property2.delete()
+                user_id.delete()
+                
+            except Exception as e:
+                messages.error(request, 'There was an error, Try again later.....')
+                return redirect('customer:user-profile')
+            messages.success(request, 'Account has been deleted Successfully')
+        else:
+            messages.warning(request, 'Unauthorized access')
         return redirect('landing')
-    
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 

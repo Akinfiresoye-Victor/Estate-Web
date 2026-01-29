@@ -1,22 +1,33 @@
 /* ============================================
-   AGENT SETTINGS - COLOR VARIABLES
+   AGENT SETTINGS - ESTATE WEB COLOR SCHEME
    ============================================ */
 :root {
-  --agent-primary: #2563eb;
-  --agent-primary-dark: #1e40af;
-  --agent-secondary: #10b981;
-  --agent-accent: #f59e0b;
-  --agent-danger: #ef4444;
-  --agent-warning: #f59e0b;
-  --agent-success: #10b981;
-  --agent-text: #1f2937;
-  --agent-text-light: #6b7280;
-  --agent-bg: #f9fafb;
+  /* Estate Web Brand Colors */
+  --agent-primary: #1a3c4e;
+  --agent-primary-dark: #0f2936;
+  --agent-secondary: #c19b76;
+  --agent-accent: #8b7355;
+  
+  /* Status Colors */
+  --agent-danger: #dc3545;
+  --agent-warning: #ffc107;
+  --agent-success: #28a745;
+  
+  /* Text Colors */
+  --agent-text: #2c3e50;
+  --agent-text-light: #6c757d;
+  
+  /* Background Colors */
+  --agent-bg: #f8f9fa;
   --agent-bg-secondary: #ffffff;
   --agent-border: #e5e7eb;
+  
+  /* Shadows */
   --agent-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   --agent-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --agent-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  
+  /* Transition */
   --agent-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -55,7 +66,7 @@
    ============================================ */
 .settings-hero {
   position: relative;
-  background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-primary-dark) 100%);
+  background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-accent) 100%);
   padding: 3rem 0;
   margin-bottom: 2rem;
   overflow: hidden;
@@ -191,7 +202,7 @@
 }
 
 .tab-btn.active {
-  background: var(--agent-primary);
+  background: linear-gradient(135deg, var(--agent-primary), var(--agent-accent));
   color: white;
 }
 
@@ -200,7 +211,7 @@
 }
 
 .tab-btn.danger-tab:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(220, 53, 69, 0.1);
 }
 
 .tab-btn.danger-tab.active {
@@ -260,7 +271,7 @@
 }
 
 .content-card.featured {
-  border: 2px solid var(--agent-primary);
+  border: 2px solid var(--agent-secondary);
 }
 
 .card-header {
@@ -282,7 +293,7 @@
 }
 
 .card-title i {
-  color: var(--agent-primary);
+  color: var(--agent-secondary);
   font-size: 1.5rem;
 }
 
@@ -314,7 +325,7 @@
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid var(--agent-primary);
+  border: 4px solid var(--agent-secondary);
   position: relative;
 }
 
@@ -327,7 +338,7 @@
 .upload-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(37, 99, 235, 0.9);
+  background: rgba(193, 155, 118, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,12 +390,12 @@
 }
 
 .upload-btn {
-  background: var(--agent-primary);
+  background: linear-gradient(135deg, var(--agent-primary), var(--agent-accent));
   color: white;
 }
 
 .upload-btn:hover {
-  background: var(--agent-primary-dark);
+  background: linear-gradient(135deg, var(--agent-primary-dark), var(--agent-primary));
   transform: translateY(-2px);
   box-shadow: var(--agent-shadow-md);
 }
@@ -439,8 +450,8 @@
 
 .input-field:focus {
   outline: none;
-  border-color: var(--agent-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: var(--agent-secondary);
+  box-shadow: 0 0 0 3px rgba(193, 155, 118, 0.1);
 }
 
 .input-field.textarea {
@@ -477,7 +488,7 @@
 }
 
 .toggle-password:hover {
-  color: var(--agent-primary);
+  color: var(--agent-secondary);
 }
 
 /* ============================================
@@ -610,7 +621,7 @@
 }
 
 .icon-btn.danger:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(220, 53, 69, 0.1);
   color: var(--agent-danger);
 }
 
@@ -620,9 +631,9 @@
   gap: 0.5rem;
   padding: 0.625rem 1rem;
   background: transparent;
-  border: 2px solid var(--agent-primary);
+  border: 2px solid var(--agent-secondary);
   border-radius: 10px;
-  color: var(--agent-primary);
+  color: var(--agent-secondary);
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -630,7 +641,7 @@
 }
 
 .add-btn:hover {
-  background: var(--agent-primary);
+  background: linear-gradient(135deg, var(--agent-secondary), var(--agent-accent));
   color: white;
 }
 
@@ -658,12 +669,12 @@
 
 .status-item.verified {
   border-left-color: var(--agent-success);
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(40, 167, 69, 0.05);
 }
 
 .status-item.pending {
   border-left-color: var(--agent-warning);
-  background: rgba(245, 158, 11, 0.05);
+  background: rgba(255, 193, 7, 0.05);
 }
 
 .status-icon {
@@ -767,7 +778,7 @@
 }
 
 .switch input:checked + .switch-slider {
-  background: var(--agent-primary);
+  background: linear-gradient(135deg, var(--agent-secondary), var(--agent-accent));
 }
 
 .switch input:checked + .switch-slider:before {
@@ -841,8 +852,8 @@
 }
 
 .session-item.current {
-  background: rgba(37, 99, 235, 0.05);
-  border-color: var(--agent-primary);
+  background: rgba(193, 155, 118, 0.05);
+  border-color: var(--agent-secondary);
 }
 
 .session-icon {
@@ -854,7 +865,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: var(--agent-primary);
+  color: var(--agent-secondary);
   flex-shrink: 0;
 }
 
@@ -875,7 +886,7 @@
 .current-badge {
   font-size: 0.75rem;
   padding: 0.25rem 0.625rem;
-  background: var(--agent-primary);
+  background: var(--agent-secondary);
   color: white;
   border-radius: 6px;
   font-weight: 600;
@@ -953,7 +964,7 @@
    ============================================ */
 .plan-card {
   position: relative;
-  background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-primary-dark) 100%);
+  background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-accent) 100%);
   border: none;
   overflow: visible;
 }
@@ -1054,7 +1065,7 @@
 }
 
 .card-icon.visa {
-  background: linear-gradient(135deg, #1a1f71 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-accent) 100%);
 }
 
 .card-details {
@@ -1076,7 +1087,7 @@
 
 .default-badge {
   padding: 0.375rem 0.875rem;
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(40, 167, 69, 0.1);
   color: var(--agent-success);
   border-radius: 8px;
   font-weight: 700;
@@ -1142,7 +1153,7 @@
 }
 
 .status-tag.paid {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(40, 167, 69, 0.1);
   color: var(--agent-success);
 }
 
@@ -1153,7 +1164,7 @@
   padding: 0.625rem 1rem;
   background: transparent;
   border: none;
-  color: var(--agent-primary);
+  color: var(--agent-secondary);
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -1162,6 +1173,7 @@
 
 .text-btn:hover {
   gap: 0.75rem;
+  color: var(--agent-primary);
 }
 
 /* ============================================
@@ -1172,8 +1184,8 @@
 }
 
 .warning-card .card-header {
-  background: rgba(239, 68, 68, 0.05);
-  border-bottom-color: rgba(239, 68, 68, 0.2);
+  background: rgba(220, 53, 69, 0.05);
+  border-bottom-color: rgba(220, 53, 69, 0.2);
 }
 
 .danger-text {
@@ -1187,11 +1199,11 @@
   padding: 1.5rem;
   background: var(--agent-bg);
   border-radius: 12px;
-  border: 2px solid rgba(239, 68, 68, 0.2);
+  border: 2px solid rgba(220, 53, 69, 0.2);
 }
 
 .danger-action-item.critical {
-  background: rgba(239, 68, 68, 0.05);
+  background: rgba(220, 53, 69, 0.05);
   border-color: var(--agent-danger);
 }
 
@@ -1258,7 +1270,7 @@
 
 .danger-divider {
   height: 2px;
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(220, 53, 69, 0.2);
   margin: 1.5rem 0;
 }
 

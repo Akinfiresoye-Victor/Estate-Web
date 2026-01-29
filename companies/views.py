@@ -16,6 +16,8 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Count, Sum
 from core.utils import *
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 
@@ -266,7 +268,7 @@ def update_company_profile(request, company_id):
         messages.info(request, 'Company account only')
         return redirect('landing')
     try:
-        company_information=CompanyInformation.objects.get(pk=company_id)
+        company_information=CompanyInformation.objects.get(unique_company_id=company_id)
         if request.user.id == company_information.user_id:
             if request.method == 'POST':
                 comp_form = CompanyForm(request.POST, request.FILES, instance=company_information)
@@ -278,7 +280,7 @@ def update_company_profile(request, company_id):
                         company.save()
                         link_form.save()
                         messages.success(request, 'Profile Updated Successfully')
-                        return redirect('company:dashboard')
+                        return redirect('company:company-settings')
             else:
                 comp_form = CompanyForm(instance=company_information)
                 link_form = SocialLinksFormset(instance=company_information)
@@ -504,7 +506,25 @@ def reports(request):
     pass
 
 def company_settings(request):
-    return render(request, 'company/company_settings.html')
+    
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.error(request, 'Companies Only')
+        return redirect('landing')
+    
+    try:
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+        context={
+            'company':company,
+        }
+        return render(request, 'company/company_settings.html', context)
+    except ObjectDoesNotExist:
+        messages.error(request, 'Error Company Info Missing')
+        return redirect('landing')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
 
 
 def lead_management(request):
@@ -826,3 +846,61 @@ def manage_company(request):
 
 def delete_company():
     pass
+
+def change_password(request):
+    """
+    Change User Passwords with precise lines of code
+    """
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log in to gain acess')
+        return redirect('login')
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        if request.method == 'POST':
+            form= PasswordChangeForm(request.user, request.POST)
+            if form.is_valid():
+                new_pass=form.save() 
+                update_session_auth_hash(request, new_pass)
+                messages.success(request, 'Password Changed successfully')
+                return redirect('customer:password-success')
+            
+            else:
+                messages.error(request, 'Error Changing password...')
+                return redirect('customer:change-password')
+            
+        else:
+            form= PasswordChangeForm(request.user)
+            return render(request, 'estate/change_passw.html', {'form': form, 'base_template':base_template})
+        
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+
+def change_password_success(request):
+    """
+    Success Page after chaging password
+    """
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log in to gain access')
+        return redirect('login')
+    if not request.user.role == 'customer':
+        messages.info(request, 'Congrats after messing around youve seen the green button')
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        return render(request, 'estate/succ_pass.html', {'base_template', base_template})
+    
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})

@@ -75,267 +75,612 @@
 
     <!-- Tab Content -->
     <div class="tabs-content">
+<!-- Personal Info Tab -->
+<div class="tab-pane active" id="personal-info">
+    <div class="content-grid">
         
-        <!-- Personal Info Tab -->
-        <div class="tab-pane active" id="personal-info">
-            <div class="content-grid">
-                
-                <!-- Profile Picture Section -->
-                <div class="content-card featured">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-image"></i>
-                            Profile Picture
-                        </h3>
+        <!-- Profile Picture Section -->
+        <div class="content-card featured">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-image"></i>
+                    Profile Picture
+                </h3>
+            </div>
+            <div class="card-content">
+                <div class="profile-display-area">
+                    <div class="profile-preview">
+                        <div class="avatar-circle">
+                            {% if agent.profile_picture %}
+                                <img src="{{ agent.profile_picture.url }}" alt="{{ agent.profile_name }}">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    {{ agent.profile_name|slice:":1"|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="card-content">
-                        <div class="profile-upload-area">
-                            <div class="profile-preview">
-                                <div class="avatar-circle">
-                                    <img src="{% static 'estate/images/default-avatar.png' %}" alt="Profile" id="avatarPreview">
-                                    <div class="upload-overlay">
-                                        <i class="bi bi-camera-fill"></i>
+                    <div class="profile-info">
+                        <h4>{{ agent.profile_name }}</h4>
+                        <p class="profile-status">
+                            {% if agent.verified %}
+                                <i class="bi bi-patch-check-fill text-success"></i>
+                                Verified Agent
+                            {% else %}
+                                <i class="bi bi-clock-history text-warning"></i>
+                                Verification Pending
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-person-badge"></i>
+                    Basic Information
+                </h3>
+            </div>
+            <div class="card-content">
+                <div class="info-display-grid">
+                    <div class="info-item">
+                        <label class="info-label">Full Name</label>
+                        <p class="info-value">{{ agent.profile_name }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label">Work Type</label>
+                        <p class="info-value">{{ agent.work_type }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label">Email Address</label>
+                        <p class="info-value">{{ agent.email|default:"Not provided" }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label">Phone Number</label>
+                        <p class="info-value">{{ agent.phone_number }}</p>
+                    </div>
+                    <div class="info-item full-width">
+                        <label class="info-label">Professional Bio</label>
+                        <p class="info-value bio-text">{{ agent.bio }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Location & Contact -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Location & Contact
+                </h3>
+            </div>
+            <div class="card-content">
+                <div class="info-display-grid">
+                    <div class="info-item">
+                        <label class="info-label">Base Location</label>
+                        <p class="info-value">{{ agent.location }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label class="info-label">Languages Spoken</label>
+                        <p class="info-value">{{ agent.language }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-share"></i>
+                    Social Media Links
+                </h3>
+                <p class="card-subtitle">Your connected social profiles</p>
+            </div>
+            <div class="card-content">
+                {% if agent.social.exists %}
+                    <div class="social-display-grid">
+                        {% for link in agent.social.all %}
+                            {%if link.link_to_social%}
+                                <a href="{{ link.link_to_social }}" target="_blank" class="social-display-item">
+                                    <div class="social-icon {{ link.social_platform|lower }}">
+                                        <i class="bi bi-{{ link.social_platform|lower }}"></i>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="upload-controls">
-                                <h4>Update your photo</h4>
-                                <p>Recommended: Square image, at least 400x400px</p>
-                                <div class="upload-buttons">
-                                    <button class="upload-btn" type="button" onclick="document.getElementById('avatarInput').click()">
-                                        <i class="bi bi-upload"></i>
-                                        Upload Photo
-                                    </button>
-                                    <input type="file" id="avatarInput" accept="image/*" hidden>
-                                    <button class="remove-btn" type="button">
-                                        <i class="bi bi-trash"></i>
-                                        Remove
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                                    <div class="social-details">
+                                        <span class="social-name">{{ link.social_platform }}</span>
+                                        <span class="social-link">View Profile</span>
+                                    </div>
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            {%endif%}
+                        {% endfor %}
                     </div>
-                </div>
-
-                <!-- Basic Information -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-person-badge"></i>
-                            Basic Information
-                        </h3>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-link-45deg"></i>
+                        <p>No social media links added yet</p>
                     </div>
-                    <div class="card-content">
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label>Full Name</label>
-                                <input type="text" class="input-field" placeholder="John Doe" value="Michael Johnson">
-                            </div>
-                            <div class="input-group">
-                                <label>Agent License Number</label>
-                                <input type="text" class="input-field" placeholder="AG-123456" value="AG-789456">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label>Email Address</label>
-                                <input type="email" class="input-field" placeholder="email@example.com" value="michael.j@realty.com">
-                            </div>
-                            <div class="input-group">
-                                <label>Phone Number</label>
-                                <input type="tel" class="input-field" placeholder="+234 800 000 0000" value="+234 802 555 7890">
-                            </div>
-                        </div>
-                        <div class="input-group full-width">
-                            <label>Professional Bio</label>
-                            <textarea class="input-field textarea" rows="4" placeholder="Tell clients about your experience and expertise...">Award-winning real estate agent with 8+ years of experience in luxury properties across Lagos. Specialized in residential sales and investment properties.</textarea>
-                            <span class="character-counter">145 / 500</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact Information -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            Location & Contact
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label>Office Location</label>
-                                <input type="text" class="input-field" placeholder="City, State" value="Lagos, Nigeria">
-                            </div>
-                            <div class="input-group">
-                                <label>Service Areas</label>
-                                <input type="text" class="input-field" placeholder="Areas you cover" value="Lekki, VI, Ikoyi">
-                            </div>
-                        </div>
-                        <div class="input-group full-width">
-                            <label>Office Address</label>
-                            <input type="text" class="input-field" placeholder="Full office address" value="12 Adeola Odeku Street, Victoria Island, Lagos">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Social Media -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-share"></i>
-                            Social Media Links
-                        </h3>
-                        <p class="card-subtitle">Connect your social profiles to increase visibility</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="social-grid">
-                            <div class="social-item">
-                                <div class="social-icon facebook">
-                                    <i class="bi bi-facebook"></i>
-                                </div>
-                                <input type="url" class="input-field" placeholder="Facebook profile URL" value="https://facebook.com/michaeljohnson">
-                            </div>
-                            <div class="social-item">
-                                <div class="social-icon twitter">
-                                    <i class="bi bi-twitter-x"></i>
-                                </div>
-                                <input type="url" class="input-field" placeholder="Twitter profile URL">
-                            </div>
-                            <div class="social-item">
-                                <div class="social-icon instagram">
-                                    <i class="bi bi-instagram"></i>
-                                </div>
-                                <input type="url" class="input-field" placeholder="Instagram profile URL" value="https://instagram.com/mike_realty">
-                            </div>
-                            <div class="social-item">
-                                <div class="social-icon linkedin">
-                                    <i class="bi bi-linkedin"></i>
-                                </div>
-                                <input type="url" class="input-field" placeholder="LinkedIn profile URL">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Save Actions -->
-            <div class="section-actions">
-                <button class="action-btn secondary">
-                    <i class="bi bi-x-circle"></i>
-                    Discard Changes
-                </button>
-                <button class="action-btn primary">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Save Personal Info
-                </button>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Professional Tab -->
-        <div class="tab-pane" id="professional">
-            <div class="content-grid">
-                
-                <!-- Experience -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-trophy"></i>
-                            Professional Experience
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label>Years of Experience</label>
-                                <select class="input-field">
-                                    <option>Less than 1 year</option>
-                                    <option>1-3 years</option>
-                                    <option>3-5 years</option>
-                                    <option>5-10 years</option>
-                                    <option selected>10+ years</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label>Specialization</label>
-                                <input type="text" class="input-field" placeholder="e.g., Luxury Residential" value="Luxury Residential">
-                            </div>
-                        </div>
-                        <div class="input-group full-width">
-                            <label>Agency/Brokerage</label>
-                            <input type="text" class="input-field" placeholder="Current agency name" value="Elite Properties Lagos">
-                        </div>
-                    </div>
-                </div>
+    </div>
 
-                <!-- Certifications -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-award-fill"></i>
-                            Certifications & Licenses
-                        </h3>
-                        <button class="add-btn">
-                            <i class="bi bi-plus-circle"></i>
-                            Add Certificate
-                        </button>
-                    </div>
-                    <div class="card-content">
-                        <div class="certification-list">
-                            <div class="certification-item">
-                                <div class="cert-icon">
-                                    <i class="bi bi-file-earmark-check-fill"></i>
-                                </div>
-                                <div class="cert-info">
-                                    <h4>Real Estate License</h4>
-                                    <p>Nigerian Institute of Estate Surveyors</p>
-                                    <span class="cert-date">Issued: Jan 2020 • Valid until: Jan 2025</span>
-                                </div>
-                                <div class="cert-actions">
-                                    <button class="icon-btn">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="icon-btn danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Update Profile Action -->
+    <div class="section-actions">
+        <a href="{%url 'agent:update-agent' agent.agent_uuid%}" class="action-btn primary update-profile-btn">
+            <i class="bi bi-pencil-square"></i>
+            Update Agent Profile
+        </a>
+    </div>
+</div>
 
-                <!-- Languages -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-translate"></i>
-                            Languages
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="input-group full-width">
-                            <label>Languages Spoken</label>
-                            <input type="text" class="input-field" placeholder="e.g., English, Yoruba, Hausa" value="English, Yoruba, French">
-                        </div>
-                    </div>
-                </div>
-
+<!-- Professional Tab -->
+<div class="tab-pane" id="professional">
+    <div class="content-grid">
+        
+        <!-- Experience -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-trophy"></i>
+                    Professional Experience
+                </h3>
             </div>
-
-            <div class="section-actions">
-                <button class="action-btn secondary">
-                    <i class="bi bi-x-circle"></i>
-                    Cancel
-                </button>
-                <button class="action-btn primary">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Save Professional Info
-                </button>
+            <div class="card-content">
+                {% if agent.experiences.exists %}
+                    <div class="experience-timeline">
+                        {% for exp in agent.experiences.all %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4 class="timeline-title">{{ exp.title }}</h4>
+                                    <p class="timeline-company">{{ exp.company }}</p>
+                                    <p class="timeline-date">
+                                        <i class="bi bi-calendar3"></i>
+                                        {{ exp.start_date|date:"M Y" }} - 
+                                        {% if exp.end_date %}
+                                            {{ exp.end_date|date:"M Y" }}
+                                        {% else %}
+                                            Present
+                                        {% endif %}
+                                    </p>
+                                    <p class="timeline-description">{{ exp.past_experence }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-briefcase"></i>
+                        <p>No professional experience added yet</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
 
+        <!-- Universal Agent Info (if applicable) -->
+        {% if agent.universal_agent %}
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="bi bi-star-fill"></i>
+                        Universal Agent Status
+                    </h3>
+                </div>
+                <div class="card-content">
+                    {% if agent.universal.exists %}
+                        {% with universal=agent.universal.first %}
+                            <div class="info-display-grid">
+                                <div class="info-item">
+                                    <label class="info-label">Years of Experience</label>
+                                    <p class="info-value">{{ universal.years_experience }}</p>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Agency Affiliation</label>
+                                    <p class="info-value">
+                                        {% if universal.agency %}
+                                            {{ universal.agency_name }}
+                                        {% else %}
+                                            Independent Agent
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Certifications -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="bi bi-award-fill"></i>
+                    Certifications & Licenses
+                </h3>
+            </div>
+            <div class="card-content">
+                <div class="certifications-display">
+                    {% if agent.government_id %}
+                        <div class="cert-display-item">
+                            <div class="cert-icon verified">
+                                <i class="bi bi-file-earmark-check-fill"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4>Government ID</h4>
+                                <p>Verified identification document</p>
+                                <span class="cert-status verified">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Submitted
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if agent.certificate %}
+                        <div class="cert-display-item">
+                            <div class="cert-icon verified">
+                                <i class="bi bi-award-fill"></i>
+                            </div>
+                            <div class="cert-details">
+                                <h4>Professional Certificate</h4>
+                                <p>Real estate certification</p>
+                                <span class="cert-status verified">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    Submitted
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if not agent.government_id and not agent.certificate %}
+                        <div class="empty-state">
+                            <i class="bi bi-shield-exclamation"></i>
+                            <p>No certifications uploaded yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Update Profile Action -->
+    <div class="section-actions">
+        <a href="{%url 'agent:update-agent' agent.agent_uuid%}" class="action-btn primary update-profile-btn">
+            <i class="bi bi-pencil-square"></i>
+            Update Professional Info
+        </a>
+    </div>
+</div>
+
+<!-- Add this CSS to your agent_settings.css -->
+<style>
+/* Profile Display Area */
+.profile-display-area {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    font-weight: 800;
+    color: white;
+}
+
+.profile-info h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--agent-text);
+    margin-bottom: 0.5rem;
+}
+
+.profile-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--agent-text-light);
+    margin: 0;
+}
+
+.profile-status i {
+    font-size: 1.125rem;
+}
+
+/* Info Display Grid */
+.info-display-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--agent-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    color: var(--agent-text);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.info-value.bio-text {
+    line-height: 1.7;
+}
+
+/* Social Display Grid */
+.social-display-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.social-display-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--agent-bg);
+    border: 1px solid var(--agent-border);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: var(--agent-transition);
+}
+
+.social-display-item:hover {
+    border-color: var(--agent-primary);
+    transform: translateX(4px);
+    box-shadow: var(--agent-shadow);
+}
+
+.social-display-item .social-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.social-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.social-name {
+    font-weight: 600;
+    color: var(--agent-text);
+    font-size: 1rem;
+}
+
+.social-link {
+    font-size: 0.875rem;
+    color: var(--agent-text-light);
+}
+
+.social-display-item > i {
+    color: var(--agent-text-light);
+    font-size: 1.125rem;
+}
+
+/* Experience Timeline */
+.experience-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.experience-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--agent-border);
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--agent-primary);
+    border: 3px solid var(--agent-bg-secondary);
+    box-shadow: 0 0 0 4px var(--agent-bg);
+    z-index: 1;
+}
+
+.timeline-content {
+    flex: 1;
+    padding: 1rem;
+    background: var(--agent-bg);
+    border-radius: 12px;
+    border: 1px solid var(--agent-border);
+}
+
+.timeline-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--agent-text);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-company {
+    font-size: 1rem;
+    color: var(--agent-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--agent-text-light);
+    margin-bottom: 0.75rem;
+}
+
+.timeline-description {
+    font-size: 0.9375rem;
+    color: var(--agent-text);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Certifications Display */
+.certifications-display {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cert-display-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: var(--agent-bg);
+    border-radius: 12px;
+    border: 1px solid var(--agent-border);
+}
+
+.cert-icon.verified {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--agent-success) 0%, #059669 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.cert-details {
+    flex: 1;
+}
+
+.cert-details h4 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--agent-text);
+    margin-bottom: 0.25rem;
+}
+
+.cert-details p {
+    font-size: 0.9375rem;
+    color: var(--agent-text-light);
+    margin-bottom: 0.5rem;
+}
+
+.cert-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.cert-status.verified {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--agent-success);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--agent-border);
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: var(--agent-text-light);
+    margin: 0;
+}
+
+/* Update Profile Button */
+.update-profile-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.0625rem;
+    padding: 1.125rem 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-display-area {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .info-display-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .experience-timeline {
+        padding-left: 1.5rem;
+    }
+
+    .timeline-marker {
+        left: -1.5rem;
+    }
+}
+</style>
         <!-- Security Tab -->
         <div class="tab-pane" id="security">
             <div class="content-grid">
@@ -658,138 +1003,448 @@
             </div>
         </div>
 
-        <!-- Preferences Tab -->
-        <div class="tab-pane" id="preferences">
-            <div class="content-grid">
+<!-- Preferences Tab -->
+<div class="tab-pane" id="preferences">
+    <div class="content-grid">
+        
+        <!-- Coming Soon Card -->
+        <div class="content-card coming-soon-card">
+            <div class="card-content">
                 
-                <!-- Display Settings -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-palette-fill"></i>
-                            Display & Appearance
-                        </h3>
+                <!-- Coming Soon Content -->
+                <div class="coming-soon-wrapper">
+                    <div class="coming-soon-animation">
+                        <div class="settings-icon-stack">
+                            <i class="bi bi-sliders icon-1"></i>
+                            <i class="bi bi-palette-fill icon-2"></i>
+                            <i class="bi bi-globe icon-3"></i>
+                        </div>
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring-2"></div>
                     </div>
-                    <div class="card-content">
-                        <div class="feature-toggle">
-                            <div class="toggle-info">
+                    
+                    <h2 class="coming-soon-heading">Preferences Coming Soon</h2>
+                    <p class="coming-soon-description">
+                        We're building an enhanced preferences center with advanced customization options 
+                        to give you complete control over your agent experience.
+                    </p>
+
+                    <!-- Feature Preview -->
+                    <div class="features-preview">
+                        <div class="preview-item">
+                            <div class="preview-icon theme">
+                                <i class="bi bi-moon-stars-fill"></i>
+                            </div>
+                            <div class="preview-content">
                                 <h4>Dark Mode</h4>
-                                <p>Switch to a darker color scheme for comfortable viewing</p>
+                                <p>Eye-friendly theme for night browsing</p>
                             </div>
-                            <label class="switch">
-                                <input type="checkbox">
-                                <span class="switch-slider"></span>
-                            </label>
                         </div>
-                        <div class="feature-toggle">
-                            <div class="toggle-info">
-                                <h4>Compact View</h4>
-                                <p>Display more information in less space</p>
+
+                        <div class="preview-item">
+                            <div class="preview-icon language">
+                                <i class="bi bi-translate"></i>
                             </div>
-                            <label class="switch">
-                                <input type="checkbox">
-                                <span class="switch-slider"></span>
-                            </label>
+                            <div class="preview-content">
+                                <h4>Multi-Language Support</h4>
+                                <p>Interface in English, Yoruba, Hausa, Igbo</p>
+                            </div>
                         </div>
+
+                        <div class="preview-item">
+                            <div class="preview-icon privacy">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <div class="preview-content">
+                                <h4>Privacy Controls</h4>
+                                <p>Manage your visibility and data sharing</p>
+                            </div>
+                        </div>
+
+                        <div class="preview-item">
+                            <div class="preview-icon display">
+                                <i class="bi bi-layout-text-window-reverse"></i>
+                            </div>
+                            <div class="preview-content">
+                                <h4>Display Options</h4>
+                                <p>Customize layout and information density</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notify Button -->
+                    <button class="notify-launch-btn" type="button" onclick="notifyMeLaunch()">
+                        <i class="bi bi-bell-fill"></i>
+                        <span>Get Notified at Launch</span>
+                    </button>
+
+                    <!-- Timeline -->
+                    <div class="launch-timeline">
+                        <i class="bi bi-rocket-takeoff-fill"></i>
+                        <span>Expected launch: Q2 2027</span>
                     </div>
                 </div>
 
-                <!-- Language & Region -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-globe"></i>
-                            Language & Region
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="form-row">
-                            <div class="input-group">
-                                <label>Language</label>
-                                <select class="input-field">
-                                    <option selected>English</option>
-                                    <option>Yoruba</option>
-                                    <option>Hausa</option>
-                                    <option>Igbo</option>
-                                    <option>French</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label>Timezone</label>
-                                <select class="input-field">
-                                    <option selected>West Africa Time (WAT)</option>
-                                    <option>Greenwich Mean Time (GMT)</option>
-                                    <option>Central European Time (CET)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>Date Format</label>
-                            <select class="input-field">
-                                <option>DD/MM/YYYY</option>
-                                <option selected>MM/DD/YYYY</option>
-                                <option>YYYY-MM-DD</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Privacy Settings -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-eye-fill"></i>
-                            Privacy Settings
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="feature-toggle">
-                            <div class="toggle-info">
-                                <h4>Public Profile</h4>
-                                <p>Allow your profile to be visible to all platform users</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" checked>
-                                <span class="switch-slider"></span>
-                            </label>
-                        </div>
-                        <div class="feature-toggle">
-                            <div class="toggle-info">
-                                <h4>Show Contact Information</h4>
-                                <p>Display your phone and email on public listings</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" checked>
-                                <span class="switch-slider"></span>
-                            </label>
-                        </div>
-                        <div class="feature-toggle">
-                            <div class="toggle-info">
-                                <h4>Activity Status</h4>
-                                <p>Let others see when you're online</p>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" checked>
-                                <span class="switch-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="section-actions">
-                <button class="action-btn secondary">
-                    <i class="bi bi-x-circle"></i>
-                    Cancel
-                </button>
-                <button class="action-btn primary">
-                    <i class="bi bi-check-circle-fill"></i>
-                    Save Preferences
-                </button>
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Add this CSS to your agent_settings.css -->
+<style>
+/* Coming Soon Card */
+.coming-soon-card {
+    border: 2px solid var(--agent-primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, rgba(30, 64, 175, 0.03) 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+.coming-soon-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--agent-primary), var(--agent-secondary), var(--agent-primary));
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.coming-soon-wrapper {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+/* Animation Stack */
+.coming-soon-animation {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 2.5rem;
+}
+
+.settings-icon-stack {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
+    animation: float 3s ease-in-out infinite;
+}
+
+.settings-icon-stack i {
+    position: absolute;
+    color: white;
+    font-size: 2.5rem;
+}
+
+.settings-icon-stack .icon-1 {
+    animation: iconRotate1 4s ease-in-out infinite;
+}
+
+.settings-icon-stack .icon-2 {
+    animation: iconRotate2 4s ease-in-out infinite;
+    animation-delay: 1.3s;
+}
+
+.settings-icon-stack .icon-3 {
+    animation: iconRotate3 4s ease-in-out infinite;
+    animation-delay: 2.6s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes iconRotate1 {
+    0%, 100% {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+    33%, 66% {
+        opacity: 0;
+        transform: rotate(180deg) scale(0.5);
+    }
+}
+
+@keyframes iconRotate2 {
+    0%, 100% {
+        opacity: 0;
+        transform: rotate(180deg) scale(0.5);
+    }
+    33% {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+    66% {
+        opacity: 0;
+        transform: rotate(180deg) scale(0.5);
+    }
+}
+
+@keyframes iconRotate3 {
+    0%, 33%, 100% {
+        opacity: 0;
+        transform: rotate(180deg) scale(0.5);
+    }
+    66% {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+}
+
+.pulse-ring,
+.pulse-ring-2 {
+    position: absolute;
+    inset: -15px;
+    border-radius: 50%;
+    border: 3px solid var(--agent-primary);
+    opacity: 0;
+    animation: pulse-out 2.5s ease-out infinite;
+}
+
+.pulse-ring-2 {
+    animation-delay: 1.25s;
+}
+
+@keyframes pulse-out {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+}
+
+/* Text Content */
+.coming-soon-heading {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--agent-text);
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+}
+
+.coming-soon-description {
+    font-size: 1.125rem;
+    color: var(--agent-text-light);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.7;
+}
+
+/* Features Preview */
+.features-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.preview-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--agent-bg-secondary);
+    border: 2px solid var(--agent-border);
+    border-radius: 16px;
+    text-align: left;
+    transition: var(--agent-transition);
+}
+
+.preview-item:hover {
+    border-color: var(--agent-primary);
+    transform: translateY(-4px);
+    box-shadow: var(--agent-shadow-md);
+}
+
+.preview-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.preview-icon.theme {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.preview-icon.language {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.preview-icon.privacy {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.preview-icon.display {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.preview-content h4 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--agent-text);
+    margin-bottom: 0.25rem;
+}
+
+.preview-content p {
+    font-size: 0.9375rem;
+    color: var(--agent-text-light);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Notify Button */
+.notify-launch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 3rem;
+    background: linear-gradient(135deg, var(--agent-primary) 0%, var(--agent-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.0625rem;
+    cursor: pointer;
+    transition: var(--agent-transition);
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+    margin-bottom: 2rem;
+}
+
+.notify-launch-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
+}
+
+.notify-launch-btn i {
+    font-size: 1.25rem;
+    animation: ring 2s ease-in-out infinite;
+}
+
+@keyframes ring {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    10%, 20% {
+        transform: rotate(-15deg);
+    }
+    15%, 25% {
+        transform: rotate(15deg);
+    }
+    30% {
+        transform: rotate(0deg);
+    }
+}
+
+/* Launch Timeline */
+.launch-timeline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.75rem;
+    background: rgba(37, 99, 235, 0.1);
+    border: 2px solid rgba(37, 99, 235, 0.2);
+    border-radius: 50px;
+    color: var(--agent-primary);
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.launch-timeline i {
+    font-size: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .coming-soon-wrapper {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .coming-soon-animation {
+        width: 120px;
+        height: 120px;
+    }
+
+    .settings-icon-stack i {
+        font-size: 2rem;
+    }
+
+    .coming-soon-heading {
+        font-size: 1.875rem;
+    }
+
+    .coming-soon-description {
+        font-size: 1rem;
+    }
+
+    .features-preview {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .notify-launch-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .coming-soon-animation {
+        width: 100px;
+        height: 100px;
+    }
+
+    .settings-icon-stack i {
+        font-size: 1.75rem;
+    }
+
+    .coming-soon-heading {
+        font-size: 1.625rem;
+    }
+
+    .notify-launch-btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+function notifyMeLaunch() {
+    alert('Thank you! We\'ll notify you when Preferences are available.');
+    // In production, this would collect the user's email/preferences for notification
+}
+</script>
         <!-- Subscription Tab -->
         <div class="tab-pane" id="subscription">
             <div class="content-grid">

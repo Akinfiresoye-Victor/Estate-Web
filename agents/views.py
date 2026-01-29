@@ -223,28 +223,105 @@ def agent_form(request):
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
 
-def update_agent_profile(request, agent_id):
+def update_agent_profile(request, agent_uuid):
+    """
+    Update agent profile with proper formset handling
+    """
+    # Authentication checks
     if not request.user.is_authenticated:
         messages.info(request, 'You have to be logged in to access this page')
         return redirect('landing')
+    
     if request.user.role != 'agent':
         messages.error(request, 'Open an agent account to access this page')
         return redirect('landing')
-    try:
-        agent_information=AgentInformation.objects.get(pk=agent_id)
-        if request.user.id == agent_information.user_id:
-            if request.method == 'POST':
-                form= AgentInformationForm(request.POST or None, request.FILES)
-                social_form=SocialLinksFormSet(request.POST or None)
-                exp_form=ExperienceFormSet(request.POST or None)
-                if form.is_valid() and social_form.is_valid() and exp_form.is_valid():
-                    with transaction.atomic():
-                        agent=form.save(commit=False)
-                        
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
-        
     
+    try:
+        # Get the agent information
+        agent_information = AgentInformation.objects.get(agent_uuid=agent_uuid)
+        
+        # Authorization check
+        if request.user.id != agent_information.user_id:
+            messages.error(request, 'You do not have permission to edit this profile')
+            return redirect('agent:agent-settings')
+        
+        if request.method == 'POST':
+            # IMPORTANT: Pass instance for formsets even in POST
+            form = AgentInformationForm(
+                request.POST, 
+                request.FILES, 
+                instance=agent_information
+            )
+            social_form = SocialLinksFormSet(
+                request.POST, 
+                instance=agent_information
+            )
+            exp_form = ExperienceFormSet(
+                request.POST, 
+                instance=agent_information
+            )
+            
+            # Validate all forms
+            if form.is_valid() and social_form.is_valid() and exp_form.is_valid():
+                try:
+                    with transaction.atomic():
+                        # Save main form
+                        agent = form.save(commit=False)
+                        agent.user = request.user
+                        agent.user_id = request.user.id
+                        agent.save()
+                        
+                        # Save formsets (they're already linked to agent via instance)
+                        social_form.save()
+                        exp_form.save()
+                        
+                        messages.success(request, 'Profile updated successfully!')
+                        return redirect('agent:settings')
+                        
+                except Exception as e:
+                    messages.error(request, f'Error saving profile: {str(e)}')
+                    print(f'Save error: {e}')
+            else:
+                # Collect all errors for debugging
+                error_messages = []
+                
+                if form.errors:
+                    error_messages.append(f'Form errors: {form.errors}')
+                
+                if social_form.errors:
+                    error_messages.append(f'Social links errors: {social_form.errors}')
+                
+                if exp_form.errors:
+                    error_messages.append(f'Experience errors: {exp_form.errors}')
+                
+                # Display first error to user
+                if error_messages:
+                    messages.error(request, 'Please correct the errors in the form')
+                    print('\n'.join(error_messages))
+        
+        else:
+            # GET request - initialize forms with instance
+            form = AgentInformationForm(instance=agent_information)
+            social_form = SocialLinksFormSet(instance=agent_information)
+            exp_form = ExperienceFormSet(instance=agent_information)
+        
+        context = {
+            'form': form,
+            'social_form': social_form,
+            'exp_form': exp_form
+        }
+        
+        return render(request, 'agent/update_agent_form.html', context)
+    
+    except ObjectDoesNotExist:
+        messages.error(request, 'Agent profile not found')
+        return redirect('agent:agent-settings')
+    
+    except Exception as e:
+        print(f'Unexpected error: {e}')
+        return render(request, 'estate/error_page.html', {'e': e})
+        
+
     
 
 
@@ -618,7 +695,14 @@ def settings(request):
         messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
-        return render(request, 'agent/settings.html')
+        agent= AgentInformation.objects.get(user_id=request.user.id)
+        context={
+            'agent':agent
+        }
+        return render(request, 'agent/settings.html', context)
+    except ObjectDoesNotExist:
+        messages.error(request, 'Error Agent Info Missing')
+        return redirect('landing')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 
