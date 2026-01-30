@@ -365,48 +365,6 @@
                                     <span class="error-text">{{ form.certificate.errors }}</span>
                                 {% endif %}
                             </div>
-
-                            <!-- Universal Agent Checkbox -->
-                            <div class="form-group full-width">
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="{{ form.universal_agent.id_for_label }}" 
-                                           name="{{ form.universal_agent.name }}" 
-                                           class="checkbox-input">
-                                    <label for="{{ form.universal_agent.id_for_label }}" class="checkbox-label">
-                                        {{ form.universal_agent.label }}
-                                        <span class="checkbox-hint">Check this if you're working independently without a company</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Universal Agent Additional Fields (Hidden by default) -->
-                            <div id="universalAgentFields" class="universal-fields" style="display: none;">
-                                <div class="form-group">
-                                    <label>Years of Experience</label>
-                                    <select name="years_experience" class="form-control">
-                                        <option value="">Select years</option>
-                                        <option value="0-1">0-1 years</option>
-                                        <option value="2-3">2-3 years</option>
-                                        <option value="4-5">4-5 years</option>
-                                        <option value="6-10">6-10 years</option>
-                                        <option value="10+">10+ years</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" id="id_agency" name="agency" class="checkbox-input">
-                                        <label for="id_agency" class="checkbox-label">
-                                            Affiliated with an Agency?
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="form-group" id="agencyNameField" style="display: none;">
-                                    <label>Agency Name</label>
-                                    <input type="text" name="agency_name" class="form-control" placeholder="Enter agency name">
-                                </div>
-                            </div>
                         </div>
 
                         <div class="form-actions">

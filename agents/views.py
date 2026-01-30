@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import AgentInformation, SessionId, AgentAnalytics, UniversalAgent, AgentRating
+from .models import AgentInformation, SessionId, AgentAnalytics, AgentRating
 from django.contrib import messages
 from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
 from django.db import transaction
@@ -16,7 +16,8 @@ from django.views.decorators.http import require_POST
 from .quotes import get_random_quote
 from django.db.models import Sum, Avg, Count
 from core.utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
-
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 # Create your views here.
@@ -177,27 +178,13 @@ def agent_form(request):
                         for social in soc_form.deleted_objects:
                             social.delete()
                         
-                        print(f"Saved {len(socials)} social links")
                         
-                        # Handle Universal Agent data if checkbox was checked
-                        if agent.universal_agent:
-                            years_exp = request.POST.get('years_experience', '0-1')
-                            is_agency = request.POST.get('agency') == 'on'
-                            agency_name = request.POST.get('agency_name', 'Not With Agency')
-                            
-                            UniversalAgent.objects.create(
-                                agent=agent,
-                                years_experience=years_exp,
-                                agency=is_agency,
-                                agency_name=agency_name if is_agency else 'Not With Agency'
-                            )
-                            print("Universal agent data saved")
                         
                         messages.success(request, 'Profile created successfully!')
                         return HttpResponseRedirect(f"{request.path}?submitted=True")
                         
                 except Exception as e:
-                    print(f"Error saving agent data: {str(e)}")
+                    print(f"Error saving agent data")
                     messages.error(request, f'Error saving data: {str(e)}')
                     # Forms will be re-rendered with the POST data below
         
@@ -735,7 +722,7 @@ def delete_lead(request, lead_id):
 
 
 
-# TODO try to add the mini scraper 
+
 
 def job_listings(request):
     if not request.user.is_authenticated:
@@ -791,3 +778,6 @@ def delete_agent(request, agent_uuid):
     except Exception as e:
         messages.error(request, 'Tell us the error')
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+# TODO Optimize all forms

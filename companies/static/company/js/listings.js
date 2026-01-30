@@ -3,13 +3,12 @@
 (function() {
     'use strict';
 
-    let propertyToDelete = null;
+    let deleteUrl = null;
 
     document.addEventListener('DOMContentLoaded', function() {
         initializeFilters();
         initializeSearch();
         initializeSort();
-        initializeDeleteButtons();
     });
 
     // Filter Tabs Functionality
@@ -86,10 +85,8 @@
                 cards.sort((a, b) => {
                     switch(sortType) {
                         case 'newest':
-                            // Assuming cards are already in newest order from backend
                             return 0;
                         case 'oldest':
-                            // Reverse order
                             return 1;
                         case 'price-high':
                             return getPriceValue(b) - getPriceValue(a);
@@ -109,7 +106,6 @@
     // Helper function to get price value from card
     function getPriceValue(card) {
         const priceText = card.querySelector('.price-amount').textContent;
-        // Remove currency symbol and commas, then convert to number
         return parseFloat(priceText.replace(/[₦,]/g, ''));
     }
 
@@ -128,42 +124,29 @@
         });
     }
 
-    // Delete Functionality
-    function initializeDeleteButtons() {
-        const deleteButtons = document.querySelectorAll('.action-btn.delete');
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        const confirmDeleteBtn = document.getElementById('confirmDelete');
+    // Delete Modal Functions
+    window.showDeleteModal = function(url) {
+        deleteUrl = url;
+        const modal = document.getElementById('deleteModal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+    };
 
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                propertyToDelete = {
-                    id: this.dataset.id,
-                    type: this.dataset.type,
-                    element: this.closest('.property-card')
-                };
-                deleteModal.show();
-            });
-        });
+    window.closeDeleteModal = function() {
+        const modal = document.getElementById('deleteModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+        deleteUrl = null;
+    };
 
-        confirmDeleteBtn.addEventListener('click', function() {
-            if (propertyToDelete) {
-                deleteProperty(propertyToDelete);
-                deleteModal.hide();
-            }
-        });
-    }
+    // Confirm Delete
+    window.confirmDelete = function() {
+        if (!deleteUrl) return;
 
-    // Delete Property Function
-    function deleteProperty(property) {
-        // Get CSRF token
         const csrftoken = getCookie('csrftoken');
 
-        // Determine the correct URL based on property type
-        const deleteUrl = property.type === 'sale' 
-            ? `/company/delete-sale-property/${property.id}/`
-            : `/company/delete-rent-property/${property.id}/`;
-
-        // Send delete request
         fetch(deleteUrl, {
             method: 'POST',
             headers: {
@@ -171,63 +154,45 @@
                 'Content-Type': 'application/json',
             },
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Animate card removal
-                property.element.style.transition = 'all 0.3s ease';
-                property.element.style.opacity = '0';
-                property.element.style.transform = 'translateY(-20px)';
-                
+        .then(response => {
+            // If response is ok (status 200-299), consider it successful
+            if (response.ok) {
+                closeDeleteModal();
+                showNotification('Property deleted successfully', 'success');
+                // Reload page after short delay
                 setTimeout(() => {
-                    property.element.remove();
-                    updateSectionVisibility();
-                    updateStats();
-                    showNotification('Property deleted successfully', 'success');
-                }, 300);
+                    window.location.reload();
+                }, 1000);
             } else {
-                showNotification('Failed to delete property', 'error');
+                // Try to get error message from response
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Failed to delete property');
+                }).catch(() => {
+                    throw new Error('Failed to delete property');
+                });
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showNotification('An error occurred while deleting the property', 'error');
+            closeDeleteModal();
+            showNotification(error.message || 'An error occurred while deleting the property', 'error');
         });
+    };
 
-        propertyToDelete = null;
-    }
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('deleteModal');
+        if (e.target === modal) {
+            closeDeleteModal();
+        }
+    });
 
-    // Update statistics after deletion
-    function updateStats() {
-        const saleCards = document.querySelectorAll('.property-card[data-category="sale"]').length;
-        const rentCards = document.querySelectorAll('.property-card[data-category="rent"]').length;
-        
-        // Update stat cards
-        const statCards = document.querySelectorAll('.stat-card');
-        if (statCards[0]) statCards[0].querySelector('h3').textContent = saleCards;
-        if (statCards[1]) statCards[1].querySelector('h3').textContent = rentCards;
-        if (statCards[2]) statCards[2].querySelector('h3').textContent = saleCards + rentCards;
-
-        // Update tab counts
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(tab => {
-            const target = tab.dataset.target;
-            const count = tab.querySelector('.tab-count');
-            
-            if (target === 'all') {
-                count.textContent = saleCards + rentCards;
-            } else if (target === 'sale') {
-                count.textContent = saleCards;
-            } else if (target === 'rent') {
-                count.textContent = rentCards;
-            }
-        });
-
-        // Update section counts
-        document.querySelectorAll('.property-count').forEach((element, index) => {
-            element.textContent = index === 0 ? `${saleCards} listings` : `${rentCards} listings`;
-        });
-    }
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDeleteModal();
+        }
+    });
 
     // Show notification
     function showNotification(message, type) {
@@ -236,15 +201,17 @@
         
         const alert = document.createElement('div');
         alert.className = `alert ${alertClass} alert-dismissible fade show`;
+        alert.style.position = 'fixed';
+        alert.style.top = '20px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
         alert.innerHTML = `
             <i class="bi bi-${icon} me-2"></i>
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
 
-        // Insert at top of page or in a messages container
-        const container = document.querySelector('.messages-container') || document.body;
-        container.insertBefore(alert, container.firstChild);
+        document.body.appendChild(alert);
 
         // Auto dismiss after 5 seconds
         setTimeout(() => {

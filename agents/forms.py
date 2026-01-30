@@ -64,20 +64,6 @@ class AgentInformationForm(forms.ModelForm):
         }
             
 
-class UniversalAgentForm(ModelForm):
-    class Meta:
-        model=UniversalAgent
-        fields=(
-            'years_experience', 'agency', 'agency_name'
-        )
-        labels={
-            'years_experience':'', 
-            'agency': '', 
-            'agency_name': ''
-        }
-        widgets={
-            'agency_name': forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Enter Agency Name'})
-        }
 
 class ExperienceForm(ModelForm):
     class Meta:
@@ -101,7 +87,7 @@ ExperienceFormSet = inlineformset_factory(
     AgentInformation,
     Experience,
     fields=['company', 'title', 'start_date', 'end_date'],
-    extra=0,  # Show 1 empty form by default
+    extra=1,  # Show 1 empty form by default
     can_delete=True,  # Allow deletion of forms
     widgets={
         'company': forms.TextInput(attrs={
@@ -128,7 +114,7 @@ SocialLinksFormSet = inlineformset_factory(
     AgentInformation,
     SocialLinks,
     fields=['social_platform', 'link_to_social'],
-    extra=0,  # Show 1 empty form by default
+    extra=1,  # Show 1 empty form by default
     can_delete=True,  # Allow deletion of forms
     widgets={
         'social_platform': forms.Select(attrs={

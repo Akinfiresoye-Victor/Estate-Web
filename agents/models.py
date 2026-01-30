@@ -29,7 +29,7 @@ class AgentInformation(models.Model):
     email = models.EmailField('Email', blank=True, max_length=75)
     location = models.CharField('Base City', blank=False, choices=STATES)
     language = models.CharField('language Spoken', blank=False, max_length=100)
-    bio = models.TextField('Work Summary', max_length=250)
+    bio = models.TextField('About You?', max_length=1024)
     work_type = models.CharField('Nature of work', blank=False, max_length=100)
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=agent_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
@@ -59,14 +59,6 @@ class SocialLinks(models.Model):
     link_to_social = models.URLField(max_length=200, blank=False)
     def __str__(self):
         return(self.agent.profile_name)
-
-#TODO Remove the universal agent shit
-class UniversalAgent(models.Model):
-    agent=models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='universal')
-    years_experience=models.CharField('Years Of Experience',default='0-1', choices=YEARS_OF_EXPERINCE)
-    agency=models.BooleanField('Affiliated With Agency?', default=False)
-    agency_name=models.CharField('Agency Name', default='Not With Agency', max_length=50)
-
 
 class AgentAnalytics(models.Model):
     agent = models.OneToOneField(AgentInformation, on_delete=models.CASCADE, related_name='analytics')

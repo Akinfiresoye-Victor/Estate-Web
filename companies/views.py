@@ -590,15 +590,16 @@ def lead_detail(request, lead_id):
         else:
             messages.warning(request, 'Access Denied')
             return redirect('landing')
-        if client.property_type =='Sale' :
-            property=PropertyManagementSale.objects.get(pk=client.property_intrested)
-        elif client.property_type == 'Rent':
-            property=PropertyManagementRent.objects.get(pk=client.property_intrested)
-        else:
+        try:
+            if client.property_type =='Sale':
+                property=PropertyManagementSale.objects.get(pk=client.property_intrested)
+            elif client.property_type == 'Rent':
+                property=PropertyManagementRent.objects.get(pk=client.property_intrested)
+        except ObjectDoesNotExist:
             property=None
         return render(request, 'company/lead_detail_page.html', {'lead':client, 'property':property})
     except Exception as e:
-        return render(request, 'estate/error_page', {'e': e})
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 
@@ -882,61 +883,3 @@ def delete_company(request, company_uuid):
     except Exception as e:
         messages.error(request, 'Tell Us the error')
         return render(request, 'estate/error_page.html', {'e':e})
-
-def change_password(request):
-    """
-    Change User Passwords with precise lines of code
-    """
-    if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain acess')
-        return redirect('login')
-    try:
-        user_role=request.user.role
-        if user_role == 'company':
-            base_template = 'company/base.html'
-        elif user_role == 'agent':
-            base_template = 'agent/base.html'
-        else:
-            base_template='estate/base.html'
-        if request.method == 'POST':
-            form= PasswordChangeForm(request.user, request.POST)
-            if form.is_valid():
-                new_pass=form.save() 
-                update_session_auth_hash(request, new_pass)
-                messages.success(request, 'Password Changed successfully')
-                return redirect('customer:password-success')
-            
-            else:
-                messages.error(request, 'Error Changing password...')
-                return redirect('customer:change-password')
-            
-        else:
-            form= PasswordChangeForm(request.user)
-            return render(request, 'estate/change_passw.html', {'form': form, 'base_template':base_template})
-        
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
-
-
-
-def change_password_success(request):
-    """
-    Success Page after chaging password
-    """
-    if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('login')
-    if not request.user.role == 'customer':
-        messages.info(request, 'Congrats after messing around youve seen the green button')
-    try:
-        user_role=request.user.role
-        if user_role == 'company':
-            base_template = 'company/base.html'
-        elif user_role == 'agent':
-            base_template = 'agent/base.html'
-        else:
-            base_template='estate/base.html'
-        return render(request, 'estate/succ_pass.html', {'base_template', base_template})
-    
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})

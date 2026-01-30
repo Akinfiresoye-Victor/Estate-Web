@@ -3,186 +3,289 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'estate/css/wishlist.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
-{%load humanize%}
+{% load humanize %}
+
 {% block content %}
 <a href="javascript:history.back()" class="back-button">
-    &larr; Go Back
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Go Back
 </a>
 
-<div class="page-header">
-  <div class="container">
-    <div class="header-content">
-      <div class="header-icon"><i class="fas fa-heart"></i></div>
-      <h1>My Saved Properties</h1>
-      <p>Your curated collection of dream properties</p>
+<div class="page-hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                Wishlist
+            </div>
+            <h1>Your Saved Properties</h1>
+            <p>Curating your perfect collection of dream homes</p>
+        </div>
     </div>
-  </div>
 </div>
 
-<div class="container pb-5">
-
-  {% if wishlist_rent or wishlist_sale %}
-  <div class="stats-bar">
-    <div class="stat-item lease">
-      <i class="fas fa-key"></i>
-      <div class="stat-info">
-        <span class="stat-number">{{ lease_count }}</span>
-        <span class="stat-label">For Lease</span>
-      </div>
-    </div>
-    <div class="stat-item sale">
-      <i class="fas fa-home"></i>
-      <div class="stat-info">
-        <span class="stat-number">{{ sale_count }}</span>
-        <span class="stat-label">For Sale</span>
-      </div>
-    </div>
-    <div class="stat-item total">
-      <i class="fas fa-bookmark"></i>
-      <div class="stat-info">
-        <span class="stat-number">{{ total_saved }}</span>
-        <span class="stat-label">Total Saved</span>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- For Lease Properties -->
-  {% if wishlist_rent %}
-  <div class="section-header">
-    <h2 class="section-title lease">
-      <i class="fas fa-key"></i>
-      For Lease
-    </h2>
-  </div>
-  <div class="row g-4 mb-5">
-    {% for wishlist_item, property in wishlist_rent %}
-      <div class="col-md-6 col-lg-4">
-        <div class="card property-card lease">
-          <div class="property-image lease">
-            <div class="property-status">
-              <i class="fas fa-key"></i>
-              For Lease
+<div class="container">
+    {% if wishlist_rent or wishlist_sale %}
+    <div class="stats-dashboard">
+        <div class="stat-card stat-lease">
+            <div class="stat-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
             </div>
-            <a href="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}" 
-               class="wishlist-btn lease" 
-               title="Remove from wishlist">
-              <i class="fas fa-heart"></i>
-            </a>
-            {% if property.base_image %}
-              <img src="{{ property.base_image.url }}" 
-                   alt="{{ property.residential }}" 
-                   class="property-img">
-            {% endif %}
-          </div>
-          <div class="card-body">
-            {%if property.property_category == 'Commercial' %}
-              <h5 class="property-title lease">{{ property.commercial }}</h5>
-            {%elif property.property_category == 'Land'%}
-              <h5 class="property-title lease">{{ property.lands }}</h5>
-            {%elif property.property_category == 'Residential'%}
-              <h5 class="property-title lease">{{ property.residential }}</h5>
-            {%else%}
-              <h5 class="property-title lease">Something went wrong.....</h5>
-            {%endif%}
-            <p class="property-location">
-              <i class="fas fa-map-marker-alt lease"></i>
-              {{ property.location }}, {{ property.state }}
-            </p>
-            <p class="property-price lease">
-              ₦{{ property.price_range|floatformat:2|intcomma }}
-              <span class="price-period">/month</span>
-            </p>
-            <p class="property-description">{{ property.description|truncatewords:20 }}</p>
-            <a href="{% url 'customer:view-property-r' property_id=wishlist_item.property_id %}" 
-               class="btn btn-view-property lease">
-              <i class="fas fa-eye"></i>
-              View Details
-            </a>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <!-- For Sale Properties -->
-  {% if wishlist_sale %}
-  <div class="section-header">
-    <h2 class="section-title sale">
-      <i class="fas fa-home"></i>
-      For Sale
-    </h2>
-  </div>
-  <div class="row g-4">
-    {% for wishlist_item, property in wishlist_sale %}
-      <div class="col-md-6 col-lg-4">
-        <div class="card property-card sale">
-          <div class="property-image sale">
-            <div class="property-status">
-              <i class="fas fa-tag"></i>
-              For Sale
+            <div class="stat-content">
+                <div class="stat-number">{{ lease_count }}</div>
+                <div class="stat-label">For Lease</div>
             </div>
-            <a href="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}" 
-               class="wishlist-btn sale" 
-               title="Remove from wishlist">
-              <i class="fas fa-heart"></i>
-            </a>
-            {% if property.base_image %}
-              <img src="{{ property.base_image.url }}" 
-                   alt="{{ property.residential }}" 
-                   class="property-img">
-            {% endif %}
-          </div>
-          <div class="card-body">
-            {%if property.property_category == 'Commercial' %}
-              <h5 class="property-title sale">{{ property.commercial }}</h5>
-            {%elif property.property_category == 'Land'%}
-              <h5 class="property-title sale">{{ property.lands }}</h5>
-            {%elif property.property_category == 'Residential'%}
-              <h5 class="property-title sale">{{ property.residential }}</h5>
-            {%else%}
-              <h5 class="property-title sale">Something went wrong.....</h5>
-            {%endif%}
-            <p class="property-location">
-              <i class="fas fa-map-marker-alt sale"></i>
-              {{ property.location }}, {{ property.state }}
-            </p>
-            <p class="property-price sale">₦{{ property.price|floatformat|intcomma }}</p>
-            <p class="property-description">{{ property.property_description|truncatewords:20 }}</p>
-            <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property_id %}" 
-               class="btn btn-view-property sale">
-              <i class="fas fa-eye"></i>
-              View Details
-            </a>
-          </div>
         </div>
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
 
-  <!-- Empty Wishlist State -->
-  {% if not wishlist_rent and not wishlist_sale %}
-  <div class="empty-state">
-    <div class="empty-icon">
-      <i class="fas fa-heart-broken"></i>
+        <div class="stat-card stat-sale">
+            <div class="stat-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ sale_count }}</div>
+                <div class="stat-label">For Sale</div>
+            </div>
+        </div>
+
+        <div class="stat-card stat-total">
+            <div class="stat-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number">{{ total_saved }}</div>
+                <div class="stat-label">Total Saved</div>
+            </div>
+        </div>
     </div>
-    <h3>No Saved Properties Yet</h3>
-    <p>Browse through listings and save properties you love!</p>
-    <div class="empty-actions">
-      <a href="{% url 'customer:rent-property' %}" class="btn btn-empty lease">
-        <i class="fas fa-key"></i>
-        Browse Lease
-      </a>
-      <a href="{% url 'customer:buy-property' %}" class="btn btn-empty sale">
-        <i class="fas fa-home"></i>
-        Browse Sale
-      </a>
+    {% endif %}
+
+    {% if wishlist_rent %}
+    <section class="properties-section">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="section-icon lease-icon">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <h2 class="section-title">For Lease</h2>
+            </div>
+            <div class="section-count lease-count">{{ lease_count }} Properties</div>
+        </div>
+
+        <div class="properties-grid">
+            {% for wishlist_item, property in wishlist_rent %}
+            <article class="property-card lease-card">
+                <div class="property-image-wrapper">
+                    <div class="property-badge lease-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Lease
+                    </div>
+                    
+                    <a href="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}" 
+                       class="wishlist-toggle active"
+                       aria-label="Remove from wishlist">
+                        <svg class="heart-outline" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <svg class="heart-filled" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </a>
+
+                    {% if property.base_image %}
+                    <img src="{{ property.base_image.url }}" 
+                         alt="{{ property.residential }}" 
+                         class="property-image"
+                         loading="lazy">
+                    {% else %}
+                    <div class="property-placeholder lease-placeholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="property-body">
+                    <h3 class="property-title">
+                        {% if property.property_category == 'Commercial' %}
+                            {{ property.commercial }}
+                        {% elif property.property_category == 'Land' %}
+                            {{ property.lands }}
+                        {% elif property.property_category == 'Residential' %}
+                            {{ property.residential }}
+                        {% else %}
+                            Property Details Unavailable
+                        {% endif %}
+                    </h3>
+
+                    <div class="property-location">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>{{ property.location }}, {{ property.state }}</span>
+                    </div>
+
+                    <div class="property-price lease-price">
+                        <span class="price-amount">₦{{ property.price_range|floatformat:2|intcomma }}</span>
+                        <span class="price-period">/month</span>
+                    </div>
+
+                    <p class="property-description">{{ property.description|truncatewords:18 }}</p>
+
+                    <a href="{% url 'customer:view-property-r' property_id=wishlist_item.property_id %}" 
+                       class="btn-view lease-btn">
+                        View Details
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if wishlist_sale %}
+    <section class="properties-section">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="section-icon sale-icon">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <h2 class="section-title">For Sale</h2>
+            </div>
+            <div class="section-count sale-count">{{ sale_count }} Properties</div>
+        </div>
+
+        <div class="properties-grid">
+            {% for wishlist_item, property in wishlist_sale %}
+            <article class="property-card sale-card">
+                <div class="property-image-wrapper">
+                    <div class="property-badge sale-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                            <line x1="7" y1="7" x2="7.01" y2="7"/>
+                        </svg>
+                        Sale
+                    </div>
+                    
+                    <a href="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}" 
+                       class="wishlist-toggle active"
+                       aria-label="Remove from wishlist">
+                        <svg class="heart-outline" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <svg class="heart-filled" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </a>
+
+                    {% if property.base_image %}
+                    <img src="{{ property.base_image.url }}" 
+                         alt="{{ property.residential }}" 
+                         class="property-image"
+                         loading="lazy">
+                    {% else %}
+                    <div class="property-placeholder sale-placeholder">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="property-body">
+                    <h3 class="property-title">
+                        {% if property.property_category == 'Commercial' %}
+                            {{ property.commercial }}
+                        {% elif property.property_category == 'Land' %}
+                            {{ property.lands }}
+                        {% elif property.property_category == 'Residential' %}
+                            {{ property.residential }}
+                        {% else %}
+                            Property Details Unavailable
+                        {% endif %}
+                    </h3>
+
+                    <div class="property-location">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>{{ property.location }}, {{ property.state }}</span>
+                    </div>
+
+                    <div class="property-price sale-price">
+                        <span class="price-amount">₦{{ property.price|floatformat|intcomma }}</span>
+                    </div>
+
+                    <p class="property-description">{{ property.property_description|truncatewords:18 }}</p>
+
+                    <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property_id %}" 
+                       class="btn-view sale-btn">
+                        View Details
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if not wishlist_rent and not wishlist_sale %}
+    <div class="empty-state">
+        <div class="empty-illustration">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <div class="empty-pulse"></div>
+        </div>
+        <h2 class="empty-title">No Saved Properties Yet</h2>
+        <p class="empty-description">Start building your collection of dream properties. Browse our listings and save the ones you love.</p>
+        <div class="empty-actions">
+            <a href="{% url 'customer:rent-property' %}" class="empty-btn lease-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+                Browse For Lease
+            </a>
+            <a href="{% url 'customer:buy-property' %}" class="empty-btn sale-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Browse For Sale
+            </a>
+        </div>
     </div>
-  </div>
-  {% endif %}
+    {% endif %}
 </div>
 
 {% endblock %}

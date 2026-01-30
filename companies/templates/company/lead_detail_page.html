@@ -175,41 +175,43 @@
               {%elif property.property_category == 'Land'%}
                 <h4>{{ property.lands }}</h4>
               {%else%}
-                <h4>Something went wrong.....</h4>
+                <h4>Property Not Found...</h4>
               {%endif%}
               <p class="property-location">
                 <i class="bi bi-geo-alt"></i>
-                {{ property.location }}
+                {{ property.location|default:"N/A" }}
               </p>
               
               <div class="property-features">
-                <span><i class="bi bi-house-door"></i>{{ property.residential }}</span>
-                <span><i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds</span>
-                <span><i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths</span>
+                <span><i class="bi bi-house-door"></i>{{ property.residential|default:"N/A" }}</span>
+                <span><i class="bi bi-door-open"></i>{{ property.bedrooms|default:"N/A" }} Beds</span>
+                <span><i class="bi bi-droplet"></i>{{ property.bathrooms|default:"N/A" }} Baths</span>
               </div>
               
               <div class="property-price">
                 {% if property.price_range %}
-                  ₦{{ property.price_range|floatformat:2|intcomma }}
+                  ₦{{ property.price_range|floatformat:2|intcomma|default:"N/A" }}
                   <span class="price-period">/month</span>
                 {% else %}
-                  ₦{{ property.price|floatformat:2|intcomma }}
+                  ₦{{ property.price|floatformat:2|intcomma|default:"N/A" }}
                 {% endif %}
               </div>
             </div>
             
-            <div class="property-action">
-              {% if property.price_range %}
-                <a href="{% url 'customer:view-property-r' property.id %}" target="_blank" class="btn-view">
-                  <i class="bi bi-eye"></i>
-                  View Property
-                </a>
-              {% else %}
-                <a href="{% url 'customer:view-property-s' property.id %}" target="_blank" class="btn-view">
-                  <i class="bi bi-eye"></i>
-                  View Property
-                </a>
-              {% endif %}
+              <div class="property-action">
+                {%if property%}
+                    {% if property.price_range %}
+                      <a href="{% url 'customer:view-property-r' property.id %}" target="_blank" class="btn-view">
+                        <i class="bi bi-eye"></i>
+                        View Property
+                      </a>
+                    {% else %}
+                      <a href="{% url 'customer:view-property-s' property.id %}" target="_blank" class="btn-view">
+                        <i class="bi bi-eye"></i>
+                        View Property
+                      </a>
+                    {% endif %}
+                {%endif%}
             </div>
             
           </div>
