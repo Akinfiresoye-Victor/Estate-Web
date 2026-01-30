@@ -844,8 +844,43 @@ def manage_company(request):
 
 
 
-def delete_company():
-    pass
+def delete_company(request, company_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.info(request, 'Companies Only')
+        return redirect('landing')
+    
+    try:
+        company_data= CompanyInformation.objects.get(unique_company_id=company_uuid)
+        if company_data.user_id != request.user.id:
+            messages.warning(request, 'Unauthorized Access')
+            return redirect('landing')
+        leads= LeadInfo.objects.filter(company_uuid=company_data.unique_company_id)
+        appointments=Appointments.objects.filter(company_uuid=company_data.unique_company_id)
+        property_views=PropertyViews.objects.filter(uuid=company_data.unique_company_id)
+        properties_on_rent=PropertyManagementRent.objects.filter(company_uuid=company_data.unique_company_id)
+        properties_on_sale=PropertyManagementSale.objects.filter(company_uuid=company_data.unique_company_id)
+        user_id=User.objects.get(pk=request.user.id)
+        try:
+            leads.delete()
+            appointments.delete()
+            property_views.delete()
+            properties_on_rent.delete()
+            properties_on_sale.delete()
+            user_id.delete()
+        except:
+            messages.error(request, 'An error Occured.....')
+            return redirect('landing')
+        messages.success(request, 'User deleted successfully')
+        return redirect('landing')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Tell Us the error')
+        return render(request, 'estate/error_page.html', {'e':'Object Does Not Exist'})
+    except Exception as e:
+        messages.error(request, 'Tell Us the error')
+        return render(request, 'estate/error_page.html', {'e':e})
 
 def change_password(request):
     """

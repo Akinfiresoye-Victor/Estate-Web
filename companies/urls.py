@@ -20,5 +20,6 @@ urlpatterns = [
     path('lead/update_stage/<int:lead_id>', views.update_lead_stage, name='update-lead-stage'),
     path('find_talents', views.find_talents, name='find-talents'),
     path('application/management', views.manage_applications, name='application-management'),
-    path('employee/management', views.manage_company, name='manage-company'), #todo complete the html page 
+    path('employee/management', views.manage_company, name='manage-company'),
+    path('delete/company/<company_uuid>', views.delete_company, name='delete-company')
 ]

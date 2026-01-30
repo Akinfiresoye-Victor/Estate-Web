@@ -17,4 +17,5 @@ urlpatterns = [
     path('lead/update_status/<int:lead_id>/', views.agent_update_lead_status, name='agent-update-lead-status'),
     path('lead/update_stage/<int:lead_id>/', views.agent_update_lead_stage, name='agent-update-lead-stage'),
     path('jobs/listings', views.job_listings, name='job-listings'),
+    path('delete/agent/<agent_uuid>', views.delete_agent, name='delete-agent')
 ]

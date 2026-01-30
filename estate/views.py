@@ -31,8 +31,10 @@ def wishlist_generator(properties_list, user_id):
     if properties_list:
         if properties_list[0].property_type == 'Rent':
             user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id, property_type='Rent')
-        else:
+        elif properties_list[0].property_type == 'Sale':
             user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id, property_type='Sale')
+        else:
+            return redirect('landing')
         properties_id=[]
         user_wishlist_list=[]
         boolean_results=[]
@@ -530,27 +532,21 @@ def delete_account(request):
     if not request.user.is_authenticated:
         messages.info(request, 'login Required')
         return redirect('login')
-    if not request.user.role == 'customer':
+    if request.user.role != 'customer':
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
     try:
-        property1= PropertyManagementRent.objects.filter(user_id=request.user.id)
-        property2= PropertyManagementSale.objects.filter(user_id=request.user.id)
         
         user_id=User.objects.get(pk=request.user.id)
-        if request.user == user_id:
-            
-            try:
-                property1.delete()
-                property2.delete()
-                user_id.delete()
-                
-            except Exception as e:
-                messages.error(request, 'There was an error, Try again later.....')
-                return redirect('customer:user-profile')
-            messages.success(request, 'Account has been deleted Successfully')
-        else:
-            messages.warning(request, 'Unauthorized access')
+        if request.user != user_id:
+            messages.warning(request, 'Unauthorized Access')
+            return redirect('landing')
+        try:
+            user_id.delete()
+        except Exception as e:
+            messages.error(request, 'There was an error, Try again later.....')
+            return redirect('customer:user-profile')
+        messages.success(request, 'Account deleted Successfully')
         return redirect('landing')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})

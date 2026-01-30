@@ -60,7 +60,7 @@ class SocialLinks(models.Model):
     def __str__(self):
         return(self.agent.profile_name)
 
-
+#TODO Remove the universal agent shit
 class UniversalAgent(models.Model):
     agent=models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='universal')
     years_experience=models.CharField('Years Of Experience',default='0-1', choices=YEARS_OF_EXPERINCE)

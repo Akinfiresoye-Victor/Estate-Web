@@ -749,3 +749,43 @@ def job_listings(request):
         return render(request, 'agent/job_listings.html')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+
+def delete_agent(request, agent_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, 'Agents Only')
+        return redirect('landing')
+    
+    try:
+        agent_data=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        if agent_data.user_id != request.user.id:
+            messages.warning(request, 'Unauthorized Access')
+            return redirect('landing')
+        user_id=User.objects.get(pk=request.user.id)
+        leads= LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
+        appointments= Appointments.objects.filter(agent_uuid=agent_data.agent_uuid)
+        property_views=PropertyViews.objects.filter(uuid=agent_data.agent_uuid)
+        sale_properties= PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
+        lease_properties= PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
+        try:
+            lease_properties.delete()
+            sale_properties.delete()
+            property_views.delete()
+            appointments.delete()
+            leads.delete()
+            user_id.delete()
+        except:
+            messages.error(request, 'An error Occured.....')
+            return redirect('landing')
+        messages.success(request, 'User Deleted Successfully')
+        return redirect('landing')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Tell Us the error')
+        return render(request, 'estate/error_page.html', {'e':'Object Doesnt Exist'})
+    except Exception as e:
+        messages.error(request, 'Tell us the error')
+        return render(request, 'estate/error_page.html', {'e':e})
