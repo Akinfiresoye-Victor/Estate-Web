@@ -1,6 +1,5 @@
 from django.db import models
 from .choices import *
-import django
 from .validators import validate_image
 from django.utils import timezone
 from members.models import User 

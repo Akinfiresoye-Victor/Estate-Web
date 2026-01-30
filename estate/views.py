@@ -524,7 +524,7 @@ def profile_settings(request):
 
 
 
-# FIXME This is an important issue
+
 def delete_account(request):
     """
     Delete user account view
@@ -541,7 +541,9 @@ def delete_account(request):
         if request.user != user_id:
             messages.warning(request, 'Unauthorized Access')
             return redirect('landing')
+        wishlists= WishlistStorageUnit.objects.filter(user_id=request.user.id)
         try:
+            wishlists.delete()
             user_id.delete()
         except Exception as e:
             messages.error(request, 'There was an error, Try again later.....')

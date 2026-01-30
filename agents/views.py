@@ -771,12 +771,14 @@ def delete_agent(request, agent_uuid):
         property_views=PropertyViews.objects.filter(uuid=agent_data.agent_uuid)
         sale_properties= PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
         lease_properties= PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
+        ratings=AgentRating.objects.filter(agent_uuid=agent_data.agent_uuid)
         try:
             lease_properties.delete()
             sale_properties.delete()
             property_views.delete()
             appointments.delete()
             leads.delete()
+            ratings.delete()
             user_id.delete()
         except:
             messages.error(request, 'An error Occured.....')

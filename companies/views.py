@@ -600,7 +600,6 @@ def lead_detail(request, lead_id):
     except Exception as e:
         return render(request, 'estate/error_page', {'e': e})
 
-#FIXME if a property is deleted all models pointing to that property must be deleted also
 
 
 def delete_lead(request, lead_id):
@@ -863,12 +862,14 @@ def delete_company(request, company_uuid):
         properties_on_rent=PropertyManagementRent.objects.filter(company_uuid=company_data.unique_company_id)
         properties_on_sale=PropertyManagementSale.objects.filter(company_uuid=company_data.unique_company_id)
         user_id=User.objects.get(pk=request.user.id)
+        ratings=CompanyRating.objects.filter(company_uuid=company_data.unique_company_id)
         try:
             leads.delete()
             appointments.delete()
             property_views.delete()
             properties_on_rent.delete()
             properties_on_sale.delete()
+            ratings.delete()
             user_id.delete()
         except:
             messages.error(request, 'An error Occured.....')

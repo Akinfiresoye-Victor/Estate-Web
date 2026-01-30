@@ -322,11 +322,24 @@ def delete_property_on_lease(request, property_id):
         if request.user.id != property1.user_id:
             messages.warning(request, 'ACCESS DENIED')
             return redirect('landing')
-        #what does the actual deleting based on the property_id
+        #TODO Defaults if property is empty <htmlside>
+        leads=LeadInfo.objects.filter(property_type='Rent', property_intrested=property1.pk)
+        appointments=Appointments.objects.filter(property_type='Rent', property_id=property1.pk)
+        property_views=PropertyViews.objects.filter(property_type='Rent', property_id=property1.pk)
+        wishlists=WishlistStorageUnit.objects.filter(property_type='Rent', property_id=property1.pk)
+        
+        for appointment in appointments:
+            appointment.property_id=None
+            appointment.property_type='Property Deleted'
+            appointment.save()
+        for lead in leads:
+            lead.property_intrested=None
+            lead.save()
+        wishlists.delete()
+        property_views.delete()
         property1.delete()
         messages.success(request, ("Property deleted successfully"))
         return redirect('listings')
-        # TODO Come back here to make sure its deleted properly(Lead, other related items)
     except Exception as e:
         messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
@@ -346,15 +359,25 @@ def delete_property_on_sale(request, property_id):
         if request.user.id != property1.user_id:
             messages.warning(request, 'Access Denied')
             return redirect()
+        leads=LeadInfo.objects.filter(property_type='Sale', property_intrested=property1.pk)
+        appointments=Appointments.objects.filter(property_type='Sale', property_id=property1.pk)
+        property_views=PropertyViews.objects.filter(property_type='Sale', property_id=property1.pk)
+        wishlists=WishlistStorageUnit.objects.filter(property_type='Sale', property_id=property1.pk)
+        for appointment in appointments:
+            appointment.property_id=None
+            appointment.property_type='Property Deleted'
+            appointment.save()
+        for lead in leads:
+            lead.property_intrested=None
+            lead.save()
+        wishlists.delete()
+        property_views.delete()
         property1.delete()
         messages.success(request, ("Property deleted successfully"))
         return redirect('listings')
-        # TODO Come back here to make sure its deleted properly(Lead, other related items)
     except Exception as e:
         messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
-# FIXME Delete Problem if a property is deleted everything must be deleted alongside with it 
-#view handling users listings
 
 
 
@@ -717,7 +740,7 @@ def add_client(request, lead_uuid, appointment_id):
         appointment_data.lead_uuid= lead_data.lead_id
         appointment_data.save()
         messages.success(request, 'Client Added')
-        return redirect('view-schedule', appointment_id)
+        return redirect('view-schedule', raw_data.appointment_uuid)
     except Exception as e:
         return render(request, 'estate/error_page', {'e':e})
     
@@ -738,7 +761,7 @@ def delete_client(request, appointment_id):
                     appointment.lead_uuid = None
                     appointment.save()
                     messages.success(request, 'Client Info Removed')
-                    return redirect('view-schedule', appointment_id)
+                    return redirect('view-schedule', appointment.appointment_uuid)
                 else:
                     messages.error(request, 'Access Denied')
                     return redirect('landing')
