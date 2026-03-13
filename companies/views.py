@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from .forms import SocialLinksFormset, CompanyForm
+from .forms import SocialLinksFormset, CompanyForm,JobPostForm
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from .models import CompanyInformation, CompanyAnalytics, SessionId, CompanyRating
+from .models import CompanyInformation, CompanyAnalytics, SessionId, CompanyRating,JobPost, CompanyActivityLog
 from members.views import logout_user
 from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments
 from estate.models import LeadInfo
@@ -191,8 +191,13 @@ def dashboard(request):
             market_position = 100
         
         competition_pct = calculated_engagement[0]
-        
-        
+
+        def calculate_profile_strength(company):
+            score = 0
+            if company.company_logo: score += 20
+            if company.agents_employed > 0: score += 30 # agent exists
+            if company.verified: score += 50 #KYC
+            return score
         context = {
             'company': company,
             'social_links': social_links,
@@ -203,7 +208,13 @@ def dashboard(request):
             'total_reviews': total_reviews,
             'competition': top_performer,
             'market_position': round(market_position, 1),
-            'engagement_rate': analytics.competition
+            'engagement_rate': analytics.competition,
+            'is_company_admin': request.user.id == company.user_id,
+            'has_logo': bool(company.company_logo),
+            'has_agent':bool(company.agents_employed > 0),
+            'is_kyc_verified': company.verified,
+            'profile_strength': calculate_profile_strength(company),
+            'recent_activities': CompanyActivityLog.objects.filter(company=company).order_by('-timestamp')[:5]
         }
         
         return render(request, 'company/dashboard.html', context)
@@ -249,6 +260,10 @@ def company_form(request):
             link_form= SocialLinksFormset()
             if 'submitted' in request.GET:
                 submitted=True
+        CompanyActivityLog.objects.create(
+            company=CompanyInformation.objects.get(user_id=request.user.id),
+            action='Account created'
+        )
         return render(request, 'company/company_form.html', {
                                                                 'form': comp_form,
                                                                 'social': link_form,
@@ -284,6 +299,10 @@ def update_company_profile(request, company_id):
             else:
                 comp_form = CompanyForm(instance=company_information)
                 link_form = SocialLinksFormset(instance=company_information)
+                CompanyActivityLog.objects.create(
+                    company=company_information,
+                    action='Company Details Updated'
+                )
             return render(request, 'company/update_company_profile.html', {
                 'form':comp_form,
                 'social': link_form
@@ -616,6 +635,10 @@ def delete_lead(request, lead_id):
         if company.unique_company_id == lead_to_delete.company_uuid:
             lead_to_delete.delete()
             messages.success(request, "Lead Deleted")
+            CompanyActivityLog.objects.create(
+                company=company,
+                action='Lead Deleted'
+            )
             return redirect('company:lead-management')
         else:
             messages.error(request, "Access Denied")
@@ -649,6 +672,10 @@ def update_lead_status(request, lead_id):
             lead.status=new_status
             lead.date_updated=timezone.now()
             lead.save()
+            CompanyActivityLog.objects.create(
+                company=company,
+                action='Lead Status Updated'
+            )
             messages.success(request, 'Status Updated Successfully')
             return redirect('company:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
@@ -683,6 +710,10 @@ def update_lead_stage(request, lead_id):
             lead.stages = new_stage
             lead.date_updated=timezone.now()
             lead.save()
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Lead Stage Updated'
+            )
             messages.success(request, 'Stage Updated Successfully')
             return redirect('company:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
@@ -818,14 +849,33 @@ def manage_applications(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('landing')
-    if request.user.role !='company':
+    if request.user.role != 'company':
         messages.info(request, 'Company Account Only')
         return redirect('landing')
     
     try:
-        return render(request, 'company/manage_applications.html')
+        company = CompanyInformation.objects.get(user_id=request.user.id)
+        company_job_posts = JobPost.objects.filter(company_uuid=company.unique_company_id)
+        
+        today = timezone.now().date()
+        jobs_data = [
+            (job, (today - job.date_posted).days)
+            for job in company_job_posts
+        ]
+        
+        total_applicants = sum(job.applicants for job in company_job_posts)
+        
+        context = {
+            'job_count': company_job_posts.count(),
+            'jobs': jobs_data,
+            'total_applicants': total_applicants
+        }
+        return render(request, 'company/manage_applications.html', context)
+    except CompanyInformation.DoesNotExist:
+        messages.error(request, 'Company Data missing')
+        return redirect('landing')
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 def manage_company(request):
@@ -883,3 +933,173 @@ def delete_company(request, company_uuid):
     except Exception as e:
         messages.error(request, 'Tell Us the error')
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+def vacancy_form(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    
+    if request.user.role != 'company':
+        messages.warning(request, 'Companies Only')
+        return redirect('landing')
+    
+    try:
+        company = CompanyInformation.objects.get(user_id=request.user.id)
+        
+        if request.method == 'POST':
+            job_form = JobPostForm(request.POST or None, request.FILES or None)
+            
+            if job_form.is_valid():
+                with transaction.atomic():
+                    job = job_form.save(commit=False)
+                    job.user_id = request.user.id
+                    job.company_uuid = company.unique_company_id
+                    job.save()
+                    CompanyActivityLog.objects.create(
+                        company=company,
+                        action= 'Job Posted'
+                    )
+                    messages.success(request, 'Job Posted Successfully!')
+                    return redirect('company:application-management')
+            else:
+                # Display form errors
+                for field, errors in job_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+        else:
+            job_form = JobPostForm()
+        
+        context = {
+            'form': job_form,
+            'company': company
+        }
+        return render(request, 'company/vacancy_form.html', context)
+        
+    except ObjectDoesNotExist:
+        messages.error(request, 'Company Profile Not Found. Please complete your company profile first.')
+        return redirect('landing')
+        
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+def update_vacancy(request, job_id):
+    """View to update an existing job posting"""
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    
+    if request.user.role != 'company':
+        messages.warning(request, 'Companies Only')
+        return redirect('landing')
+    company=CompanyInformation.objects.get(user_id= request.user.id)
+    job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
+    if job.company_uuid != company.unique_company_id:
+        messages.error(request, 'You do not have permission to edit this job posting.')
+        return redirect('landing')
+    try:
+        if request.method == 'POST':
+            job_form = JobPostForm(request.POST, request.FILES, instance=job)
+            
+            if job_form.is_valid():
+                with transaction.atomic():
+                    job_form.save()
+                    messages.success(request, 'Job Updated Successfully!')
+                    CompanyActivityLog.objects.create(
+                        company=company,
+                        action= 'Job Post Updated'
+                    )
+                    return redirect('company:application-management')
+            else:
+                for field, errors in job_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+        else:
+            job_form = JobPostForm(instance=job)
+        
+        context = {
+            'form': job_form,
+            'job': job,
+            'is_update': True
+        }
+        return render(request, 'company/vacancy_form.html', context)
+        
+    except JobPost.DoesNotExist:
+        messages.error(request, 'Job posting not found or you do not have permission to edit it.')
+        return redirect('company:application-management')
+        
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        return render(request, 'estate/error_page.html', {'error': e})
+
+
+def delete_vacancy(request, job_id):
+    """View to delete a job posting"""
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    
+    if request.user.role != 'company':
+        messages.warning(request, 'Companies Only')
+        return redirect('landing')
+    
+    try:
+        job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+        if job.company_uuid != company.unique_company_id:
+            messages.warning(request, 'Unauthorized Action')
+            return redirect('landing')
+        job_title = job.job_title
+        job.delete()
+        CompanyActivityLog.objects.create(
+        company=company,
+        action= 'Job Post Deleted'
+        )
+        messages.success(request, f'Job posting "{job_title}" deleted successfully.')
+        return redirect('company:application-management')
+        
+    except JobPost.DoesNotExist:
+        messages.error(request, 'Job posting not found or you do not have permission to delete it.')
+        return redirect('company:application-management')
+        
+    except Exception as e:
+        messages.error(request, f'An error occurred while deleting: {str(e)}')
+        return redirect('company:application-management')
+
+
+def toggle_job_status(request, job_id):
+    """Toggle job active/inactive status"""
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    
+    if request.user.role != 'company':
+        messages.warning(request, 'Companies Only')
+        return redirect('landing')
+    
+    try:
+        job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+        if job.company_uuid != company.unique_company_id:
+            messages.warning(request, 'Unauthorized Action')
+            return redirect('landing')
+        job.is_active = not job.is_active
+        job.save()
+        CompanyActivityLog.objects.create(
+            company=company,
+            action= 'Job Post Updated'
+        )
+        
+        status = "activated" if job.is_active else "deactivated"
+        messages.success(request, f'Job posting "{job.job_title}" {status} successfully.')
+        return redirect('company:application-management')
+        
+    except JobPost.DoesNotExist:
+        messages.error(request, 'Job posting not found.')
+        return redirect('company:application-management')
+        
+    except Exception as e:
+        messages.error(request, f'An error occurred: {str(e)}')
+        return redirect('company:application-management')

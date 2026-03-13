@@ -18,6 +18,7 @@ from django.db.models import Sum, Avg, Count
 from core.utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from companies.models import JobPost,CompanyInformation
 
 
 # Create your views here.
@@ -209,6 +210,118 @@ def agent_form(request):
         print(f"Unexpected error: {str(e)}")
         messages.error(request, f'An error occurred: {str(e)}')
         return render(request, 'estate/error_page.html', {'e': e})
+
+# def agent_form(request):
+#     # Check authentication
+#     if not request.user.is_authenticated:
+#         messages.info(request, 'You must be logged in to access this page')
+#         return redirect('landing')
+    
+#     # Check if user is an agent
+#     if request.user.role != 'agent':
+#         messages.error(request, 'Account must be an Agent account to access this page')
+#         return redirect('landing')
+    
+#     try:
+#         # Check if agent already has a profile
+#         if AgentInformation.objects.filter(user_id=request.user.id).exists():
+#             messages.info(request, 'Form has been filled. Go into edit mode to edit details')
+#             return redirect('agent:dashboard')
+        
+#         submitted = False
+        
+#         if request.method == 'POST':
+#             # Initialize forms with POST data
+#             form = AgentInformationForm(request.POST, request.FILES)
+#             exp_link = ExperienceFormSet(request.POST, prefix='exp')
+#             soc_form = SocialLinksFormSet(request.POST, prefix='social')
+            
+#             # Validate all forms
+#             form_valid = form.is_valid()
+#             exp_valid = exp_link.is_valid()
+#             soc_valid = soc_form.is_valid()
+            
+#             # Debug: Print errors if any
+#             if not form_valid:
+#                 print("Main form errors:", form.errors)
+#                 messages.error(request, f'Main form errors: {form.errors}')
+            
+#             if not exp_valid:
+#                 print("Experience formset errors:", exp_link.errors)
+#                 messages.error(request, f'Experience errors: {exp_link.errors}')
+            
+#             if not soc_valid:
+#                 print("Social formset errors:", soc_form.errors)
+#                 messages.error(request, f'Social links errors: {soc_form.errors}')
+            
+#             # If all forms are valid, save them
+#             if form_valid and exp_valid and soc_valid:
+#                 try:
+#                     with transaction.atomic():
+#                         # Save the main agent form
+#                         agent = form.save(commit=False)
+#                         agent.user_id = request.user.id
+#                         agent.users = request.user
+                        
+#                         # Handle universal_agent checkbox
+#                         agent.universal_agent = request.POST.get('universal_agent') == 'on'
+                        
+#                         agent.save()
+#                         print(f"Agent saved with ID: {agent.id}")
+                        
+#                         # Save experience formset
+#                         experiences = exp_link.save(commit=False)
+#                         for exp in experiences:
+#                             exp.agent = agent
+#                             exp.save()
+                        
+#                         # Handle deleted experiences
+#                         for exp in exp_link.deleted_objects:
+#                             exp.delete()
+                        
+#                         print(f"Saved {len(experiences)} experiences")
+                        
+#                         # Save social links formset
+#                         socials = soc_form.save(commit=False)
+#                         for social in socials:
+#                             social.agent = agent
+#                             social.save()
+                        
+#                         # Handle deleted social links
+#                         for social in soc_form.deleted_objects:
+#                             social.delete()
+                        
+                        
+                        
+#                         messages.success(request, 'Profile created successfully!')
+#                         return HttpResponseRedirect(f"{request.path}?submitted=True")
+                        
+#                 except Exception as e:
+#                     print(f"Error saving agent data")
+#                     messages.error(request, f'Error saving data: {str(e)}')
+#                     # Forms will be re-rendered with the POST data below
+        
+#         else:
+#             # GET request - initialize empty forms
+#             form = AgentInformationForm()
+#             exp_link = ExperienceFormSet(prefix='exp')
+#             soc_form = SocialLinksFormSet(prefix='social')
+            
+#             # Check if we're showing the success page
+#             if 'submitted' in request.GET:
+#                 submitted = True
+        
+#         return render(request, 'agent/agent_form.html', {
+#             'form': form,
+#             'social': soc_form,
+#             'exp_form': exp_link,
+#             'submitted': submitted
+#         })
+        
+#     except Exception as e:
+#         print(f"Unexpected error: {str(e)}")
+#         messages.error(request, f'An error occurred: {str(e)}')
+#         return render(request, 'estate/error_page.html', {'e': e})
 
 def update_agent_profile(request, agent_uuid):
     """
@@ -717,7 +830,7 @@ def delete_lead(request, lead_id):
 
 
 
-#TODO Perform proper error handling even in places you think error cant occur
+
 
 
 
@@ -733,8 +846,34 @@ def job_listings(request):
         return redirect('lnding')
     
     try:
-        return render(request, 'agent/job_listings.html')
+        jobs=JobPost.objects.all()
+        companies_name=[]
+        market_days=[]
+        for names in jobs:
+            companies_id= names.company_uuid
+            company=CompanyInformation.objects.get(unique_company_id=companies_id)
+            companies_name.append(company.company_name)
+        # Calculate days on market for each job post
+        for job in jobs:
+            job_posted_date = job.date_posted
+            days_on_market = (datetime.now().date() - job_posted_date).days
+            market_days.append(days_on_market)
+        return render(request, 'agent/job_listings.html',{'jobs':zip(jobs,companies_name,market_days)})
     except Exception as e:
+        return render(request, 'estate/error_page.html', {'e':e})
+
+
+def job_detail(request, job_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    try:
+        job=JobPost.objects.get(pk=job_id)
+        return render(request, 'agent/job_detail.html', {'job':job})
+    except ObjectDoesNotExist:
+        messages.info(request, 'Error Job Data not found')
+    except Exception as e:
+        messages.error(request, 'Tell us the error')
         return render(request, 'estate/error_page.html', {'e':e})
 
 
@@ -778,6 +917,10 @@ def delete_agent(request, agent_uuid):
     except Exception as e:
         messages.error(request, 'Tell us the error')
         return render(request, 'estate/error_page.html', {'e':e})
+
+
+
+
 
 
 # TODO Optimize all forms

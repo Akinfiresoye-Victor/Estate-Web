@@ -1,0 +1,365 @@
+{% extends 'agent/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block title %}Real Estate Agent - Estate Web Properties{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'agent/css/job_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="job-detail-container">
+  
+  <!-- Back Navigation -->
+  <div class="back-nav">
+    <a href="{% url 'agent:job-listings' %}" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Back to Job Listings
+    </a>
+  </div>
+
+  <!-- Job Header -->
+  <div class="job-header-card">
+    <div class="job-header-content">
+      {% if company_name %}
+      <div class="company-logo-large">{{ company_name|slice:":2"|upper }}</div>
+      {% else %}
+      <div class="company-logo-large">{{ job.company_uuid|slice:":2"|upper }}</div>
+      {% endif %}
+      <div class="job-header-info">
+        <h1 class="job-title-large">{{ job.job_title }}</h1>
+        <p class="company-name-large">{{ company_name|default:"Company" }}</p>
+        
+        <div class="job-meta">
+          <span class="meta-item">
+            <i class="bi bi-briefcase"></i>
+            {{ job.job_type|default:"Not specified" }}
+          </span>
+          <span class="meta-item">
+            <i class="bi bi-geo-alt"></i>
+            {{ job.job_location|default:"Not specified" }}
+          </span>
+          <span class="meta-item">
+            <i class="bi bi-clock"></i>
+            {{ job.date_posted|timesince }} ago
+          </span>
+        </div>
+
+        <div class="job-salary-large">
+          <i class="bi bi-cash-stack"></i>
+          {% if job.min_pay and job.max_pay %}
+            {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} - {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }} per {{ job.salary_period|default:"month"|lower }}
+          {% elif job.min_pay %}
+            From {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} per {{ job.salary_period|default:"month"|lower }}
+          {% else %}
+            Negotiable
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="job-actions">
+      <button class="btn-apply">
+        <i class="bi bi-send"></i>
+        Apply Now
+      </button>
+      <button class="btn-save">
+        <i class="bi bi-bookmark"></i>
+      </button>
+      <button class="btn-share">
+        <i class="bi bi-share"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    
+    <!-- Left Column - Job Details -->
+    <div class="job-content">
+      
+      <!-- Job Overview -->
+      <section class="content-section">
+        <h2 class="section-title">
+          <i class="bi bi-info-circle"></i>
+          Job Overview
+        </h2>
+        <p class="job-overview-text">
+          {{ job.short_description|default:"No short description provided." }}
+        </p>
+      </section>
+
+      <!-- Job Description -->
+      <section class="content-section">
+        <h2 class="section-title">
+          <i class="bi bi-file-text"></i>
+          Job Description
+        </h2>
+        <div class="description-content">
+          {{ job.full_description|linebreaks|default:"No full description provided." }}
+
+          {% if job.responsibilities %}
+          <h3>Key Responsibilities:</h3>
+          {{ job.responsibilities|linebreaks }}
+          {% endif %}
+
+          {% if job.benefits %}
+          <h3>What We Offer:</h3>
+          {{ job.benefits|linebreaks }}
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Requirements -->
+      <section class="content-section">
+        <h2 class="section-title">
+          <i class="bi bi-check-circle"></i>
+          Requirements
+        </h2>
+        <div class="requirements-content">
+          <h3>Qualifications:</h3>
+          <ul>
+            {% if job.education_required %}
+              <li>{{ job.education_required }}</li>
+            {% endif %}
+            {% if job.experience_required %}
+              <li>{{ job.experience_required }}</li>
+            {% endif %}
+            {% if job.positions_available %}
+              <li>Hiring: {{ job.positions_available }} position{{ job.positions_available|pluralize }}</li>
+            {% endif %}
+            {% if job.applicants is not None %}
+              <li>{{ job.applicants }} applicant{{ job.applicants|pluralize }}</li>
+            {% endif %}
+          </ul>
+
+          <h3>Skills & Competencies:</h3>
+          {% if job.skills_required %}
+            <p>{{ job.skills_required }}</p>
+          {% else %}
+            <p>Not specified</p>
+          {% endif %}
+
+          {% if job.preferences %}
+          <h3>Preferred Qualifications:</h3>
+          {{ job.preferences|linebreaks }}
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- How to Apply -->
+      <section class="content-section">
+        <h2 class="section-title">
+          <i class="bi bi-envelope"></i>
+          How to Apply
+        </h2>
+        <div class="apply-content">
+          <p>
+            Interested candidates should submit their resume, cover letter, and any relevant 
+            certifications through our online application portal. Please include examples of 
+            successful transactions or client testimonials if available.
+          </p>
+          <p>
+            Applications will be reviewed on a rolling basis. Only shortlisted candidates will 
+            be contacted for interviews.
+          </p>
+          <div class="apply-deadline">
+            <i class="bi bi-calendar-event"></i>
+            <strong>Application Deadline:</strong>
+            {% if job.application_deadline %}
+              {{ job.application_deadline|date:"F j, Y" }}
+            {% else %}
+              Not specified
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- Apply Button (Bottom) -->
+      <div class="apply-section">
+        <button class="btn-apply-large" data-job-id="{{ job.pk }}">
+          <i class="bi bi-send"></i>
+          Apply for this Position
+        </button>
+        <p class="apply-note">
+          By applying, you agree to our <a href="#">Terms of Service</a> and 
+          <a href="#">Privacy Policy</a>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Right Sidebar - Company Info & Quick Facts -->
+    <aside class="job-sidebar">
+      
+      <!-- Quick Facts -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">Quick Facts</h3>
+        <div class="quick-facts">
+          <div class="fact-item">
+            <i class="bi bi-calendar-check"></i>
+            <div class="fact-content">
+              <span class="fact-label">Posted</span>
+              <span class="fact-value">{{ job.date_posted|timesince }} ago</span>
+            </div>
+          </div>
+          <div class="fact-item">
+            <i class="bi bi-people"></i>
+            <div class="fact-content">
+              <span class="fact-label">Applicants</span>
+              <span class="fact-value">{{ job.applicants|default:0 }} candidates</span>
+            </div>
+          </div>
+          <div class="fact-item">
+            <i class="bi bi-briefcase"></i>
+            <div class="fact-content">
+              <span class="fact-label">Employment Type</span>
+              <span class="fact-value">{{ job.job_type|default:"Not specified" }}</span>
+            </div>
+          </div>
+          <div class="fact-item">
+            <i class="bi bi-clock"></i>
+            <div class="fact-content">
+              <span class="fact-label">Working Hours</span>
+              <span class="fact-value">{{ job.salary_period|default:"Flexible" }}</span>
+            </div>
+          </div>
+          <div class="fact-item">
+            <i class="bi bi-geo-alt"></i>
+            <div class="fact-content">
+              <span class="fact-label">Location</span>
+              <span class="fact-value">{{ job.job_location|default:"Not specified" }}</span>
+            </div>
+          </div>
+          <div class="fact-item">
+            <i class="bi bi-currency-exchange"></i>
+            <div class="fact-content">
+              <span class="fact-label">Salary Range</span>
+              <span class="fact-value">
+                {% if job.min_pay and job.max_pay %}
+                  {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} - {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }}/{{ job.salary_period|default:"month"|lower }}
+                {% elif job.min_pay %}
+                  From {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }}/{{ job.salary_period|default:"month"|lower }}
+                {% else %}
+                  Negotiable
+                {% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Information -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">About the Company</h3>
+        <div class="company-info">
+          <div class="company-logo-sidebar">EP</div>
+          <h4 class="company-name">Estate Web Properties</h4>
+          <p class="company-description">
+            Estate Web Properties is a leading real estate firm in Lagos, specializing in 
+            residential and commercial property sales, leasing, and property management services. 
+            We pride ourselves on exceptional customer service and innovative solutions.
+          </p>
+          
+          <div class="company-stats">
+            <div class="stat-item">
+              <strong>100+</strong>
+              <span>Properties Listed</span>
+            </div>
+            <div class="stat-item">
+              <strong>50+</strong>
+              <span>Agents</span>
+            </div>
+            <div class="stat-item">
+              <strong>500+</strong>
+              <span>Clients Served</span>
+            </div>
+          </div>
+
+          <div class="company-links">
+            <a href="#" class="company-link">
+              <i class="bi bi-globe"></i>
+              Visit Website
+            </a>
+            <a href="#" class="company-link">
+              <i class="bi bi-briefcase"></i>
+              View All Jobs
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Job -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">Share This Job</h3>
+        <div class="share-buttons">
+          <button class="share-btn twitter">
+            <i class="bi bi-twitter"></i>
+            Twitter
+          </button>
+          <button class="share-btn facebook">
+            <i class="bi bi-facebook"></i>
+            Facebook
+          </button>
+          <button class="share-btn linkedin">
+            <i class="bi bi-linkedin"></i>
+            LinkedIn
+          </button>
+          <button class="share-btn whatsapp">
+            <i class="bi bi-whatsapp"></i>
+            WhatsApp
+          </button>
+          <button class="share-btn copy">
+            <i class="bi bi-link-45deg"></i>
+            Copy Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Similar Jobs -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-title">Similar Jobs</h3>
+        <div class="similar-jobs">
+          <a href="#" class="similar-job-item">
+            <div class="similar-job-info">
+              <h5>Property Manager</h5>
+              <p>Urban Estates Ltd.</p>
+              <span class="similar-job-location">
+                <i class="bi bi-geo-alt"></i>
+                Abuja
+              </span>
+            </div>
+          </a>
+          <a href="#" class="similar-job-item">
+            <div class="similar-job-info">
+              <h5>Sales Executive</h5>
+              <p>Prime Properties</p>
+              <span class="similar-job-location">
+                <i class="bi bi-geo-alt"></i>
+                Lagos
+              </span>
+            </div>
+          </a>
+          <a href="#" class="similar-job-item">
+            <div class="similar-job-info">
+              <h5>Real Estate Consultant</h5>
+              <p>Apex Realty</p>
+              <span class="similar-job-location">
+                <i class="bi bi-geo-alt"></i>
+                Port Harcourt
+              </span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>
+
+{% endblock %}

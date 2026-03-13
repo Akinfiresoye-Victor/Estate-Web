@@ -3,7 +3,7 @@ from django.contrib import messages
 from .forms import *
 from django.http import HttpResponseRedirect
 from django.db import transaction
-from companies.models import CompanyInformation
+from companies.models import CompanyInformation, CompanyActivityLog
 from . import news_scrape as ns
 from admin_panel.views import admin
 from agents.models import AgentInformation
@@ -101,6 +101,10 @@ def sell_property(request):
                         landlord.save()
                         image_form.instance=landlord
                         image_form.save()
+                        CompanyActivityLog.objects.create(
+                            company=company,
+                            action= 'Property Listed'
+                        )
                     except CompanyInformation.DoesNotExist:
                         agent=AgentInformation.objects.get(user_id=request.user.id)
                         landlord.agent_uuid=str(agent.agent_uuid)
@@ -172,6 +176,10 @@ def lease_property(request):
                         landlord.save()
                         image_form.instance=landlord
                         image_form.save()
+                        CompanyActivityLog.objects.create(
+                            company=company,
+                            action= 'Property Listed'
+                        )
                     except CompanyInformation.DoesNotExist:
                         agent= AgentInformation.objects.get(user_id=request.user.id)
                         landlord.agent_uuid= agent.agent_uuid
@@ -256,11 +264,15 @@ def update_property_rent(request, property_id):
             return redirect('landing')
         prop_form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
         image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property)
-
+        company=CompanyInformation.objects.get(user_id=request.user.id)
         if prop_form.is_valid() and image_form.is_valid():
             prop_form.save()
             image_form.save()
             messages.success(request, "Property Updated Successfully")
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Property Listing Updated'
+            )
             return redirect('listings')
         return render(request, 'core/update_property.html', {'property': property, 'form': prop_form, 'images': image_form, 'base_template':base_template})
         
@@ -294,11 +306,15 @@ def update_property_sale(request, property_id):
             return redirect('landing')
         prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
         image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
-        
+        company=CompanyInformation.objects.get(user_id=request.user.id)
         if prop_form.is_valid() and image_form.is_valid():
             prop_form.save()
             image_form.save()
             messages.success(request, "Property Updated Successfully")
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Property Listing Updated'
+            )
             return redirect('listings')
         return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
         
@@ -316,6 +332,7 @@ def delete_property_on_lease(request, property_id):
         messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
+        company=CompanyInformation.objects.get(user_id=request.user.id)
         #deleting using th property id
         property1= PropertyManagementRent.objects.get(pk=property_id)
         #protects against other user deleting ones property
@@ -340,6 +357,10 @@ def delete_property_on_lease(request, property_id):
             property_views.delete()
             property1.delete()
             messages.success(request, ("Property deleted successfully"))
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Property Listing Deleted'
+            )
             return redirect('listings')
         except Exception as e:
             messages.error(request, 'An error occured.....')
@@ -356,6 +377,7 @@ def delete_property_on_sale(request, property_id):
         messages.warning(request, 'Access Denied')
         return redirect('landing')
     try:
+        company=CompanyInformation.objects.get(user_id=request.user.id)
         property1= PropertyManagementSale.objects.get(pk=property_id)
         
         #Additional layer of security
@@ -377,6 +399,10 @@ def delete_property_on_sale(request, property_id):
         property_views.delete()
         property1.delete()
         messages.success(request, ("Property deleted successfully"))
+        CompanyActivityLog.objects.create(
+            company=company,
+            action= 'Property Listing Deleted'
+        )
         return redirect('listings')
     except Exception as e:
         messages.error(request, 'Tell us the Error')
@@ -455,6 +481,10 @@ def add_schedule(request):
                 if request.user.role == 'company':
                     company=CompanyInformation.objects.get(user_id=request.user.id)
                     appointment.company_uuid = str(company.unique_company_id)
+                    CompanyActivityLog.objects.create(
+                        company=company,
+                        action= 'Appointment Created'
+                    )
                 elif request.user.role == 'agent':
                     agent=AgentInformation.objects.get(user_id=request.user.id)
                     appointment.agent_uuid = str(agent.agent_uuid)
@@ -605,6 +635,10 @@ def edit_appointment(request, appointment_id):
         if request.user.role == 'company':
             company = CompanyInformation.objects.get(user_id=request.user.id)
             item= Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=appointment_id)
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Appointment Updated'
+            )
             if item.company_uuid == company.unique_company_id:
                 appointment=item
             else:
@@ -763,6 +797,10 @@ def delete_client(request, appointment_id):
                 if appointment.company_uuid == company.unique_company_id:
                     appointment.lead_uuid = None
                     appointment.save()
+                    CompanyActivityLog.objects.create(
+                        company=company,
+                        action= 'Client Data Deleted'
+                    )
                     messages.success(request, 'Client Info Removed')
                     return redirect('view-schedule', appointment.appointment_uuid)
                 else:
@@ -790,3 +828,5 @@ def delete_client(request, appointment_id):
             return redirect('landing')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
+
+

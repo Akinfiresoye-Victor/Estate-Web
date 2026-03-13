@@ -8,12 +8,16 @@
 
 {% block content %}
 
-<!-- Profile Header -->
+<!-- ============================================================
+     PROFILE HEADER
+     Desktop: wide cover + logo left, details right
+     Mobile:  compact cover, logo centred, details stacked
+     ============================================================ -->
 <div class="profile-header">
   <div class="profile-cover"></div>
   <div class="container">
     <div class="profile-content">
-      
+
       <div class="company-logo">
         {% if company.company_logo %}
           <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}">
@@ -23,7 +27,7 @@
           </div>
         {% endif %}
       </div>
-      
+
       <div class="company-details">
         <h1 class="company-name">{{ company.company_name }}</h1>
         <div class="company-meta">
@@ -37,26 +41,491 @@
             Since {{ company.year_established }}
           </span>
         </div>
-        <div class="company-badge">
+        {% if has_logo and has_agent and is_kyc_verified %}
+        <div class="company-badge verified">
           <i class="bi bi-patch-check-fill"></i>
           <span>Verified</span>
         </div>
+        {% else %}
+        <div class="company-badge pending">
+          <i class="bi bi-patch-exclamation-fill"></i>
+          <span>Setup Incomplete</span>
+        </div>
+        {% endif %}
       </div>
-      
-      
+
     </div>
   </div>
 </div>
 
-<!-- Dashboard Content -->
+
+<!-- ============================================================
+     SETUP PROGRESS TRACKER
+     Slim bar under header — tap to expand mission checklist
+     ============================================================ -->
+<div class="progress-tracker-bar">
+  <div class="container">
+    <div class="progress-tracker-inner" id="progressToggle" onclick="toggleChecklist()">
+      <div class="progress-left">
+        <i class="bi bi-bar-chart-steps"></i>
+        <span class="progress-label">Profile: <strong>{{ profile_strength }}%</strong></span>
+      </div>
+      <div class="progress-center">
+        <div class="progress-bg">
+          <div class="progress-fill" style="width: {{ profile_strength }}%;"></div>
+        </div>
+      </div>
+      <div class="progress-right">
+        <span class="progress-hint">Missions</span>
+        <i class="bi bi-chevron-down progress-chevron" id="progressChevron"></i>
+      </div>
+    </div>
+
+    <!-- Collapsible Checklist -->
+    <div class="progress-checklist" id="progressChecklist">
+      <div class="checklist-grid">
+
+        <div class="checklist-item {% if has_logo %}done{% endif %}">
+          <div class="checklist-icon">
+            <i class="bi bi-{% if has_logo %}check-circle-fill{% else %}circle{% endif %}"></i>
+          </div>
+          <div class="checklist-text">
+            <span class="checklist-title">Upload Logo</span>
+            <span class="checklist-sub">Give your company a face</span>
+          </div>
+          <span class="checklist-points {% if has_logo %}earned{% endif %}">+20%</span>
+        </div>
+
+        <div class="checklist-item {% if has_agent %}done{% endif %}">
+          <div class="checklist-icon">
+            <i class="bi bi-{% if has_agent %}check-circle-fill{% else %}circle{% endif %}"></i>
+          </div>
+          <div class="checklist-text">
+            <span class="checklist-title">Invite an Agent</span>
+            <span class="checklist-sub">Build your team</span>
+          </div>
+          <span class="checklist-points {% if has_agent %}earned{% endif %}">+30%</span>
+        </div>
+
+        <div class="checklist-item {% if is_kyc_verified %}done{% endif %}">
+          <div class="checklist-icon">
+            <i class="bi bi-{% if is_kyc_verified %}check-circle-fill{% else %}circle{% endif %}"></i>
+          </div>
+          <div class="checklist-text">
+            <span class="checklist-title">Verify ID / KYC</span>
+            <span class="checklist-sub">Unlock Verified badge</span>
+          </div>
+          <span class="checklist-points {% if is_kyc_verified %}earned{% endif %}">+50%</span>
+        </div>
+
+      </div>
+      {% if has_logo and has_agent and is_kyc_verified %}
+      <div class="checklist-complete-banner">
+        <i class="bi bi-trophy-fill"></i>
+        <span>All missions complete! Your <strong>Verified</strong> badge is active.</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     DASHBOARD BODY
+     ============================================================ -->
 <div class="container dashboard-container">
-  
   <div class="dashboard-grid">
-    
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      
-      <!-- About -->
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         DOM order is the mobile order:
+           1. Quick Actions  (most important — post a property)
+           2. Stats strip     (overview at a glance)
+           3. Tools grid      (secondary actions)
+         On desktop, CSS `order` flips Stats to the top.
+         ========================================================= -->
+    <main class="main-content">
+
+
+      <!-- =====================================================
+           QUICK ACTIONS
+           Mobile: 2×2 icon grid — large tap targets
+           Desktop: horizontal row of cards
+           ===================================================== -->
+      <section class="actions-section">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="actions-grid">
+
+          <a href="{% url 'lease-property' %}" class="action-card primary">
+            <div class="action-icon"><i class="bi bi-house-add"></i></div>
+            <div class="action-content">
+              <h4>Lease</h4>
+              <p>List a rental</p>
+            </div>
+          </a>
+
+          <a href="{% url 'sell-property' %}" class="action-card primary">
+            <div class="action-icon"><i class="bi bi-tag-fill"></i></div>
+            <div class="action-content">
+              <h4>Sell</h4>
+              <p>List for sale</p>
+            </div>
+          </a>
+
+          <a href="{% url 'listings' %}" class="action-card">
+            <div class="action-icon"><i class="bi bi-houses"></i></div>
+            <div class="action-content">
+              <h4>Listings</h4>
+              <p>View all properties</p>
+            </div>
+          </a>
+
+          <a href="{% url 'company:manage-company' %}" class="action-card">
+            <div class="action-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="action-content">
+              <h4>Team</h4>
+              <p>Manage employees</p>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           STATS
+           Mobile: horizontal scroll strip (swipeable)
+           Desktop: 2×2 grid
+           Zero state: Hero card + 2-card strip with tip
+           ===================================================== -->
+      <section class="stats-section">
+        <h2 class="section-title">Overview</h2>
+
+        {% if total_properties == 0 %}
+
+        <!-- ZERO STATE -->
+        <div class="hero-card">
+          <div class="hero-icon"><i class="bi bi-houses"></i></div>
+          <h3>Welcome to Estate Web!</h3>
+          <p>Post your first property to unlock analytics like Market Ranking and Average Rating.</p>
+          <div class="hero-actions">
+            <a href="{% url 'lease-property' %}" class="btn-hero">
+              <i class="bi bi-house-add"></i> List Rental
+            </a>
+            <a href="{% url 'sell-property' %}" class="btn-hero secondary">
+              <i class="bi bi-tag-fill"></i> List for Sale
+            </a>
+          </div>
+        </div>
+
+        <!-- Two-card strip: Properties count + Inquiries tip -->
+        <div class="stats-scroll-wrapper">
+          <div class="stats-scroll">
+            <div class="stat-card">
+              <div class="stat-icon properties">
+                <i class="bi bi-house-check"></i>
+              </div>
+              <div class="stat-data">
+                <h3>0</h3>
+                <p>Properties</p>
+              </div>
+            </div>
+            <div class="stat-card zero-tip-card">
+              <div class="stat-icon inquiries">
+                <i class="bi bi-chat-dots"></i>
+              </div>
+              <div class="stat-data">
+                <p class="zero-state-tip">
+                  <i class="bi bi-lightbulb-fill tip-icon"></i>
+                  Post a property to see customer messages here.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% else %}
+
+        <!-- NORMAL STATE: 4-card scroll strip -->
+        <div class="stats-scroll-wrapper">
+          <div class="stats-scroll">
+
+            <div class="stat-card">
+              <div class="stat-icon properties">
+                <i class="bi bi-house-check"></i>
+              </div>
+              <div class="stat-data">
+                <h3>{{ total_properties|default:"0" }}</h3>
+                <p>Properties</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon views {% if market_position <= 10 %}top-performer{% elif market_position <= 25 %}above-average{% endif %}">
+                <i class="bi bi-{% if market_position <= 1 %}trophy-fill{% elif market_position <= 5 %}award-fill{% elif market_position <= 25 %}star-fill{% else %}graph-up{% endif %}"></i>
+              </div>
+              <div class="stat-data">
+                <h3>{{ competition }}</h3>
+                <p>Market Rank</p>
+                {% if market_position <= 25 %}
+                  <small class="ranking-badge">Top {{ market_position|floatformat:"0" }}%</small>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon inquiries">
+                <i class="bi bi-chat-dots"></i>
+              </div>
+              <div class="stat-data">
+                <h3>{{ total_inquiries|default:"0" }}</h3>
+                <p>Inquiries</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon rating">
+                <i class="bi bi-star"></i>
+              </div>
+              <div class="stat-data">
+                <h3>{{ average_rating|default:"0.0"|floatformat:'1' }}</h3>
+                <p>Avg Rating</p>
+              </div>
+            </div>
+
+          </div>
+          <!-- Scroll dots indicator — mobile only -->
+          <div class="scroll-dots" id="scrollDots">
+            <span class="scroll-dot active"></span>
+            <span class="scroll-dot"></span>
+            <span class="scroll-dot"></span>
+            <span class="scroll-dot"></span>
+          </div>
+        </div>
+
+        {% endif %}
+      </section>
+
+
+      <!-- =====================================================
+           MANAGEMENT TOOLS
+           Mobile: 2-column compact icon grid
+           Desktop: multi-column card grid
+           ===================================================== -->
+      <section class="tools-section">
+        <h2 class="section-title">Management Tools</h2>
+        <div class="tools-grid">
+
+          <a href="{% url 'company:lead-management' %}" class="tool-card">
+            <div class="tool-icon"><i class="bi bi-person-lines-fill"></i></div>
+            <h4>Leads</h4>
+            <p>Customer inquiries</p>
+          </a>
+
+          <a href="{% url 'company:application-management' %}" class="tool-card">
+            <div class="tool-icon"><i class="bi bi-person-badge-fill"></i></div>
+            <h4>Applicants</h4>
+            <p>Job applications</p>
+          </a>
+
+          <a href="{% url 'appointment' %}" class="tool-card">
+            <div class="tool-icon"><i class="bi bi-calendar-event"></i></div>
+            <h4>Appointments</h4>
+            <p>Schedule viewings</p>
+          </a>
+
+          <a href="{% url 'company:analytics' %}" class="tool-card">
+            <div class="tool-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <h4>Analytics</h4>
+            <p>Track performance</p>
+          </a>
+
+          <div class="tool-card coming-soon">
+            <div class="coming-soon-badge">
+              <i class="bi bi-clock-history"></i>
+              <span>Soon</span>
+            </div>
+            <div class="tool-icon disabled"><i class="bi bi-file-earmark-text"></i></div>
+            <h4>Documents</h4>
+            <p>Legal docs</p>
+          </div>
+
+          <div class="tool-card coming-soon">
+            <div class="coming-soon-badge">
+              <i class="bi bi-clock-history"></i>
+              <span>Soon</span>
+            </div>
+            <div class="tool-icon disabled"><i class="bi bi-bar-chart"></i></div>
+            <h4>Reports</h4>
+            <p>Generate reports</p>
+          </div>
+
+          <a href="{% url 'company:company-settings' %}" class="tool-card">
+            <div class="tool-icon"><i class="bi bi-gear"></i></div>
+            <h4>Settings</h4>
+            <p>Preferences</p>
+          </a>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           INFO SECTION (mobile: accordion; desktop: sidebar)
+           On mobile this renders at the bottom of the page.
+           On desktop it's pulled out as the sidebar via CSS grid.
+           ===================================================== -->
+      <section class="mobile-info-section">
+
+        {% if is_company_admin %}
+        <!-- Activity accordion -->
+        <div class="accordion-card">
+          <button class="accordion-trigger" onclick="toggleAccordion(this)">
+            <span class="accordion-title">
+              <i class="bi bi-activity"></i> Recent Activity
+            </span>
+            <i class="bi bi-chevron-down accordion-chevron"></i>
+          </button>
+          <div class="accordion-body">
+            <div class="activity-feed">
+              {% if recent_activities %}
+                {% for activity in recent_activities %}
+                <div class="activity-item">
+                  <div class="activity-dot"></div>
+                  <div class="activity-content">
+                    <span class="activity-text">{{ activity.message }}</span>
+                    <span class="activity-time">{{ activity.timestamp|timesince }} ago</span>
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+              <div class="activity-empty">
+                <i class="bi bi-clock-history"></i>
+                <p>No activity yet.</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% else %}
+        <!-- About accordion -->
+        <div class="accordion-card">
+          <button class="accordion-trigger" onclick="toggleAccordion(this)">
+            <span class="accordion-title">
+              <i class="bi bi-info-circle-fill"></i> About Company
+            </span>
+            <i class="bi bi-chevron-down accordion-chevron"></i>
+          </button>
+          <div class="accordion-body">
+            <p class="company-bio">{{ company.company_bio }}</p>
+            <div class="info-item">
+              <i class="bi bi-person-badge"></i>
+              <div class="info-content">
+                <span class="info-label">Principal Broker</span>
+                <span class="info-value">{{ company.principal_broker }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Contact accordion -->
+        <div class="accordion-card">
+          <button class="accordion-trigger" onclick="toggleAccordion(this)">
+            <span class="accordion-title">
+              <i class="bi bi-telephone-fill"></i> Contact
+            </span>
+            <i class="bi bi-chevron-down accordion-chevron"></i>
+          </button>
+          <div class="accordion-body">
+            <a href="tel:{{ company.phone_number }}" class="contact-item">
+              <i class="bi bi-phone"></i>
+              <div class="contact-content">
+                <span class="contact-label">Phone</span>
+                <span class="contact-value">{{ company.phone_number }}</span>
+              </div>
+            </a>
+            <a href="mailto:{{ company.email }}" class="contact-item">
+              <i class="bi bi-envelope"></i>
+              <div class="contact-content">
+                <span class="contact-label">Email</span>
+                <span class="contact-value">{{ company.email }}</span>
+              </div>
+            </a>
+            <div class="contact-item">
+              <i class="bi bi-geo-alt"></i>
+              <div class="contact-content">
+                <span class="contact-label">Address</span>
+                <span class="contact-value">{{ company.address }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if social_links %}
+        <!-- Social accordion -->
+        <div class="accordion-card">
+          <button class="accordion-trigger" onclick="toggleAccordion(this)">
+            <span class="accordion-title">
+              <i class="bi bi-share-fill"></i> Social Media
+            </span>
+            <i class="bi bi-chevron-down accordion-chevron"></i>
+          </button>
+          <div class="accordion-body">
+            <div class="social-links">
+              {% for link in social_links %}
+              <a href="{{ link.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
+                <i class="bi bi-{{ link.social_platform|lower }}"></i>
+                <span>{{ link.social_platform }}</span>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         DESKTOP SIDEBAR
+         Hidden on mobile (mobile-info-section takes over).
+         Shown on desktop via CSS.
+         ========================================================= -->
+    <aside class="sidebar desktop-only">
+
+      {% if is_company_admin %}
+      <div class="info-card">
+        <div class="card-header">
+          <i class="bi bi-activity"></i>
+          <h3>Recent Activity</h3>
+        </div>
+        <div class="card-body">
+          <div class="activity-feed">
+            {% if recent_activities %}
+              {% for activity in recent_activities %}
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  <span class="activity-text">{{ activity.message }}</span>
+                  <span class="activity-time">{{ activity.timestamp|timesince }} ago</span>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+            <div class="activity-empty">
+              <i class="bi bi-clock-history"></i>
+              <p>No activity yet. Post your first property to get started!</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% else %}
       <div class="info-card">
         <div class="card-header">
           <i class="bi bi-info-circle-fill"></i>
@@ -64,7 +533,6 @@
         </div>
         <div class="card-body">
           <p class="company-bio">{{ company.company_bio }}</p>
-          
           <div class="info-item">
             <i class="bi bi-person-badge"></i>
             <div class="info-content">
@@ -74,8 +542,8 @@
           </div>
         </div>
       </div>
+      {% endif %}
 
-      <!-- Contact -->
       <div class="info-card">
         <div class="card-header">
           <i class="bi bi-telephone-fill"></i>
@@ -89,7 +557,6 @@
               <span class="contact-value">{{ company.phone_number }}</span>
             </div>
           </a>
-          
           <a href="mailto:{{ company.email }}" class="contact-item">
             <i class="bi bi-envelope"></i>
             <div class="contact-content">
@@ -97,7 +564,6 @@
               <span class="contact-value">{{ company.email }}</span>
             </div>
           </a>
-          
           <div class="contact-item">
             <i class="bi bi-geo-alt"></i>
             <div class="contact-content">
@@ -108,7 +574,6 @@
         </div>
       </div>
 
-      <!-- Social Links -->
       {% if social_links %}
       <div class="info-card">
         <div class="card-header">
@@ -118,10 +583,10 @@
         <div class="card-body">
           <div class="social-links">
             {% for link in social_links %}
-              <a href="{{ link.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
-                <i class="bi bi-{{ link.social_platform|lower }}"></i>
-                <span>{{ link.social_platform }}</span>
-              </a>
+            <a href="{{ link.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
+              <i class="bi bi-{{ link.social_platform|lower }}"></i>
+              <span>{{ link.social_platform }}</span>
+            </a>
             {% endfor %}
           </div>
         </div>
@@ -130,185 +595,185 @@
 
     </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-      
-      <!-- Statistics -->
-      <div class="stats-section">
-        <h2 class="section-title">Overview</h2>
-        <div class="stats-grid">
-          
-          <div class="stat-card">
-            <div class="stat-icon properties">
-              <i class="bi bi-house-check"></i>
-            </div>
-            <div class="stat-data">
-              <h3>{{ total_properties|default:"0" }}</h3>
-              <p>Total Properties</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon views {% if market_position <= 10 %}top-performer{% elif market_position <= 25 %}above-average{% endif %}">
-              <i class="bi bi-{% if market_position <= 1 %}trophy-fill{% elif market_position <= 5 %}award-fill{% elif market_position <= 25 %}star-fill{% else %}graph-up{% endif %}"></i>
-            </div>
-            <div class="stat-data">
-              <h3>{{ competition }}</h3>
-              <p>Market Ranking</p>
-              {% if market_position <= 25 %}
-                <small class="ranking-badge">{{ market_position|floatformat:"1" }}th percentile</small>
-              {% endif %}
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon inquiries">
-              <i class="bi bi-chat-dots"></i>
-            </div>
-            <div class="stat-data">
-              <h3>{{ total_inquiries|default:"0" }}</h3>
-              <p>Inquiries</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon rating">
-              <i class="bi bi-star"></i>
-            </div>
-            <div class="stat-data">
-              <h3>{{ average_rating|default:"0.0"|floatformat:'2'}}</h3>
-              <p>Avg Rating</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="actions-section">
-        <h2 class="section-title">Quick Actions</h2>
-        <div class="actions-grid">
-          
-          <a href="{% url 'lease-property' %}" class="action-card primary">
-            <div class="action-icon">
-              <i class="bi bi-house-add"></i>
-            </div>
-            <div class="action-content">
-              <h4>Lease Property</h4>
-              <p>List new rental</p>
-            </div>
-          </a>
-
-          <a href="{% url 'sell-property' %}" class="action-card primary">
-            <div class="action-icon">
-              <i class="bi bi-house-add"></i>
-            </div>
-            <div class="action-content">
-              <h4>Sell Property</h4>
-              <p>List for sale</p>
-            </div>
-          </a>
-
-          <a href="{% url 'listings' %}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-houses"></i>
-            </div>
-            <div class="action-content">
-              <h4>Manage Properties</h4>
-              <p>View all listings</p>
-            </div>
-          </a>
-
-
-
-  <a href="{% url 'company:manage-company' %}" class="action-card">
-    <div class="action-icon">
-      <i class="bi bi-people-fill"></i>
-    </div>
-    <div class="action-content">
-      <h4>Employee Management</h4>
-      <p>Manage your team</p>
-    </div>
-  </a>
-      
-        </div>
-      </div>
-
-  <!-- Management Tools -->
-  <div class="tools-section">
-    <h2 class="section-title">Management Tools</h2>
-    <div class="tools-grid">
-      
-      <a href="{% url 'company:lead-management' %}" class="tool-card">
-        <div class="tool-icon">
-          <i class="bi bi-person-lines-fill"></i>
-        </div>
-        <h4>Lead Management</h4>
-        <p>Manage customer inquiries</p>
-      </a>
-      <a href="{% url 'company:application-management' %}" class="tool-card">
-        <div class="tool-icon">
-          <i class="bi bi-person-badge-fill"></i>
-        </div>
-        <h4>Applicant Tracking</h4>
-        <p>Manage Job Applications</p>
-      </a>
-
-      <a href="{% url 'appointment' %}" class="tool-card">
-        <div class="tool-icon">
-          <i class="bi bi-calendar-event"></i>
-        </div>
-        <h4>Appointments</h4>
-        <p>Schedule viewings</p>
-      </a>
-          <a href="{% url 'company:analytics' %}" class="action-card">
-            <div class="action-icon">
-              <i class="bi bi-graph-up-arrow"></i>
-            </div>
-            <div class="action-content">
-              <h4>Analytics</h4>
-              <p>Track performance</p>
-            </div>
-          </a>
-      <div class="tool-card coming-soon">
-        <div class="coming-soon-badge">
-          <i class="bi bi-clock-history"></i>
-          <span>Coming Soon</span>
-        </div>
-
-        <div class="tool-icon disabled">
-          <i class="bi bi-file-earmark-text"></i>
-        </div>
-        <h4>Documents</h4>
-        <p>Manage legal docs</p>
-      </div>
-
-      <div class="tool-card coming-soon">
-        <div class="coming-soon-badge">
-          <i class="bi bi-clock-history"></i>
-          <span>Coming Soon</span>
-        </div>
-        <div class="tool-icon disabled">
-          <i class="bi bi-bar-chart"></i>
-        </div>
-        <h4>Reports</h4>
-        <p>Generate reports</p>
-      </div>
-
-      <a href="{% url 'company:company-settings' %}" class="tool-card">
-        <div class="tool-icon">
-          <i class="bi bi-gear"></i>
-        </div>
-        <h4>Settings</h4>
-        <p>Configure preferences</p>
-      </a>
-
-    </div>
-  </div>
-    </main>
 
   </div>
-
 </div>
+
+
+<!-- ============================================================
+     FAB — desktop only
+     On mobile, the bottom nav bar below handles navigation.
+     ============================================================ -->
+<div class="fab-wrapper desktop-fab">
+  <div class="fab-menu" id="fabMenu">
+    <a href="{% url 'lease-property' %}" class="fab-item">
+      <span class="fab-item-label">Lease Property</span>
+      <div class="fab-item-icon"><i class="bi bi-house-add-fill"></i></div>
+    </a>
+    <a href="{% url 'sell-property' %}" class="fab-item">
+      <span class="fab-item-label">Sell Property</span>
+      <div class="fab-item-icon"><i class="bi bi-tag-fill"></i></div>
+    </a>
+    <a href="{% url 'company:manage-company' %}" class="fab-item">
+      <span class="fab-item-label">Invite Agent</span>
+      <div class="fab-item-icon"><i class="bi bi-person-plus-fill"></i></div>
+    </a>
+  </div>
+  <button class="fab-btn" id="fabBtn" onclick="toggleFab()" aria-label="Quick Actions">
+    <i class="bi bi-plus fab-icon" id="fabIcon"></i>
+  </button>
+</div>
+
+
+<!-- ============================================================
+     MOBILE POST POPUP
+     Slides up from bottom when Post button is tapped.
+     Backdrop dims the page and closes popup on tap.
+     ============================================================ -->
+<div class="post-popup-backdrop" id="postBackdrop" onclick="closePostPopup()"></div>
+<div class="post-popup" id="postPopup">
+  <p class="post-popup-label">What would you like to post?</p>
+  <a href="{% url 'lease-property' %}" class="post-popup-btn">
+    <div class="post-popup-icon lease">
+      <i class="bi bi-house-add-fill"></i>
+    </div>
+    <div class="post-popup-text">
+      <strong>Lease Property</strong>
+      <span>List a rental property</span>
+    </div>
+    <i class="bi bi-chevron-right post-popup-arrow"></i>
+  </a>
+  <a href="{% url 'sell-property' %}" class="post-popup-btn">
+    <div class="post-popup-icon sell">
+      <i class="bi bi-tag-fill"></i>
+    </div>
+    <div class="post-popup-text">
+      <strong>Sell Property</strong>
+      <span>List a property for sale</span>
+    </div>
+    <i class="bi bi-chevron-right post-popup-arrow"></i>
+  </a>
+</div>
+
+<!-- ============================================================
+     MOBILE BOTTOM NAVIGATION BAR
+     ============================================================ -->
+<nav class="mobile-bottom-nav" aria-label="Main navigation">
+
+  <a href="#" class="nav-tab active" aria-label="Dashboard">
+    <i class="bi bi-house-fill"></i>
+    <span>Home</span>
+  </a>
+
+  <!-- Post: toggle button — opens the popup above -->
+  <button class="nav-tab nav-tab-primary" onclick="togglePostPopup()" id="postNavBtn" aria-label="Post Property">
+    <div class="nav-tab-primary-btn" id="postNavIcon">
+      <i class="bi bi-plus-lg"></i>
+    </div>
+    <span>Post</span>
+  </button>
+
+  <a href="{% url 'company:lead-management' %}" class="nav-tab" aria-label="Leads">
+    <i class="bi bi-person-lines-fill"></i>
+    <span>Leads</span>
+  </a>
+
+  <a href="{% url 'company:analytics' %}" class="nav-tab" aria-label="Analytics">
+    <i class="bi bi-graph-up-arrow"></i>
+    <span>Analytics</span>
+  </a>
+
+  <a href="{% url 'company:company-settings' %}" class="nav-tab" aria-label="Settings">
+    <i class="bi bi-gear-fill"></i>
+    <span>More</span>
+  </a>
+
+</nav>
+
+
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+  // ── Progress Checklist toggle ──────────────────────────────
+  function toggleChecklist() {
+    const checklist = document.getElementById('progressChecklist');
+    const chevron   = document.getElementById('progressChevron');
+    const isOpen    = checklist.classList.contains('open');
+    checklist.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  // ── FAB (desktop) ──────────────────────────────────────────
+  function toggleFab() {
+    const menu   = document.getElementById('fabMenu');
+    const icon   = document.getElementById('fabIcon');
+    const btn    = document.getElementById('fabBtn');
+    const isOpen = menu.classList.contains('open');
+    menu.classList.toggle('open');
+    icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(45deg)';
+    btn.classList.toggle('active', !isOpen);
+  }
+
+  document.addEventListener('click', function(e) {
+    const wrapper = document.querySelector('.fab-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById('fabMenu').classList.remove('open');
+      document.getElementById('fabIcon').style.transform = 'rotate(0deg)';
+      document.getElementById('fabBtn').classList.remove('active');
+    }
+  });
+
+  // ── Accordion (mobile info sections) ──────────────────────
+  // Each accordion starts closed. Clicking the trigger
+  // slides the body open/closed via max-height animation.
+  function toggleAccordion(trigger) {
+    const card    = trigger.closest('.accordion-card');
+    const body    = card.querySelector('.accordion-body');
+    const chevron = card.querySelector('.accordion-chevron');
+    const isOpen  = card.classList.contains('open');
+    card.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  // ── Mobile Post Popup ─────────────────────────────────────
+  // Tapping the Post button slides up a sheet with
+  // Lease and Sell options. Backdrop or second tap closes it.
+  function togglePostPopup() {
+    const popup    = document.getElementById('postPopup');
+    const backdrop = document.getElementById('postBackdrop');
+    const icon     = document.getElementById('postNavIcon');
+    const isOpen   = popup.classList.contains('open');
+    if (isOpen) {
+      closePostPopup();
+    } else {
+      popup.classList.add('open');
+      backdrop.classList.add('open');
+      icon.style.transform = 'rotate(45deg)';
+    }
+  }
+
+  function closePostPopup() {
+    document.getElementById('postPopup').classList.remove('open');
+    document.getElementById('postBackdrop').classList.remove('open');
+    document.getElementById('postNavIcon').style.transform = 'rotate(0deg)';
+  }
+
+  // ── Stat scroll dots (mobile) ─────────────────────────────
+  // Watches the horizontal scroll strip and lights up the
+  // matching dot so the user knows how many cards there are.
+  const scrollWrapper = document.querySelector('.stats-scroll');
+  const dots          = document.querySelectorAll('.scroll-dot');
+
+  if (scrollWrapper && dots.length) {
+    scrollWrapper.addEventListener('scroll', () => {
+      const index = Math.round(
+        scrollWrapper.scrollLeft / scrollWrapper.offsetWidth * dots.length
+      );
+      dots.forEach((d, i) => d.classList.toggle('active', i === index));
+    }, { passive: true });
+  }
+</script>
 
 {% endblock %}

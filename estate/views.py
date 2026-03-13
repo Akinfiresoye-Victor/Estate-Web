@@ -445,7 +445,7 @@ def update_profile(request, user_id):
         return render(request, 'estate/error_page.html', {'e': e})
 
 
-
+#TODO encrypt this 
 def change_password(request):
     """
     Change User Passwords with precise lines of code

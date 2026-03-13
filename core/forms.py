@@ -222,3 +222,5 @@ class AppointmentForm(ModelForm):
             return 'No Note Provided'
         
         return note.strip()
+
+

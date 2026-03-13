@@ -1,0 +1,362 @@
+{% extends 'company/base.html' %}
+{% load static %}
+
+{% block title %}{% if is_update %}Update{% else %}Post{% endif %} Job Vacancy - Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/vacancy_form.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Messages Container -->
+<div class="messages-container">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' or message.tags == 'danger' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-circle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% elif message.tags == 'info' %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% else %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Header Section -->
+<div class="vacancy-header">
+  <div class="container">
+    <a href="{% url 'company:application-management' %}" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Back to Applications
+    </a>
+    <h1>{% if is_update %}Update Job Vacancy{% else %}Post New Job Vacancy{% endif %}</h1>
+    <p>{% if is_update %}Update the details to keep your job posting current{% else %}Fill out the details to attract the best talent for your company{% endif %}</p>
+  </div>
+</div>
+
+<!-- Main Form Container -->
+<div class="form-container">
+  <form method="POST" enctype="multipart/form-data" id="vacancyForm">
+    {% csrf_token %}
+
+    <!-- Job Basic Information -->
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-briefcase"></i>
+        Job Information
+      </h3>
+      <p class="section-description">Provide the basic details about the position</p>
+
+      <div class="form-grid">
+        <!-- Job Title -->
+        <div class="form-group full-width">
+          <label for="{{ form.job_title.id_for_label }}">
+            Job Title
+            <span class="required">*</span>
+          </label>
+          {{ form.job_title }}
+          {% if form.job_title.errors %}
+            <span class="error-text">{{ form.job_title.errors }}</span>
+          {% endif %}
+          <small class="field-hint">e.g. Real Estate Agent, Property Manager, Sales Executive</small>
+        </div>
+
+        <!-- Job Type -->
+        <div class="form-group">
+          <label for="{{ form.job_type.id_for_label }}">
+            Employment Type
+            <span class="required">*</span>
+          </label>
+          {{ form.job_type }}
+          {% if form.job_type.errors %}
+            <span class="error-text">{{ form.job_type.errors }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Job Location -->
+        <div class="form-group">
+          <label for="{{ form.job_location.id_for_label }}">
+            Location
+            <span class="required">*</span>
+          </label>
+          {{ form.job_location }}
+          {% if form.job_location.errors %}
+            <span class="error-text">{{ form.job_location.errors }}</span>
+          {% endif %}
+          <small class="field-hint">City or "Remote" for remote positions</small>
+        </div>
+
+        <!-- Positions Available -->
+        <div class="form-group">
+          <label for="{{ form.positions_available.id_for_label }}">
+            Number of Positions
+          </label>
+          {{ form.positions_available }}
+          {% if form.positions_available.errors %}
+            <span class="error-text">{{ form.positions_available.errors }}</span>
+          {% endif %}
+          <small class="field-hint">How many people are you hiring?</small>
+        </div>
+
+        <!-- Application Deadline -->
+        <div class="form-group">
+          <label for="{{ form.application_deadline.id_for_label }}">
+            Application Deadline
+          </label>
+          {{ form.application_deadline }}
+          {% if form.application_deadline.errors %}
+            <span class="error-text">{{ form.application_deadline.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Last date to receive applications</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Description -->
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-file-text"></i>
+        Job Description
+      </h3>
+      <p class="section-description">Describe the role and responsibilities</p>
+
+      <div class="form-grid">
+        <!-- Short Description -->
+        <div class="form-group full-width">
+          <label for="{{ form.short_description.id_for_label }}">
+            Short Description
+            <span class="required">*</span>
+          </label>
+          {{ form.short_description }}
+          {% if form.short_description.errors %}
+            <span class="error-text">{{ form.short_description.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Brief overview (max 250 characters) - shown in job listings</small>
+        </div>
+
+        <!-- Full Description -->
+        <div class="form-group full-width">
+          <label for="{{ form.full_description.id_for_label }}">
+            Full Description
+          </label>
+          {{ form.full_description }}
+          {% if form.full_description.errors %}
+            <span class="error-text">{{ form.full_description.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Detailed job overview and what the role entails</small>
+        </div>
+
+        <!-- Responsibilities -->
+        <div class="form-group full-width">
+          <label for="{{ form.responsibilities.id_for_label }}">
+            Key Responsibilities
+          </label>
+          {{ form.responsibilities }}
+          {% if form.responsibilities.errors %}
+            <span class="error-text">{{ form.responsibilities.errors }}</span>
+          {% endif %}
+          <small class="field-hint">List the main duties and responsibilities (one per line)</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requirements -->
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-check-square"></i>
+        Requirements & Qualifications
+      </h3>
+      <p class="section-description">Specify what you're looking for in candidates</p>
+
+      <div class="form-grid">
+        <!-- Experience Required -->
+        <div class="form-group">
+          <label for="{{ form.experience_required.id_for_label }}">
+            Experience Required
+          </label>
+          {{ form.experience_required }}
+          {% if form.experience_required.errors %}
+            <span class="error-text">{{ form.experience_required.errors }}</span>
+          {% endif %}
+          <small class="field-hint">e.g., "2-5 years", "Entry Level", "Senior"</small>
+        </div>
+
+        <!-- Education Required -->
+        <div class="form-group">
+          <label for="{{ form.education_required.id_for_label }}">
+            Education Required
+          </label>
+          {{ form.education_required }}
+          {% if form.education_required.errors %}
+            <span class="error-text">{{ form.education_required.errors }}</span>
+          {% endif %}
+          <small class="field-hint">e.g., "Bachelor's Degree", "High School"</small>
+        </div>
+
+        <!-- Skills Required -->
+        <div class="form-group full-width">
+          <label for="{{ form.skills_required.id_for_label }}">
+            Required Skills
+          </label>
+          {{ form.skills_required }}
+          {% if form.skills_required.errors %}
+            <span class="error-text">{{ form.skills_required.errors }}</span>
+          {% endif %}
+          <small class="field-hint">List required skills (one per line or comma-separated)</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compensation & Benefits -->
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-cash-stack"></i>
+        Compensation & Benefits
+      </h3>
+      <p class="section-description">Specify the salary range and benefits for this position</p>
+
+      <div class="form-grid">
+        <!-- Salary Currency -->
+        <div class="form-group">
+          <label for="{{ form.salary_currency.id_for_label }}">
+            Currency
+          </label>
+          {{ form.salary_currency }}
+          {% if form.salary_currency.errors %}
+            <span class="error-text">{{ form.salary_currency.errors }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Salary Period -->
+        <div class="form-group">
+          <label for="{{ form.salary_period.id_for_label }}">
+            Salary Period
+          </label>
+          {{ form.salary_period }}
+          {% if form.salary_period.errors %}
+            <span class="error-text">{{ form.salary_period.errors }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Minimum Pay -->
+        <div class="form-group">
+          <label for="{{ form.min_pay.id_for_label }}">
+            Minimum Salary
+          </label>
+          {{ form.min_pay }}
+          {% if form.min_pay.errors %}
+            <span class="error-text">{{ form.min_pay.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Starting salary range</small>
+        </div>
+
+        <!-- Maximum Pay -->
+        <div class="form-group">
+          <label for="{{ form.max_pay.id_for_label }}">
+            Maximum Salary
+          </label>
+          {{ form.max_pay }}
+          {% if form.max_pay.errors %}
+            <span class="error-text">{{ form.max_pay.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Upper limit of salary range</small>
+        </div>
+
+        <!-- Benefits -->
+        <div class="form-group full-width">
+          <label for="{{ form.benefits.id_for_label }}">
+            Benefits & Perks
+          </label>
+          {{ form.benefits }}
+          {% if form.benefits.errors %}
+            <span class="error-text">{{ form.benefits.errors }}</span>
+          {% endif %}
+          <small class="field-hint">e.g., Health insurance, Remote work, Professional development, Paid leave</small>
+        </div>
+      </div>
+
+      <div class="salary-preview">
+        <i class="bi bi-info-circle"></i>
+        <span>Leave salary fields blank if you prefer not to disclose compensation information</span>
+      </div>
+    </div>
+
+    <!-- Job Settings -->
+    <div class="form-card">
+      <h3 class="section-title">
+        <i class="bi bi-gear"></i>
+        Job Settings
+      </h3>
+      <p class="section-description">Control how this job posting appears</p>
+
+      <div class="form-grid">
+        <!-- Active Status -->
+        <div class="form-group checkbox-group">
+          <div class="form-check">
+            {{ form.is_active }}
+            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+              {{ form.is_active.label }}
+            </label>
+          </div>
+          {% if form.is_active.errors %}
+            <span class="error-text">{{ form.is_active.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Uncheck to save as draft without publishing</small>
+        </div>
+
+        <!-- Featured Status -->
+        <div class="form-group checkbox-group">
+          <div class="form-check">
+            {{ form.is_featured }}
+            <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+              {{ form.is_featured.label }}
+            </label>
+          </div>
+          {% if form.is_featured.errors %}
+            <span class="error-text">{{ form.is_featured.errors }}</span>
+          {% endif %}
+          <small class="field-hint">Featured jobs get more visibility on the homepage</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <a href="{% url 'company:application-management' %}" class="btn-cancel">
+        <i class="bi bi-x-circle"></i>
+        Cancel
+      </a>
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-check-circle"></i>
+        {% if is_update %}Update Job Vacancy{% else %}Post Job Vacancy{% endif %}
+      </button>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'company/js/vacancy_form.js' %}"></script>
+{% endblock %}

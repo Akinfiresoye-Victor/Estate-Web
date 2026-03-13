@@ -31,6 +31,7 @@ class CompanyInformation(models.Model):
     principal_broker= models.CharField('Registered Owner of Company', max_length=100)
     time_created=models.DateTimeField(default=timezone.now, blank=False)
     verified=models.BooleanField('Verified Company',default=False)
+    agents_employed=models.IntegerField('Number of Employees', default=0, blank=False, null=False)
     def __str__(self):
         return self.company_name
 
@@ -81,3 +82,92 @@ class CompanyRating(models.Model):
     
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.rating} stars"
+
+
+
+class JobPost(models.Model):
+    # Existing fields (unchanged)
+    user_id = models.IntegerField('Company ID', default=1, blank=False, null=False)
+    company_uuid = models.CharField('Company UUID', default=uuid.uuid4, blank=False, null=False, max_length=36)  # Fixed: removed () from uuid.uuid4
+    job_title = models.CharField('Job Title', default='', blank=False, null=True, max_length=100)
+    job_type = models.CharField('Full/Part time', default='', blank=False, null=False, max_length=20)
+    job_location = models.CharField('Location', default='', blank=False, null=False, max_length=100)  # Increased from 11 to 100
+    short_description = models.CharField('Short Desc', default='', max_length=250, blank=False, null=False)  # Changed default=None to ''
+    full_description = models.TextField('Full Desc', blank=True, null=True)  # Changed from CharField to TextField
+    min_pay = models.DecimalField('Min Salary', max_digits=10, decimal_places=2, blank=True, null=True)  # Changed from FloatField to DecimalField
+    max_pay = models.DecimalField('Max Salary', max_digits=10, decimal_places=2, blank=True, null=True)  # Changed from FloatField to DecimalField
+    applicants = models.IntegerField('Applicants Number', default=0, blank=True, null=False)
+    shortlisted = models.IntegerField('Shortlisted Number', default=0, blank=True, null=False)
+    pending_applicants = models.IntegerField('Pending', default=0, blank=True, null=True)
+    date_posted = models.DateField('Date Posted', default=timezone.now)
+    date_updated = models.DateField('Date Updated', default=timezone.now)
+    
+    # New essential fields
+    experience_required = models.CharField('Experience Required', max_length=50, blank=True, null=True, 
+                                          help_text='e.g., 2-5 years, Entry Level, Senior')
+    education_required = models.CharField('Education Required', max_length=100, blank=True, null=True,
+                                         help_text='e.g., Bachelor\'s Degree, High School, etc.')
+    skills_required = models.TextField('Skills Required', blank=True, null=True,
+                                      help_text='Comma-separated list of required skills')
+    responsibilities = models.TextField('Key Responsibilities', blank=True, null=True,
+                                       help_text='List of main job responsibilities')
+    benefits = models.TextField('Benefits & Perks', blank=True, null=True,
+                               help_text='e.g., Health insurance, Remote work, etc.')
+    
+    # Additional useful fields
+    application_deadline = models.DateField('Application Deadline', blank=True, null=True)
+    is_active = models.BooleanField('Active', default=True, help_text='Is this job posting currently active?')
+    is_featured = models.BooleanField('Featured', default=False, help_text='Feature this job on homepage')
+    salary_currency = models.CharField('Currency', max_length=10, default='NGN', blank=True)
+    salary_period = models.CharField('Salary Period', max_length=20, default='Monthly', 
+                                    choices=[
+                                        ('Hourly', 'Per Hour'),
+                                        ('Daily', 'Per Day'),
+                                        ('Weekly', 'Per Week'),
+                                        ('Monthly', 'Per Month'),
+                                        ('Yearly', 'Per Year'),
+                                    ])
+    positions_available = models.IntegerField('Number of Positions', default=1, 
+                                            help_text='How many people are you hiring?')
+    
+    class Meta:
+        ordering = ['-date_posted']
+        verbose_name = 'Job Posting'
+        verbose_name_plural = 'Job Postings'
+    
+    def __str__(self):
+        return f"{self.job_title} - {self.job_type}-{self.pk}"
+    
+    def save(self, *args, **kwargs):
+        # Update date_updated on every save
+        self.date_updated = timezone.now()
+        super().save(*args, **kwargs)
+    
+    @property
+    def is_expired(self):
+        """Check if job posting has expired"""
+        if self.application_deadline:
+            return timezone.now().date() > self.application_deadline
+        return False
+    
+    @property
+    def days_remaining(self):
+        """Calculate days remaining until deadline"""
+        if self.application_deadline:
+            delta = self.application_deadline - timezone.now().date()
+            return delta.days if delta.days >= 0 else 0
+        return None
+
+class Applications(models.Model):
+    job=models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='job_applications')
+    applicants_uuid=models.CharField('applicant_uuid', null=False, blank=False, default=uuid.uuid4)
+    applicants_resume=models.FileField('Applicants Resume', null=True, blank=True)
+    date_posted=models.DateField('Date Posted', default=timezone.now)
+    date_updated=models.DateField('Date Updated', default=timezone.now)
+
+class CompanyActivityLog(models.Model):
+    company = models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='activity_logs')
+    action = models.CharField('Activity Description', max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+#TODO the appointment side must use UUID for the crud implementation

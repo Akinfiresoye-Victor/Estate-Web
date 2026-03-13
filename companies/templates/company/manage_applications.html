@@ -1,7 +1,7 @@
 {% extends 'company/base.html' %}
 
 {% load static %}
-
+{%load humanize%}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'company/css/manage_applications.css' %}">
 {% endblock %}
@@ -18,10 +18,10 @@
         <p class="page-subtitle">Post vacancies and manage applicants</p>
       </div>
       <div class="header-actions">
-        <button class="btn-post-job" id="openPostJobModal">
+        <a href="{%url 'company:vacancy-form'%}" class="btn-post-job">
           <i class="bi bi-plus-circle"></i>
           <span>Post New Job</span>
-        </button>
+        </a>
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-label">Active Jobs</span>
-        <h3 class="stat-value">8</h3>
+        <h3 class="stat-value">{{job_count}}</h3>
       </div>
     </div>
 
@@ -75,7 +75,7 @@
     <button class="tab-btn active" data-tab="active-jobs">
       <i class="bi bi-briefcase"></i>
       <span>Active Jobs</span>
-      <span class="tab-count">8</span>
+      <span class="tab-count">{{job_count}}</span>
     </button>
     <button class="tab-btn" data-tab="applicants">
       <i class="bi bi-people"></i>
@@ -94,22 +94,27 @@
     <div class="jobs-list">
 
       <!-- Job Card 1 -->
+      {%for job,days in jobs%}
       <div class="job-listing-card">
         <div class="job-card-header">
           <div class="job-card-info">
-            <h3 class="job-card-title">Real Estate Agent</h3>
+            <h3 class="job-card-title">{{job.job_title}}</h3>
             <div class="job-card-meta">
               <span class="meta-tag">
                 <i class="bi bi-geo-alt"></i>
-                Lagos
+                {{job.job_location}}
               </span>
               <span class="meta-tag">
                 <i class="bi bi-briefcase"></i>
-                Full Time
+                {{job.job_type}}
               </span>
               <span class="meta-tag posted">
                 <i class="bi bi-clock"></i>
-                Posted 5 days ago
+                {%if days > 0%}
+                  Posted {{days}} days ago
+                {%else%}
+                  New Listing
+                {%endif%}
               </span>
             </div>
           </div>
@@ -124,28 +129,27 @@
         </div>
 
         <p class="job-card-description">
-          Seeking experienced agents to manage property listings, client relationships, and close deals in the Lagos area.
+          {{job.short_description}}
         </p>
-
         <div class="job-card-stats">
           <div class="stat-item">
             <i class="bi bi-people"></i>
-            <span><strong>23</strong> Applicants</span>
+            <span><strong>{{job.applicants}}</strong> Applicants</span>
           </div>
           <div class="stat-item">
             <i class="bi bi-clock-history"></i>
-            <span><strong>8</strong> Pending</span>
+            <span><strong>{{job.pending_applicants}}</strong> Pending</span>
           </div>
           <div class="stat-item">
             <i class="bi bi-star"></i>
-            <span><strong>5</strong> Shortlisted</span>
+            <span><strong>{{job.shortlisted}}</strong> Shortlisted</span>
           </div>
         </div>
 
         <div class="job-card-footer">
           <span class="salary-range">
             <i class="bi bi-cash"></i>
-            ₦150,000 - ₦300,000/month
+            ₦{{job.min_pay|floatformat:0|intcomma}} - ₦{{job.max_pay|floatformat:0|intcomma}}/month
           </span>
           <a href="#" class="btn-view-applicants">
             View Applicants
@@ -153,129 +157,7 @@
           </a>
         </div>
       </div>
-
-      <!-- Job Card 2 -->
-      <div class="job-listing-card">
-        <div class="job-card-header">
-          <div class="job-card-info">
-            <h3 class="job-card-title">Property Manager</h3>
-            <div class="job-card-meta">
-              <span class="meta-tag">
-                <i class="bi bi-geo-alt"></i>
-                Abuja
-              </span>
-              <span class="meta-tag">
-                <i class="bi bi-briefcase"></i>
-                Full Time
-              </span>
-              <span class="meta-tag posted">
-                <i class="bi bi-clock"></i>
-                Posted 1 week ago
-              </span>
-            </div>
-          </div>
-          <div class="job-card-actions">
-            <button class="btn-icon" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn-icon danger" title="Close Job">
-              <i class="bi bi-x-circle"></i>
-            </button>
-          </div>
-        </div>
-
-        <p class="job-card-description">
-          Oversee residential properties, handle tenant relations, coordinate maintenance, and ensure property compliance.
-        </p>
-
-        <div class="job-card-stats">
-          <div class="stat-item">
-            <i class="bi bi-people"></i>
-            <span><strong>31</strong> Applicants</span>
-          </div>
-          <div class="stat-item">
-            <i class="bi bi-clock-history"></i>
-            <span><strong>12</strong> Pending</span>
-          </div>
-          <div class="stat-item">
-            <i class="bi bi-star"></i>
-            <span><strong>7</strong> Shortlisted</span>
-          </div>
-        </div>
-
-        <div class="job-card-footer">
-          <span class="salary-range">
-            <i class="bi bi-cash"></i>
-            ₦180,000 - ₦350,000/month
-          </span>
-          <a href="#" class="btn-view-applicants">
-            View Applicants
-            <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-
-      <!-- Job Card 3 -->
-      <div class="job-listing-card">
-        <div class="job-card-header">
-          <div class="job-card-info">
-            <h3 class="job-card-title">Marketing Coordinator</h3>
-            <div class="job-card-meta">
-              <span class="meta-tag">
-                <i class="bi bi-geo-alt"></i>
-                Remote
-              </span>
-              <span class="meta-tag">
-                <i class="bi bi-briefcase"></i>
-                Contract
-              </span>
-              <span class="meta-tag posted">
-                <i class="bi bi-clock"></i>
-                Posted 3 days ago
-              </span>
-            </div>
-          </div>
-          <div class="job-card-actions">
-            <button class="btn-icon" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="btn-icon danger" title="Close Job">
-              <i class="bi bi-x-circle"></i>
-            </button>
-          </div>
-        </div>
-
-        <p class="job-card-description">
-          Plan and execute marketing campaigns, manage social media, and create content for property listings.
-        </p>
-
-        <div class="job-card-stats">
-          <div class="stat-item">
-            <i class="bi bi-people"></i>
-            <span><strong>45</strong> Applicants</span>
-          </div>
-          <div class="stat-item">
-            <i class="bi bi-clock-history"></i>
-            <span><strong>14</strong> Pending</span>
-          </div>
-          <div class="stat-item">
-            <i class="bi bi-star"></i>
-            <span><strong>4</strong> Shortlisted</span>
-          </div>
-        </div>
-
-        <div class="job-card-footer">
-          <span class="salary-range">
-            <i class="bi bi-cash"></i>
-            ₦120,000 - ₦200,000/month
-          </span>
-          <a href="#" class="btn-view-applicants">
-            View Applicants
-            <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      </div>
-
+{%endfor%}
     </div>
   </div>
 
