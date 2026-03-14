@@ -9,7 +9,8 @@ from admin_panel.views import admin
 from agents.models import AgentInformation
 from estate.models import LeadInfo
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.http import HttpResponse
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 def landing_page(request):
@@ -27,6 +28,7 @@ def landing_page(request):
 
 def about_page(request):
     return render(request, 'core/about.html')
+
 
 
 '''Users Feedbacks'''
@@ -55,6 +57,64 @@ def feedbacks(request):
     except Exception as e:
         messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
+
+
+'''New Multi-Channel Feedback System — receives AJAX POST from the feedback modal'''
+@require_POST
+def submit_feedback(request):
+    try:
+        reaction   = request.POST.get('reaction',  '').strip()
+        category   = request.POST.get('category',  '').strip()
+        details    = request.POST.get('details',   '').strip()
+        role       = request.POST.get('role',      '').strip()
+        screenshot = request.FILES.get('screenshot', None)
+
+        if not reaction or not category:
+            messages.error(request, 'Reaction and category are required.')
+            return HttpResponse(status=400)
+
+        try:
+            reaction_int = int(reaction)
+            if reaction_int not in range(1, 6):
+                raise ValueError
+        except ValueError:
+            messages.error(request, 'Invalid reaction value.')
+            return HttpResponse(status=400)
+
+        valid_categories = ['bug', 'feature', 'complaint', 'praise']
+        if category not in valid_categories:
+            messages.error(request, 'Invalid category.')
+            return HttpResponse(status=400)
+
+        valid_roles = ['agent', 'company', 'admin', 'landlord']
+        if role not in valid_roles:
+            role = None
+
+
+        feedback_obj = Feedbacks(
+            reaction   = reaction_int,
+            category   = category,
+            details    = details,
+            role       = role,
+            screenshot = screenshot,
+        )
+
+        if request.user.is_authenticated:
+            feedback_obj.user = request.user
+
+        feedback_obj.save()
+
+        messages.success(request, 'Thanks for your feedback! We read every submission.')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            messages.error(request, 'Error Redirecting')
+            return redirect('landing')
+
+    except Exception as e:
+        print(f'[Feedback Error] {e}')
+        messages.error(request, 'Something went wrong. Please try again.')
+        return HttpResponse(status=500)
 '''Property Management'''
 
 #listing properties for sale

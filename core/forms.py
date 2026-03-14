@@ -12,11 +12,40 @@ YES_NO_CHOICES=(
 
 class FeedbackForm(ModelForm):
     class Meta:
-        model=Feedback
-        fields=('feedback',)
-        labels={'feedback': '',}
-        widgets={'feedback': forms.Textarea(attrs={'class':'form-control', 'placeholder': 'Please enter your feedback'}),}
+        model = Feedbacks
+        fields = ('reaction', 'category', 'details', 'screenshot')
+        # 'feedback' field removed — replaced by the new system fields above.
+        # 'role' is not here because the view sets it programmatically,
+        # not from direct user input on the form.
+        # 'user' is not here for the same reason — the view links it
+        # from request.user automatically.
 
+        labels = {
+            'reaction':   '',
+            'category':   '',
+            'details':    '',
+            'screenshot': '',
+        }
+
+        widgets = {
+            # reaction and category are handled by custom emoji/select UI
+            # in the HTML — these hidden inputs just carry the values through.
+            'reaction': forms.HiddenInput(),
+            'category': forms.HiddenInput(),
+
+            # details is the open text box
+            'details': forms.Textarea(attrs={
+                'class': 'fp-textarea',
+                'placeholder': 'What happened? What would you like to see?',
+                'rows': 4,
+            }),
+
+            # screenshot is a file input — shown only for bug reports
+            'screenshot': forms.FileInput(attrs={
+                'class': 'fp-screenshot-input',
+                'accept': 'image/*',
+            }),
+        }
 
 
 #Form for putting properties up for sale

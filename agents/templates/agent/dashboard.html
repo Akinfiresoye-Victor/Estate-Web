@@ -1,5 +1,4 @@
 {% extends 'agent/base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
@@ -8,333 +7,526 @@
 
 {% block content %}
 
-<div class="dashboard-container">
-  
-  <!-- Welcome Header -->
-  <div class="welcome-header">
-    <div class="header-left">
-      <div class="agent-avatar">
-        {% if agent_info.profile_picture %}
-          <img src="{{ agent_info.profile_picture.url }}" alt="{{ name }}">
-        {% else %}
-          <img src="https://ui-avatars.com/api/?name={{ name }}&size=80&background=1a3c4e&color=fff&bold=true" alt="{{ name }}">
-        {% endif %}
-        <span class="online-dot"></span>
-      </div>
-      <div class="greeting-section">
-        <h1 class="greeting-title">{{ greeting }}, {{ first_name }}!</h1>
-        <p class="greeting-subtitle">{{ work_type }}</p>
-        {% if agent_info.verified %}
-        <span class="verified-tag">
-          <i class="bi bi-patch-check-fill"></i>
-          Verified
-        </span>
-        {% endif %}
-      </div>
+<!-- ═══════════════════════════════════════════
+     PROFILE HEADER
+     Mobile: compact — avatar left, name right, bell top-right
+     Desktop: wider with more breathing room
+     ═══════════════════════════════════════════ -->
+<div class="profile-header">
+  <div class="profile-cover"></div>
+  <div class="profile-content">
+
+    <div class="agent-avatar-wrap">
+      {% if agent_info.profile_picture %}
+        <img src="{{ agent_info.profile_picture.url }}" alt="{{ name }}" loading="lazy">
+      {% else %}
+        <div class="avatar-placeholder">{{ first_name|slice:":1"|upper }}</div>
+      {% endif %}
+      <span class="online-dot"></span>
     </div>
-    
-    <div class="header-right">
-      <button class="header-icon-btn">
-        <i class="bi bi-bell"></i>
-        <span class="notification-count">3</span>
+
+    <div class="agent-details">
+      <h1 class="agent-name">{{ greeting }}, {{ first_name }}!</h1>
+      <p class="agent-role">{{ work_type }}</p>
+      {% if agent_info.verified %}
+      <span class="verified-tag"><i class="bi bi-patch-check-fill"></i> Verified</span>
+      {% else %}
+      <span class="unverified-tag"><i class="bi bi-patch-exclamation-fill"></i> Setup Incomplete</span>
+      {% endif %}
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="notif-dot"></span>
       </button>
-      <button class="header-icon-btn">
-        <i class="bi bi-chat-dots"></i>
-      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     PROGRESS TRACKER
+     Slim bar — tap to reveal missions
+     ═══════════════════════════════════════════ -->
+<div class="progress-tracker-bar">
+  <div class="page-pad">
+    <button class="progress-tracker-inner" id="progressBtn"
+            onclick="toggleChecklist()" aria-expanded="false">
+      <span class="progress-left">
+        <i class="bi bi-bar-chart-steps"></i>
+        <span>Profile: <strong>{{ agent_profile_strength }}%</strong></span>
+      </span>
+      <span class="progress-center">
+        <span class="progress-bg">
+          <span class="progress-fill" style="width:{{ agent_profile_strength }}%"></span>
+        </span>
+      </span>
+      <span class="progress-right">
+        <span>Missions</span>
+        <i class="bi bi-chevron-down progress-chevron" id="progressChevron"></i>
+      </span>
+    </button>
+
+    <div class="progress-checklist" id="progressChecklist">
+      <div class="checklist-grid">
+
+        <div class="checklist-item {% if has_headshot %}done{% endif %}">
+          <i class="bi bi-{% if has_headshot %}check-circle-fill{% else %}circle{% endif %} cl-icon"></i>
+          <div class="cl-text">
+            <span class="cl-title">Upload your Headshot</span>
+            <span class="cl-sub">Build trust with buyers</span>
+          </div>
+          <span class="cl-pts {% if has_headshot %}earned{% endif %}">+25%</span>
+        </div>
+
+        <div class="checklist-item {% if has_whatsapp %}done{% endif %}">
+          <i class="bi bi-{% if has_whatsapp %}check-circle-fill{% else %}circle{% endif %} cl-icon"></i>
+          <div class="cl-text">
+            <span class="cl-title">Add WhatsApp Number</span>
+            <span class="cl-sub">Get direct leads fast</span>
+          </div>
+          <span class="cl-pts {% if has_whatsapp %}earned{% endif %}">+25%</span>
+        </div>
+
+        <div class="checklist-item {% if has_listing %}done{% endif %}">
+          <i class="bi bi-{% if has_listing %}check-circle-fill{% else %}circle{% endif %} cl-icon"></i>
+          <div class="cl-text">
+            <span class="cl-title">Complete First Listing</span>
+            <span class="cl-sub">Start earning commissions</span>
+          </div>
+          <span class="cl-pts {% if has_listing %}earned{% endif %}">+50%</span>
+        </div>
+
+      </div>
+      {% if has_headshot and has_whatsapp and has_listing %}
+      <div class="cl-complete">
+        <i class="bi bi-trophy-fill"></i>
+        <span>All missions complete! Your profile is fully set up.</span>
+      </div>
+      {% endif %}
     </div>
   </div>
+</div>
 
-  <!-- Daily Tip Banner -->
+
+<!-- ═══════════════════════════════════════════
+     MAIN CONTENT
+     ═══════════════════════════════════════════ -->
+<div class="page-pad main-content">
+
+
+  <!-- TIP BANNER -->
   <div class="tip-banner">
-    <div class="tip-icon">
-      <i class="bi bi-lightbulb-fill"></i>
-    </div>
-    <div class="tip-content">
+    <div class="tip-icon"><i class="bi bi-lightbulb-fill"></i></div>
+    <div class="tip-body">
       <p class="tip-text">"{{ tips }}"</p>
       <span class="tip-author">— {{ by }}</span>
     </div>
   </div>
 
-  <!-- Key Metrics -->
-  <div class="metrics-grid">
-    
-    <div class="metric-card">
-      <div class="metric-icon blue">
-        <i class="bi bi-house-check"></i>
-      </div>
-      <div class="metric-content">
-        <span class="metric-label">Active Listings</span>
-        <h2 class="metric-value">{{ house_count }}</h2>
-      </div>
+
+  <!-- ─────────────────────────────────────────
+       SECTION 1: MY ACTIVE LISTINGS
+       Horizontal swipeable stat cards on mobile.
+       2 cards visible at once — user can see
+       there's more to swipe to.
+       ───────────────────────────────────────── -->
+  <section class="section-block">
+    <div class="section-header">
+      <h2 class="section-title"><i class="bi bi-house-check"></i> My Listings</h2>
+      <a href="{% url 'listings' %}" class="see-all-link">View All <i class="bi bi-arrow-right-short"></i></a>
     </div>
 
-    <div class="metric-card">
-      <div class="metric-icon green">
-        <i class="bi bi-people"></i>
-      </div>
-      <div class="metric-content">
-        <span class="metric-label">Total Leads</span>
-        <h2 class="metric-value">{{ lead_count }}</h2>
-        {% if new_lead_count > 0 %}
-        <span class="metric-badge">+{{ new_lead_count }} New</span>
-        {% endif %}
-      </div>
-    </div>
+    <div class="stats-scroll" id="statsScroll">
 
-    <div class="metric-card">
-      <div class="metric-icon orange">
-        <i class="bi bi-calendar-event"></i>
-      </div>
-      <div class="metric-content">
-        <span class="metric-label">Today's Appointments</span>
-        <h2 class="metric-value">{{ todays_appointment|length }}</h2>
-      </div>
-    </div>
-
-    <div class="metric-card">
-      <div class="metric-icon purple">
-        <i class="bi bi-star"></i>
-      </div>
-      <div class="metric-content">
-        <span class="metric-label">Rating</span>
-        <h2 class="metric-value">{{avg_rating|default:"0.0"|floatformat:'2'}}</h2>
-        <span class="metric-subtext">{{total_reviews|default:"None"}} reviews</span>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Main Layout -->
-  <div class="main-layout">
-    
-    <!-- Quick Actions -->
-    <section class="actions-section">
-      <div class="section-header">
-        <h2 class="section-title">
-          <i class="bi bi-lightning-charge"></i>
-          Quick Actions
-        </h2>
-      </div>
-      
-      <div class="actions-grid">
-        
-        <a href="{% url 'lease-property' %}" class="action-card primary">
-          <div class="action-icon">
-            <i class="bi bi-house-add"></i>
-          </div>
-          <div class="action-info">
-            <h3>Lease Property</h3>
-            <p>List new rental</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
-        <a href="{% url 'sell-property' %}" class="action-card primary">
-          <div class="action-icon">
-            <i class="bi bi-house-add"></i>
-          </div>
-          <div class="action-info">
-            <h3>Sell Property</h3>
-            <p>List for sale</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
-        <a href="{% url 'listings' %}" class="action-card">
-          <div class="action-icon">
-            <i class="bi bi-grid-3x3-gap"></i>
-          </div>
-          <div class="action-info">
-            <h3>My Portfolio</h3>
-            <p>View all listings</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
-        <a href="{% url 'agent:leads' %}" class="action-card">
-          <div class="action-icon">
-            <i class="bi bi-person-badge"></i>
-          </div>
-          <div class="action-info">
-            <h3>Manage Leads</h3>
-            <p>Track clients</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
-        <a href="{% url 'appointment' %}" class="action-card">
-          <div class="action-icon">
-            <i class="bi bi-calendar-check"></i>
-          </div>
-          <div class="action-info">
-            <h3>Appointments</h3>
-            <p>View schedule</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
-        <a href="{% url 'agent:analytics' %}" class="action-card">
-          <div class="action-icon">
-            <i class="bi bi-graph-up-arrow"></i>
-          </div>
-          <div class="action-info">
-            <h3>Analytics</h3>
-            <p>View insights</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
-        <div class="action-card disabled">
-          <span class="coming-soon-badge">
-            <i class="bi bi-clock-history"></i>
-            Coming Soon
-          </span>
-          <div class="action-icon">
-            <i class="bi bi-file-earmark-text"></i>
-          </div>
-          <div class="action-info">
-            <h3>Documents</h3>
-            <p>Manage contracts</p>
-          </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-house-check"></i></div>
+        <div class="stat-data">
+          <h3>{{ house_count }}</h3>
+          <p>Active Listings</p>
         </div>
-
-        <a href="{% url 'agent:settings' %}" class="action-card">
-          <div class="action-icon">
-            <i class="bi bi-gear"></i>
-          </div>
-          <div class="action-info">
-            <h3>Settings</h3>
-            <p>Configure preferences</p>
-          </div>
-          <i class="bi bi-arrow-right-short action-arrow"></i>
-        </a>
-
       </div>
-    </section>
 
-    <!-- Today's Schedule -->
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-data">
+          <h3>{{ lead_count }}</h3>
+          <p>Total Leads</p>
+          {% if new_lead_count > 0 %}
+          <span class="new-badge">+{{ new_lead_count }} New</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon orange"><i class="bi bi-calendar-event"></i></div>
+        <div class="stat-data">
+          <h3>{{ todays_appointment|length }}</h3>
+          <p>Appointments Today</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="bi bi-star-fill"></i></div>
+        <div class="stat-data">
+          <h3>{{ avg_rating|default:"0.0"|floatformat:'1' }}</h3>
+          <p>Avg Rating</p>
+          <span class="stat-sub">{{ total_reviews|default:"0" }} reviews</span>
+        </div>
+      </div>
+
+      {% if potential_commission %}
+      <div class="stat-card">
+        <div class="stat-icon gold"><i class="bi bi-cash-coin"></i></div>
+        <div class="stat-data">
+          <h3 class="commission-val">₦{{ potential_commission|floatformat:"0" }}</h3>
+          <p>Potential Commission</p>
+          <span class="stat-sub">From active listings</span>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="scroll-dots" id="scrollDots">
+      <span class="scroll-dot active"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      <span class="scroll-dot"></span>
+      {% if potential_commission %}<span class="scroll-dot"></span>{% endif %}
+    </div>
+  </section>
+
+
+  <!-- ─────────────────────────────────────────
+       SECTION 2: INQUIRY INBOX
+       People interested in your houses.
+       Most important action: WhatsApp button.
+       ───────────────────────────────────────── -->
+  <section class="section-block">
+    <div class="section-header">
+      <h2 class="section-title"><i class="bi bi-chat-dots-fill"></i> People Interested</h2>
+      <a href="{% url 'agent:leads' %}" class="see-all-link">View All <i class="bi bi-arrow-right-short"></i></a>
+    </div>
+
+    {% if recent_inquiries %}
+    <div class="inbox-list">
+      {% for inquiry in recent_inquiries %}
+      <div class="inbox-item">
+        <div class="lead-avatar">{{ inquiry.name|slice:":1"|upper }}</div>
+        <div class="lead-info">
+          <span class="lead-name">{{ inquiry.name }}</span>
+          <span class="lead-prop"><i class="bi bi-house"></i> {{ inquiry.property_name }}</span>
+          <span class="lead-time">{{ inquiry.date_created|timesince }} ago</span>
+        </div>
+        <a href="#"
+           class="wa-btn"
+           data-phone="{{ inquiry.phone_no }}"
+           data-name="{{ inquiry.name }}"
+           data-agent="{{ name }}"
+           data-property="{{ inquiry.property_name }}"
+           onclick="openWhatsApp(this); return false;">
+          <i class="bi bi-whatsapp"></i>
+          <span>Chat</span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="inbox-empty">
+      <div class="empty-icon-wrap"><i class="bi bi-chat-dots"></i></div>
+      <h3>No Inquiries Yet</h3>
+      <p>Share your listings to attract buyers and renters.</p>
+      <a href="{% url 'lease-property' %}" class="btn-primary-action">
+        <i class="bi bi-house-add"></i> Post a Listing
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+
+  <!-- ─────────────────────────────────────────
+       SECTION 3: QUICK ACTIONS
+       2×2 grid on mobile — big tap targets.
+       4-col on desktop.
+       ───────────────────────────────────────── -->
+  <section class="section-block">
+    <div class="section-header">
+      <h2 class="section-title"><i class="bi bi-lightning-charge-fill"></i> Quick Actions</h2>
+    </div>
+
+    <div class="actions-grid">
+
+      <a href="{% url 'lease-property' %}" class="action-card primary">
+        <div class="action-icon"><i class="bi bi-house-add"></i></div>
+        <div class="action-info"><h4>Lease</h4><p>List a rental</p></div>
+      </a>
+
+      <a href="{% url 'sell-property' %}" class="action-card primary">
+        <div class="action-icon"><i class="bi bi-tag-fill"></i></div>
+        <div class="action-info"><h4>Sell</h4><p>List for sale</p></div>
+      </a>
+
+      <a href="{% url 'listings' %}" class="action-card">
+        <div class="action-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+        <div class="action-info"><h4>Portfolio</h4><p>All listings</p></div>
+      </a>
+
+      <a href="{% url 'agent:leads' %}" class="action-card">
+        <div class="action-icon"><i class="bi bi-person-badge-fill"></i></div>
+        <div class="action-info"><h4>Leads</h4><p>Track clients</p></div>
+      </a>
+
+      <a href="{% url 'appointment' %}" class="action-card">
+        <div class="action-icon"><i class="bi bi-calendar-check"></i></div>
+        <div class="action-info"><h4>Schedule</h4><p>View viewings</p></div>
+      </a>
+
+      <a href="{% url 'agent:analytics' %}" class="action-card">
+        <div class="action-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div class="action-info"><h4>Analytics</h4><p>Track insights</p></div>
+      </a>
+
+      <div class="action-card coming-soon-card">
+        <div class="cs-badge"><i class="bi bi-clock-history"></i> Soon</div>
+        <div class="action-icon disabled-icon"><i class="bi bi-file-earmark-text"></i></div>
+        <div class="action-info"><h4>Documents</h4><p>Contracts</p></div>
+      </div>
+
+      <a href="{% url 'agent:settings' %}" class="action-card">
+        <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
+        <div class="action-info"><h4>Settings</h4><p>Preferences</p></div>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ─────────────────────────────────────────
+       SECTION 4: TODAY'S SCHEDULE
+       ───────────────────────────────────────── -->
+  <section class="section-block">
+    <div class="section-header">
+      <h2 class="section-title"><i class="bi bi-calendar-day"></i> Today's Schedule</h2>
+      <a href="{% url 'add-schedule' %}" class="add-link">
+        <i class="bi bi-plus-circle-fill"></i> Add
+      </a>
+    </div>
+
     {% if todays_appointment %}
-    <section class="schedule-section">
-      <div class="section-header">
-        <h2 class="section-title">
-          <i class="bi bi-calendar-day"></i>
-          Today's Schedule
-        </h2>
-        <a href="{% url 'add-schedule' %}" class="add-btn">
-          <i class="bi bi-plus-circle"></i>
-          Add Appointment
-        </a>
-      </div>
-      
-      <div class="schedule-grid">
-        {% for appointment in todays_appointment %}
-        <div class="schedule-card">
-          <div class="schedule-time-block">
-            {% if appointment.time %}
-              <span class="time-value">{{ appointment.time }}</span>
-              <span class="time-period">{{ appointment.timeformat }}</span>
-            {% else %}
-              <span class="time-value">Any</span>
-              <span class="time-period">Time</span>
-            {% endif %}
+    <div class="schedule-list">
+      {% for appointment in todays_appointment %}
+      <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="schedule-card">
+        <div class="schedule-time">
+          {% if appointment.time %}
+            <span class="time-val">{{ appointment.time }}</span>
+            <span class="time-fmt">{{ appointment.timeformat }}</span>
+          {% else %}
+            <span class="time-val">Any</span>
+            <span class="time-fmt">Time</span>
+          {% endif %}
+        </div>
+        <div class="schedule-info">
+          <h4 class="schedule-title">{{ appointment.appointment_type }}</h4>
+          <p class="schedule-loc">
+            <i class="bi bi-geo-alt"></i>
+            {% if appointment.appointment_type == 'Virtual' %}Virtual Meeting
+            {% elif appointment.location %}{{ appointment.location }}
+            {% else %}Not Specified{% endif %}
+          </p>
+          <span class="schedule-tag {{ appointment.appointment_type|lower }}">{{ appointment.appointment_type }}</span>
+        </div>
+        <i class="bi bi-chevron-right schedule-chevron"></i>
+      </a>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-schedule">
+      <i class="bi bi-calendar-x empty-schedule-icon"></i>
+      <p>No appointments today. Your schedule is clear!</p>
+      <a href="{% url 'add-schedule' %}" class="btn-primary-action">
+        <i class="bi bi-plus-circle"></i> Add Appointment
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+
+  <!-- ─────────────────────────────────────────
+       ACCORDION SECTIONS (mobile-friendly bottom info)
+       Company News + Your Info collapse on mobile,
+       shown fully expanded on desktop.
+       ───────────────────────────────────────── -->
+
+  <!-- Company News -->
+  <div class="accordion-card">
+    <button class="accordion-trigger" onclick="toggleAccordion(this)">
+      <span class="acc-title"><i class="bi bi-megaphone-fill"></i> Company News</span>
+      <i class="bi bi-chevron-down acc-chevron"></i>
+    </button>
+    <div class="accordion-body">
+      {% if company_announcements %}
+        {% for announcement in company_announcements %}
+        <div class="news-card">
+          <div class="news-meta">
+            <span class="news-badge"><i class="bi bi-building"></i> {{ announcement.company.company_name }}</span>
+            <span class="news-time">{{ announcement.created_at|timesince }} ago</span>
           </div>
-          
-          <div class="schedule-info">
-            <h3 class="schedule-title">{{ appointment.appointment_type }}</h3>
-            <p class="schedule-location">
-              <i class="bi bi-geo-alt"></i>
-              {% if appointment.appointment_type == 'Virtual' %}
-                Virtual Meeting
-              {% elif appointment.location %}
-                {{ appointment.location }}
-              {% else %}
-                Not Specified
-              {% endif %}
-            </p>
-            <span class="schedule-type {{ appointment.appointment_type|lower }}">
-              {{ appointment.appointment_type }}
-            </span>
-          </div>
-          
-          <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="schedule-action">
-            <i class="bi bi-arrow-right"></i>
-          </a>
+          <h4 class="news-title">{{ announcement.title }}</h4>
+          <p class="news-body">{{ announcement.message }}</p>
         </div>
         {% endfor %}
-      </div>
-    </section>
-    {% else %}
-    <section class="schedule-section empty">
-      <div class="empty-schedule">
-        <div class="empty-icon">
-          <i class="bi bi-calendar-x"></i>
+      {% else %}
+        <div class="acc-empty">
+          <i class="bi bi-megaphone"></i>
+          <p>No announcements yet from your company admin.</p>
         </div>
-        <h3>No Appointments Today</h3>
-        <p>Your schedule is clear. Time to focus on other tasks!</p>
-        <a href="{% url 'add-schedule' %}" class="btn-add-schedule">
-          <i class="bi bi-plus-circle"></i>
-          Schedule an Appointment
-        </a>
-      </div>
-    </section>
-    {% endif %}
-
-    <!-- Contact Info -->
-    <section class="info-section">
-      <div class="section-header">
-        <h2 class="section-title">
-          <i class="bi bi-person-circle"></i>
-          Your Information
-        </h2>
-      </div>
-      
-      <div class="info-grid">
-        
-        <div class="info-item">
-          <div class="info-icon">
-            <i class="bi bi-envelope"></i>
-          </div>
-          <div class="info-text">
-            <span class="info-label">Email</span>
-            <span class="info-value">{{ email }}</span>
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-icon">
-            <i class="bi bi-telephone"></i>
-          </div>
-          <div class="info-text">
-            <span class="info-label">Phone</span>
-            <span class="info-value">{{ phone }}</span>
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-icon">
-            <i class="bi bi-geo-alt"></i>
-          </div>
-          <div class="info-text">
-            <span class="info-label">Location</span>
-            <span class="info-value">{{ location }}, Nigeria</span>
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-icon">
-            <i class="bi bi-building"></i>
-          </div>
-          <div class="info-text">
-            <span class="info-label">Company</span>
-            <span class="info-value">{{company_name | default:"N/A"}}</span>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
+      {% endif %}
+    </div>
   </div>
 
+  <!-- Your Information -->
+  <div class="accordion-card">
+    <button class="accordion-trigger" onclick="toggleAccordion(this)">
+      <span class="acc-title"><i class="bi bi-person-circle"></i> Your Information</span>
+      <i class="bi bi-chevron-down acc-chevron"></i>
+    </button>
+    <div class="accordion-body">
+      <div class="info-grid">
+        <div class="info-row">
+          <i class="bi bi-envelope info-icon"></i>
+          <div><span class="info-label">Email</span><span class="info-val">{{ email }}</span></div>
+        </div>
+        <div class="info-row">
+          <i class="bi bi-telephone info-icon"></i>
+          <div><span class="info-label">Phone</span><span class="info-val">{{ phone }}</span></div>
+        </div>
+        <div class="info-row">
+          <i class="bi bi-geo-alt info-icon"></i>
+          <div><span class="info-label">Location</span><span class="info-val">{{ location }}, Nigeria</span></div>
+        </div>
+        <div class="info-row">
+          <i class="bi bi-building info-icon"></i>
+          <div><span class="info-label">Company</span><span class="info-val">{{ company_name|default:"N/A" }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div><!-- end .main-content -->
+
+
+<!-- ═══════════════════════════════════════════
+     MOBILE POST POPUP
+     ═══════════════════════════════════════════ -->
+<div class="post-backdrop" id="postBackdrop" onclick="closePostPopup()"></div>
+<div class="post-popup" id="postPopup">
+  <p class="post-popup-label">What would you like to post?</p>
+  <a href="{% url 'lease-property' %}" class="post-popup-btn">
+    <div class="popup-icon lease"><i class="bi bi-house-add-fill"></i></div>
+    <div class="popup-text"><strong>Lease Property</strong><span>List a rental property</span></div>
+    <i class="bi bi-chevron-right popup-arrow"></i>
+  </a>
+  <a href="{% url 'sell-property' %}" class="post-popup-btn">
+    <div class="popup-icon sell"><i class="bi bi-tag-fill"></i></div>
+    <div class="popup-text"><strong>Sell Property</strong><span>List a property for sale</span></div>
+    <i class="bi bi-chevron-right popup-arrow"></i>
+  </a>
 </div>
+
+
+<!-- ═══════════════════════════════════════════
+     MOBILE BOTTOM NAV
+     ═══════════════════════════════════════════ -->
+<nav class="mobile-bottom-nav">
+  <a href="#" class="nav-tab active"><i class="bi bi-house-fill"></i><span>Home</span></a>
+
+  <button class="nav-tab nav-post-btn" id="postNavBtn" onclick="togglePostPopup()">
+    <div class="nav-post-circle" id="postNavIcon"><i class="bi bi-plus-lg"></i></div>
+    <span>Post</span>
+  </button>
+
+  <a href="{% url 'agent:leads' %}" class="nav-tab"><i class="bi bi-person-lines-fill"></i><span>Inbox</span></a>
+  <a href="{% url 'appointment' %}" class="nav-tab"><i class="bi bi-calendar-check"></i><span>Schedule</span></a>
+  <a href="{% url 'agent:settings' %}" class="nav-tab"><i class="bi bi-gear-fill"></i><span>More</span></a>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  /* Progress checklist */
+  window.toggleChecklist = function () {
+    var list    = document.getElementById('progressChecklist');
+    var chevron = document.getElementById('progressChevron');
+    var btn     = document.getElementById('progressBtn');
+    var isOpen  = list.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+    btn.setAttribute('aria-expanded', String(isOpen));
+  };
+
+  /* Accordions */
+  window.toggleAccordion = function (trigger) {
+    var card    = trigger.closest('.accordion-card');
+    var chevron = card.querySelector('.acc-chevron');
+    var isOpen  = card.classList.toggle('open');
+    chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+  };
+
+  /* Mobile post popup */
+  window.togglePostPopup = function () {
+    document.getElementById('postPopup').classList.contains('open')
+      ? closePostPopup() : openPostPopup();
+  };
+  window.openPostPopup = function () {
+    document.getElementById('postPopup').classList.add('open');
+    document.getElementById('postBackdrop').classList.add('open');
+    document.getElementById('postNavIcon').style.transform = 'rotate(45deg)';
+    document.body.style.overflow = 'hidden';
+  };
+  window.closePostPopup = function () {
+    document.getElementById('postPopup').classList.remove('open');
+    document.getElementById('postBackdrop').classList.remove('open');
+    document.getElementById('postNavIcon').style.transform = 'rotate(0deg)';
+    document.body.style.overflow = '';
+  };
+
+  /* WhatsApp one-tap — Nigerian number format */
+  window.openWhatsApp = function (el) {
+    var raw      = (el.getAttribute('data-phone') || '').replace(/\D/g, '');
+    var name     = el.getAttribute('data-name')     || '';
+    var agent    = el.getAttribute('data-agent')    || '';
+    var property = el.getAttribute('data-property') || '';
+    if (!raw) { alert('No phone number on file for this lead.'); return; }
+    if (raw.startsWith('0')) raw = '234' + raw.slice(1);
+    var msg = encodeURIComponent(
+      'Hello ' + name + ', I\'m ' + agent + ' from Estate Web. ' +
+      'You asked about the ' + property + '. ' +
+      'I\'d love to help — when is a good time to talk?'
+    );
+    window.open('https://wa.me/' + raw + '?text=' + msg, '_blank');
+  };
+
+  /* Stat scroll dots */
+  var strip = document.getElementById('statsScroll');
+  var dots  = document.querySelectorAll('.scroll-dot');
+  if (strip && dots.length) {
+    strip.addEventListener('scroll', function () {
+      var idx = Math.round(strip.scrollLeft / strip.firstElementChild.offsetWidth);
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+    }, { passive: true });
+  }
+
+}());
+</script>
 
 {% endblock %}

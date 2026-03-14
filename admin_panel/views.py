@@ -184,19 +184,49 @@ def time_formatting(formatted_time):
 
 #for admins only
 def view_feedbacks(request):
-    if request.user.username == admin:
-        feedbacks=Feedback.objects.all()
-        return render(request,'view_feedback.html', {'feedback': feedbacks})
-    else:
-        messages.warning(request, 'Page is for aadmins only')
+    # is_staff is Django's built-in flag for admin users.
+    # It's safer than checking username == 'admin' because:
+    # 1. Your admin username could change
+    # 2. Another user could theoretically be named 'admin'
+    # 3. is_staff works with Django's permission system properly
+    print(request.user.id)
+    if not request.user.is_staff:
+        messages.warning(request, 'This page is for admins only.')
         return redirect('landing')
+
+    feedbacks = Feedbacks.objects.all().order_by('-submitted_at')
+
+    # ── Stats for the 4 stat boxes at the top of the page ────────────
+    # These are simple database counts — Django does them in one query each.
+    bug_count     = feedbacks.filter(category='bug').count()
+    feature_count = feedbacks.filter(category='feature').count()
+
+    # Average reaction score — only from submissions that have a reaction.
+    # We exclude nulls (old records) so they don't drag the average down.
+    from django.db.models import Avg
+    avg_result = feedbacks.exclude(reaction__isnull=True).aggregate(Avg('reaction'))
+    avg_raw    = avg_result['reaction__avg']
+
+    # Round to 1 decimal place and show emoji next to it.
+    # If no reactions yet, show a dash instead of crashing.
+    if avg_raw is not None:
+        avg_reaction = f"{avg_raw:.1f} ⭐"
+    else:
+        avg_reaction = "—"
+
+    return render(request, 'view_feedback.html', {
+        'feedback':      feedbacks,
+        'bug_count':     bug_count,
+        'feature_count': feature_count,
+        'avg_reaction':  avg_reaction,
+    })
 
 #for admins only
 def delete_feedback(request, feedback_id):
     if request.user.is_authenticated:
         if request.user.username == admin:
             #getting the property_id which will be used to handle the deletion
-            feedback= Feedback.objects.get(pk=feedback_id)
+            feedback= Feedbacks.objects.get(pk=feedback_id)
             #keeps another user from deleting a users data 
             if request.user.id == 1:
                 #what does the actual deleting based on the property_id

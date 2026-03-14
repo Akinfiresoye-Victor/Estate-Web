@@ -8,7 +8,7 @@ from estate.models import LeadInfo
 #TODO Cross check all authentication side to affect loss of data 
 
 #registering all our models to our admin site
-admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedback, AgentInformation,
+admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedbacks, AgentInformation,
                     Experience, SocialLinks, PropertyRentImage, PropertySaleImage, User, CompanyInformation,
                     CompanyAnalytics, LeadInfo,WishlistStorageUnit, SessionId, PropertyViews,Appointments, 
                     AgentAnalytics, agent_session, CompanyRating,JobPost, CompanyActivityLog

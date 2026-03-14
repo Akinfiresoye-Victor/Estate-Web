@@ -28,70 +28,80 @@ def dashboard(request):
     if not request.user.role == 'agent':
         return redirect('landing')
     try:
-        try:
-            if AgentInformation.objects.get(user_id=request.user.id):
-                agent_data= AgentInformation.objects.get(user_id=request.user.id)
-                agent_name=agent_data.profile_name
-                agent_profession=agent_data.work_type
-                agent_email=agent_data.email
-                agent_phone=agent_data.phone_number
-                agent_location=agent_data.location
-                first_name=agent_name.split()
-                first_name=first_name[0]
-                raw_time=timezone.localtime(timezone.now())
-                current_hour=raw_time.hour
-                if current_hour >= 0 and current_hour < 12:
-                    greeting='Good Morning'
-                elif current_hour >= 12 and current_hour < 16:
-                    greeting='Good Afternoon'
-                else:
-                    greeting='Good Evening'
-                    
-                quote = get_random_quote()
-                tips = quote['tips']
-                by = quote['by']
-                agent_prop_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
-                agent_prop_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
-                
-                
-                leads=LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
-                new_leads= leads.filter(date_created=datetime.today())
-                
-                
-                '''Today's Appointment'''
-                
-                today_appointments=Appointments.objects.filter(agent_uuid=agent_data.agent_uuid).filter(appointment=datetime.today())
-                rating_data = AgentRating.objects.filter(
-                    agent_uuid=agent_data.agent_uuid
-                ).aggregate(
-                    avg_rating=Avg('rating'),
-                    total_reviews=Count('id')
-                )
-                average_rating = rating_data['avg_rating'] or 0.0
-                total_reviews = rating_data['total_reviews']
-                
-                
-                return render(request, 'agent/dashboard.html', {
-                    'agent_info':agent_data,
-                    'name':agent_name,
-                    'work_type': agent_profession,
-                    'email': agent_email,
-                    'phone': agent_phone,
-                    'location': agent_location,
-                    'first_name': first_name,
-                    'greeting': greeting,
-                    'tips': tips,
-                    'by': by,
-                    'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
-                    'lead_count': leads.count(),
-                    'new_lead_count': new_leads.count(),
-                    'todays_appointment':today_appointments,
-                    'avg_rating': average_rating,
-                    'total_reviews': total_reviews
-                })
-        except AgentInformation.DoesNotExist:
-            messages.error(request, 'Set up your Profile to access other pages')
-            return redirect('agent:agent-form')
+        agent_data= AgentInformation.objects.get(user_id=request.user.id)
+        agent_name=agent_data.profile_name
+        agent_profession=agent_data.work_type
+        agent_email=agent_data.email
+        agent_phone=agent_data.phone_number
+        agent_location=agent_data.location
+        first_name=agent_name.split()
+        first_name=first_name[0]
+        raw_time=timezone.localtime(timezone.now())
+        current_hour=raw_time.hour
+        if current_hour >= 0 and current_hour < 12:
+            greeting='Good Morning'
+        elif current_hour >= 12 and current_hour < 16:
+            greeting='Good Afternoon'
+        else:
+            greeting='Good Evening'
+            
+        quote = get_random_quote()
+        tips = quote['tips']
+        by = quote['by']
+        agent_prop_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
+        agent_prop_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
+        
+        
+        leads=LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
+        new_leads= leads.filter(date_created=datetime.today())
+        
+        
+        '''Today's Appointment'''
+        
+        today_appointments=Appointments.objects.filter(agent_uuid=agent_data.agent_uuid).filter(appointment=datetime.today())
+        rating_data = AgentRating.objects.filter(
+            agent_uuid=agent_data.agent_uuid
+        ).aggregate(
+            avg_rating=Avg('rating'),
+            total_reviews=Count('id')
+        )
+        average_rating = rating_data['avg_rating'] or 0.0
+        total_reviews = rating_data['total_reviews']
+        
+        def calculate_profile_strength():
+            score=0
+            if agent_data.profile_picture: score+=25
+            if agent_prop_on_lease.exists() or agent_prop_on_sale.exists(): score+=25
+            if agent_data.phone_number: score+=50
+            return score
+
+# company_announcements — queryset with .title, .message, .created_at, .company.company_name TODO do this once companies and agents have been linked
+        return render(request, 'agent/dashboard.html', {
+            'agent_info':agent_data,
+            'has_headshot':bool(agent_data.profile_picture),
+            'has_whatsapp': bool(agent_data.phone_number),
+            'has_listing': bool(agent_prop_on_lease.exists() or agent_prop_on_sale.exists()),
+            'agent_profile_strength': calculate_profile_strength(),
+            'name':agent_name,
+            'work_type': agent_profession,
+            'recent_inquiries':leads,
+            'email': agent_email,
+            'phone': agent_phone,
+            'location': agent_location,
+            'first_name': first_name,
+            'greeting': greeting,
+            'tips': tips,
+            'by': by,
+            'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
+            'lead_count': leads.count(),
+            'new_lead_count': new_leads.count(),
+            'todays_appointment':today_appointments,
+            'avg_rating': average_rating,
+            'total_reviews': total_reviews
+            })
+    except AgentInformation.DoesNotExist:
+        messages.error(request, 'Set up your Profile to access other pages')
+        return redirect('agent:agent-form')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 

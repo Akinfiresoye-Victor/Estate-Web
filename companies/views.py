@@ -192,7 +192,7 @@ def dashboard(request):
         
         competition_pct = calculated_engagement[0]
 
-        def calculate_profile_strength(company):
+        def calculate_profile_strength():
             score = 0
             if company.company_logo: score += 20
             if company.agents_employed > 0: score += 30 # agent exists
@@ -213,7 +213,7 @@ def dashboard(request):
             'has_logo': bool(company.company_logo),
             'has_agent':bool(company.agents_employed > 0),
             'is_kyc_verified': company.verified,
-            'profile_strength': calculate_profile_strength(company),
+            'profile_strength': calculate_profile_strength(),
             'recent_activities': CompanyActivityLog.objects.filter(company=company).order_by('-timestamp')[:5]
         }
         

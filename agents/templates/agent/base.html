@@ -1,3 +1,4 @@
+{% comment %} Agent Side {% endcomment %}
 <!doctype html>
 <html lang="en">
 {% load static %}
@@ -115,6 +116,380 @@
   </style>
 
   {% block extra_css %}{% endblock %}
+
+  {# ================================================================ #}
+  {# FEEDBACK SYSTEM — ADDED STYLES (do not modify anything above)    #}
+  {# ================================================================ #}
+  <style>
+
+    /* ── Side Tab ──────────────────────────────────────────── */
+    .feedback-side-tab {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1050;
+      background: var(--primary-color);
+      color: white;
+      padding: 14px 8px;
+      border-radius: 10px 0 0 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: -3px 0 16px rgba(0,0,0,0.18);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feedback-side-tab:hover {
+      background: var(--secondary-color);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.22);
+    }
+
+    .feedback-tab-label {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .feedback-side-tab i {
+      font-size: 17px;
+    }
+
+    /* ── Overlay ───────────────────────────────────────────── */
+    .feedback-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.52);
+      z-index: 1060;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .feedback-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Modal ─────────────────────────────────────────────── */
+    .feedback-modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+      transform: translateY(24px);
+      transition: transform 0.25s ease;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .feedback-overlay.active .feedback-modal {
+      transform: translateY(0);
+    }
+
+    .feedback-modal-header {
+      background: var(--primary-color);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .feedback-modal-header h5 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .feedback-close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+      padding: 4px 6px;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+      line-height: 1;
+    }
+
+    .feedback-close-btn:hover {
+      opacity: 1;
+    }
+
+    .feedback-modal-body {
+      padding: 20px;
+    }
+
+    /* Role-based question banner */
+    .feedback-role-question {
+      font-size: 13px;
+      color: var(--text-light);
+      background: #f8f9fa;
+      border-left: 3px solid var(--secondary-color);
+      padding: 10px 13px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 18px;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    /* ── Form Fields ───────────────────────────────────────── */
+    .feedback-field {
+      margin-bottom: 16px;
+    }
+
+    .feedback-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* Emoji row */
+    .feedback-emoji-row {
+      display: flex;
+      gap: 6px;
+      justify-content: space-between;
+    }
+
+    .feedback-emoji-btn {
+      background: #f8f9fa;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      font-size: 22px;
+      padding: 8px 4px;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+
+    .feedback-emoji-btn:hover {
+      background: #e9ecef;
+      transform: scale(1.12);
+    }
+
+    .feedback-emoji-btn.selected {
+      border-color: var(--secondary-color);
+      background: #fdf6ee;
+      transform: scale(1.18);
+    }
+
+    /* Select & Textarea */
+    .feedback-select,
+    .feedback-textarea {
+      width: 100%;
+      border: 1.5px solid #dee2e6;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.2s;
+      background: white;
+    }
+
+    .feedback-select:focus,
+    .feedback-textarea:focus {
+      border-color: var(--primary-color);
+    }
+
+    .feedback-textarea {
+      resize: none;
+    }
+
+    /* Screenshot */
+    .feedback-screenshot-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #f8f9fa;
+      border: 1.5px dashed #adb5bd;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .feedback-screenshot-label:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .feedback-screenshot-name {
+      font-size: 12px;
+      color: var(--success-color);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Submit button */
+    .feedback-submit-btn {
+      width: 100%;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .feedback-submit-btn:hover {
+      background: var(--secondary-color);
+      transform: translateY(-1px);
+    }
+
+    /* ── Thank You State ───────────────────────────────────── */
+    .feedback-thankyou {
+      padding: 36px 24px;
+      text-align: center;
+    }
+
+    .feedback-thankyou-icon {
+      font-size: 52px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .feedback-thankyou h5 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .feedback-thankyou p {
+      font-size: 13px;
+      color: var(--text-light);
+      margin-bottom: 22px;
+      line-height: 1.65;
+    }
+
+    /* ── Post-Action Toast ─────────────────────────────────── */
+    .feedback-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1055;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+      padding: 12px 16px;
+      width: calc(100% - 32px);
+      max-width: 400px;
+      animation: slideUpToast 0.3s ease;
+    }
+
+    @keyframes slideUpToast {
+      from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+      to   { transform: translateX(-50%) translateY(0);   opacity: 1; }
+    }
+
+    .feedback-toast-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .feedback-toast-msg {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dark);
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    .feedback-toast-stars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .feedback-toast-stars button {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1.5px solid #dee2e6;
+      background: #f8f9fa;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text-dark);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .feedback-toast-stars button:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .feedback-toast-close {
+      background: none;
+      border: none;
+      font-size: 15px;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px 6px;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .feedback-toast-close:hover {
+      color: var(--text-dark);
+    }
+
+    /* ── Mobile Adjustments ────────────────────────────────── */
+    @media (max-width: 576px) {
+      .feedback-tab-label {
+        display: none; /* show icon only on small screens */
+      }
+      .feedback-side-tab {
+        padding: 12px 7px;
+      }
+      .feedback-emoji-btn {
+        font-size: 18px;
+        padding: 6px 2px;
+      }
+      .feedback-toast-msg {
+        font-size: 12px;
+      }
+    }
+
+  </style>
+  {# ================================================================ #}
+  {# END FEEDBACK SYSTEM STYLES                                       #}
+  {# ================================================================ #}
+
 </head>
 
 <body>
@@ -180,5 +555,339 @@
   </script>
 
   {% block extra_js %}{% endblock %}
+
+  {# ================================================================ #}
+  {# FEEDBACK SYSTEM — ADDED HTML + JS (do not modify anything above) #}
+  {# ================================================================ #}
+
+  {# --- 1. Side Tab Button ----------------------------------------- #}
+  <div class="feedback-side-tab" id="feedbackSideTab" role="button" aria-label="Open feedback form" onclick="openFeedbackModal()">
+    <i class="bi bi-chat-dots-fill"></i>
+    <span class="feedback-tab-label">Feedback</span>
+  </div>
+
+  {# --- 2. Feedback Modal ------------------------------------------ #}
+  <div class="feedback-overlay" id="feedbackOverlay">
+    <div class="feedback-modal" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackModalTitle">
+
+      {# Modal Header #}
+      <div class="feedback-modal-header">
+        <h5 id="feedbackModalTitle">
+          <i class="bi bi-chat-heart-fill me-2"></i>Share Your Feedback
+        </h5>
+        <button class="feedback-close-btn" onclick="closeFeedbackModal()" aria-label="Close feedback modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      {# Modal Body (the 3-field form) #}
+      <div class="feedback-modal-body" id="feedbackFormBody">
+
+        {# Role-based question — injected by JS based on user role #}
+        <p class="feedback-role-question" id="feedbackRoleQuestion"></p>
+
+        {# Field 1: Reaction Emojis #}
+        <div class="feedback-field">
+          <label class="feedback-label">How do you feel right now?</label>
+          <div class="feedback-emoji-row" role="group" aria-label="Reaction selector">
+            <button class="feedback-emoji-btn" data-value="1" title="Very Bad"    type="button">😡</button>
+            <button class="feedback-emoji-btn" data-value="2" title="Not Happy"   type="button">🙁</button>
+            <button class="feedback-emoji-btn" data-value="3" title="Neutral"     type="button">😐</button>
+            <button class="feedback-emoji-btn" data-value="4" title="Good"        type="button">🙂</button>
+            <button class="feedback-emoji-btn" data-value="5" title="Excellent"   type="button">😍</button>
+          </div>
+          {# Hidden input stores the selected emoji value (1–5) #}
+          <input type="hidden" id="feedbackReaction" value="">
+        </div>
+
+        {# Field 2: Category Dropdown #}
+        <div class="feedback-field">
+          <label class="feedback-label" for="feedbackCategory">Category</label>
+          <select class="feedback-select" id="feedbackCategory" onchange="toggleScreenshot()">
+            <option value="" disabled selected>Select a category...</option>
+            <option value="bug">🐛 Bug Report</option>
+            <option value="feature">💡 Feature Idea</option>
+            <option value="complaint">😤 Complaint</option>
+            <option value="praise">🌟 Praise</option>
+          </select>
+        </div>
+
+        {# Field 3: Open Text #}
+        <div class="feedback-field">
+          <label class="feedback-label" for="feedbackDetails">Tell us more...</label>
+          <textarea
+            class="feedback-textarea"
+            id="feedbackDetails"
+            placeholder="What happened? What would you like to see?"
+            rows="3"
+          ></textarea>
+        </div>
+
+        {# Optional: Screenshot — only visible when Bug is selected #}
+        <div class="feedback-field" id="screenshotField" style="display: none;">
+          <label class="feedback-label">Attach a Screenshot <span style="font-weight:400;text-transform:none;">(optional)</span></label>
+          <label class="feedback-screenshot-label" for="feedbackScreenshot">
+            <i class="bi bi-image"></i> Choose Screenshot
+          </label>
+          <input type="file" id="feedbackScreenshot" accept="image/*" style="display: none;" onchange="updateScreenshotLabel(this)">
+          <span class="feedback-screenshot-name" id="screenshotName"></span>
+        </div>
+
+        {# Submit #}
+        <button class="feedback-submit-btn" type="button" onclick="submitFeedback()">
+          <i class="bi bi-send-fill me-2"></i>Send Feedback
+        </button>
+
+      </div>{# end feedback-modal-body #}
+
+      {# Thank You State — hidden until submission succeeds #}
+      <div class="feedback-thankyou" id="feedbackThankyou" style="display: none;">
+        <span class="feedback-thankyou-icon">🎉</span>
+        <h5>Thanks, <span id="feedbackUserName">there</span>!</h5>
+        <p>
+          We are a growing Nigerian startup and your voice helps us
+          build better for everyone. We read every submission.
+        </p>
+        <button class="feedback-submit-btn" type="button" onclick="closeFeedbackModal()">
+          Close
+        </button>
+      </div>
+
+    </div>{# end feedback-modal #}
+  </div>{# end feedback-overlay #}
+
+
+  <div class="feedback-toast" id="feedbackToast" style="display: none;" role="status" aria-live="polite">
+    <div class="feedback-toast-inner">
+      <span class="feedback-toast-msg" id="feedbackToastMsg">How was the experience?</span>
+      <div class="feedback-toast-stars" aria-label="Quick rating">
+        <button type="button" onclick="quickRate(1)" title="Rate 1">1</button>
+        <button type="button" onclick="quickRate(2)" title="Rate 2">2</button>
+        <button type="button" onclick="quickRate(3)" title="Rate 3">3</button>
+        <button type="button" onclick="quickRate(4)" title="Rate 4">4</button>
+        <button type="button" onclick="quickRate(5)" title="Rate 5">5</button>
+      </div>
+      <button class="feedback-toast-close" type="button" onclick="dismissToast()" aria-label="Dismiss">✕</button>
+    </div>
+  </div>
+
+  {# --- Feedback System JavaScript --------------------------------- #}
+  <script>
+    // ── Role & User Config ───────────────────────────────────────────
+    // "agent" is hardcoded here because this is the Agent base.html.
+    // The company and admin base.html files will have their own value.
+    const ESTATE_USER_ROLE = 'agent';
+
+    // Django injects the logged-in user's first name via template tag.
+    // The |default:"there" fallback handles unauthenticated edge cases.
+    const ESTATE_USER_NAME = '{{ request.user.first_name|default:"there" }}';
+
+    // ── Role-Based Questions ─────────────────────────────────────────
+    // Each role sees a different contextual question at the top of the form.
+    // Only the 'agent' key is active here; others included for reference.
+    const ROLE_QUESTIONS = {
+      agent:   'Did you face any issues while uploading property photos or managing your listings today?',
+      company: 'How easy was it to manage your agents and listings today?',
+      admin:   'Are there any platform issues or improvements you want to flag?',
+      landlord:'Did anything confuse you while using the platform today?'
+    };
+
+    // ── Open Modal ───────────────────────────────────────────────────
+    function openFeedbackModal() {
+      const overlay = document.getElementById('feedbackOverlay');
+
+      // Inject the role-based question
+      const question = ROLE_QUESTIONS[ESTATE_USER_ROLE] || 'How can we improve Estate Web for you?';
+      document.getElementById('feedbackRoleQuestion').textContent = question;
+
+      // Inject user name into thank-you state
+      document.getElementById('feedbackUserName').textContent = ESTATE_USER_NAME;
+
+      // Make overlay visible
+      overlay.classList.add('active');
+
+      // Trap focus inside modal for accessibility
+      document.getElementById('feedbackModal').focus();
+    }
+
+    // ── Close Modal ──────────────────────────────────────────────────
+    function closeFeedbackModal() {
+      const overlay = document.getElementById('feedbackOverlay');
+      overlay.classList.remove('active');
+      // Reset form after fade-out animation finishes (250ms)
+      setTimeout(resetFeedbackForm, 280);
+    }
+
+    // ── Reset Form to Initial State ──────────────────────────────────
+    function resetFeedbackForm() {
+      document.getElementById('feedbackReaction').value = '';
+      document.getElementById('feedbackCategory').value = '';
+      document.getElementById('feedbackDetails').value = '';
+      document.getElementById('screenshotField').style.display = 'none';
+      document.getElementById('screenshotName').textContent = '';
+
+      // Reset emoji button selection
+      document.querySelectorAll('.feedback-emoji-btn').forEach(function(btn) {
+        btn.classList.remove('selected');
+      });
+
+      // Hide thank-you, show form body
+      document.getElementById('feedbackThankyou').style.display = 'none';
+      document.getElementById('feedbackFormBody').style.display = 'block';
+    }
+
+    // ── Close Overlay When Clicking the Dark Background ─────────────
+    // This lets users dismiss the modal by tapping outside it on mobile.
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('feedbackOverlay').addEventListener('click', function(e) {
+        // Only close if the click was directly on the overlay, not the modal card
+        if (e.target === this) {
+          closeFeedbackModal();
+        }
+      });
+    });
+
+    // ── Emoji Button Selection ───────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.feedback-emoji-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          // Deselect all, then select clicked one
+          document.querySelectorAll('.feedback-emoji-btn').forEach(function(b) {
+            b.classList.remove('selected');
+          });
+          this.classList.add('selected');
+          // Store value in hidden input
+          document.getElementById('feedbackReaction').value = this.dataset.value;
+        });
+      });
+    });
+
+    // ── Toggle Screenshot Field ──────────────────────────────────────
+    // Only shows when "Bug Report" is selected in the category dropdown.
+    function toggleScreenshot() {
+      const category = document.getElementById('feedbackCategory').value;
+      const screenshotField = document.getElementById('screenshotField');
+      screenshotField.style.display = (category === 'bug') ? 'block' : 'none';
+    }
+
+    // ── Update Screenshot File Label ─────────────────────────────────
+    function updateScreenshotLabel(input) {
+      const nameEl = document.getElementById('screenshotName');
+      nameEl.textContent = input.files[0] ? input.files[0].name : '';
+    }
+
+    // ── Submit Feedback via AJAX ─────────────────────────────────────
+    // Uses fetch() so the page does NOT reload — the user stays exactly
+    // where they are. The form data goes to /feedback/submit/ (Django view).
+    function submitFeedback() {
+  const reaction = document.getElementById('feedbackReaction').value;
+  const category = document.getElementById('feedbackCategory').value;
+  const details  = document.getElementById('feedbackDetails').value.trim();
+
+  const existingError = document.getElementById('feedbackErrorMsg');
+  if (existingError) existingError.remove();
+
+  if (!reaction) { showFeedbackError('Please tap an emoji to show how you feel.'); return; }
+  if (!category) { showFeedbackError('Please select a category for your feedback.'); return; }
+
+  const form   = document.createElement('form');
+  form.method  = 'POST';
+  form.action  = '/feedback/submit/';
+  form.enctype = 'multipart/form-data';
+
+  const csrf = document.createElement('input');
+  csrf.type  = 'hidden';
+  csrf.name  = 'csrfmiddlewaretoken';
+  csrf.value = getCookie('csrftoken');
+  form.appendChild(csrf);
+
+  Object.entries({ reaction, category, details, role: ESTATE_USER_ROLE }).forEach(function([name, value]) {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  const screenshotInput = document.getElementById('feedbackScreenshot');
+  if (screenshotInput && screenshotInput.files[0]) {
+    screenshotInput.name = 'screenshot';
+    form.appendChild(screenshotInput);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function showFeedbackError(message) {
+  const errorDiv         = document.createElement('div');
+  errorDiv.id            = 'feedbackErrorMsg';
+  errorDiv.style.cssText = 'background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:13px;color:#856404;margin-bottom:12px;font-family:Poppins,sans-serif;';
+  errorDiv.textContent   = '⚠ ' + message;
+  const formBody = document.getElementById('feedbackFormBody');
+  formBody.insertBefore(errorDiv, formBody.firstChild);
+}
+    // ── CSRF Cookie Helper ───────────────────────────────────────────
+    // Django requires the CSRF token on every POST request.
+    // This reads it from the browser cookie that Django sets automatically.
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function(cookie) {
+          const c = cookie.trim();
+          if (c.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(c.slice(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
+
+    // ── Post-Action Toast Public API ─────────────────────────────────
+    // Call showFeedbackToast() from ANY page after a major action.
+    // Example (in agent_form.html after property is saved):
+    //   showFeedbackToast("How was the listing process?");
+
+    function showFeedbackToast(message) {
+      const toast  = document.getElementById('feedbackToast');
+      const msgEl  = document.getElementById('feedbackToastMsg');
+      if (message) msgEl.textContent = message;
+      toast.style.display = 'block';
+      // Auto-dismiss after 8 seconds so it doesn't block the screen
+      setTimeout(dismissToast, 8000);
+    }
+
+    function dismissToast() {
+      document.getElementById('feedbackToast').style.display = 'none';
+    }
+
+    // quickRate: user taps a number on the toast →
+    // dismiss toast, open full modal, pre-select that emoji
+    function quickRate(value) {
+      dismissToast();
+      openFeedbackModal();
+      // Small delay so the modal is rendered before we try to click the button
+      setTimeout(function() {
+        const emojiBtn = document.querySelector('.feedback-emoji-btn[data-value="' + value + '"]');
+        if (emojiBtn) emojiBtn.click();
+      }, 120);
+    }
+
+    // ── Keyboard: Close modal on Escape key ──────────────────────────
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('feedbackOverlay');
+        if (overlay.classList.contains('active')) {
+          closeFeedbackModal();
+        }
+      }
+    });
+
+  </script>
+
+  {# ================================================================ #}
+  {# END FEEDBACK SYSTEM                                              #}
+  {# ================================================================ #}
+
 </body>
 </html>

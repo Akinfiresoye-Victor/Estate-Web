@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.landing_page, name='landing'),
     path('about/', views.about_page, name='about'),
     path('feedback/', views.feedbacks, name='feedback'),
+    path('feedback/submit/', views.submit_feedback, name='submit_feedback'),
     path('delete_property_r/<property_id>/', views.delete_property_on_lease, name="delete-property-r"),
     path('delete_property_s/<property_id>/', views.delete_property_on_sale, name="delete-property-s"),
     path('update_property/<property_id>/', views.update_property_rent, name="update-property"),

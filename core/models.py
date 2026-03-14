@@ -4,7 +4,7 @@ from .validators import validate_image
 from django.utils import timezone
 from members.models import User 
 import uuid
-
+from django.conf import settings
 
 
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
@@ -86,11 +86,96 @@ class PropertyRentImage(models.Model):
 
 
 
-class Feedback(models.Model):
-    email=models.EmailField('Your Email')
-    feedback= models.CharField(max_length=300, blank=False)
-    date_sent= models.DateField(default=timezone.now)
+class Feedbacks(models.Model):
 
+    # ── Legacy fields — kept to protect any existing records ──────────
+    # These were in the original model. Do NOT remove them.
+    # New submissions won't use them but old ones still reference them.
+    email      = models.EmailField('Your Email', blank=True, null=True)
+    feedback   = models.CharField(max_length=300, blank=True, null=True)
+    date_sent  = models.DateField(default=timezone.now)
+
+    # ── New fields — added for the multi-channel feedback system ──────
+
+    # The logged-in user who submitted. null=True means unauthenticated
+    # users (or old records) won't cause errors. on_delete=SET_NULL means
+    # if a user account is deleted, the feedback record stays — we don't
+    # lose the data, just the link to who sent it.
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,   
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='feedbacks'
+    )
+    # Which type of user sent this. Max 10 chars covers all our role names.
+    # blank=True so old records (which have no role) don't cause errors.
+    ROLE_CHOICES = [
+        ('agent',    'Agent'),
+        ('company',  'Company Admin'),
+        ('admin',    'Admin'),
+        ('landlord', 'Landlord'),
+    ]
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    # The emoji reaction score: 1 (😡) to 5 (😍).
+    # null=True protects old records that have no reaction score.
+    reaction = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        help_text='Emoji reaction score from 1 (worst) to 5 (best)'
+    )
+
+    # The category the user selected from the dropdown.
+    CATEGORY_CHOICES = [
+        ('bug',       'Bug Report'),
+        ('feature',   'Feature Idea'),
+        ('complaint', 'Complaint'),
+        ('praise',    'Praise'),
+    ]
+    category = models.CharField(
+        max_length=10,
+        choices=CATEGORY_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    # The open text field — "Tell us more..."
+    # TextField (not CharField) because we don't limit how much they write.
+    details = models.TextField(blank=True, null=True)
+
+    # Optional screenshot — only uploaded on bug reports.
+    # upload_to puts all screenshots in a dedicated folder inside MEDIA_ROOT.
+    # null=True means this field is simply empty if no file was attached.
+    screenshot = models.ImageField(
+        upload_to='feedback_screenshots/',
+        null=True,
+        blank=True
+    )
+
+    # Auto-set to right now when the record is created. 
+    # auto_now_add=True means Django sets this automatically —
+    # you never have to pass it in your view.
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Most recent submissions appear first in queries and admin.
+        ordering = ['-submitted_at']
+        verbose_name = 'Feedback'
+        verbose_name_plural = 'Feedback Submissions'
+
+    def __str__(self):
+        # What shows in the Django admin list view for each record.
+        # Example: "agent • bug • 2026-03-14"
+        role     = self.role     or 'unknown'
+        category = self.category or 'general'
+        date     = self.submitted_at.strftime('%Y-%m-%d') if self.submitted_at else str(self.date_sent)
+        return f'{role} • {category} • {date}'
 
 
 class WishlistStorageUnit(models.Model):

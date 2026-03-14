@@ -7,16 +7,15 @@
 
 {% block content %}
 
+{# ── Back Button — untouched from original ──────────────────────── #}
 <a href="javascript:history.back()" class="attractive-back-button">
     &larr; Go back
 </a>
 
 <style>
-.attractive-back-button {
+  /* ── Back Button — untouched from original ──────────────────── */
+  .attractive-back-button {
     margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
     display: inline-flex;
     align-items: center;
     padding: 0.7rem 1.5rem;
@@ -28,37 +27,358 @@
     font-weight: 600;
     font-size: 0.95rem;
     transition: all 0.3s ease;
-}
+  }
 
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
+  .attractive-back-button:hover {
+    background-color: #1a3c4e;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
+  }
 
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
+  .attractive-back-button:active {
+    background-color: #0a0a0aff;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* ── Page Layout ─────────────────────────────────────────────── */
+  .feedback-page-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0 48px;
+  }
+
+  /* ── Card — matches modal's card aesthetic ───────────────────── */
+  .feedback-page-card {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+    overflow: hidden;
+  }
+
+  /* ── Card Header — same dark blue as modal header ────────────── */
+  .feedback-page-header {
+    background: #1a3c4e;
+    color: white;
+    padding: 20px 24px;
+    text-align: center;
+  }
+
+  .feedback-page-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .feedback-page-header p {
+    font-size: 13px;
+    margin: 0;
+    opacity: 0.78;
+  }
+
+  /* ── Card Body ───────────────────────────────────────────────── */
+  .feedback-page-body {
+    padding: 24px;
+  }
+
+  /* Role-based question banner */
+  .feedback-page-role-q {
+    font-size: 13px;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-left: 3px solid #c19b76;
+    padding: 10px 13px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 22px;
+    font-style: italic;
+    line-height: 1.55;
+  }
+
+  /* ── Field Shared Styles ─────────────────────────────────────── */
+  .fp-field {
+    margin-bottom: 18px;
+  }
+
+  .fp-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* ── Emoji Row ───────────────────────────────────────────────── */
+  .fp-emoji-row {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+  }
+
+  .fp-emoji-btn {
+    background: #f8f9fa;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 24px;
+    padding: 10px 4px;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.15s ease;
+    line-height: 1;
+  }
+
+  .fp-emoji-btn:hover {
+    background: #e9ecef;
+    transform: scale(1.12);
+  }
+
+  .fp-emoji-btn.selected {
+    border-color: #c19b76;
+    background: #fdf6ee;
+    transform: scale(1.18);
+  }
+
+  /* ── Select & Textarea ───────────────────────────────────────── */
+  .fp-select,
+  .fp-textarea {
+    width: 100%;
+    border: 1.5px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    color: #2c3e50;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+  }
+
+  .fp-select:focus,
+  .fp-textarea:focus {
+    border-color: #1a3c4e;
+  }
+
+  .fp-textarea { resize: none; }
+
+  /* ── Screenshot ──────────────────────────────────────────────── */
+  .fp-screenshot-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #f8f9fa;
+    border: 1.5px dashed #adb5bd;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .fp-screenshot-label:hover {
+    border-color: #1a3c4e;
+    color: #1a3c4e;
+  }
+
+  .fp-screenshot-name {
+    font-size: 12px;
+    color: #28a745;
+    margin-left: 8px;
+  }
+
+  /* ── Submit Button ───────────────────────────────────────────── */
+  .fp-submit-btn {
+    width: 100%;
+    background: #1a3c4e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.2s, transform 0.15s;
+  }
+
+  .fp-submit-btn:hover {
+    background: #c19b76;
+    transform: translateY(-1px);
+  }
+
+  /* ── Mobile ──────────────────────────────────────────────────── */
+  @media (max-width: 576px) {
+    .feedback-page-body { padding: 18px; }
+    .fp-emoji-btn { font-size: 20px; padding: 8px 2px; }
+  }
 </style>
 
-<div class="feedback-container">
-    <div class="feedback-card">
-        <h2 class="text-center">💬 We Value Your Feedback</h2>
-        <p class="text-center text-muted">Your thoughts help us improve and grow.</p>
-        <!-- Feedback Form -->
-        <form method="POST" class="feedback-form shadow-sm p-3 rounded">
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ form.feedback }}
-            </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary px-4 py-2"> Submit Feedback</button>
-            </div>
-        </form>
+{# ── Main Page Card ──────────────────────────────────────────────── #}
+<div class="feedback-page-wrap">
+  <div class="feedback-page-card">
+
+    {# Header #}
+    <div class="feedback-page-header">
+      <h2>💬 We Value Your Feedback</h2>
+      <p>Your thoughts help us improve and grow.</p>
     </div>
+
+    {# Body / Form #}
+    <div class="feedback-page-body">
+
+      {# Role-based question — same JS logic as the modal ──────── #}
+      <p class="feedback-page-role-q" id="fpRoleQuestion"></p>
+
+      <form method="POST" enctype="multipart/form-data" id="feedbackPageForm">
+        {% csrf_token %}
+
+        {# Hidden fields — carry the new data to the existing view #}
+        <input type="hidden" id="fpReactionInput"  name="reaction"  value="">
+        <input type="hidden" id="fpCategoryInput"  name="category"  value="">
+        <input type="hidden" id="fpRoleInput"      name="role"      value="">
+
+        {# Field 1: Emoji Reaction #}
+        <div class="fp-field">
+          <label class="fp-label">How do you feel right now?</label>
+          <div class="fp-emoji-row" role="group" aria-label="Reaction selector">
+            <button class="fp-emoji-btn" data-value="1" title="Very Bad"  type="button">😡</button>
+            <button class="fp-emoji-btn" data-value="2" title="Not Happy" type="button">🙁</button>
+            <button class="fp-emoji-btn" data-value="3" title="Neutral"   type="button">😐</button>
+            <button class="fp-emoji-btn" data-value="4" title="Good"      type="button">🙂</button>
+            <button class="fp-emoji-btn" data-value="5" title="Excellent" type="button">😍</button>
+          </div>
+        </div>
+
+        {# Field 2: Category #}
+        <div class="fp-field">
+          <label class="fp-label" for="fpCategory">Category</label>
+          <select class="fp-select" id="fpCategory" onchange="fpToggleScreenshot()">
+            <option value="" disabled selected>Select a category...</option>
+            <option value="bug">🐛 Bug Report</option>
+            <option value="feature">💡 Feature Idea</option>
+            <option value="complaint">😤 Complaint</option>
+            <option value="praise">🌟 Praise</option>
+          </select>
+        </div>
+
+        {# Field 3: Details #}
+        <div class="fp-field">
+          <label class="fp-label" for="fpDetails">Tell us more...</label>
+          <textarea
+            class="fp-textarea"
+            id="fpDetails"
+            name="details"
+            placeholder="What happened? What would you like to see?"
+            rows="4"
+          ></textarea>
+        </div>
+
+        {# Optional Screenshot — only shown for Bug category #}
+        <div class="fp-field" id="fpScreenshotField" style="display:none;">
+          <label class="fp-label">
+            Attach a Screenshot
+            <span style="font-weight:400;text-transform:none;">(optional)</span>
+          </label>
+          <label class="fp-screenshot-label" for="fpScreenshot">
+            <i class="bi bi-image"></i> Choose Screenshot
+          </label>
+          <input
+            type="file"
+            id="fpScreenshot"
+            name="screenshot"
+            accept="image/*"
+            style="display:none;"
+            onchange="fpUpdateScreenshotLabel(this)"
+          >
+          <span class="fp-screenshot-name" id="fpScreenshotName"></span>
+        </div>
+
+        <button type="submit" class="fp-submit-btn" onclick="return fpValidate()">
+          <i class="bi bi-send-fill me-2"></i>Send Feedback
+        </button>
+
+      </form>
+
+    </div>{# end feedback-page-body #}
+  </div>{# end feedback-page-card #}
 </div>
+
+{# ── Standalone Page JavaScript ──────────────────────────────────── #}
+<script>
+  // ── Role detection — same role question logic as the modals ──────
+  // The role comes from Django's template context.
+  // base_template is already in context (set by the feedbacks view).
+  // We derive the role from it to avoid adding a new context variable.
+  const FP_ROLE_QUESTIONS = {
+    agent:   'Did you face any issues while uploading property photos or managing your listings today?',
+    company: 'How easy was it to onboard your agents or manage your listings today?',
+    admin:   'Are there any platform issues or improvements you want to log?',
+    landlord:'Did anything confuse you while using the platform today?',
+  };
+
+  // Django injects the role string into a data attribute on the body
+  // so JS can read it without a separate API call.
+  // We read request.user.role via the template tag below.
+  const FP_USER_ROLE = '{{ request.user.role|default:"landlord" }}';
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Inject role question
+    const q = FP_ROLE_QUESTIONS[FP_USER_ROLE] || 'How can we improve Estate Web for you?';
+    document.getElementById('fpRoleQuestion').textContent = q;
+
+    // Set hidden role input so the view receives it
+    document.getElementById('fpRoleInput').value = FP_USER_ROLE;
+
+    // ── Emoji button selection ──────────────────────────────────
+    document.querySelectorAll('.fp-emoji-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.fp-emoji-btn').forEach(function (b) {
+          b.classList.remove('selected');
+        });
+        this.classList.add('selected');
+        document.getElementById('fpReactionInput').value = this.dataset.value;
+      });
+    });
+  });
+
+  // ── Toggle Screenshot Field ───────────────────────────────────────
+  function fpToggleScreenshot() {
+    const category = document.getElementById('fpCategory').value;
+    document.getElementById('fpCategoryInput').value = category;
+    document.getElementById('fpScreenshotField').style.display =
+      (category === 'bug') ? 'block' : 'none';
+  }
+
+  // ── Update Screenshot Label ───────────────────────────────────────
+  function fpUpdateScreenshotLabel(input) {
+    document.getElementById('fpScreenshotName').textContent =
+      input.files[0] ? input.files[0].name : '';
+  }
+
+  // ── Validate Before Submit ────────────────────────────────────────
+  // Returns false to block the form if validation fails,
+  // returns true to allow it through.
+  function fpValidate() {
+    const reaction = document.getElementById('fpReactionInput').value;
+    const category = document.getElementById('fpCategoryInput').value;
+
+    if (!reaction) {
+      alert('Please tap an emoji to show how you feel.');
+      return false;
+    }
+    if (!category) {
+      alert('Please select a category for your feedback.');
+      return false;
+    }
+    return true;
+  }
+</script>
+
 {% endblock %}

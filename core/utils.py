@@ -239,3 +239,5 @@ def property_views_count(property_type, property_id):
         property_type=property_type,
         property_id=property_id
     ).count()
+    
+    
