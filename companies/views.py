@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect
-from .forms import SocialLinksFormset, CompanyForm,JobPostForm
+from .forms import SocialLinksFormset, CompanyForm,JobPostForm, InviteLinkForm
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from .models import CompanyInformation, CompanyAnalytics, SessionId, CompanyRating,JobPost, CompanyActivityLog
+from .models import *
 from members.views import logout_user
 from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments
 from estate.models import LeadInfo
 from members.models import User
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import date
+from datetime import date, timedelta
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
@@ -18,8 +18,8 @@ from django.db.models import Avg, Count, Sum
 from core.utils import *
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-
-
+from agents.models import AgentInformation
+from django.urls import reverse
 
 
 
@@ -191,11 +191,11 @@ def dashboard(request):
             market_position = 100
         
         competition_pct = calculated_engagement[0]
-
+        employee_count=Employees.objects.filter(company=company).count()
         def calculate_profile_strength():
             score = 0
             if company.company_logo: score += 20
-            if company.agents_employed > 0: score += 30 # agent exists
+            if employee_count > 0: score += 30 # agent exists
             if company.verified: score += 50 #KYC
             return score
         context = {
@@ -211,12 +211,12 @@ def dashboard(request):
             'engagement_rate': analytics.competition,
             'is_company_admin': request.user.id == company.user_id,
             'has_logo': bool(company.company_logo),
-            'has_agent':bool(company.agents_employed > 0),
+            'has_agent':bool(employee_count > 0),
             'is_kyc_verified': company.verified,
             'profile_strength': calculate_profile_strength(),
             'recent_activities': CompanyActivityLog.objects.filter(company=company).order_by('-timestamp')[:5]
         }
-        
+        #TODO fix the login problem on the company side
         return render(request, 'company/dashboard.html', context)
         
     except CompanyInformation.DoesNotExist:
@@ -887,10 +887,43 @@ def manage_company(request):
         return redirect('landing')
     
     try:
-        return render(request, 'company/manage_company.html')
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+
+        # Run expiry check only on currently active links
+        active_links=InviteLink.objects.filter(company=company, is_active=True)
+        for link in active_links:
+            if timezone.now() >= link.expires_at:
+                link.is_active=False
+            if link.max_uses is not None and link.use_count >= link.max_uses:
+                link.is_active=False
+            link.save()
+
+        # Delete inactive links that expired more than 24 hours ago
+        InviteLink.objects.filter(
+            company=company,
+            is_active=False,
+            expires_at__lt=timezone.now() - timedelta(hours=24)
+        ).delete()
+
+        # Fetch ALL links (active + revoked) for display in the panel
+        invite_links=InviteLink.objects.filter(company=company).order_by('-created_at')
+        employees=Employees.objects.filter(company=company)
+        employee_count=employees.count()
+        department_count=employees.values('company_department').distinct().count()
+        activitylog=CompanyActivityLog.objects.filter(company=company).order_by('-timestamp')[:10]
+        return render(request, 'company/manage_company.html', {
+            'employees': employees,
+            'total_employees': employee_count,
+            'active_agents': employee_count,  # adjust if you add a status field later
+            'departments_count': department_count,
+            'invite_links': invite_links,
+            'active_invite_links_count': invite_links.filter(is_active=True).count(),
+            'activity_logs':activitylog ,
+            'form': InviteLinkForm(),
+            'invite_url': None,  # None by default, set to the URL string after generation
+        })
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
-
 
 
 
@@ -1103,3 +1136,134 @@ def toggle_job_status(request, job_id):
     except Exception as e:
         messages.error(request, f'An error occurred: {str(e)}')
         return redirect('company:application-management')
+
+
+
+#for manual add
+def onboard_agent(request, agent_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.info(request, 'Companies Only')
+        return redirect('landing')
+    
+    try:
+        agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+        try:
+            #checking if employee is present
+            Employees.objects.get(agent_uuid=agent_uuid)
+            messages.success(request, 'Agent Added Successfully')
+            return redirect('landing')
+        except ObjectDoesNotExist:
+            Employees.objects.create(
+                company=company,
+                agent_name=agent.profile_name,
+                company_department='Unassigned',
+                company_role=agent.work_type,
+                agent_email=agent.email,
+                agent_phone_no=agent.phone_number,
+                agent_uuid=agent.agent_uuid,
+                agent_headshot=agent.profile_picture,
+            )
+            agent.company_uuid=company.unique_company_id
+            agent.save()
+            CompanyActivityLog.objects.create(
+                company=company,
+                action='Agent Onboarded'
+            )
+            messages.success(request, 'Agent Onboarded Successfully')
+            if 'HTTP_REFERER' in request.META:
+                return redirect(request.META['HTTP_REFERER'])  
+            else:
+                messages.error(request, 'Error Redirecting')
+                return redirect('landing')
+    except Exception as e:
+        messages.error(request, 'An error Occured')
+        return render(request, 'estate/error_page.html', {'e':e})
+
+
+def generate_invite_link(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.error(request, 'Company Account Only')
+        return redirect('landing')
+
+    try:
+        company = CompanyInformation.objects.get(user_id=request.user.id)
+
+        if request.method == 'POST':
+            form = InviteLinkForm(request.POST)
+
+            if form.is_valid():
+                # Convert the admin's choice expiration into an integer
+                hours = int(form.cleaned_data['expiry_duration'])
+
+                max_uses = form.cleaned_data['max_uses']
+
+                # Calculate the exact expiry datetime from now
+                expires_at = timezone.now() + timedelta(hours=hours)
+
+                # Create the InviteLink row — invite_token is auto-generated by the model
+                invite = InviteLink.objects.create(
+                    company=company,
+                    expires_at=expires_at,
+                    max_uses=max_uses,
+                )
+
+                invite_url = request.build_absolute_uri(
+                    reverse('agent:join_via_invite') + f'?token={invite.invite_token}'
+                )
+
+                # Log it
+                CompanyActivityLog.objects.create(
+                    company=company,
+                    action=f'Invite link generated (expires in {hours}h)'
+                )
+
+                # Pass the generated URL back to the template for the copy button
+                messages.success(request, 'Invite link generated! Copy it from the panel below.')
+                return redirect('company:manage-company')
+
+        else:
+            # GET request — just show the empty form
+            form = InviteLinkForm()
+
+        return render(request, 'estate/generate_invite.html', {'form': form})
+
+    except Exception as e:
+        # Log e server-side in production instead of exposing it to the template
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+
+
+def revoke_invite_link(request, token):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.warning(request, 'Access Denied')
+        return redirect('landing')
+    
+    try:
+        invite_link=InviteLink.objects.get(invite_token=token)
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+        
+        if not invite_link.company==company:
+            messages.error(request, 'RESTRICTED ACCESS')
+            return redirect('landing')
+        invite_link.is_active=False
+        invite_link.save()
+        CompanyActivityLog.objects.create(
+            company=company,
+            activity='Invite Link Deactivated'
+        )
+        messages.success(request, 'Invite Link Revoked')
+        return redirect('company:manage-company')
+    except Exception as e:
+        messages.error(request,'An error occured')
+        return render(request, 'estate/error_page.html', {'e':e})

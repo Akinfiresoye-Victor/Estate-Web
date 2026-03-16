@@ -199,3 +199,21 @@ APPOINTMENT_TYPE=[
     ('Virtual', 'Virtual')
 ]
 
+
+
+AGENT_STATUS=[
+    ('Active', 'Active'),
+    ('On Leave', 'On Leave'),
+    ('Home Sick', 'Home Sick'),
+    ('Parternity Leave', 'Parternity Leave'),
+    ('Emergency', 'Emergency'),
+    ('Resigned', 'Resigned'),
+    ('On Probation', 'On probation'),
+    ('Fired', 'Fired'), 
+]
+
+EXPIRY_CHOICES = [
+    ('24', '24 Hours'),
+    ('48', '48 Hours'),
+    ('168', '7 Days'),  
+]

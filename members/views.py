@@ -24,20 +24,19 @@ def login_user(request):
             user= authenticate(request, username=username, password=password)#returns a bool 
             #If the user is found it then logs him/her in
             if user is not None:
-                print('Found')
                 #logins user if the variable user is true
                 login(request, user)
                 messages.success(request, (f'Welcome Back {request.user.username}'))
-                print(request.user.role)
                 if user.role == 'customer':
-                    return redirect('customer:user-profile')
+                    next_url = request.GET.get('next') or request.POST.get('next')
+                    return redirect(next_url if next_url else 'customer:user-profile')
                 elif user.role == 'agent':
-                    return redirect('agent:dashboard')
+                    next_url = request.GET.get('next') or request.POST.get('next')
+                    return redirect(next_url if next_url else 'agent:dashboard')
                 elif user.role == 'company':
-                    print('company_dashboard')
-                    return redirect('company:dashboard')
+                    next_url = request.GET.get('next') or request.POST.get('next')
+                    return redirect(next_url if next_url else 'company:dashboard')
                 else:
-                    print('landing page')
                     return redirect('landing')
             else:
                 messages.error(request, ('Incorrect Credentials'))
@@ -103,7 +102,8 @@ def register_agent(request):
                 user= authenticate(username= username, password= password)
                 login(request, user)
                 messages.success(request, (f'Welcome {request.user.username}, and Thanks for joining Estate Web, Feel free to look around'))
-                return redirect('agent:dashboard')
+                next_url = request.GET.get('next') or request.POST.get('next')
+                return redirect(next_url if next_url else 'agent:dashboard')
             else:
                 messages.error(request, ('Make Sure You filled all input boxes correctly'))
                 return render(request, 'registration/register_agent.html', {'form': form, 'role':'Agent'})
@@ -132,7 +132,8 @@ def register_company(request):
                 user= authenticate(username= username, password= password)
                 login(request, user)
                 messages.success(request, (f'Welcome {request.user.username}, and Thanks for joining Estate Web, Feel free to look around'))
-                return redirect('company:dashboard')
+                next_url = request.GET.get('next') or request.POST.get('next')
+                return redirect(next_url if next_url else 'company:dashboard')
             else:
                 messages.error(request, ('Make Sure You filled all input boxes correctly'))
                 return render(request, 'registration/register_company.html', {'form': form, 'role':'Company'})

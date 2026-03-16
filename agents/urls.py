@@ -18,5 +18,6 @@ urlpatterns = [
     path('lead/update_stage/<int:lead_id>/', views.agent_update_lead_stage, name='agent-update-lead-stage'),
     path('jobs/listings', views.job_listings, name='job-listings'),
     path('jobs/detail/<job_id>',views.job_detail, name='job-detail'),
-    path('delete/agent/<agent_uuid>', views.delete_agent, name='delete-agent')
+    path('delete/agent/<agent_uuid>', views.delete_agent, name='delete-agent'),
+    path('invite/join/', views.join_via_invite, name='join_via_invite'),
 ]

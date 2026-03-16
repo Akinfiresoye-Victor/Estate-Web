@@ -22,5 +22,8 @@ urlpatterns = [
     path('application/management', views.manage_applications, name='application-management'),
     path('list_vacancy', views.vacancy_form, name='vacancy-form'),
     path('employee/management', views.manage_company, name='manage-company'),
-    path('delete/company/<company_uuid>', views.delete_company, name='delete-company')
+    path('delete/company/<company_uuid>', views.delete_company, name='delete-company'),
+    path('onboard/agent/<agent_uuid>', views.onboard_agent, name='onboarding'),
+    path('invite/generate/', views.generate_invite_link, name='generate_invite_link'),
+    path('revoke_invite/<token>', views.revoke_invite_link, name='revoke-link'),
 ]

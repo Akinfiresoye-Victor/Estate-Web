@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
-from .models import CompanyInformation, CompanySocialLinks,JobPost
-from core.choices import STATES
+from .models import CompanyInformation, CompanySocialLinks,JobPost, InviteLink
+from core.choices import STATES, EXPIRY_CHOICES
 from django.forms import formset_factory, inlineformset_factory
 from django.core.exceptions import ValidationError
 
@@ -217,4 +217,24 @@ class JobPostForm(forms.ModelForm):
                 })
         
         return cleaned_data
-    
+
+
+#TODO implement the manual onboarding agent form
+
+# and we convert it to actual hours before saving to expires_at
+
+class InviteLinkForm(forms.Form):
+    expiry_duration = forms.ChoiceField(
+        choices=EXPIRY_CHOICES,
+        label='Link Expires In',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    max_uses = forms.IntegerField(
+        required=False,       # optional — admin may not want a usage cap
+        min_value=1,          # if they do set it, 0 makes no sense
+        label='Usage Limit (Optional)',
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Leave blank for a default of 200'
+        })
+    )

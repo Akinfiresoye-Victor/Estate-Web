@@ -1,884 +1,522 @@
 {% extends 'company/base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'company/css/employee_management.css' %}">
+<link rel="stylesheet" href="{% static 'company/css/manage_company.css' %}">
 {% endblock %}
 
 {% block content %}
+<div class="ew-page">
 
-<div class="employee-management-container">
-  
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <div class="header-left">
-        <h1 class="page-title">Team Management</h1>
-        <p class="page-subtitle">Manage your company employees and their roles</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn-export">
-          <i class="bi bi-download"></i>
-          <span>Export</span>
-        </button>
-        <button class="btn-add-employee" id="openAddEmployeeModal">
-          <i class="bi bi-person-plus"></i>
-          <span>Add Employee</span>
-        </button>
-      </div>
+  {% if messages %}
+  <div class="django-messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+
+  <!-- PAGE HEADER -->
+  <div class="ew-header">
+    <div class="ew-header-text">
+      <h1 class="ew-header-title">Team Management</h1>
+      <p class="ew-header-sub">Manage agents and onboard new members</p>
+    </div>
+    <div class="ew-header-actions">
+      <button class="btn btn-ghost" id="exportBtn">
+        <i class="bi bi-download"></i>
+        <span class="btn-label">Export</span>
+      </button>
+      <button class="btn btn-secondary" id="openManualModal">
+        <i class="bi bi-person-plus-fill"></i>
+        <span class="btn-label">Add Agent</span>
+      </button>
+      <button class="btn btn-primary" id="openInviteModal">
+        <i class="bi bi-link-45deg"></i>
+        <span class="btn-label">Generate Invite</span>
+      </button>
     </div>
   </div>
 
-  <!-- Stats Overview -->
-  <div class="stats-overview">
-    <div class="stat-card">
-      <div class="stat-icon total">
-        <i class="bi bi-people"></i>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Total Employees</span>
-        <h3 class="stat-value">24</h3>
-        <span class="stat-change positive">
-          <i class="bi bi-arrow-up"></i>
-          +3 this month
-        </span>
-      </div>
-    </div>
 
-    <div class="stat-card">
-      <div class="stat-icon agents">
-        <i class="bi bi-briefcase"></i>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Active Agents</span>
-        <h3 class="stat-value">16</h3>
-      </div>
-    </div>
+  <!-- STATS — horizontal scroll on mobile, grid on desktop -->
+  <div class="stats-scroll-wrap">
+    <div class="ew-stats">
 
-    <div class="stat-card">
-      <div class="stat-icon departments">
-        <i class="bi bi-diagram-3"></i>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Departments</span>
-        <h3 class="stat-value">5</h3>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon performance">
-        <i class="bi bi-graph-up-arrow"></i>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Avg Performance</span>
-        <h3 class="stat-value">4.6/5</h3>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filters and Search -->
-  <div class="filters-section">
-    <div class="filters-bar">
-      <div class="filter-group">
-        <label for="departmentFilter" class="filter-label">Department</label>
-        <select class="filter-select" id="departmentFilter">
-          <option value="">All Departments</option>
-          <option value="sales">Sales</option>
-          <option value="management">Property Management</option>
-          <option value="marketing">Marketing</option>
-          <option value="admin">Administration</option>
-          <option value="finance">Finance</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="roleFilter" class="filter-label">Role</label>
-        <select class="filter-select" id="roleFilter">
-          <option value="">All Roles</option>
-          <option value="agent">Real Estate Agent</option>
-          <option value="manager">Property Manager</option>
-          <option value="coordinator">Marketing Coordinator</option>
-          <option value="accountant">Accountant</option>
-          <option value="admin">Admin Staff</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="statusFilter" class="filter-label">Status</label>
-        <select class="filter-select" id="statusFilter">
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="on-leave">On Leave</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
-
-      <div class="search-group">
-        <label for="searchEmployee" class="filter-label">Search</label>
-        <div class="search-box">
-          <i class="bi bi-search"></i>
-          <input type="text" id="searchEmployee" placeholder="Search employees...">
+      <div class="stat-card total">
+        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+        <div>
+          <span class="stat-label">Total Agents</span>
+          <div class="stat-value">{{ total_employees }}</div>
         </div>
       </div>
+
+      <div class="stat-card agents">
+        <div class="stat-icon"><i class="bi bi-briefcase-fill"></i></div>
+        <div>
+          <span class="stat-label">Active</span>
+          <div class="stat-value">{{ active_agents }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card departments">
+        <div class="stat-icon"><i class="bi bi-diagram-3-fill"></i></div>
+        <div>
+          <span class="stat-label">Departments</span>
+          <div class="stat-value">{{ departments_count }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card links">
+        <div class="stat-icon"><i class="bi bi-link-45deg"></i></div>
+        <div>
+          <span class="stat-label">Active Links</span>
+          <div class="stat-value">{{ active_invite_links_count }}</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- View Toggle -->
-  <div class="view-controls">
-    <div class="view-toggle">
-      <button class="toggle-btn active" data-view="grid">
-        <i class="bi bi-grid-3x3-gap"></i>
-        Grid
-      </button>
-      <button class="toggle-btn" data-view="list">
-        <i class="bi bi-list-ul"></i>
-        List
-      </button>
+
+  <!-- INVITE LINKS — stacked cards on mobile, row on desktop -->
+  <div class="invite-panel">
+    <div class="invite-panel-header">
+      <div class="invite-panel-title">
+        <i class="bi bi-link-45deg"></i> Active Invite Links
+      </div>
     </div>
-    <div class="sort-options">
-      <select class="sort-select">
-        <option value="name-asc">Name (A-Z)</option>
-        <option value="name-desc">Name (Z-A)</option>
-        <option value="role">Role</option>
-        <option value="department">Department</option>
-        <option value="recent">Recently Added</option>
+
+    {% if invite_links %}
+      {% for link in invite_links %}
+      <div class="invite-card">
+
+        <div class="invite-url-row">
+          <span class="invite-token">{{ request.scheme }}://{{ request.get_host }}{% url 'agent:join_via_invite' %}?token={{ link.invite_token }}</span>
+        </div>
+
+        <div class="invite-bottom">
+          <div class="invite-meta">
+            <span class="invite-chip"><i class="bi bi-clock"></i> {{ link.expires_at|date:"M d, Y" }}</span>
+            <span class="invite-chip"><i class="bi bi-people"></i> {{ link.use_count }}{% if link.max_uses %}/{{ link.max_uses }}{% else %}/∞{% endif %}</span>
+            {% if link.is_active %}
+              <span class="badge-active">Active</span>
+            {% else %}
+              <span class="badge-expired">Revoked</span>
+            {% endif %}
+          </div>
+          <div class="invite-actions">
+            <button class="copy-btn"
+              onclick="copyInviteLink(this, '{{ request.scheme }}://{{ request.get_host }}{% url 'agent:join_via_invite' %}?token={{ link.invite_token }}')">
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+            <a href="#"
+               class="btn btn-sm btn-warning"
+               onclick="openRevokeModal('{{ link.invite_token }}'); return false;">
+              <i class="bi bi-slash-circle"></i> Revoke
+            </a>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-links">
+        <i class="bi bi-link-45deg"></i>
+        No active invite links. Generate one to start onboarding agents.
+      </div>
+    {% endif %}
+  </div>
+
+
+  <!-- FILTERS -->
+  <div class="ew-filters">
+    <div class="filter-group">
+      <label class="filter-label">Department</label>
+      <select class="filter-select" id="deptFilter">
+        <option value="">All Departments</option>
+        <option value="Sales">Sales</option>
+        <option value="Management">Property Management</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Administration">Administration</option>
+        <option value="Finance">Finance</option>
+        <option value="Unassigned">Unassigned</option>
       </select>
     </div>
+    <div class="filter-group">
+      <label class="filter-label">Status</label>
+      <select class="filter-select" id="statusFilter">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="on-leave">On Leave</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Search</label>
+      <div class="search-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search agents...">
+      </div>
+    </div>
   </div>
 
-  <!-- Employees Grid View -->
+
+  <!-- VIEW CONTROLS — list toggle hidden on mobile -->
+  <div class="ew-view-controls">
+    <div class="view-toggle">
+      <button class="toggle-btn active" data-view="grid">
+        <i class="bi bi-grid-3x3-gap"></i> <span class="btn-label">Grid</span>
+      </button>
+      <button class="toggle-btn list-toggle-btn" data-view="list">
+        <i class="bi bi-list-ul"></i> <span class="btn-label">List</span>
+      </button>
+    </div>
+    <select class="sort-select" id="sortSelect">
+      <option value="name-asc">Name (A–Z)</option>
+      <option value="name-desc">Name (Z–A)</option>
+      <option value="dept">Department</option>
+      <option value="recent">Recently Added</option>
+    </select>
+  </div>
+
+
+  <!-- EMPLOYEE GRID -->
   <div class="employees-grid active" id="gridView">
-    
-    <!-- Employee Card 1 -->
-    <div class="employee-card">
-      <div class="employee-card-header">
-        <div class="employee-avatar">
-          <img src="https://ui-avatars.com/api/?name=Chioma+Adeyemi&size=80&background=1a3c4e&color=fff&bold=true" alt="Chioma Adeyemi">
+    {% for employee in employees %}
+    <div class="emp-card"
+         data-name="{{ employee.agent_name|lower }}"
+         data-dept="{{ employee.company_department }}"
+         data-status="active">
+
+      <div class="emp-card-top">
+        <div class="emp-avatar">
+          {% if employee.agent_headshot %}
+            <img src="{{ employee.agent_headshot.url }}" alt="{{ employee.agent_name }}">
+          {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ employee.agent_name|urlencode }}&size=80&background=1a3c4e&color=fff&bold=true" alt="{{ employee.agent_name }}">
+          {% endif %}
           <span class="status-dot active"></span>
         </div>
-        <div class="employee-actions-menu">
-          <button class="menu-btn">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
+        <div class="emp-menu">
+          <button class="menu-btn" aria-label="Options"><i class="bi bi-three-dots-vertical"></i></button>
           <div class="dropdown-menu">
-            <a href="#" class="menu-item">
-              <i class="bi bi-eye"></i>
-              View Profile
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-pencil"></i>
-              Edit Details
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-graph-up"></i>
-              Performance
-            </a>
-            <a href="#" class="menu-item danger">
-              <i class="bi bi-trash"></i>
-              Remove
+            <a href="#" class="menu-item"><i class="bi bi-eye"></i> View Profile</a>
+            <a href="#" class="menu-item"><i class="bi bi-pencil"></i> Edit Details</a>
+            <a href="#" class="menu-item danger"
+               onclick="return confirm('Remove {{ employee.agent_name }} from your company?')">
+              <i class="bi bi-person-dash"></i> Remove Agent
             </a>
           </div>
         </div>
       </div>
 
-      <div class="employee-info">
-        <h3 class="employee-name">Chioma Adeyemi</h3>
-        <p class="employee-role">Senior Real Estate Agent</p>
-        <span class="employee-department">Sales</span>
+      <div class="emp-info">
+        <div class="emp-name">{{ employee.agent_name }}</div>
+        <div class="emp-role">{{ employee.company_role }}</div>
+        <span class="emp-dept">{{ employee.company_department }}</span>
       </div>
 
-      <div class="employee-meta">
-        <div class="meta-item">
-          <i class="bi bi-envelope"></i>
-          <span>chioma.adeyemi@company.com</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-telephone"></i>
-          <span>+234 803 456 7890</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-calendar-check"></i>
-          <span>Joined: Jan 2023</span>
-        </div>
+      <div class="emp-meta">
+        <div class="meta-row"><i class="bi bi-envelope"></i> {{ employee.agent_email }}</div>
+        <div class="meta-row"><i class="bi bi-telephone"></i> {{ employee.agent_phone_no }}</div>
+        <div class="meta-row"><i class="bi bi-calendar-check"></i> Joined {{ employee.date_joined|date:"M Y" }}</div>
       </div>
 
-      <div class="employee-stats">
-        <div class="stat-box">
-          <span class="stat-number">127</span>
-          <span class="stat-text">Properties</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">4.9</span>
-          <span class="stat-text">Rating</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">89</span>
-          <span class="stat-text">Deals</span>
-        </div>
+      <div class="emp-footer">
+        <span class="status-badge active"><i class="bi bi-check-circle"></i> Active</span>
+        <span class="onboard-source"><i class="bi bi-link-45deg"></i> Via Invite</span>
       </div>
 
-      <div class="employee-status">
-        <span class="status-badge active">
-          <i class="bi bi-check-circle"></i>
-          Active
-        </span>
-      </div>
     </div>
-
-    <!-- Employee Card 2 -->
-    <div class="employee-card">
-      <div class="employee-card-header">
-        <div class="employee-avatar">
-          <img src="https://ui-avatars.com/api/?name=Ibrahim+Musa&size=80&background=1a3c4e&color=fff&bold=true" alt="Ibrahim Musa">
-          <span class="status-dot active"></span>
-        </div>
-        <div class="employee-actions-menu">
-          <button class="menu-btn">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#" class="menu-item">
-              <i class="bi bi-eye"></i>
-              View Profile
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-pencil"></i>
-              Edit Details
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-graph-up"></i>
-              Performance
-            </a>
-            <a href="#" class="menu-item danger">
-              <i class="bi bi-trash"></i>
-              Remove
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="employee-info">
-        <h3 class="employee-name">Ibrahim Musa</h3>
-        <p class="employee-role">Property Manager</p>
-        <span class="employee-department">Management</span>
-      </div>
-
-      <div class="employee-meta">
-        <div class="meta-item">
-          <i class="bi bi-envelope"></i>
-          <span>ibrahim.musa@company.com</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-telephone"></i>
-          <span>+234 805 123 4567</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-calendar-check"></i>
-          <span>Joined: Mar 2022</span>
-        </div>
-      </div>
-
-      <div class="employee-stats">
-        <div class="stat-box">
-          <span class="stat-number">94</span>
-          <span class="stat-text">Properties</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">4.8</span>
-          <span class="stat-text">Rating</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">67</span>
-          <span class="stat-text">Deals</span>
-        </div>
-      </div>
-
-      <div class="employee-status">
-        <span class="status-badge active">
-          <i class="bi bi-check-circle"></i>
-          Active
-        </span>
-      </div>
+    {% empty %}
+    <div class="empty-state">
+      <i class="bi bi-people"></i>
+      <p>No agents yet. Generate an invite link or add an agent manually.</p>
     </div>
-
-    <!-- Employee Card 3 -->
-    <div class="employee-card">
-      <div class="employee-card-header">
-        <div class="employee-avatar">
-          <img src="https://ui-avatars.com/api/?name=Blessing+Okonkwo&size=80&background=1a3c4e&color=fff&bold=true" alt="Blessing Okonkwo">
-          <span class="status-dot on-leave"></span>
-        </div>
-        <div class="employee-actions-menu">
-          <button class="menu-btn">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#" class="menu-item">
-              <i class="bi bi-eye"></i>
-              View Profile
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-pencil"></i>
-              Edit Details
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-graph-up"></i>
-              Performance
-            </a>
-            <a href="#" class="menu-item danger">
-              <i class="bi bi-trash"></i>
-              Remove
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="employee-info">
-        <h3 class="employee-name">Blessing Okonkwo</h3>
-        <p class="employee-role">Marketing Coordinator</p>
-        <span class="employee-department">Marketing</span>
-      </div>
-
-      <div class="employee-meta">
-        <div class="meta-item">
-          <i class="bi bi-envelope"></i>
-          <span>blessing.okonkwo@company.com</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-telephone"></i>
-          <span>+234 807 890 1234</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-calendar-check"></i>
-          <span>Joined: Jul 2023</span>
-        </div>
-      </div>
-
-      <div class="employee-stats">
-        <div class="stat-box">
-          <span class="stat-number">45</span>
-          <span class="stat-text">Campaigns</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">4.6</span>
-          <span class="stat-text">Rating</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">32</span>
-          <span class="stat-text">Projects</span>
-        </div>
-      </div>
-
-      <div class="employee-status">
-        <span class="status-badge on-leave">
-          <i class="bi bi-clock-history"></i>
-          On Leave
-        </span>
-      </div>
-    </div>
-
-    <!-- Employee Card 4 -->
-    <div class="employee-card">
-      <div class="employee-card-header">
-        <div class="employee-avatar">
-          <img src="https://ui-avatars.com/api/?name=Tunde+Bakare&size=80&background=1a3c4e&color=fff&bold=true" alt="Tunde Bakare">
-          <span class="status-dot active"></span>
-        </div>
-        <div class="employee-actions-menu">
-          <button class="menu-btn">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#" class="menu-item">
-              <i class="bi bi-eye"></i>
-              View Profile
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-pencil"></i>
-              Edit Details
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-graph-up"></i>
-              Performance
-            </a>
-            <a href="#" class="menu-item danger">
-              <i class="bi bi-trash"></i>
-              Remove
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="employee-info">
-        <h3 class="employee-name">Tunde Bakare</h3>
-        <p class="employee-role">Real Estate Agent</p>
-        <span class="employee-department">Sales</span>
-      </div>
-
-      <div class="employee-meta">
-        <div class="meta-item">
-          <i class="bi bi-envelope"></i>
-          <span>tunde.bakare@company.com</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-telephone"></i>
-          <span>+234 809 234 5678</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-calendar-check"></i>
-          <span>Joined: Sep 2023</span>
-        </div>
-      </div>
-
-      <div class="employee-stats">
-        <div class="stat-box">
-          <span class="stat-number">73</span>
-          <span class="stat-text">Properties</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">4.7</span>
-          <span class="stat-text">Rating</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">56</span>
-          <span class="stat-text">Deals</span>
-        </div>
-      </div>
-
-      <div class="employee-status">
-        <span class="status-badge active">
-          <i class="bi bi-check-circle"></i>
-          Active
-        </span>
-      </div>
-    </div>
-
-    <!-- Employee Card 5 -->
-    <div class="employee-card">
-      <div class="employee-card-header">
-        <div class="employee-avatar">
-          <img src="https://ui-avatars.com/api/?name=Fatima+Yusuf&size=80&background=1a3c4e&color=fff&bold=true" alt="Fatima Yusuf">
-          <span class="status-dot active"></span>
-        </div>
-        <div class="employee-actions-menu">
-          <button class="menu-btn">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#" class="menu-item">
-              <i class="bi bi-eye"></i>
-              View Profile
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-pencil"></i>
-              Edit Details
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-graph-up"></i>
-              Performance
-            </a>
-            <a href="#" class="menu-item danger">
-              <i class="bi bi-trash"></i>
-              Remove
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="employee-info">
-        <h3 class="employee-name">Fatima Yusuf</h3>
-        <p class="employee-role">Accountant</p>
-        <span class="employee-department">Finance</span>
-      </div>
-
-      <div class="employee-meta">
-        <div class="meta-item">
-          <i class="bi bi-envelope"></i>
-          <span>fatima.yusuf@company.com</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-telephone"></i>
-          <span>+234 801 567 8901</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-calendar-check"></i>
-          <span>Joined: Apr 2022</span>
-        </div>
-      </div>
-
-      <div class="employee-stats">
-        <div class="stat-box">
-          <span class="stat-number">156</span>
-          <span class="stat-text">Reports</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">5.0</span>
-          <span class="stat-text">Rating</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">98%</span>
-          <span class="stat-text">Accuracy</span>
-        </div>
-      </div>
-
-      <div class="employee-status">
-        <span class="status-badge active">
-          <i class="bi bi-check-circle"></i>
-          Active
-        </span>
-      </div>
-    </div>
-
-    <!-- Employee Card 6 -->
-    <div class="employee-card">
-      <div class="employee-card-header">
-        <div class="employee-avatar">
-          <img src="https://ui-avatars.com/api/?name=Emeka+Eze&size=80&background=1a3c4e&color=fff&bold=true" alt="Emeka Eze">
-          <span class="status-dot active"></span>
-        </div>
-        <div class="employee-actions-menu">
-          <button class="menu-btn">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="#" class="menu-item">
-              <i class="bi bi-eye"></i>
-              View Profile
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-pencil"></i>
-              Edit Details
-            </a>
-            <a href="#" class="menu-item">
-              <i class="bi bi-graph-up"></i>
-              Performance
-            </a>
-            <a href="#" class="menu-item danger">
-              <i class="bi bi-trash"></i>
-              Remove
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="employee-info">
-        <h3 class="employee-name">Emeka Eze</h3>
-        <p class="employee-role">Admin Officer</p>
-        <span class="employee-department">Administration</span>
-      </div>
-
-      <div class="employee-meta">
-        <div class="meta-item">
-          <i class="bi bi-envelope"></i>
-          <span>emeka.eze@company.com</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-telephone"></i>
-          <span>+234 806 345 6789</span>
-        </div>
-        <div class="meta-item">
-          <i class="bi bi-calendar-check"></i>
-          <span>Joined: Jun 2023</span>
-        </div>
-      </div>
-
-      <div class="employee-stats">
-        <div class="stat-box">
-          <span class="stat-number">234</span>
-          <span class="stat-text">Tasks</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">4.5</span>
-          <span class="stat-text">Rating</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">95%</span>
-          <span class="stat-text">On-time</span>
-        </div>
-      </div>
-
-      <div class="employee-status">
-        <span class="status-badge active">
-          <i class="bi bi-check-circle"></i>
-          Active
-        </span>
-      </div>
-    </div>
-
+    {% endfor %}
   </div>
 
-  <!-- Employees List View (Hidden by default) -->
+
+  <!-- EMPLOYEE LIST (desktop only) -->
   <div class="employees-list" id="listView">
     <div class="list-table">
       <div class="table-header">
-        <div class="th th-employee">Employee</div>
-        <div class="th th-role">Role</div>
-        <div class="th th-department">Department</div>
-        <div class="th th-contact">Contact</div>
-        <div class="th th-status">Status</div>
-        <div class="th th-actions">Actions</div>
+        <div>Agent</div><div>Role</div><div>Department</div>
+        <div>Contact</div><div>Status</div><div>Actions</div>
       </div>
-
-      <div class="table-body">
-        
-        <div class="table-row">
-          <div class="td td-employee">
-            <div class="employee-cell">
-              <img src="https://ui-avatars.com/api/?name=Chioma+Adeyemi&size=40&background=1a3c4e&color=fff&bold=true" alt="Chioma Adeyemi">
-              <div class="employee-details">
-                <span class="name">Chioma Adeyemi</span>
-                <span class="email">chioma.adeyemi@company.com</span>
-              </div>
+      {% for employee in employees %}
+      <div class="table-row"
+           data-name="{{ employee.agent_name|lower }}"
+           data-dept="{{ employee.company_department }}"
+           data-status="active">
+        <div class="td">
+          <div class="emp-cell">
+            {% if employee.agent_headshot %}
+              <img src="{{ employee.agent_headshot.url }}" alt="{{ employee.agent_name }}">
+            {% else %}
+              <img src="https://ui-avatars.com/api/?name={{ employee.agent_name|urlencode }}&size=40&background=1a3c4e&color=fff&bold=true" alt="{{ employee.agent_name }}">
+            {% endif %}
+            <div>
+              <div class="ename">{{ employee.agent_name }}</div>
+              <div class="eemail">{{ employee.agent_email }}</div>
             </div>
           </div>
-          <div class="td td-role">Senior Real Estate Agent</div>
-          <div class="td td-department">
-            <span class="dept-tag sales">Sales</span>
-          </div>
-          <div class="td td-contact">+234 803 456 7890</div>
-          <div class="td td-status">
-            <span class="status-badge active">
-              <i class="bi bi-check-circle"></i>
-              Active
-            </span>
-          </div>
-          <div class="td td-actions">
-            <button class="action-btn" title="View">
-              <i class="bi bi-eye"></i>
-            </button>
-            <button class="action-btn" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="action-btn danger" title="Remove">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
         </div>
-
-        <div class="table-row">
-          <div class="td td-employee">
-            <div class="employee-cell">
-              <img src="https://ui-avatars.com/api/?name=Ibrahim+Musa&size=40&background=1a3c4e&color=fff&bold=true" alt="Ibrahim Musa">
-              <div class="employee-details">
-                <span class="name">Ibrahim Musa</span>
-                <span class="email">ibrahim.musa@company.com</span>
-              </div>
-            </div>
-          </div>
-          <div class="td td-role">Property Manager</div>
-          <div class="td td-department">
-            <span class="dept-tag management">Management</span>
-          </div>
-          <div class="td td-contact">+234 805 123 4567</div>
-          <div class="td td-status">
-            <span class="status-badge active">
-              <i class="bi bi-check-circle"></i>
-              Active
-            </span>
-          </div>
-          <div class="td td-actions">
-            <button class="action-btn" title="View">
-              <i class="bi bi-eye"></i>
-            </button>
-            <button class="action-btn" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="action-btn danger" title="Remove">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+        <div class="td">{{ employee.company_role }}</div>
+        <div class="td">
+          <span class="dept-tag {{ employee.company_department|lower }}">{{ employee.company_department }}</span>
         </div>
-
-        <div class="table-row">
-          <div class="td td-employee">
-            <div class="employee-cell">
-              <img src="https://ui-avatars.com/api/?name=Blessing+Okonkwo&size=40&background=1a3c4e&color=fff&bold=true" alt="Blessing Okonkwo">
-              <div class="employee-details">
-                <span class="name">Blessing Okonkwo</span>
-                <span class="email">blessing.okonkwo@company.com</span>
-              </div>
-            </div>
-          </div>
-          <div class="td td-role">Marketing Coordinator</div>
-          <div class="td td-department">
-            <span class="dept-tag marketing">Marketing</span>
-          </div>
-          <div class="td td-contact">+234 807 890 1234</div>
-          <div class="td td-status">
-            <span class="status-badge on-leave">
-              <i class="bi bi-clock-history"></i>
-              On Leave
-            </span>
-          </div>
-          <div class="td td-actions">
-            <button class="action-btn" title="View">
-              <i class="bi bi-eye"></i>
-            </button>
-            <button class="action-btn" title="Edit">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button class="action-btn danger" title="Remove">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+        <div class="td">{{ employee.agent_phone_no }}</div>
+        <div class="td">
+          <span class="status-badge active"><i class="bi bi-check-circle"></i> Active</span>
         </div>
-
+        <div class="td td-actions">
+          <a href="#" class="action-btn" title="View"><i class="bi bi-eye"></i></a>
+          <a href="#" class="action-btn" title="Edit"><i class="bi bi-pencil"></i></a>
+          <a href="#" class="action-btn danger" title="Remove"
+             onclick="return confirm('Remove {{ employee.agent_name }}?')">
+            <i class="bi bi-person-dash"></i>
+          </a>
+        </div>
       </div>
+      {% empty %}
+      <div style="padding:40px;text-align:center;color:var(--text-light);">No agents found.</div>
+      {% endfor %}
     </div>
   </div>
 
+
+  <!-- AUDIT LOG — card list on mobile, no table -->
+  <div class="audit-section">
+    <h2 class="section-title"><i class="bi bi-clipboard2-check"></i> Onboarding Activity</h2>
+
+    {% if activity_logs %}
+    <div class="audit-list">
+      {% for log in activity_logs %}
+      <div class="audit-card">
+        <div class="audit-icon-wrap"><i class="bi bi-person-circle"></i></div>
+        <div class="audit-body">
+          <span class="audit-action-text">{{ log.action }}</span>
+          <div class="audit-foot">
+            {% if 'manually' in log.action|lower %}
+              <span class="audit-tag manual">Manual</span>
+            {% else %}
+              <span class="audit-tag invite">Invite Link</span>
+            {% endif %}
+            <span class="audit-time">{{ log.created_at|date:"M d, Y · H:i" }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-audit">No onboarding activity yet.</div>
+    {% endif %}
+  </div>
+
+</div><!-- end .ew-page -->
+
+
+<!-- MODAL: Generate Invite Link -->
+<div class="ew-modal" id="inviteModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="bi bi-link-45deg"></i> Generate Invite Link</h3>
+      <button class="modal-close" id="closeInviteModal"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <form method="POST" action="{% url 'company:generate_invite_link' %}">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="form-field">
+          {{ form.expiry_duration.label_tag }}
+          {{ form.expiry_duration }}
+          <span class="form-hint">The link stops working after this period.</span>
+        </div>
+        <div class="form-field">
+          {{ form.max_uses.label_tag }}
+          {{ form.max_uses }}
+          <span class="form-hint">Leave blank for unlimited uses.</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" id="cancelInviteModal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-link-45deg"></i> Generate Link
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- Add Employee Modal -->
-<div class="modal" id="addEmployeeModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Add New Employee</h2>
-      <button class="modal-close" id="closeModal">
-        <i class="bi bi-x-lg"></i>
-      </button>
+
+<!-- MODAL: Add Agent Manually -->
+<div class="ew-modal" id="manualModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="bi bi-person-plus-fill"></i> Add Agent Manually</h3>
+      <button class="modal-close" id="closeManualModal"><i class="bi bi-x-lg"></i></button>
     </div>
     <div class="modal-body">
-      <form class="employee-form">
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" placeholder="Enter first name" required>
-          </div>
-          <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" placeholder="Enter last name" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="employee@company.com" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" placeholder="+234 800 000 0000" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="role">Role</label>
-            <select id="role" required>
-              <option value="">Select Role</option>
-              <option value="agent">Real Estate Agent</option>
-              <option value="manager">Property Manager</option>
-              <option value="coordinator">Marketing Coordinator</option>
-              <option value="accountant">Accountant</option>
-              <option value="admin">Admin Staff</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="department">Department</label>
-            <select id="department" required>
-              <option value="">Select Department</option>
-              <option value="sales">Sales</option>
-              <option value="management">Property Management</option>
-              <option value="marketing">Marketing</option>
-              <option value="finance">Finance</option>
-              <option value="admin">Administration</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="joinDate">Join Date</label>
-          <input type="date" id="joinDate" required>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
-          <button type="submit" class="btn-submit">
-            <i class="bi bi-check-circle"></i>
-            Add Employee
-          </button>
-        </div>
-
-      </form>
+      <div class="notice-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>Enter the agent's <strong>Agent UUID</strong> to add them directly. The agent must already have an Estate Web account.</span>
+      </div>
+      <div class="form-field">
+        <label for="agentUuidInput">Agent UUID</label>
+        <input type="text" id="agentUuidInput"
+               placeholder="e.g. 3f2a1c4d-8b7e-4a2f-9c1d-..."
+               autocomplete="off" spellcheck="false">
+        <span class="form-hint">Paste the UUID exactly as provided by the agent.</span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-ghost" id="cancelManualModal">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="submitManualOnboard()">
+        <i class="bi bi-person-check-fill"></i> Add Agent
+      </button>
     </div>
   </div>
 </div>
 
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="bi bi-clipboard-check"></i>
+  <span id="toastMsg">Copied!</span>
+</div>
+
+
 <script>
-  // View toggle
-  const toggleBtns = document.querySelectorAll('.toggle-btn');
-  const gridView = document.getElementById('gridView');
-  const listView = document.getElementById('listView');
-  
-  toggleBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const view = btn.getAttribute('data-view');
-      
-      toggleBtns.forEach(b => b.classList.remove('active'));
+(function () {
+  'use strict';
+
+  /* View toggle */
+  var toggleBtns = document.querySelectorAll('.toggle-btn');
+  var gridView   = document.getElementById('gridView');
+  var listView   = document.getElementById('listView');
+  toggleBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      toggleBtns.forEach(function (b) { b.classList.remove('active'); });
       btn.classList.add('active');
-      
-      if (view === 'grid') {
-        gridView.classList.add('active');
-        listView.classList.remove('active');
+      if (btn.dataset.view === 'grid') {
+        gridView.classList.add('active'); listView.classList.remove('active');
       } else {
-        listView.classList.add('active');
-        gridView.classList.remove('active');
+        listView.classList.add('active'); gridView.classList.remove('active');
       }
     });
   });
 
-  // Modal functionality
-  const modal = document.getElementById('addEmployeeModal');
-  const openModalBtn = document.getElementById('openAddEmployeeModal');
-  const closeModalBtn = document.getElementById('closeModal');
-  const cancelBtn = document.getElementById('cancelBtn');
-  
-  openModalBtn.addEventListener('click', () => {
-    modal.classList.add('active');
-  });
-  
-  closeModalBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-  
-  cancelBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-  
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-    }
-  });
-
-  // Dropdown menu toggle
-  const menuBtns = document.querySelectorAll('.menu-btn');
-  
-  menuBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  /* 3-dot dropdowns */
+  document.querySelectorAll('.menu-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      const dropdown = btn.nextElementSibling;
-      
-      // Close all other dropdowns
-      document.querySelectorAll('.dropdown-menu').forEach(menu => {
-        if (menu !== dropdown) {
-          menu.classList.remove('show');
-        }
+      var dd = btn.nextElementSibling;
+      document.querySelectorAll('.dropdown-menu').forEach(function (m) {
+        if (m !== dd) m.classList.remove('show');
       });
-      
-      dropdown.classList.toggle('show');
+      dd.classList.toggle('show');
     });
+  });
+  document.addEventListener('click', function () {
+    document.querySelectorAll('.dropdown-menu').forEach(function (m) { m.classList.remove('show'); });
   });
 
-  // Close dropdowns when clicking outside
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-      menu.classList.remove('show');
+  /* Modals */
+  function openModal(id)  { document.getElementById(id).classList.add('active'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+  /* Expose to window so onclick="" attributes in HTML can reach them */
+  window.openModal  = openModal;
+  window.closeModal = closeModal;
+
+  document.getElementById('openInviteModal').addEventListener('click',   function () { openModal('inviteModal'); });
+  document.getElementById('closeInviteModal').addEventListener('click',  function () { closeModal('inviteModal'); });
+  document.getElementById('cancelInviteModal').addEventListener('click', function () { closeModal('inviteModal'); });
+  document.getElementById('inviteModal').addEventListener('click', function (e) { if (e.target === this) closeModal('inviteModal'); });
+
+  document.getElementById('openManualModal').addEventListener('click',   function () { openModal('manualModal'); });
+  document.getElementById('closeManualModal').addEventListener('click',  function () { closeModal('manualModal'); });
+  document.getElementById('cancelManualModal').addEventListener('click', function () { closeModal('manualModal'); });
+  document.getElementById('manualModal').addEventListener('click', function (e) { if (e.target === this) closeModal('manualModal'); });
+
+  /* Manual onboard */
+  window.submitManualOnboard = function () {
+    var uuid = document.getElementById('agentUuidInput').value.trim();
+    if (!uuid) { showToast('Please enter an Agent UUID first.'); return; }
+    var pat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!pat.test(uuid)) { showToast("Doesn't look like a valid UUID. Please check."); return; }
+    window.location.href = 'company/onboard/agent/' + uuid;
+  };
+
+  /* Toast */
+  window.showToast = function (msg) {
+    var t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, 2500);
+  };
+
+  /* Copy */
+  window.copyInviteLink = function (btn, url) {
+    navigator.clipboard.writeText(url).then(function () { showToast('Invite link copied!'); });
+  };
+
+  /* Filter */
+  function filterCards() {
+    var s  = document.getElementById('searchInput').value.toLowerCase();
+    var d  = document.getElementById('deptFilter').value;
+    var st = document.getElementById('statusFilter').value;
+    document.querySelectorAll('.emp-card, .table-row[data-name]').forEach(function (c) {
+      var show = (c.dataset.name || '').includes(s)
+              && (d  === '' || c.dataset.dept   === d)
+              && (st === '' || c.dataset.status === st);
+      c.style.display = show ? '' : 'none';
     });
-  });
+  }
+  document.getElementById('searchInput').addEventListener('input', filterCards);
+  document.getElementById('deptFilter').addEventListener('change', filterCards);
+  document.getElementById('statusFilter').addEventListener('change', filterCards);
+
+  /* Revoke modal */
+  window.openRevokeModal = function (token) {
+    document.getElementById('revokeConfirmBtn').href = '/company/revoke_invite/' + token;
+    openModal('revokeModal');
+  };
+
+}());
 </script>
+
+
+<!-- MODAL: Revoke Invite Link -->
+<div class="ew-modal" id="revokeModal">
+  <div class="modal-box revoke-modal-box">
+    <div class="modal-head">
+      <h3><i class="bi bi-slash-circle"></i> Revoke Invite Link</h3>
+      <button class="modal-close" onclick="closeModal('revokeModal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="revoke-warning">
+        <div class="revoke-warning-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <div class="revoke-warning-text">
+          <strong>This action cannot be undone.</strong>
+          <p>Once revoked, this invite link becomes permanently unusable. Any agents who haven't joined yet will no longer be able to use it.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-ghost" onclick="closeModal('revokeModal')">
+        Cancel
+      </button>
+      <a id="revokeConfirmBtn" href="#" class="btn btn-danger">
+        <i class="bi bi-slash-circle"></i> Yes, Revoke It
+      </a>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

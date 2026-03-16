@@ -18,7 +18,8 @@ from django.db.models import Sum, Avg, Count
 from core.utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-from companies.models import JobPost,CompanyInformation
+from companies.models import JobPost,CompanyInformation,InviteLink, CompanyActivityLog, Employees
+from django.urls import reverse
 
 
 # Create your views here.
@@ -934,3 +935,119 @@ def delete_agent(request, agent_uuid):
 
 
 # TODO Optimize all forms
+
+def join_via_invite(request):
+    """
+    Agent lands here after clicking the invite link.
+    URL looks like:  /invite/join/?token=<uuid>
+    Redirect map:
+      Token missing           → landing
+      Not logged in           → login page (next= brings them back after login)
+      Wrong role              → landing
+      No agent profile yet    → agent:setup-profile  (new signup edge case)
+      Token not found         → landing
+      Link deactivated        → landing
+      Link expired            → landing
+      Max uses reached        → landing
+      Already in any company  → agent:dashboard
+      Already in THIS company → agent:dashboard
+      Success                 → agent:dashboard
+    """
+ 
+    # ── 1. Pull token from query string
+    # /invite/join/?token=abc123-...
+    token = request.GET.get('token')
+
+    if not token:
+        messages.error(request, 'Invalid invite link — no token provided.')
+        return redirect('landing')
+
+    if not request.user.is_authenticated:
+        messages.info(request, 'Please log in to use this invite link.')
+        next_url = request.get_full_path()
+        return redirect(f'/accounts/login/?next={next_url}')
+
+    if request.user.role != 'agent':
+        messages.info(request, 'Only agents can join via invite link.')
+        return redirect('landing')
+
+    try:
+        agent = AgentInformation.objects.get(user_id=request.user.id)
+    except ObjectDoesNotExist:
+        messages.info(
+            request,
+            'Please complete your agent profile first before joining a company.'
+        )
+        return redirect('agent:setup-profile')  # change to your actual URL name
+ 
+    try:
+        invite_link = InviteLink.objects.get(invite_token=token)
+    except ObjectDoesNotExist:
+        messages.error(request, 'This invite link is invalid or broken.')
+        return redirect('landing')
+ 
+    if not invite_link.is_active:
+        messages.info(request, 'This invite link has been deactivated.')
+        return redirect('landing')
+ 
+    if timezone.now() >= invite_link.expires_at:
+        messages.info(request, 'This invite link has expired.')
+        return redirect('landing')
+ 
+    if invite_link.max_uses is not None and invite_link.use_count >= invite_link.max_uses:
+        messages.info(request, 'This invite link has reached its maximum uses.')
+        return redirect('landing')
+ 
+    # ── 6. Agent must not already be in any company ───────────
+    if agent.company_uuid:
+        messages.info(
+            request,
+            'You already belong to a company. '
+            'You can only be part of one company at a time.'
+        )
+        return redirect('agent:dashboard')
+ 
+    # ── 7. Agent must not already be in THIS specific company ─
+    company = invite_link.company
+ 
+    if Employees.objects.filter(agent_uuid=agent.agent_uuid).exists():
+        messages.info(request, f"You've already joined {company.company_name}.")
+        return redirect('agent:dashboard')
+ 
+    # ── 8. All checks passed — onboard the agent ─────────────
+    try:
+        Employees.objects.create(
+            company=company,
+            agent_name=agent.profile_name,
+            company_department='Unassigned',
+            company_role=agent.work_type,
+            agent_email=agent.email,
+            agent_phone_no=agent.phone_number,
+            agent_uuid=agent.agent_uuid,
+            agent_headshot=agent.profile_picture,
+        )
+ 
+        # Link the agent to the company
+        agent.company_uuid = company.unique_company_id
+        agent.save()
+ 
+        # Increment use counter — this was MISSING in your original code.
+        # Without this, max_uses checking never actually triggers.
+        invite_link.use_count += 1
+        invite_link.save(update_fields=['use_count'])
+ 
+        # Log to company activity feed
+        CompanyActivityLog.objects.create(
+            company=company,
+            action=f'Agent {agent.profile_name} joined the team via invite link.'
+        )
+ 
+        # Fixed: original had messages.info(f'...') — missing request arg
+        messages.success(
+            request,
+            f"Congrats on your new job at {company.company_name}! 🎉"
+        )
+        return redirect('agent:dashboard')
+ 
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})

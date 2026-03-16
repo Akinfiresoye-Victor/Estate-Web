@@ -1,9 +1,11 @@
 from django.db import models
-from core.choices import STATES, SOCIAL_LINKS
+from core.choices import STATES, SOCIAL_LINKS,AGENT_STATUS
 from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
 from django.utils import timezone
+from datetime import timedelta
+
 
 def company_logo_path(instance, filename):
     return f"company/logo/{instance.company_name}/{filename}"
@@ -34,6 +36,24 @@ class CompanyInformation(models.Model):
     agents_employed=models.IntegerField('Number of Employees', default=0, blank=False, null=False)
     def __str__(self):
         return self.company_name
+
+
+
+
+class Employees(models.Model):
+    company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='employee')
+    agent_name=models.CharField('Full Name', max_length=50, blank=False, null=False)
+    company_department=models.CharField('Agent Department', max_length=20, blank=True, null=True)
+    company_role=models.CharField('Agent Role', max_length=50, blank=False, null=False)
+    agent_email=models.EmailField('Agent Email', blank=True, null=True,max_length=75)
+    agent_phone_no=models.CharField('Phone No', blank=False, max_length=12)
+    agent_uuid=models.CharField('Agent UUID', unique=True, max_length=36, blank=False)
+    date_joined=models.DateField(auto_now_add=True)
+    agent_status=models.CharField(choices=AGENT_STATUS, blank=False, default='Active')
+    agent_headshot=models.ImageField('Agent Picture', blank=True)
+    def __str__(self):
+        return(f'{self.company}-- {self.agent_name}--{self.company_department}')
+
 
 
 
@@ -171,3 +191,13 @@ class CompanyActivityLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     
 #TODO the appointment side must use UUID for the crud implementation
+
+
+class InviteLink(models.Model):
+    company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='invite_link')
+    invite_token=models.CharField('Link UUID', max_length=36, default=uuid.uuid4, editable=False, unique=True)
+    created_at=models.DateTimeField(auto_now_add=True)
+    expires_at=models.DateTimeField('Date To expire', default=timezone.now() + timedelta(hours=24))#default of 24 hours
+    max_uses=models.IntegerField('Usage Possibility', default=200, null=True, blank=True)
+    use_count=models.IntegerField('Use Count', default=0, null=False, blank=False)
+    is_active= models.BooleanField('Is Link Active?',default=True )

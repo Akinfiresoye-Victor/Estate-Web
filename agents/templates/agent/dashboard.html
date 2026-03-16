@@ -103,7 +103,11 @@
       {% if has_headshot and has_whatsapp and has_listing %}
       <div class="cl-complete">
         <i class="bi bi-trophy-fill"></i>
-        <span>All missions complete! Your profile is fully set up.</span>
+        {% if agent_info.verified %}
+          <span>All missions complete! Your profile is fully set up.</span>
+        {%else%}
+          <span>Wait while we review your account for verification.</span>
+        {%endif%}
       </div>
       {% endif %}
     </div>

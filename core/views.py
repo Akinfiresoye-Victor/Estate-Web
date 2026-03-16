@@ -18,11 +18,14 @@ def landing_page(request):
         return render(request, 'core/landing.html')
     else:
         if request.user.role == 'company':
-            return redirect('company:dashboard')
+            next_url = request.GET.get('next') or request.POST.get('next')
+            return redirect(next_url if next_url else 'company:dashboard')
         elif request.user.role == 'agent':
-            return redirect('agent:dashboard')
+            next_url = request.GET.get('next') or request.POST.get('next')
+            return redirect(next_url if next_url else 'agent:dashboard')
         elif request.user.role == 'customer':
-            return redirect('customer:user-profile')
+            next_url = request.GET.get('next') or request.POST.get('next')
+            return redirect(next_url if next_url else 'customer:user-profile')
         else:
             return render(request, 'core/landing.html')
 
