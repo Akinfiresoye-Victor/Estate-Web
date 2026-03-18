@@ -11,6 +11,7 @@ from estate.models import LeadInfo
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+from core.utils import score_new_listing
 
 # Create your views here.
 def landing_page(request):
@@ -120,33 +121,36 @@ def submit_feedback(request):
         return HttpResponse(status=500)
 '''Property Management'''
 
-#listing properties for sale
 def sell_property(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login in required')
         return redirect('login')
-    #user must have an email before he/she can list a property
+ 
     if request.user.role == 'customer':
         messages.info(request, 'Feature Coming Out Soon')
         return redirect('landing')
+ 
     try:
-        user_role=request.user.role
+        user_role = request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
         else:
-            base_template='estate/base.html'
-        submitted= False
-
-        if request.method== 'POST':
-            prop_form=SellForm(request.POST or None, request.FILES or None)
-            image_form=SaleImageFormSet(request.POST or None, request.FILES or None)
+            base_template = 'estate/base.html'
+ 
+        submitted = False
+ 
+        if request.method == 'POST':
+            prop_form  = SellForm(request.POST or None, request.FILES or None)
+            image_form = SaleImageFormSet(request.POST or None, request.FILES or None)
+ 
             if prop_form.is_valid() and image_form.is_valid():
                 with transaction.atomic():
-                    landlord= prop_form.save(commit=False)
+                    landlord = prop_form.save(commit=False)
                     category = prop_form.cleaned_data.get('property_category')
-                    # Clear the non-selected fields
+ 
+                    # Clear non-selected category fields
                     if category == 'Residential':
                         landlord.commercial = ''
                         landlord.lands = ''
@@ -156,72 +160,97 @@ def sell_property(request):
                     elif category == 'Land':
                         landlord.residential = ''
                         landlord.commercial = ''
+ 
                     try:
-                        company= CompanyInformation.objects.get(user_id= request.user.id)
-                        landlord.company_uuid= company.unique_company_id
-                        landlord.user_id= request.user.id
-                        landlord.time_stamp=timezone.now()
+                        company = CompanyInformation.objects.get(user_id=request.user.id)
+                        landlord.company_uuid  = company.unique_company_id
+                        landlord.user_id       = request.user.id
+                        landlord.time_stamp    = timezone.now()
                         landlord.save()
-                        image_form.instance=landlord
+ 
+                        image_form.instance = landlord
                         image_form.save()
+ 
+                        # ── Initial scoring ──────────────────────────
+                        score_new_listing(landlord, 'Sale')
+ 
                         CompanyActivityLog.objects.create(
                             company=company,
-                            action= 'Property Listed'
+                            action='Property Listed'
                         )
+ 
                     except CompanyInformation.DoesNotExist:
-                        agent=AgentInformation.objects.get(user_id=request.user.id)
-                        landlord.agent_uuid=str(agent.agent_uuid)
+                        agent = AgentInformation.objects.get(user_id=request.user.id)
+                        landlord.agent_uuid   = str(agent.agent_uuid)
                         if agent.company_uuid:
                             landlord.company_uuid = agent.company_uuid
-                        landlord.user_id= request.user.id
-                        landlord.time_stamp= timezone.now()
+                        landlord.user_id      = request.user.id
+                        landlord.time_stamp   = timezone.now()
                         landlord.save()
-                        image_form.instance=landlord
+ 
+                        image_form.instance = landlord
                         image_form.save()
+ 
+                        # ── Initial scoring ──────────────────────────
+                        score_new_listing(landlord, 'Sale')
+ 
                 return HttpResponseRedirect('?submitted=True')
+ 
             else:
                 return render(request, 'estate/error_page.html', {'e': prop_form.errors})
+ 
         else:
-            prop_form= SellForm()
-            image_form=SaleImageFormSet()
-            
+            prop_form  = SellForm()
+            image_form = SaleImageFormSet()
             if 'submitted' in request.GET:
-                submitted=True
-        context={'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template}
+                submitted = True
+ 
+        context = {
+            'form':          prop_form,
+            'image_form':    image_form,
+            'submitted':     submitted,
+            'base_template': base_template,
+        }
         return render(request, 'core/sell_property.html', context)
-    
+ 
     except Exception as e:
         messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})
-
-#listing properties for rent
+ 
+ 
+# ─────────────────────────────────────────────────────────────────────────────
+# lease_property
+# ─────────────────────────────────────────────────────────────────────────────
+ 
 def lease_property(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
-    #user must have an email befre he/she can list with us
+ 
     if request.user.role == 'customer':
         messages.info(request, 'Coming out soon')
         return redirect('landing')
-        
+ 
     try:
-        submitted= False
-        user_role=request.user.role
+        submitted  = False
+        user_role  = request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
         else:
-            base_template='estate/base.html'
-        if request.method== 'POST':
-            prop_form=LeaseForm(request.POST or None, request.FILES or None) #request.FILES to handle the images 
-            image_form=RentImageFormSet(request.POST or None, request.FILES or None)
+            base_template = 'estate/base.html'
+ 
+        if request.method == 'POST':
+            prop_form  = LeaseForm(request.POST or None, request.FILES or None)
+            image_form = RentImageFormSet(request.POST or None, request.FILES or None)
+ 
             if prop_form.is_valid() and image_form.is_valid():
                 with transaction.atomic():
-                    landlord= prop_form.save(commit=False)
+                    landlord = prop_form.save(commit=False)
                     category = prop_form.cleaned_data.get('property_category')
-                    
-                    # Clear the non-selected fields
+ 
+                    # Clear non-selected category fields
                     if category == 'Residential':
                         landlord.commercial = ''
                         landlord.lands = ''
@@ -231,43 +260,62 @@ def lease_property(request):
                     elif category == 'Land':
                         landlord.residential = ''
                         landlord.commercial = ''
+ 
                     try:
-                        company= CompanyInformation.objects.get(user_id= request.user.id)
-                        landlord.company_uuid= company.unique_company_id
-                        landlord.user_id= request.user.id
-                        landlord.time_stamp= timezone.now()
+                        company = CompanyInformation.objects.get(user_id=request.user.id)
+                        landlord.company_uuid  = company.unique_company_id
+                        landlord.user_id       = request.user.id
+                        landlord.time_stamp    = timezone.now()
                         landlord.save()
-                        image_form.instance=landlord
+ 
+                        image_form.instance = landlord
                         image_form.save()
+ 
+                        # ── Initial scoring ──────────────────────────
+                        score_new_listing(landlord, 'Rent')
+ 
                         CompanyActivityLog.objects.create(
                             company=company,
-                            action= 'Property Listed'
+                            action='Property Listed'
                         )
+ 
                     except CompanyInformation.DoesNotExist:
-                        agent= AgentInformation.objects.get(user_id=request.user.id)
-                        landlord.agent_uuid= agent.agent_uuid
-                        if agent.company_uuid != None:
-                            landlord.company_uuid= agent.company_uuid
-                        landlord.user_id= request.user.id
-                        landlord.time_stamp= timezone.now()
+                        agent = AgentInformation.objects.get(user_id=request.user.id)
+                        landlord.agent_uuid = agent.agent_uuid
+                        if agent.company_uuid is not None:
+                            landlord.company_uuid = agent.company_uuid
+                        landlord.user_id      = request.user.id
+                        landlord.time_stamp   = timezone.now()
                         landlord.save()
-                        image_form.instance=landlord
+ 
+                        image_form.instance = landlord
                         image_form.save()
-                    #making sure form is submitted once
-                    return HttpResponseRedirect('?submitted=True')
+ 
+                        # ── Initial scoring ──────────────────────────
+                        score_new_listing(landlord, 'Rent')
+ 
+                return HttpResponseRedirect('?submitted=True')
+ 
             else:
                 return render(request, 'estate/error_page.html', {'e': prop_form.errors})
+ 
         else:
-            prop_form= LeaseForm()
-            image_form=RentImageFormSet()
+            prop_form  = LeaseForm()
+            image_form = RentImageFormSet()
             if 'submitted' in request.GET:
-                submitted=True
-        context={'form': prop_form,'image_form':image_form, 'submitted':submitted, 'base_template':base_template}
+                submitted = True
+ 
+        context = {
+            'form':          prop_form,
+            'image_form':    image_form,
+            'submitted':     submitted,
+            'base_template': base_template,
+        }
         return render(request, 'core/lease_property.html', context)
+ 
     except Exception as e:
         messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
-        
+        return render(request, 'estate/error_page.html', {'e': e})        
 
 
 '''News Blog Automation'''

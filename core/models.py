@@ -34,6 +34,8 @@ class PropertyManagementSale(models.Model):
     last_reset_date= models.DateTimeField(default=timezone.now)
     property_type=models.CharField('property Type', default='Sale')
     total_likes=models.IntegerField('Wishlisted time', default=0, blank=False, null=False)
+    listing_score=models.IntegerField('Listing Score', default=0, blank=False, null=False)
+    featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False )
 
 
 
@@ -65,6 +67,8 @@ class PropertyManagementRent(models.Model):
     last_reset_date= models.DateTimeField(default=timezone.now)
     property_type=models.CharField('property Type', default='Rent')
     total_likes=models.IntegerField('Wishlisted time', default=0, blank=False, null=False)
+    listing_score=models.IntegerField('Listing Score', default=0, blank=False, null=False)
+    featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False )
 
 
 

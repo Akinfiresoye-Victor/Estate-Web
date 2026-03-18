@@ -2,548 +2,722 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent Registration - Estate Web</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{% static 'agent/css/agent_form.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Agent Profile Setup — Estate Web</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'agent/css/agent_form.css' %}">
 </head>
 <body>
 
-    {% if submitted %}
-    <!-- Success Modal -->
-    <div class="success-overlay active" id="successModal">
-        <div class="success-card">
-            <div class="success-icon">
-                <i class="bi bi-check-circle-fill"></i>
-            </div>
-            <h2>Registration Successful!</h2>
-            <p>Your agent profile has been created successfully. You can now access your dashboard.</p>
-            <a href="{% url 'agent:dashboard' %}" class="btn-dashboard">Go to Dashboard</a>
+{# ── Messages ─────────────────────────────────────────────────────── #}
+<div class="messages-container">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' or message.tags == 'danger' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+      {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-circle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% elif message.tags == 'info' %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <i class="bi bi-info-circle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% else %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="bi bi-check-circle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
+
+
+{# ── Success overlay ─────────────────────────────────────────────── #}
+{% if submitted %}
+<div class="success-overlay" id="successModal">
+  <div class="success-card">
+    <div class="success-icon">
+      <i class="bi bi-check-circle-fill"></i>
     </div>
-    {% endif %}
+    <h2>Profile Created!</h2>
+    <p>
+      Welcome, {{ request.user.first_name }}! Your agent profile is ready.
+      Complete verification to earn your verified badge and gain client trust.
+    </p>
+    <a href="{% url 'agent:dashboard' %}" class="btn-dashboard">
+      <i class="bi bi-house-fill"></i> Go to Dashboard
+    </a>
+  </div>
+</div>
+{% endif %}
 
-<style>
-    :root {
-      --primary-color: #1a3c4e;
-      --secondary-color: #c19b76;
-      --accent-color: #8b7355;
-      --text-dark: #2c3e50;
-      --text-light: #6c757d;
-      --bg-light: #f8f9fa;
-      --success-color: #28a745;
-      --danger-color: #dc3545;
-      --warning-color: #ffc107;
-      --info-color: #17a2b8;
-    }
-    /* Messages Container */
-    .messages-container {
-      position: fixed;
-      top: 2rem;
-      right: 2rem;
-      z-index: 9999;
-      max-width: 400px;
-    }
 
-    .alert {
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-      animation: slideInRight 0.5s ease;
-      margin-bottom: 1rem;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: opacity 0.5s ease;
-    }
+{# ── Navbar ───────────────────────────────────────────────────────── #}
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
+      Estate Web
+    </a>
+    <div class="ms-auto d-flex gap-2">
+      <a href="{% url 'agent:dashboard' %}" class="btn-outline-dash">
+        <i class="bi bi-arrow-left"></i> Dashboard
+      </a>
+      <a href="{% url 'logout' %}" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+    </div>
+  </div>
+</nav>
 
-    .alert .btn-close {
-      width: 1.5rem !important;
-      height: 1.5rem !important;
-      min-width: 1.5rem !important;
-      min-height: 1.5rem !important;
-      padding: 0.3rem !important;
-      flex-shrink: 0 !important;
-      background-size: 1rem !important;
-    }
 
-    .alert.fade:not(.show) {
-      opacity: 0;
-    }
+{# ── Wizard ───────────────────────────────────────────────────────── #}
+<div class="wizard-wrapper">
 
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    /* Main Content Container */
-    .main-content {
-      padding: 0 0 4rem;
-    }
-
-    @media (max-width: 768px) {
-      .messages-container {
-        top: 1rem;
-        right: 1rem;
-        left: 1rem;
-        max-width: none;
-      }
-    }
-</style>
-  <!-- Messages Container -->
-  <div class="messages-container">
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags == 'error' or message.tags == 'danger' %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% elif message.tags == 'warning' %}
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% elif message.tags == 'info' %}
-          <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% else %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
+  {# Welcome banner using request.user — no need to re-ask name #}
+  <div class="welcome-banner">
+    <div class="welcome-avatar">{{ request.user.first_name|slice:":1"|upper }}</div>
+    <div class="welcome-text">
+      <h3>Hi, {{ request.user.first_name }} {{ request.user.last_name }} 👋</h3>
+      <p>Just a few more details to get your agent profile ready</p>
+    </div>
   </div>
 
-    <div class="form-wrapper">
-        
-        <!-- Left Side - Branding -->
-        <div class="form-left">
-            <div class="branding-content">
-                <div class="logo-section">
-                    <i class="bi bi-buildings"></i>
-                    <h1>Estate Web</h1>
-                </div>
-                <h2>Join Our Network of Professional Agents</h2>
-                <p>Complete your profile to start managing properties and connecting with clients.</p>
-                
-                <div class="features-list">
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle"></i>
-                        <span>Manage unlimited property listings</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle"></i>
-                        <span>Track leads and appointments</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle"></i>
-                        <span>Access analytics and reports</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="bi bi-check-circle"></i>
-                        <span>Professional verification badge</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="page-header">
+    <div class="header-icon"><i class="bi bi-person-badge-fill"></i></div>
+    <h1 class="page-title">Agent Profile Setup</h1>
+    <p class="page-subtitle">3 quick steps — takes about 2 minutes</p>
+  </div>
 
-        <!-- Right Side - Form -->
-        <div class="form-right">
-            <div class="form-container">
-                
-                <!-- Progress Steps -->
-                <div class="progress-steps">
-                    <div class="step active" data-step="1">
-                        <div class="step-number">1</div>
-                        <span>Basic Info</span>
-                    </div>
-                    <div class="step-line"></div>
-                    <div class="step" data-step="2">
-                        <div class="step-number">2</div>
-                        <span>Experience</span>
-                    </div>
-                    <div class="step-line"></div>
-                    <div class="step" data-step="3">
-                        <div class="step-number">3</div>
-                        <span>Social Links</span>
-                    </div>
-                </div>
+  {# Step indicator #}
+  <div class="step-indicator">
 
-                <form method="POST" enctype="multipart/form-data" id="agentForm">
-                    {% csrf_token %}
+    <div class="step-dot active" id="dot-1">
+      <div class="step-circle" id="circle-1">1</div>
+      <span class="step-dot-label">Contact</span>
+    </div>
+    <div class="step-line" id="line-1"></div>
 
-                    <!-- Step 1: Basic Information -->
-                    <div class="form-step active" data-step="1">
-                        <h3 class="step-title">Basic Information</h3>
-                        <p class="step-description">Tell us about yourself and your professional background</p>
+    <div class="step-dot" id="dot-2">
+      <div class="step-circle" id="circle-2">2</div>
+      <span class="step-dot-label">Professional</span>
+    </div>
+    <div class="step-line" id="line-2"></div>
 
-                        <div class="form-grid">
-                            <div class="form-group full-width">
-                                <label for="{{ form.first_name.id_for_label }}">
-                                    {{ form.first_name.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="{{ form.first_name.name }}" 
-                                       id="{{ form.first_name.id_for_label }}" 
-                                       class="form-control" 
-                                       placeholder="Enter your first name" 
-                                       required>
-                                {% if form.first_name.errors %}
-                                    <span class="error-text">{{ form.first_name.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                        <div class="form-grid">
-                            <div class="form-group full-width">
-                                <label for="{{ form.last_name.id_for_label }}">
-                                    {{ form.last_name.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="{{ form.last_name.name }}" 
-                                       id="{{ form.last_name.id_for_label }}" 
-                                       class="form-control" 
-                                       placeholder="Enter your last name" 
-                                       required>
-                                {% if form.last_name.errors %}
-                                    <span class="error-text">{{ form.last_name.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label for="{{ form.phone_number.id_for_label }}">
-                                    {{ form.phone_number.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="tel" name="{{ form.phone_number.name }}" 
-                                       id="{{ form.phone_number.id_for_label }}" 
-                                       class="form-control" 
-                                       placeholder="Enter phone number" 
-                                       required>
-                                {% if form.phone_number.errors %}
-                                    <span class="error-text">{{ form.phone_number.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label for="{{ form.email.id_for_label }}">
-                                    {{ form.email.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="email" name="{{ form.email.name }}" 
-                                       id="{{ form.email.id_for_label }}" 
-                                       class="form-control" 
-                                       placeholder="Enter email address" 
-                                       required>
-                                {% if form.email.errors %}
-                                    <span class="error-text">{{ form.email.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label for="{{ form.location.id_for_label }}">
-                                    {{ form.location.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <select name="{{ form.location.name }}" 
-                                        id="{{ form.location.id_for_label }}" 
-                                        class="form-control" 
-                                        required>
-                                    <option value="">Select your base city</option>
-                                    {% for value, label in form.location.field.choices %}
-                                        {% if value %}
-                                            <option value="{{ value }}">{{ label }}</option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                                {% if form.location.errors %}
-                                    <span class="error-text">{{ form.location.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group">
-                                <label for="{{ form.language.id_for_label }}">
-                                    {{ form.language.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="{{ form.language.name }}" 
-                                       id="{{ form.language.id_for_label }}" 
-                                       class="form-control" 
-                                       placeholder="e.g English, French" 
-                                       required>
-                                {% if form.language.errors %}
-                                    <span class="error-text">{{ form.language.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group full-width">
-                                <label for="{{ form.work_type.id_for_label }}">
-                                    {{ form.work_type.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <input type="text" name="{{ form.work_type.name }}" 
-                                       id="{{ form.work_type.id_for_label }}" 
-                                       class="form-control" 
-                                       placeholder="e.g Realtor, Consultant" 
-                                       required>
-                                {% if form.work_type.errors %}
-                                    <span class="error-text">{{ form.work_type.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group full-width">
-                                <label for="{{ form.bio.id_for_label }}">
-                                    {{ form.bio.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <textarea name="{{ form.bio.name }}" 
-                                          id="{{ form.bio.id_for_label }}" 
-                                          class="form-control" 
-                                          placeholder="Tell us about yourself in a detailes summary...." 
-                                          rows="4" 
-                                          required></textarea>
-                                {% if form.bio.errors %}
-                                    <span class="error-text">{{ form.bio.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group full-width">
-                                <label for="{{ form.profile_picture.id_for_label }}">
-                                    Profile Picture
-                                </label>
-                                <div class="file-upload-wrapper">
-                                    <input type="file" id="{{ form.profile_picture.id_for_label }}" 
-                                           name="{{ form.profile_picture.name }}" 
-                                           accept="image/*" class="file-input">
-                                    <label for="{{ form.profile_picture.id_for_label }}" class="file-label">
-                                        <i class="bi bi-cloud-upload"></i>
-                                        <span>Choose profile picture</span>
-                                    </label>
-                                    <span class="file-name"></span>
-                                </div>
-                                {% if form.profile_picture.errors %}
-                                    <span class="error-text">{{ form.profile_picture.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group full-width">
-                                <label for="{{ form.government_id.id_for_label }}">
-                                    {{ form.government_id.label }}
-                                    <span class="required">*</span>
-                                </label>
-                                <div class="file-upload-wrapper">
-                                    <input type="file" id="{{ form.government_id.id_for_label }}" 
-                                           name="{{ form.government_id.name }}" 
-                                           accept=".pdf,.jpg,.jpeg,.png" class="file-input">
-                                    <label for="{{ form.government_id.id_for_label }}" class="file-label">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                        <span>Upload government ID</span>
-                                    </label>
-                                    <span class="file-name"></span>
-                                </div>
-                                {% if form.government_id.errors %}
-                                    <span class="error-text">{{ form.government_id.errors }}</span>
-                                {% endif %}
-                            </div>
-
-                            <div class="form-group full-width">
-                                <label for="{{ form.certificate.id_for_label }}">
-                                    {{ form.certificate.label }}
-                                </label>
-                                <div class="file-upload-wrapper">
-                                    <input type="file" id="{{ form.certificate.id_for_label }}" 
-                                           name="{{ form.certificate.name }}" 
-                                           accept=".pdf,.jpg,.jpeg,.png" class="file-input">
-                                    <label for="{{ form.certificate.id_for_label }}" class="file-label">
-                                        <i class="bi bi-award"></i>
-                                        <span>Upload certificate</span>
-                                    </label>
-                                    <span class="file-name"></span>
-                                </div>
-                                {% if form.certificate.errors %}
-                                    <span class="error-text">{{ form.certificate.errors }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-next">
-                                Next Step
-                                <i class="bi bi-arrow-right"></i>
-                            </button>
-                        </div>
-                        <br/>
-                        <div class="text-center">
-                        <a class= "btn btn-danger w-10" href="{%url 'logout'%}">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                        </a>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Experience -->
-                    <div class="form-step" data-step="2">
-                        <h3 class="step-title">Professional Experience</h3>
-                        <p class="step-description">Add your work history and experience</p>
-
-                        <div id="experienceSection">
-                            {{ exp_form.management_form }}
-                            <div class="experience-forms">
-                                {% for form in exp_form %}
-                                    <div class="experience-item">
-                                        <div class="experience-header">
-                                            <h4>Experience #<span class="exp-number">{{ forloop.counter }}</span></h4>
-                                            {% if not forloop.first %}
-                                                <button type="button" class="btn-remove-exp">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        <div class="form-grid">
-                                            <div class="form-group">
-                                                <label>Company Name</label>
-                                                {{ form.company }}
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Position/Title</label>
-                                                {{ form.title }}
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Start Date</label>
-                                                {{ form.start_date }}
-                                            </div>
-                                            <div class="form-group">
-                                                <label>End Date</label>
-                                                {{ form.end_date }}
-                                            </div>
-                                        </div>
-                                        {{ form.DELETE }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn-add-more" id="addExperience">
-                            <i class="bi bi-plus-circle"></i>
-                            Add Another Experience
-                        </button>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-prev">
-                                <i class="bi bi-arrow-left"></i>
-                                Previous
-                            </button>
-                            <button type="button" class="btn-next">
-                                Next Step
-                                <i class="bi bi-arrow-right"></i>
-                            </button>
-                        </div>
-                        <br/>
-                        <div class="text-center">
-                        <a class= "btn btn-danger w-10" href="{%url 'logout'%}">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                        </a>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Social Links -->
-                    <div class="form-step" data-step="3">
-                        <h3 class="step-title">Social Media Links</h3>
-                        <p class="step-description">Connect your professional social media profiles</p>
-
-                        <div id="socialSection">
-                            {{ social.management_form }}
-                            <div class="social-forms">
-                                {% for form in social %}
-                                    <div class="social-item">
-                                        <div class="social-header">
-                                            <h4>Social Link #<span class="social-number">{{ forloop.counter }}</span></h4>
-                                            {% if not forloop.first %}
-                                                <button type="button" class="btn-remove-social">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        <div class="form-grid">
-                                            <div class="form-group">
-                                                <label>Platform</label>
-                                                {{ form.social_platform }}
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Profile URL</label>
-                                                {{ form.link_to_social }}
-                                            </div>
-                                        </div>
-                                        {{ form.DELETE }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn-add-more" id="addSocial">
-                            <i class="bi bi-plus-circle"></i>
-                            Add Another Link
-                        </button>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-prev">
-                                <i class="bi bi-arrow-left"></i>
-                                Previous
-                            </button>
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-check-circle"></i>
-                                Complete Registration
-                            </button>
-                        </div>
-                        <br/>
-                        <div class="text-center">
-                        <a class= "btn btn-danger w-10" href="{%url 'logout'%}">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
-                        </a>
-                        </div>
-                    </div>
-
-                </form>
-
-            </div>
-        </div>
-
+    <div class="step-dot" id="dot-3">
+      <div class="step-circle" id="circle-3">3</div>
+      <span class="step-dot-label">Documents</span>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'agent/js/agent_form.js' %}"></script>
-    
-    <!-- Auto-dismiss alerts -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-          setTimeout(function() {
-            alert.classList.remove('show');
-            setTimeout(function() {
-              alert.remove();
-            }, 500);
-          }, 5000);
-        });
+  </div>
+
+  {# Progress bar #}
+  <div class="wizard-progress">
+    <div class="wizard-progress-fill" id="progressFill" style="width:33%"></div>
+  </div>
+
+
+  <form method="POST" enctype="multipart/form-data" id="agentForm">
+    {% csrf_token %}
+
+    <div class="wizard-card">
+
+      <div class="wizard-step active" id="step-1">
+
+        <div class="step-header">
+          <i class="bi bi-telephone-fill"></i>
+          <div class="step-header-text">
+            <h3>Contact Details</h3>
+            <p>How clients and the platform will reach you</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="form-label">
+                  Phone Number <span class="required">*</span>
+                </label>
+                <input type="tel"
+                       name="{{ form.phone_number.name }}"
+                       id="{{ form.phone_number.id_for_label }}"
+                       class="form-control"
+                       placeholder="e.g. 08012345678"
+                       required>
+                {% if form.phone_number.errors %}
+                  <span class="error-text">{{ form.phone_number.errors }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="form-label">
+                  Email Address <span class="required">*</span>
+                </label>
+                <input type="email"
+                       name="{{ form.email.name }}"
+                       id="{{ form.email.id_for_label }}"
+                       class="form-control"
+                       placeholder="Personal or company email"
+                       required>
+                {# Clarify it can be any email #}
+                <span class="field-hint">Can be your personal or company email address</span>
+                {% if form.email.errors %}
+                  <span class="error-text">{{ form.email.errors }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="form-label">
+                  Base City / State <span class="required">*</span>
+                </label>
+                <select name="{{ form.location.name }}"
+                        id="{{ form.location.id_for_label }}"
+                        required>
+                  <option value="">Select your base city</option>
+                  {% for value, label in form.location.field.choices %}
+                    {% if value %}
+                      <option value="{{ value }}">{{ label }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                {% if form.location.errors %}
+                  <span class="error-text">{{ form.location.errors }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="form-label">
+                  Languages Spoken <span class="required">*</span>
+                </label>
+                <input type="text"
+                       name="{{ form.language.name }}"
+                       id="{{ form.language.id_for_label }}"
+                       class="form-control"
+                       placeholder="e.g. English, Yoruba"
+                       required>
+                {% if form.language.errors %}
+                  <span class="error-text">{{ form.language.errors }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="step-nav">
+          <span class="step-count">Step 1 of 3</span>
+          <button type="button" class="btn-next" onclick="goToStep(2)">
+            Continue <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>{# end step-1 #}
+
+
+      <div class="wizard-step" id="step-2">
+
+        <div class="step-header">
+          <i class="bi bi-briefcase-fill"></i>
+          <div class="step-header-text">
+            <h3>Professional Info</h3>
+            <p>Your role, bio and work history</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          <div class="form-group">
+            <label class="form-label">
+              Nature of Work <span class="required">*</span>
+            </label>
+            <input type="text"
+                   name="{{ form.work_type.name }}"
+                   id="{{ form.work_type.id_for_label }}"
+                   class="form-control"
+                   placeholder="e.g. Realtor, Property Consultant"
+                   required>
+            {% if form.work_type.errors %}
+              <span class="error-text">{{ form.work_type.errors }}</span>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              About You <span class="required">*</span>
+            </label>
+            <textarea name="{{ form.bio.name }}"
+                      id="{{ form.bio.id_for_label }}"
+                      class="form-control"
+                      placeholder="Write a brief professional summary about yourself..."
+                      required></textarea>
+            {% if form.bio.errors %}
+              <span class="error-text">{{ form.bio.errors }}</span>
+            {% endif %}
+          </div>
+
+          {# Experience formset #}
+          <div class="form-group">
+            <label class="form-label">
+              Work Experience
+              <span class="optional-badge">Optional</span>
+            </label>
+
+            <div id="experienceSection">
+              {{ exp_form.management_form }}
+              <div class="experience-forms" id="experienceForms">
+                {% for exp in exp_form %}
+                  <div class="experience-item">
+                    <div class="item-header">
+                      <h4><i class="bi bi-building"></i> Experience #{{ forloop.counter }}</h4>
+                      {% if not forloop.first %}
+                        <button type="button" class="btn-remove-item btn-remove-exp">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      {% endif %}
+                    </div>
+                    <div class="row g-2">
+                      <div class="col-sm-6">
+                        <label class="form-label">Company</label>
+                        {{ exp.company }}
+                        {% if exp.company.errors %}
+                          <span class="error-text">{{ exp.company.errors }}</span>
+                        {% endif %}
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="form-label">Position / Title</label>
+                        {{ exp.title }}
+                        {% if exp.title.errors %}
+                          <span class="error-text">{{ exp.title.errors }}</span>
+                        {% endif %}
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="form-label">Start Date</label>
+                        {{ exp.start_date }}
+                        {% if exp.start_date.errors %}
+                          <span class="error-text">{{ exp.start_date.errors }}</span>
+                        {% endif %}
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="form-label">End Date <span class="optional-badge">Leave blank if current</span></label>
+                        {{ exp.end_date }}
+                        {% if exp.end_date.errors %}
+                          <span class="error-text">{{ exp.end_date.errors }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    {{ exp.DELETE }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <button type="button" class="btn-add-more" id="addExperience">
+              <i class="bi bi-plus-circle"></i> Add Experience
+            </button>
+          </div>
+
+          {# Social links formset #}
+          <div class="form-group">
+            <label class="form-label">
+              Social / Professional Links
+              <span class="optional-badge">Optional</span>
+            </label>
+
+            <div id="socialSection">
+              {{ social.management_form }}
+              <div class="social-forms" id="socialForms">
+                {% for soc in social %}
+                  <div class="social-item">
+                    <div class="item-header">
+                      <h4><i class="bi bi-link-45deg"></i> Social Link #{{ forloop.counter }}</h4>
+                      {% if not forloop.first %}
+                        <button type="button" class="btn-remove-item btn-remove-social">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      {% endif %}
+                    </div>
+                    <div class="row g-2">
+                      <div class="col-sm-5">
+                        <label class="form-label">Platform</label>
+                        {{ soc.social_platform }}
+                        {% if soc.social_platform.errors %}
+                          <span class="error-text">{{ soc.social_platform.errors }}</span>
+                        {% endif %}
+                      </div>
+                      <div class="col-sm-7">
+                        <label class="form-label">Profile URL</label>
+                        {{ soc.link_to_social }}
+                        {% if soc.link_to_social.errors %}
+                          <span class="error-text">{{ soc.link_to_social.errors }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    {{ soc.DELETE }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <button type="button" class="btn-add-more" id="addSocial">
+              <i class="bi bi-plus-circle"></i> Add Social Link
+            </button>
+          </div>
+
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn-prev" onclick="goToStep(1)">
+            <i class="bi bi-arrow-left"></i> Back
+          </button>
+          <span class="step-count">Step 2 of 3</span>
+          <button type="button" class="btn-next" onclick="goToStep(3)">
+            Continue <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>{# end step-2 #}
+
+
+
+      <div class="wizard-step" id="step-3">
+
+        <div class="step-header">
+          <i class="bi bi-file-earmark-person-fill"></i>
+          <div class="step-header-text">
+            <h3>Documents & Photo</h3>
+            <p>Speeds up your verified badge — most are optional</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          {# Profile picture #}
+          <div class="form-group">
+            <label class="form-label">
+              Profile Picture
+              <span class="optional-badge">Optional</span>
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file"
+                     id="{{ form.profile_picture.id_for_label }}"
+                     name="{{ form.profile_picture.name }}"
+                     accept="image/*"
+                     class="file-input">
+              <label for="{{ form.profile_picture.id_for_label }}" class="file-label">
+                <i class="bi bi-person-bounding-box"></i>
+                <span>Choose a clear, professional photo</span>
+              </label>
+              <span class="file-name" id="pictureName"></span>
+            </div>
+            {% if form.profile_picture.errors %}
+              <span class="error-text">{{ form.profile_picture.errors }}</span>
+            {% endif %}
+          </div>
+
+          {# Government ID #}
+          <div class="form-group">
+            <label class="form-label">
+              Government ID <span class="required">*</span>
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file"
+                     id="{{ form.government_id.id_for_label }}"
+                     name="{{ form.government_id.name }}"
+                     accept=".pdf,.jpg,.jpeg,.png"
+                     class="file-input">
+              <label for="{{ form.government_id.id_for_label }}" class="file-label">
+                <i class="bi bi-card-heading"></i>
+                <span>NIN, Voter's Card, Driver's Licence, etc.</span>
+              </label>
+              <span class="file-name" id="govIdName"></span>
+            </div>
+            <span class="form-text">PDF, JPG or PNG accepted</span>
+            {% if form.government_id.errors %}
+              <span class="error-text">{{ form.government_id.errors }}</span>
+            {% endif %}
+          </div>
+
+          {# Professional certificate #}
+          <div class="form-group">
+            <label class="form-label">
+              Professional Certificate
+              <span class="optional-badge">Optional</span>
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file"
+                     id="{{ form.certificate.id_for_label }}"
+                     name="{{ form.certificate.name }}"
+                     accept=".pdf,.jpg,.jpeg,.png"
+                     class="file-input">
+              <label for="{{ form.certificate.id_for_label }}" class="file-label">
+                <i class="bi bi-award"></i>
+                <span>IESV, NIESV or any relevant certificate</span>
+              </label>
+              <span class="file-name" id="certName"></span>
+            </div>
+            <span class="form-text">Helps verify your credentials faster</span>
+            {% if form.certificate.errors %}
+              <span class="error-text">{{ form.certificate.errors }}</span>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn-prev" onclick="goToStep(2)">
+            <i class="bi bi-arrow-left"></i> Back
+          </button>
+          <span class="step-count">Step 3 of 3</span>
+          <button type="submit" class="btn-submit">
+            <i class="bi bi-check-circle"></i> Complete Setup
+          </button>
+        </div>
+
+      </div>{# end step-3 #}
+
+    </div>{# end wizard-card #}
+  </form>
+
+</div>{# end wizard-wrapper #}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'agent/js/agent_form.js' %}"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   Agent Form — Step Wizard with Validation
+   ═══════════════════════════════════════════════════ */
+
+var TOTAL = 3;
+var current = 1;
+
+/* Required field IDs per step */
+var STEP_REQUIRED = {
+  1: [
+    '{{ form.phone_number.id_for_label }}',
+    '{{ form.email.id_for_label }}',
+    '{{ form.location.id_for_label }}',
+    '{{ form.language.id_for_label }}'
+  ],
+  2: [
+    '{{ form.work_type.id_for_label }}',
+    '{{ form.bio.id_for_label }}'
+  ],
+  3: [
+    '{{ form.government_id.id_for_label }}'  /* file field — checked differently */
+  ]
+};
+
+/* ── Validate a step — returns true if all required fields filled ── */
+function validateStep(n) {
+  var ids    = STEP_REQUIRED[n] || [];
+  var passed = true;
+
+  ids.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+
+    clearFieldError(el);
+
+    /* File inputs need special check */
+    var empty = (el.type === 'file')
+      ? (!el.files || el.files.length === 0)
+      : el.value.trim() === '';
+
+    if (empty) {
+      showFieldError(el);
+      passed = false;
+    }
+  });
+
+  return passed;
+}
+
+function showFieldError(el) {
+  el.classList.add('field-error');
+
+  var parent = el.closest('.form-group') || el.parentElement;
+  if (!parent.querySelector('.field-error-msg')) {
+    var msg = document.createElement('span');
+    msg.className = 'field-error-msg';
+    msg.textContent = el.type === 'file'
+      ? 'Please upload this file'
+      : 'This field is required';
+    parent.appendChild(msg);
+  }
+
+  var evt = el.type === 'file' ? 'change' : 'input';
+  el.addEventListener(evt, function onFix() {
+    var nowFilled = el.type === 'file'
+      ? (el.files && el.files.length > 0)
+      : el.value.trim() !== '';
+
+    if (nowFilled) {
+      clearFieldError(el);
+      updateDot(current);
+    }
+    el.removeEventListener(evt, onFix);
+  });
+}
+
+function clearFieldError(el) {
+  el.classList.remove('field-error');
+  var parent = el.closest('.form-group') || el.parentElement;
+  var msg = parent.querySelector('.field-error-msg');
+  if (msg) msg.remove();
+}
+
+/* ── Update a single dot: ✓ completed / ✗ error / active / default ── */
+function updateDot(n, forceActive) {
+  var dot    = document.getElementById('dot-' + n);
+  var circle = document.getElementById('circle-' + n);
+  if (!dot || !circle) return;
+
+  dot.classList.remove('active', 'completed', 'error');
+
+  if (forceActive) {
+    dot.classList.add('active');
+    circle.textContent = n;
+    return;
+  }
+
+  var ids = STEP_REQUIRED[n] || [];
+  if (ids.length === 0) {
+    /* No required fields — mark complete once visited */
+    dot.classList.add('completed');
+    circle.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem"></i>';
+    return;
+  }
+
+  var allFilled = ids.every(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return true;
+    return el.type === 'file'
+      ? (el.files && el.files.length > 0)
+      : el.value.trim() !== '';
+  });
+
+  if (allFilled) {
+    dot.classList.add('completed');
+    circle.innerHTML = '<i class="bi bi-check-lg" style="font-size:.65rem"></i>';
+  } else {
+    dot.classList.add('error');
+    circle.innerHTML = '<i class="bi bi-x-lg" style="font-size:.6rem"></i>';
+  }
+}
+
+/* ── Move to a step ── */
+function goToStep(n, skipValidation) {
+  if (n < 1 || n > TOTAL) return;
+
+  /* Block forward move if current step has empty required fields */
+  if (!skipValidation && n > current) {
+    if (!validateStep(current)) {
+      updateDot(current);
+      return;
+    }
+  }
+
+  /* Save dot state for the step we're leaving */
+  if (!skipValidation) updateDot(current);
+
+  /* Switch panels */
+  document.getElementById('step-' + current).classList.remove('active');
+  document.getElementById('step-' + n).classList.add('active');
+
+  /* Update all dots */
+  for (var i = 1; i <= TOTAL; i++) {
+    if (i === n) {
+      var d = document.getElementById('dot-' + i);
+      var c = document.getElementById('circle-' + i);
+      if (d && c) {
+        d.classList.remove('active', 'completed', 'error');
+        d.classList.add('active');
+        c.textContent = i;
+      }
+    }
+    var line = document.getElementById('line-' + i);
+    if (line) line.classList.toggle('completed', i < n);
+  }
+
+  document.getElementById('progressFill').style.width =
+    Math.round((n / TOTAL) * 100) + '%';
+
+  current = n;
+  document.querySelector('.wizard-wrapper')
+    .scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── DOMContentLoaded ── */
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* File name display */
+  [
+    ['{{ form.profile_picture.id_for_label }}', 'pictureName'],
+    ['{{ form.government_id.id_for_label }}',   'govIdName'],
+    ['{{ form.certificate.id_for_label }}',     'certName'],
+  ].forEach(function (pair) {
+    var input = document.getElementById(pair[0]);
+    var label = document.getElementById(pair[1]);
+    if (input && label) {
+      input.addEventListener('change', function () {
+        label.textContent = this.files.length ? this.files[0].name : '';
       });
-    </script>
+    }
+  });
+
+  /* Auto-dismiss alerts */
+  document.querySelectorAll('.alert').forEach(function (alert) {
+    setTimeout(function () {
+      alert.classList.remove('show');
+      setTimeout(function () { alert.remove(); }, 400);
+    }, 5000);
+  });
+
+  /* Jump to step with Django server-side errors */
+  var hasStep1 = [
+    '{{ form.phone_number.errors|yesno:"true,false" }}',
+    '{{ form.email.errors|yesno:"true,false" }}',
+    '{{ form.location.errors|yesno:"true,false" }}',
+    '{{ form.language.errors|yesno:"true,false" }}'
+  ].includes('true');
+
+  var hasStep2 = [
+    '{{ form.work_type.errors|yesno:"true,false" }}',
+    '{{ form.bio.errors|yesno:"true,false" }}'
+  ].includes('true');
+
+  if (hasStep1) {
+    goToStep(1, true);
+  } else if (hasStep2) {
+    goToStep(2, true);
+  } else if ('{{ form.errors|yesno:"true,false" }}' === 'true') {
+    goToStep(3, true);
+  }
+});
+</script>
+
 </body>
 </html>

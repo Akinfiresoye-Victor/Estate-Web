@@ -7,8 +7,10 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Sum
 from estate.models import LeadInfo
-
-
+from core.models import PropertyManagementRent, PropertyManagementSale,PropertyViews, WishlistStorageUnit
+from estate.models import LeadInfo
+from agents.models import AgentInformation
+from companies.models import CompanyInformation
 
 
 def monthly_change(current_value, average_value):
@@ -49,7 +51,6 @@ def engagement_rate(total_likes, avg_property_views, avg_profile_views, rating_s
 
 def reset_button(analytics, agent_uuid, lease_views, sale_views):
     """Reset monthly tracking if 30 days have passed"""
-    from core.models import PropertyManagementRent, PropertyManagementSale
     
     current_time = timezone.now()
     time_difference = current_time - analytics.last_reset_date
@@ -241,3 +242,210 @@ def property_views_count(property_type, property_id):
     ).count()
     
     
+
+
+
+
+
+from datetime import timedelta
+from django.utils import timezone
+
+
+# ── helpers ───────────────────────────────────────────────────────────────────
+
+def _get_description(property_obj, property_type):
+    """Both models store the description under different field names."""
+    if property_type == 'Rent':
+        return getattr(property_obj, 'description', '') or ''
+    return getattr(property_obj, 'property_description', '') or ''
+
+
+def _is_verified_lister(property_obj):
+    """
+    Returns True if the lister (agent or company) is verified.
+    Imported inside the function to avoid circular imports.
+    """
+    try:
+
+
+        if property_obj.agent_uuid and property_obj.agent_uuid != 'None':
+            agent = AgentInformation.objects.filter(
+                agent_uuid=property_obj.agent_uuid
+            ).first()
+            return bool(agent and agent.verified)
+
+        if property_obj.company_uuid and property_obj.company_uuid != 'None':
+            company = CompanyInformation.objects.filter(
+                unique_company_id=property_obj.company_uuid
+            ).first()
+            return bool(company and company.verified)
+
+    except Exception:
+        pass
+    return False
+
+
+def _is_fully_complete(property_obj):
+    """
+    True if the listing has filled all the fields that matter most
+    for a buyer/renter to make a decision.
+    """
+    return all([
+        property_obj.bedrooms,
+        property_obj.bathrooms,
+        property_obj.location,
+        property_obj.phone_number,
+        property_obj.base_image,
+    ])
+
+
+def _count_media(property_obj):
+    """Returns total image count (base image counts as 1)."""
+    extra = property_obj.images.count()      # related formset images
+    base  = 1 if property_obj.base_image else 0
+    return base + extra
+
+
+def _get_activity_counts(property_obj, property_type):
+    """
+    Returns (views, saves, inquiries) for a property.
+    Imported locally to avoid circular imports.
+    """
+    try:       # adjust app label if different
+
+        views     = PropertyViews.objects.filter(
+            property_type=property_type,
+            property_id=property_obj.pk
+        ).count()
+
+        saves     = WishlistStorageUnit.objects.filter(
+            property_type=property_type,
+            property_id=property_obj.pk
+        ).count()
+
+        inquiries = LeadInfo.objects.filter(
+            property_type=property_type,
+            property_intrested=property_obj.pk
+        ).count()
+
+        return views, saves, inquiries
+
+    except Exception:
+        return 0, 0, 0
+
+
+# ── core calculation (always starts from zero) ────────────────────────────────
+
+def _calculate_full_score(property_obj, property_type):
+    """
+    Calculates the complete listing score from scratch.
+    Never reads the stored listing_score — so calling this twice
+    produces the same result (idempotent).
+    """
+    points = 0
+
+    # ── 1. Media density ─────────────────────────────────────────────
+    media = _count_media(property_obj)
+    if media >= 3:
+        points += 10
+    elif media >= 1:
+        points += 5
+    # 0 images → 0 points
+
+    # ── 2. Description quality ───────────────────────────────────────
+    desc_len = len(_get_description(property_obj, property_type))
+    if desc_len >= 200:
+        points += 10
+    elif desc_len >= 50:
+        points += 5
+    # < 50 chars → 0 points
+
+    # ── 3. Verified lister bonus ─────────────────────────────────────
+    if _is_verified_lister(property_obj):
+        points += 5
+
+    # ── 4. Full completion bonus ──────────────────────────────────────
+    if _is_fully_complete(property_obj):
+        points += 5
+
+    # ── 5. New listing boost (first 48 hours only) ────────────────────
+    # Handled later via the age multiplier, but we give a flat +10 here
+    # only at initial scoring (flag it via the caller).
+    # Actually handled in score_new_listing() below.
+
+    # ── 6. Activity ───────────────────────────────────────────────────
+    views, saves, inquiries = _get_activity_counts(property_obj, property_type)
+
+    if views >= 10:
+        points += 10
+    if saves >= 5:
+        points += 10
+    if inquiries >= 5:
+        points += 10
+
+    # ── 7. Age multiplier ─────────────────────────────────────────────
+    age = timezone.now() - property_obj.listed_date
+
+    if age <= timedelta(hours=48):
+        points = int(points * 1.2)          # new listing boost
+    elif age <= timedelta(days=7):
+        pass                                 # baseline — no change
+    elif age <= timedelta(days=30):
+        points = int(points * 0.8)           # initial decay
+    else:
+        points = int(points * 0.5)           # old listing penalty
+
+    # ── 8. Featured listing override ─────────────────────────────────
+    if property_obj.featured_listings:
+        points += 50
+
+    return points
+
+
+# ── public API ────────────────────────────────────────────────────────────────
+
+def score_new_listing(property_obj, property_type):
+    """
+    Called ONCE right after a property is first saved.
+    Includes the new-user / new-listing +10 boost.
+    Saves the score back to the object.
+    """
+    points = _calculate_full_score(property_obj, property_type)
+
+    # Extra +10 for brand-new listings (first time only)
+    points += 10
+
+    property_obj.listing_score = points
+    property_obj.last_reset_date = timezone.now()
+    property_obj.save(update_fields=['listing_score', 'last_reset_date'])
+
+    return points
+
+
+def refresh_activity_score(property_obj, property_type):
+    """
+    Recalculates the full score from scratch and saves it.
+
+    Uses last_reset_date as a 24-hour gate: if it was already updated
+    in the last 24 hours this function returns immediately without
+    touching the database.  This means it is safe to call from any
+    view (e.g. a property-detail view) without risk of the score
+    ballooning on every request.
+
+    Returns the new score, or the current stored score if the gate
+    prevented a recalculation.
+    """
+    now     = timezone.now()
+    elapsed = now - property_obj.last_reset_date
+
+    # ── 24-hour gate ──────────────────────────────────────────────────
+    if elapsed < timedelta(hours=24):
+        return property_obj.listing_score          # nothing to do
+
+    points = _calculate_full_score(property_obj, property_type)
+
+    property_obj.listing_score  = points
+    property_obj.last_reset_date = now
+    property_obj.save(update_fields=['listing_score', 'last_reset_date'])
+
+    return points

@@ -34,6 +34,7 @@ class AgentInformation(models.Model):
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
     certificate = models.FileField('Professional Certificate', blank=True, null=True)
     verified = models.BooleanField('Verified agent', default=False)
+    date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):
         return f'{self.first_name}-{self.last_name}'
 

@@ -33,7 +33,7 @@ class CompanyInformation(models.Model):
     principal_broker= models.CharField('Registered Owner of Company', max_length=100)
     time_created=models.DateTimeField(default=timezone.now, blank=False)
     verified=models.BooleanField('Verified Company',default=False)
-    agents_employed=models.IntegerField('Number of Employees', default=0, blank=False, null=False)
+    date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):
         return self.company_name
 
@@ -190,7 +190,7 @@ class CompanyActivityLog(models.Model):
     action = models.CharField('Activity Description', max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     
-#TODO the appointment side must use UUID for the crud implementation
+
 
 
 class InviteLink(models.Model):

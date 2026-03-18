@@ -17,6 +17,7 @@ from companies.models import CompanyInformation, CompanyRating
 import uuid
 from django.db.models import Avg, Count
 from django.core.exceptions import ObjectDoesNotExist
+from core.utils import refresh_activity_score
 
 
 
@@ -80,90 +81,94 @@ def property_view_count(property_id, property_type, users_id, users_uuid):
 
 
 def buy_property(request):
-    
-    """
-    Lists all the properties on sale
-    """
-    
+    """Lists all properties on sale, ordered by listing score."""
+ 
     if not request.user.is_authenticated:
-        messages.info(request,'Log in to gain access')
+        messages.info(request, 'Log in to gain access')
         return redirect('login')
     if not request.user.role == 'customer':
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
-    
+ 
     try:
-        sale_qs=PropertyManagementSale.objects.all().order_by('-listed_date')
-        #Filtering Code
-        myfilter=PropertySaleFilter(request.GET, queryset=sale_qs)
-        if myfilter.qs:
-            sale_qs=myfilter.qs
-        else:
-            sale_qs=[]
-        #The line that does the actual querying and its organized by the date listed from the latest to the oldest 
-        p=Paginator(sale_qs, 9)
-        page=request.GET.get('page')
-        on_sale= p.get_page(page)
-        nums= "a" * on_sale.paginator.num_pages
-        
-        properties_list=[]
-        for prop in sale_qs:
-            properties_list.append(prop)
-        #generating users liked properties
-        in_wishlist=wishlist_generator(properties_list, request.user.id)
-        properties_with_wishist=zip(on_sale, in_wishlist)
-        context={
-            'buy': properties_with_wishist,
-            'on_sale': on_sale,
-            'nums':nums,
-            'salefilter':myfilter
+        # ── Order by score (highest first), then recency as tiebreaker ──
+        sale_qs = PropertyManagementSale.objects.all().order_by(
+            '-listing_score', '-listed_date'
+        )
+ 
+        # Filtering
+        myfilter = PropertySaleFilter(request.GET, queryset=sale_qs)
+        sale_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementSale.objects.none()
+ 
+        p       = Paginator(sale_qs, 9)
+        page    = request.GET.get('page')
+        on_sale = p.get_page(page)
+        nums    = "a" * on_sale.paginator.num_pages
+ 
+        properties_list       = list(sale_qs)
+        in_wishlist           = wishlist_generator(properties_list, request.user.id)
+        properties_with_wishlist = zip(on_sale, in_wishlist)
+ 
+        context = {
+            'buy':        properties_with_wishlist,
+            'on_sale':    on_sale,
+            'nums':       nums,
+            'salefilter': myfilter,
         }
-        return render(request, 'estate/buy_property.html',context)
-    
+        return render(request, 'estate/buy_property.html', context)
+ 
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
-
-
-
+ 
+ 
+# ─────────────────────────────────────────────────────────────────────────────
+# rent_property — ordered by listing_score, activity refresh on detail views
+# ─────────────────────────────────────────────────────────────────────────────
+ 
 def rent_property(request):
-    """
-    Lists all the properties on rent
-    """
+    """Lists all properties on rent, ordered by listing score."""
+ 
     if not request.user.is_authenticated:
-        messages.info(request, 'login Required')
+        messages.info(request, 'Login Required')
         return redirect('login')
     if not request.user.role == 'customer':
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
+ 
     try:
-        rent_qs=PropertyManagementRent.objects.all().order_by('-listed_date')
-        #Filtering
-        myfilter=PropertyRentFilter(request.GET, queryset=rent_qs)
-        if myfilter.qs:
-            rent_qs=myfilter.qs
-        else:
-            rent_qs=[]
-        p=Paginator(rent_qs, 9)
-        page= request.GET.get('page')
-        on_lease= p.get_page(page)
-        nums= "a" * on_lease.paginator.num_pages
-        
-        properties_list=[]
-        for prop in rent_qs:
-            properties_list.append(prop)
-        in_wishlist=wishlist_generator(properties_list, request.user.id)
-        properties_with_wishlist=zip(on_lease, in_wishlist)
-        context={
-            'nums':nums,
-            'on_lease': properties_with_wishlist,
-            'leased':on_lease,
-            'rentfilter':myfilter
+        # ── Order by score (highest first), then recency as tiebreaker ──
+        rent_qs = PropertyManagementRent.objects.all().order_by(
+            '-listing_score', '-listed_date'
+        )
+ 
+        # Filtering
+        myfilter = PropertyRentFilter(request.GET, queryset=rent_qs)
+        rent_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementRent.objects.none()
+ 
+        p        = Paginator(rent_qs, 9)
+        page     = request.GET.get('page')
+        on_lease = p.get_page(page)
+        nums     = "a" * on_lease.paginator.num_pages
+ 
+        properties_list         = list(rent_qs)
+        in_wishlist             = wishlist_generator(properties_list, request.user.id)
+        properties_with_wishlist = zip(on_lease, in_wishlist)
+ 
+        context = {
+            'nums':       nums,
+            'on_lease':   properties_with_wishlist,
+            'leased':     on_lease,
+            'rentfilter': myfilter,
         }
         return render(request, 'estate/rent_property.html', context)
-    
+ 
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
+
+# Add this import at the top of your views.py alongside the other scoring import:
+#
+#   from .scoring import score_new_listing, refresh_activity_score
 
 
 def view_property_on_sale(request, property_id):
@@ -207,9 +212,12 @@ def view_property_on_sale(request, property_id):
                 else f'Listed by {agent_in_charge.first_name} (Independent)'
             )
 
-        # ── Single call for both branches ────────────────────
         messages.info(request, msg)
         property_view_count(property_id, "Sale", request.user.id, view_id)
+
+        # ── Refresh score (24-hour gate means this only does real
+        #    work once per day regardless of how many users view it) ──
+        refresh_activity_score(prop, 'Sale')
 
         return render(request, 'estate/view_property_s.html', {
             'property':      prop,
@@ -224,39 +232,39 @@ def view_property_on_sale(request, property_id):
         return redirect(request.META.get('HTTP_REFERER', 'customer:buy-property'))
 
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})  
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 def view_property_on_lease(request, property_id):
-    """
-    View Listed Property in details
-    """
+    """View Listed Property in details"""
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
         return redirect('login')
+
     try:
-        user_role=request.user.role
+        user_role = request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
         else:
-            base_template='estate/base.html'
+            base_template = 'estate/base.html'
 
-        property_to_be_viewed= PropertyManagementRent.objects.get(pk=property_id)
-        
+        property_to_be_viewed = PropertyManagementRent.objects.get(pk=property_id)
+
         try:
-            company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            agent_in_charge=(AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
-                            if property_to_be_viewed.agent_uuid !='None' else None
-                                )
-            view_id=company_in_charge.unique_company_id
-            msg=(
+            company_in_charge = CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            agent_in_charge   = (
+                AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
+                if property_to_be_viewed.agent_uuid != 'None' else None
+            )
+            view_id = company_in_charge.unique_company_id
+            msg = (
                 f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
                 if agent_in_charge
                 else f'Listed by {company_in_charge.company_name}'
             )
-            
+
         except CompanyInformation.DoesNotExist:
             agent_in_charge   = AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
             company_in_charge = (
@@ -269,26 +277,32 @@ def view_property_on_lease(request, property_id):
                 if company_in_charge
                 else f'Listed by {agent_in_charge.first_name} (Independent)'
             )
+
         messages.info(request, msg)
         property_view_count(property_id, "Rent", request.user.id, view_id)
-        context={
-            'property': property_to_be_viewed,
-            'agent_info': agent_in_charge,
-            'company_info': company_in_charge,
-            'base_template':base_template,
-            'role':user_role,
+
+        # ── Refresh score (24-hour gate means this only does real
+        #    work once per day regardless of how many users view it) ──
+        refresh_activity_score(property_to_be_viewed, 'Rent')
+
+        context = {
+            'property':      property_to_be_viewed,
+            'agent_info':    agent_in_charge,
+            'company_info':  company_in_charge,
+            'base_template': base_template,
+            'role':          user_role,
         }
         return render(request, 'estate/view_property_r.html', context)
+
     except ObjectDoesNotExist:
-        messages.error(request, 'An error occured')
+        messages.error(request, 'An error occurred')
         if 'HTTP_REFERER' in request.META:
-            return redirect(request.META['HTTP_REFERER'])  
+            return redirect(request.META['HTTP_REFERER'])
         else:
             return redirect('customer:rent-property')
+
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
-
-
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 

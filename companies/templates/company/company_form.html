@@ -1,239 +1,152 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Company Profile Setup - Estate Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Company Profile Setup — Estate Web</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="{% static 'company/css/company_form.css' %}">
 </head>
 <body>
 
-  <!-- Messages Container -->
-  <div class="messages-container">
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags == 'error' or message.tags == 'danger' %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% elif message.tags == 'warning' %}
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% elif message.tags == 'info' %}
-          <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% else %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
+{# ── Messages ─────────────────────────────────────────────────────── #}
+<div class="messages-container">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' or message.tags == 'danger' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% elif message.tags == 'warning' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-circle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% elif message.tags == 'info' %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <i class="bi bi-info-circle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% else %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="bi bi-check-circle-fill"></i>{{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
+
+
+{% if submitted %}
+
+<div class="success-wrapper">
+  <div class="success-card">
+    <div class="success-icon">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+    <h2 class="success-title">Profile Set Successfully!</h2>
+    <p class="success-message">
+      You can now access all company tools. Complete verification to gain clients' trust and unlock the verified badge.
+    </p>
+    <div>
+      <a href="{% url 'company:dashboard' %}" class="btn-dashboard">
+        <i class="bi bi-house-fill"></i> Go to Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
+      Estate Web
+    </a>
+    <div class="ms-auto">
+      <a href="{% url 'company:dashboard' %}" class="btn-outline-dash">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+</nav>
+
+
+<div class="wizard-wrapper">
+
+  {# Page header #}
+  <div class="page-header">
+    <div class="header-icon"><i class="bi bi-building"></i></div>
+    <h1 class="page-title">Company Profile Setup</h1>
+    <p class="page-subtitle">3 quick steps — takes about 2 minutes</p>
   </div>
 
+  {# Step indicator #}
+  <div class="step-indicator" id="stepIndicator">
 
-        {% if submitted %}
-            <!-- Success State -->
-            <div class="success-card">
-                <div class="success-icon">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <h2 class="success-title">Profile Set Successfully!</h2>
-                <p class="success-message">You can now access other tools, make sure to complete verification to gain clients trust</p>
-                <div class="success-actions">
-                    <a href="{% url 'company:dashboard' %}" class="btn-dashboard">
-                        <i class="bi bi-house-fill me-2"></i>
-                        View Dashboard
-                    </a>
-                </div>
-            </div>
-
-{%else%}
-
-  <!-- Navigation Header -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-    <div class="container">
-      <a class="navbar-brand" href="/">
-        <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
-        <span class="brand-text">Estate Web</span>
-      </a>
-      <div class="ms-auto">
-        <a href="{% url 'company:dashboard' %}" class="btn btn-outline-primary">
-          <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-        </a>
-      </div>
+    <div class="step-dot active" id="dot-1">
+      <div class="step-circle" id="circle-1">1</div>
+      <span class="step-dot-label">Essentials</span>
     </div>
-  </nav>
 
-  <!-- Form Container -->
-  <div class="form-wrapper">
-    <div class="container">
-      
-      <!-- Page Header -->
-      <div class="page-header">
-        <div class="header-icon">
-          <i class="bi bi-building"></i>
-        </div>
-        <h1 class="page-title">Company Profile Setup</h1>
-        <p class="page-subtitle">Complete your company profile to start listing properties and managing your business on Estate Web</p>
-      </div>
+    <div class="step-line" id="line-1"></div>
 
-      <!-- Progress Steps -->
-      <div class="progress-steps">
-        <div class="step active">
-          <div class="step-number">1</div>
-          <div class="step-label">Company Info</div>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-label">Contact Details</div>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-label">Social Links</div>
-        </div>
-      </div>
+    <div class="step-dot" id="dot-2">
+      <div class="step-circle" id="circle-2">2</div>
+      <span class="step-dot-label">About</span>
+    </div>
 
-      <!-- Main Form -->
-      <form method="post" enctype="multipart/form-data" class="company-form" id="companyForm">
-        {% csrf_token %}
-        
-        <!-- Company Information Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-building-fill"></i>
-            <h2>Company Information</h2>
-          </div>
-          
-          <div class="row g-4">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="{{ form.company_name.id_for_label }}" class="form-label">
-                  {{ form.company_name.label }}
-                </label>
-                {{ form.company_name }}
-                {% if form.company_name.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.company_name.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
+    <div class="step-line" id="line-2"></div>
 
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="{{ form.year_established.id_for_label }}" class="form-label">
-                  {{ form.year_established.label }}
-                </label>
-                {{ form.year_established }}
-                {% if form.year_established.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.year_established.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
+    <div class="step-dot" id="dot-3">
+      <div class="step-circle" id="circle-3">3</div>
+      <span class="step-dot-label">Extras</span>
+    </div>
 
-            <div class="col-12">
-              <div class="form-group">
-                <label for="{{ form.company_bio.id_for_label }}" class="form-label">
-                  {{ form.company_bio.label }}
-                </label>
-                {{ form.company_bio }}
-                {% if form.company_bio.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.company_bio.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
+  </div>
 
+  {# Thin progress bar #}
+  <div class="wizard-progress">
+    <div class="wizard-progress-fill" id="progressFill" style="width:33%"></div>
+  </div>
 
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="{{ form.service_areas.id_for_label }}" class="form-label">
-                  {{ form.service_areas.label }}
-                </label>
-                {{ form.service_areas }}
-                {% if form.service_areas.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.service_areas.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
+  <form method="post" enctype="multipart/form-data" id="companyForm">
+    {% csrf_token %}
 
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="{{ form.principal_broker.id_for_label }}" class="form-label">
-                  {{ form.principal_broker.label }}
-                </label>
-                {{ form.principal_broker }}
-                {% if form.principal_broker.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.principal_broker.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
+    <div class="wizard-card">
 
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="{{ form.company_logo.id_for_label }}" class="form-label">
-                  {{ form.company_logo.label }}
-                  <span class="optional-badge">Optional</span>
-                </label>
-                <div class="file-upload-wrapper">
-                  <input type="file" 
-                         name="{{ form.company_logo.name }}" 
-                         id="{{ form.company_logo.id_for_label }}"
-                         class="file-input"
-                         accept="image/*">
-                  <label for="{{ form.company_logo.id_for_label }}" class="file-label">
-                    <i class="bi bi-cloud-upload me-2"></i>
-                    <span class="file-text">Choose company logo</span>
-                  </label>
-                  <div class="file-preview" id="logoPreview"></div>
-                </div>
-                {% if form.company_logo.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.company_logo.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
+      <div class="wizard-step active" id="step-1">
+
+        <div class="step-header">
+          <i class="bi bi-building-fill"></i>
+          <div class="step-header-text">
+            <h3>Essential Details</h3>
+            <p>The basics — name, contact and location</p>
           </div>
         </div>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-telephone-fill"></i>
-            <h2>Contact Information</h2>
+        <div class="step-body">
+
+          <div class="form-group">
+            <label for="{{ form.company_name.id_for_label }}" class="form-label">
+              {{ form.company_name.label }}
+            </label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}
+              <div class="invalid-feedback">{{ form.company_name.errors }}</div>
+            {% endif %}
           </div>
-          
-          <div class="row g-4">
-            <div class="col-md-6">
+
+          <div class="row g-3">
+            <div class="col-sm-6">
               <div class="form-group">
                 <label for="{{ form.phone_number.id_for_label }}" class="form-label">
                   {{ form.phone_number.label }}
@@ -243,14 +156,12 @@
                   {{ form.phone_number }}
                 </div>
                 {% if form.phone_number.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.phone_number.errors }}
-                  </div>
+                  <div class="invalid-feedback">{{ form.phone_number.errors }}</div>
                 {% endif %}
               </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-sm-6">
               <div class="form-group">
                 <label for="{{ form.email.id_for_label }}" class="form-label">
                   {{ form.email.label }}
@@ -260,146 +171,426 @@
                   {{ form.email }}
                 </div>
                 {% if form.email.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.email.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-
-            <div class="col-12">
-              <div class="form-group">
-                <label for="{{ form.address.id_for_label }}" class="form-label">
-                  {{ form.address.label }}
-                </label>
-                <div class="input-with-icon">
-                  <i class="bi bi-geo-alt"></i>
-                  {{ form.address }}
-                </div>
-                {% if form.address.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.address.errors }}
-                  </div>
+                  <div class="invalid-feedback">{{ form.email.errors }}</div>
                 {% endif %}
               </div>
             </div>
           </div>
+
+          <div class="form-group">
+            <label for="{{ form.address.id_for_label }}" class="form-label">
+              {{ form.address.label }}
+            </label>
+            <div class="input-with-icon">
+              <i class="bi bi-geo-alt"></i>
+              {{ form.address }}
+            </div>
+            {% if form.address.errors %}
+              <div class="invalid-feedback">{{ form.address.errors }}</div>
+            {% endif %}
+          </div>
+
         </div>
 
-        <!-- Legal Documentation Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-file-earmark-text-fill"></i>
-            <h2>Legal Documentation</h2>
-          </div>
-          
-          <div class="row g-4">
-            <div class="col-12">
-              <div class="form-group">
-                <label for="{{ form.legal_certificate.id_for_label }}" class="form-label">
-                  {{ form.legal_certificate.label }}
-                  <span class="optional-badge">Optional</span>
-                </label>
-                <div class="file-upload-wrapper">
-                  <input type="file" 
-                         name="{{ form.legal_certificate.name }}" 
-                         id="{{ form.legal_certificate.id_for_label }}"
-                         class="file-input"
-                         accept=".pdf,.doc,.docx,image/*">
-                  <label for="{{ form.legal_certificate.id_for_label }}" class="file-label">
-                    <i class="bi bi-cloud-upload me-2"></i>
-                    <span class="file-text">Upload legal certificate (PDF, JPG and PNG)</span>
-                  </label>
-                  <div class="file-preview" id="certPreview"></div>
-                </div>
-                <small class="form-text">Upload your company's legal registration certificate for verification purposes</small>
-                {% if form.legal_certificate.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.legal_certificate.errors }}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
-
-<!-- Social Links Section - REPLACE THE ENTIRE SECTION -->
-<div class="form-section">
-  <div class="section-header">
-    <i class="bi bi-share-fill"></i>
-    <h2>Companies Links Links</h2>
-  </div>
-  <p class="section-subtitle">Add your company's social media profiles (optional)</p>
-  
-  <div id="socialLinksContainer">
-    {{ social.management_form }}
-    
-    {% for form in social %}
-      <div class="social-link-item">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-5">
-            <div class="form-group">
-              <label class="form-label">Platform</label>
-              {{ form.social_platform }}
-              {% if form.social_platform.errors %}
-                <div class="invalid-feedback d-block">
-                  {{ form.social_platform.errors }}
-                </div>
-              {% endif %}
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="form-label">Profile URL</label>
-              {{ form.link_to_social }}
-              {% if form.link_to_social.errors %}
-                <div class="invalid-feedback d-block">
-                  {{ form.link_to_social.errors }}
-                </div>
-              {% endif %}
-            </div>
-          </div>
-          <div class="col-md-1">
-            <button type="button" class="btn-remove-social">
-              <i class="bi bi-trash"></i>
-            </button>
-            {{ form.DELETE }}
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  
-  <button type="button" class="btn-add-social">
-    <i class="bi bi-plus-circle me-2"></i>Add Another Social Link
-  </button>
-</div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-          <a href="{% url 'company:dashboard' %}" class="btn-secondary">
-            <i class="bi bi-x-circle me-2"></i>Cancel
-          </a>
-          <button type="submit" class="btn-primary">
-            <i class="bi bi-check-circle me-2"></i>Complete Profile Setup
+        <div class="step-nav">
+          <span class="step-count">Step 1 of 3</span>
+          <button type="button" class="btn-next" onclick="goToStep(2)">
+            Continue <i class="bi bi-arrow-right"></i>
           </button>
         </div>
 
-      </form>
+      </div>{# end step-1 #}
 
-    </div>
+      <div class="wizard-step" id="step-2">
+
+        <div class="step-header">
+          <i class="bi bi-info-circle-fill"></i>
+          <div class="step-header-text">
+            <h3>About Your Company</h3>
+            <p>Background, region and ownership details</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          <div class="form-group">
+            <label for="{{ form.company_bio.id_for_label }}" class="form-label">
+              {{ form.company_bio.label }}
+            </label>
+            {{ form.company_bio }}
+            {% if form.company_bio.errors %}
+              <div class="invalid-feedback">{{ form.company_bio.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="{{ form.year_established.id_for_label }}" class="form-label">
+                  {{ form.year_established.label }}
+                </label>
+                {{ form.year_established }}
+                {% if form.year_established.errors %}
+                  <div class="invalid-feedback">{{ form.year_established.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="{{ form.service_areas.id_for_label }}" class="form-label">
+                  {{ form.service_areas.label }}
+                </label>
+                {{ form.service_areas }}
+                {% if form.service_areas.errors %}
+                  <div class="invalid-feedback">{{ form.service_areas.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="{{ form.principal_broker.id_for_label }}" class="form-label">
+              {{ form.principal_broker.label }}
+            </label>
+            {{ form.principal_broker }}
+            {% if form.principal_broker.errors %}
+              <div class="invalid-feedback">{{ form.principal_broker.errors }}</div>
+            {% endif %}
+          </div>
+
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn-prev" onclick="goToStep(1)">
+            <i class="bi bi-arrow-left"></i> Back
+          </button>
+          <span class="step-count">Step 2 of 3</span>
+          <button type="button" class="btn-next" onclick="goToStep(3)">
+            Continue <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>{# end step-2 #}
+
+
+      <div class="wizard-step" id="step-3">
+
+        <div class="step-header">
+          <i class="bi bi-star-fill"></i>
+          <div class="step-header-text">
+            <h3>Final Touches</h3>
+            <p>Logo, documents and social links — all optional</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          {# Logo upload #}
+          <div class="form-group">
+            <label class="form-label">
+              {{ form.company_logo.label }}
+              <span class="optional-badge">Optional</span>
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file"
+                     name="{{ form.company_logo.name }}"
+                     id="{{ form.company_logo.id_for_label }}"
+                     class="file-input"
+                     accept="image/*">
+              <label for="{{ form.company_logo.id_for_label }}" class="file-label">
+                <i class="bi bi-cloud-upload"></i>
+                <span class="file-text">Choose company logo</span>
+              </label>
+              <div class="file-preview" id="logoPreview"></div>
+            </div>
+            {% if form.company_logo.errors %}
+              <div class="invalid-feedback">{{ form.company_logo.errors }}</div>
+            {% endif %}
+          </div>
+
+          {# Legal certificate #}
+          <div class="form-group">
+            <label class="form-label">
+              {{ form.legal_certificate.label }}
+              <span class="optional-badge">Optional</span>
+            </label>
+            <div class="file-upload-wrapper">
+              <input type="file"
+                     name="{{ form.legal_certificate.name }}"
+                     id="{{ form.legal_certificate.id_for_label }}"
+                     class="file-input"
+                     accept=".pdf,.doc,.docx,image/*">
+              <label for="{{ form.legal_certificate.id_for_label }}" class="file-label">
+                <i class="bi bi-file-earmark-text"></i>
+                <span class="file-text">Upload legal certificate (PDF, JPG, PNG)</span>
+              </label>
+              <div class="file-preview" id="certPreview"></div>
+            </div>
+            <span class="form-text">For verification purposes — speeds up your verified badge approval</span>
+            {% if form.legal_certificate.errors %}
+              <div class="invalid-feedback">{{ form.legal_certificate.errors }}</div>
+            {% endif %}
+          </div>
+
+          {# Social links formset #}
+          <div class="form-group">
+            <label class="form-label">Social & Website Links
+              <span class="optional-badge">Optional</span>
+            </label>
+
+            <div id="socialLinksContainer">
+              {{ social.management_form }}
+
+              {% for sform in social %}
+                <div class="social-link-item">
+                  <div class="row g-2 align-items-center">
+                    <div class="col-5">
+                      {{ sform.social_platform }}
+                      {% if sform.social_platform.errors %}
+                        <div class="invalid-feedback">{{ sform.social_platform.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-6">
+                      {{ sform.link_to_social }}
+                      {% if sform.link_to_social.errors %}
+                        <div class="invalid-feedback">{{ sform.link_to_social.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="col-1">
+                      <button type="button" class="btn-remove-social">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                      {{ sform.DELETE }}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <button type="button" class="btn-add-social" id="addSocialBtn">
+              <i class="bi bi-plus-circle"></i> Add Social Link
+            </button>
+          </div>
+
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn-prev" onclick="goToStep(2)">
+            <i class="bi bi-arrow-left"></i> Back
+          </button>
+          <span class="step-count">Step 3 of 3</span>
+          <button type="submit" class="btn-submit">
+            <i class="bi bi-check-circle"></i> Complete Setup
+          </button>
+        </div>
+
+      </div>{# end step-3 #}
+
+    </div>{# end wizard-card #}
+  </form>
+
+</div>{# end wizard-wrapper #}
+
+<footer class="form-footer">
+  <div class="container">
+    <p>&copy; 2025 Estate Web. All rights reserved.</p>
   </div>
+</footer>
 
-  <!-- Footer -->
-  <footer class="form-footer">
-    <div class="container">
-      <p>&copy; 2025 Estate Web. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'company/js/company_form.js' %}"></script>
-{%endif%}
+
+<script>
+/* ═══════════════════════════════════════════════════
+   Company Form — Step Wizard with Validation
+   ═══════════════════════════════════════════════════ */
+
+var TOTAL_STEPS = 3;
+var currentStep = 1;
+
+/* Required field IDs per step (matches Django rendered IDs) */
+var STEP_REQUIRED = {
+  1: [
+    '{{ form.company_name.id_for_label }}',
+    '{{ form.phone_number.id_for_label }}',
+    '{{ form.email.id_for_label }}',
+    '{{ form.address.id_for_label }}'
+  ],
+  2: [
+    '{{ form.company_bio.id_for_label }}',
+    '{{ form.year_established.id_for_label }}',
+    '{{ form.service_areas.id_for_label }}',
+    '{{ form.principal_broker.id_for_label }}'
+  ],
+  3: [] /* all optional */
+};
+
+/* ── Validate a single step — returns true if all required filled ── */
+function validateStep(n) {
+  var ids    = STEP_REQUIRED[n] || [];
+  var passed = true;
+
+  ids.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+
+    clearFieldError(el);
+
+    var empty = el.value.trim() === '';
+    if (empty) {
+      showFieldError(el);
+      passed = false;
+    }
+  });
+
+  return passed;
+}
+
+function showFieldError(el) {
+  el.classList.add('field-error');
+
+  /* Add inline message if not already there */
+  var parent = el.closest('.form-group') || el.parentElement;
+  if (!parent.querySelector('.field-error-msg')) {
+    var msg = document.createElement('span');
+    msg.className = 'field-error-msg';
+    msg.textContent = 'This field is required';
+    parent.appendChild(msg);
+  }
+
+  /* Remove error once user starts typing */
+  el.addEventListener('input', function onInput() {
+    if (el.value.trim() !== '') {
+      clearFieldError(el);
+      updateDot(currentStep); /* re-evaluate dot live */
+    }
+    el.removeEventListener('input', onInput);
+  });
+}
+
+function clearFieldError(el) {
+  el.classList.remove('field-error');
+  var parent = el.closest('.form-group') || el.parentElement;
+  var msg = parent.querySelector('.field-error-msg');
+  if (msg) msg.remove();
+}
+
+/* ── Update a single dot: completed / error / default ── */
+function updateDot(n, forceActive) {
+  var dot    = document.getElementById('dot-' + n);
+  var circle = document.getElementById('circle-' + n);
+  if (!dot || !circle) return;
+
+  dot.classList.remove('active', 'completed', 'error');
+
+  if (forceActive) {
+    dot.classList.add('active');
+    circle.textContent = n;
+    return;
+  }
+
+  var ids = STEP_REQUIRED[n] || [];
+  var allFilled = ids.every(function (id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim() !== '';
+  });
+
+  if (allFilled && ids.length > 0) {
+    dot.classList.add('completed');
+    circle.innerHTML = '<i class="bi bi-check-lg" style="font-size:.7rem"></i>';
+  } else if (!allFilled && ids.length > 0) {
+    dot.classList.add('error');
+    circle.innerHTML = '<i class="bi bi-x-lg" style="font-size:.65rem"></i>';
+  } else {
+    /* Step 3 — no required fields — always show completed once visited */
+    dot.classList.add('completed');
+    circle.innerHTML = '<i class="bi bi-check-lg" style="font-size:.7rem"></i>';
+  }
+}
+
+/* ── Move to a step ── */
+function goToStep(n, skipValidation) {
+  if (n < 1 || n > TOTAL_STEPS) return;
+
+  /* Validate current step before going forward */
+  if (!skipValidation && n > currentStep) {
+    var ok = validateStep(currentStep);
+    if (!ok) {
+      updateDot(currentStep, false); /* show ✗ */
+      return; /* block */
+    }
+  }
+
+  /* Leaving current step — update its dot */
+  if (!skipValidation) {
+    updateDot(currentStep, false);
+  }
+
+  /* Show new step */
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('step-' + n).classList.add('active');
+
+  /* Update all dots */
+  for (var i = 1; i <= TOTAL_STEPS; i++) {
+    if (i === n) {
+      /* Current step gets active treatment */
+      var dot    = document.getElementById('dot-' + i);
+      var circle = document.getElementById('circle-' + i);
+      if (dot && circle) {
+        dot.classList.remove('active', 'completed', 'error');
+        dot.classList.add('active');
+        circle.textContent = i;
+      }
+    }
+    /* Connector line */
+    var line = document.getElementById('line-' + i);
+    if (line) line.classList.toggle('completed', i < n);
+  }
+
+  /* Progress bar */
+  document.getElementById('progressFill').style.width =
+    Math.round((n / TOTAL_STEPS) * 100) + '%';
+
+  currentStep = n;
+  document.querySelector('.wizard-wrapper')
+    .scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Auto-dismiss alerts + error jump on POST failure ── */
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.alert').forEach(function (alert) {
+    setTimeout(function () {
+      alert.classList.remove('show');
+      setTimeout(function () { alert.remove(); }, 400);
+    }, 5000);
+  });
+
+  /* Jump to step with Django server-side errors */
+  var hasStep1 = [
+    '{{ form.company_name.errors|yesno:"true,false" }}',
+    '{{ form.phone_number.errors|yesno:"true,false" }}',
+    '{{ form.email.errors|yesno:"true,false" }}',
+    '{{ form.address.errors|yesno:"true,false" }}'
+  ].includes('true');
+
+  var hasStep2 = [
+    '{{ form.company_bio.errors|yesno:"true,false" }}',
+    '{{ form.year_established.errors|yesno:"true,false" }}',
+    '{{ form.service_areas.errors|yesno:"true,false" }}',
+    '{{ form.principal_broker.errors|yesno:"true,false" }}'
+  ].includes('true');
+
+  if (hasStep1) {
+    goToStep(1, true);
+  } else if (hasStep2) {
+    goToStep(2, true);
+  } else if ('{{ form.errors|yesno:"true,false" }}' === 'true') {
+    goToStep(3, true);
+  }
+});
+</script>
+
+{% endif %}{# end submitted #}
 </body>
 </html>

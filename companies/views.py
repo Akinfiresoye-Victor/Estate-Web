@@ -216,7 +216,6 @@ def dashboard(request):
             'profile_strength': calculate_profile_strength(),
             'recent_activities': CompanyActivityLog.objects.filter(company=company).order_by('-timestamp')[:5]
         }
-        #TODO fix the login problem on the company side
         return render(request, 'company/dashboard.html', context)
         
     except CompanyInformation.DoesNotExist:
@@ -240,8 +239,8 @@ def company_form(request):
         submitted=False
         if request.method == 'POST':
             try:
-                if CompanyInformation.objects.get(user_id=request.user.id):
-                    return redirect('company:dashboard')
+                CompanyInformation.objects.get(user_id=request.user.id)
+                return redirect('company:dashboard')
             except CompanyInformation.DoesNotExist:
                 comp_form=CompanyForm(request.POST or None, request.FILES or None)
                 link_form=SocialLinksFormset(request.POST or None)
@@ -255,15 +254,15 @@ def company_form(request):
                         link_form.save()
                         messages.success(request, 'Profile Successfully Set')
                         return HttpResponseRedirect('?submitted=True')
+                CompanyActivityLog.objects.create(
+                company=CompanyInformation.objects.get(user_id=request.user.id),
+                action='Account created'
+        )
         else:
             comp_form= CompanyForm()
             link_form= SocialLinksFormset()
             if 'submitted' in request.GET:
                 submitted=True
-        CompanyActivityLog.objects.create(
-            company=CompanyInformation.objects.get(user_id=request.user.id),
-            action='Account created'
-        )
         return render(request, 'company/company_form.html', {
                                                                 'form': comp_form,
                                                                 'social': link_form,

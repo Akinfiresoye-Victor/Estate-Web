@@ -1,5 +1,4 @@
 {% extends 'agent/base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
@@ -8,1149 +7,869 @@
 
 {% block content %}
 
-<!-- Back Button -->
+{# ── Back Button ─────────────────────────────────────────────────── #}
 <a href="{% url 'agent:dashboard' %}" class="modern-back-link">
-    <i class="bi bi-arrow-left-circle-fill"></i>
-    <span>Back to Dashboard</span>
+  <i class="bi bi-arrow-left-circle-fill"></i>
+  <span>Back to Dashboard</span>
 </a>
 
-<!-- Page Header -->
+
+{# ── Hero Header ─────────────────────────────────────────────────── #}
 <div class="settings-hero">
-    <div class="hero-background">
-        <div class="background-pattern"></div>
+  <div class="container-fluid">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <i class="bi bi-gear-fill"></i>
+        Account Settings
+      </h1>
+      <p class="hero-description">Manage your profile, security and preferences</p>
     </div>
-    <div class="container-fluid">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <i class="bi bi-gear-fill"></i>
-                    Account Settings
-                </h1>
-                <p class="hero-description">Customize your profile and manage your preferences</p>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
-<!-- Main Content -->
+
+{# ── Main Settings Container ─────────────────────────────────────── #}
 <div class="container-fluid settings-container">
-    
-    <!-- Tab Navigation -->
-    <div class="tabs-navigation">
-        <button class="tab-btn active" data-tab="personal-info">
-            <i class="bi bi-person-circle"></i>
-            <span>Personal Info</span>
-        </button>
-        <button class="tab-btn" data-tab="professional">
-            <i class="bi bi-briefcase-fill"></i>
-            <span>Professional</span>
-        </button>
-        <button class="tab-btn" data-tab="security">
-            <i class="bi bi-shield-fill-check"></i>
-            <span>Security</span>
-        </button>
-        <button class="tab-btn" data-tab="notifications">
-            <i class="bi bi-bell-fill"></i>
-            <span>Notifications</span>
-        </button>
-        <button class="tab-btn" data-tab="preferences">
-            <i class="bi bi-sliders"></i>
-            <span>Preferences</span>
-        </button>
-        <button class="tab-btn" data-tab="subscription">
-            <i class="bi bi-credit-card-fill"></i>
-            <span>Subscription</span>
-        </button>
-        <button class="tab-btn danger-tab" data-tab="account-actions">
-            <i class="bi bi-exclamation-octagon-fill"></i>
-            <span>Account Actions</span>
-        </button>
-    </div>
 
-    <!-- Tab Content -->
-    <div class="tabs-content">
-        <!-- Personal Info Tab -->
-        <div class="tab-pane active" id="personal-info">
-            <div class="content-grid">
-                
-                <!-- Profile Picture Section -->
-                <div class="content-card featured">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-image"></i>
-                            Profile Picture
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="profile-display-area">
-                            <div class="profile-preview">
-                                <div class="avatar-circle">
-                                    {% if agent.profile_picture %}
-                                        <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}">
-                                    {% else %}
-                                        <div class="avatar-placeholder">
-                                            {{ agent.first_name|slice:":1"|upper }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="profile-info">
-                                <h4>{{ agent.first_name }} {{ agent.last_name }}</h4>
-                                <p class="profile-status">
-                                    {% if agent.verified %}
-                                        <i class="bi bi-patch-check-fill text-success"></i>
-                                        Verified Agent
-                                    {% else %}
-                                        <i class="bi bi-clock-history text-warning"></i>
-                                        Verification Pending
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  {# ── Tab Navigation ───────────────────────────────────────────── #}
+  <div class="tabs-navigation">
+    <div class="tabs-nav-inner">
 
-                <!-- Basic Information -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-person-badge"></i>
-                            Basic Information
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="info-display-grid">
-                            <div class="info-item">
-                                <label class="info-label">Full Name</label>
-                                <p class="info-value">{{ agent.first_name }} {{ agent.last_name }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label class="info-label">Work Type</label>
-                                <p class="info-value">{{ agent.work_type }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label class="info-label">Email Address</label>
-                                <p class="info-value">{{ agent.email|default:"Not provided" }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label class="info-label">Phone Number</label>
-                                <p class="info-value">{{ agent.phone_number }}</p>
-                            </div>
-                            <div class="info-item full-width">
-                                <label class="info-label">Professional Bio</label>
-                                <p class="info-value bio-text">{{ agent.bio }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <button class="tab-btn active" data-tab="personal-info">
+        <i class="bi bi-person-circle"></i>
+        <span>Personal Info</span>
+      </button>
 
-                <!-- Location & Contact -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            Location & Contact
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="info-display-grid">
-                            <div class="info-item">
-                                <label class="info-label">Base Location</label>
-                                <p class="info-value">{{ agent.location }}</p>
-                            </div>
-                            <div class="info-item">
-                                <label class="info-label">Languages Spoken</label>
-                                <p class="info-value">{{ agent.language }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <button class="tab-btn" data-tab="professional">
+        <i class="bi bi-briefcase-fill"></i>
+        <span>Professional</span>
+      </button>
 
-                <!-- Social Media -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-share"></i>
-                            Social Media Links
-                        </h3>
-                        <p class="card-subtitle">Your connected social profiles</p>
-                    </div>
-                    <div class="card-content">
-                        {% if agent.social.exists %}
-                            <div class="social-display-grid">
-                                {% for link in agent.social.all %}
-                                    {% if link.link_to_social %}
-                                        <a href="{{ link.link_to_social }}" target="_blank" class="social-display-item">
-                                            <div class="social-icon {{ link.social_platform|lower }}">
-                                                <i class="bi bi-{{ link.social_platform|lower }}"></i>
-                                            </div>
-                                            <div class="social-details">
-                                                <span class="social-name">{{ link.social_platform }}</span>
-                                                <span class="social-link">View Profile</span>
-                                            </div>
-                                            <i class="bi bi-box-arrow-up-right"></i>
-                                        </a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="bi bi-link-45deg"></i>
-                                <p>No social media links added yet</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+      <button class="tab-btn" data-tab="security">
+        <i class="bi bi-shield-fill-check"></i>
+        <span>Security</span>
+      </button>
 
-            </div>
+      <button class="tab-btn" data-tab="notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span>Notifications</span>
+      </button>
 
-            <!-- Update Profile Action -->
-            <div class="section-actions">
-                <a href="{% url 'agent:update-agent' agent.agent_uuid %}" class="action-btn primary update-profile-btn">
-                    <i class="bi bi-pencil-square"></i>
-                    Update Agent Profile
-                </a>
-            </div>
-        </div>
+      <button class="tab-btn" data-tab="preferences">
+        <i class="bi bi-sliders"></i>
+        <span>Preferences</span>
+      </button>
 
-        <!-- Professional Tab -->
-        <div class="tab-pane" id="professional">
-            <div class="content-grid">
-                
-                <!-- Experience -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-trophy"></i>
-                            Professional Experience
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        {% if agent.experiences.exists %}
-                            <div class="experience-timeline">
-                                {% for exp in agent.experiences.all %}
-                                    <div class="timeline-item">
-                                        <div class="timeline-marker"></div>
-                                        <div class="timeline-content">
-                                            <h4 class="timeline-title">{{ exp.title }}</h4>
-                                            <p class="timeline-company">{{ exp.company }}</p>
-                                            <p class="timeline-date">
-                                                <i class="bi bi-calendar3"></i>
-                                                {{ exp.start_date|date:"M Y" }} - 
-                                                {% if exp.end_date %}
-                                                    {{ exp.end_date|date:"M Y" }}
-                                                {% else %}
-                                                    Present
-                                                {% endif %}
-                                            </p>
-                                            <p class="timeline-description">{{ exp.past_experence }}</p>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="bi bi-briefcase"></i>
-                                <p>No professional experience added yet</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+      <button class="tab-btn" data-tab="subscription">
+        <i class="bi bi-credit-card-fill"></i>
+        <span>Subscription</span>
+      </button>
 
-
-                <!-- Certifications -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-award-fill"></i>
-                            Certifications & Licenses
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="certifications-display">
-                            {% if agent.government_id %}
-                                <div class="cert-display-item">
-                                    <div class="cert-icon verified">
-                                        <i class="bi bi-file-earmark-check-fill"></i>
-                                    </div>
-                                    <div class="cert-details">
-                                        <h4>Government ID</h4>
-                                        <p>Verified identification document</p>
-                                        <span class="cert-status verified">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            Submitted
-                                        </span>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            
-                            {% if agent.certificate %}
-                                <div class="cert-display-item">
-                                    <div class="cert-icon verified">
-                                        <i class="bi bi-award-fill"></i>
-                                    </div>
-                                    <div class="cert-details">
-                                        <h4>Professional Certificate</h4>
-                                        <p>Real estate certification</p>
-                                        <span class="cert-status verified">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            Submitted
-                                        </span>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            
-                            {% if not agent.government_id and not agent.certificate %}
-                                <div class="empty-state">
-                                    <i class="bi bi-shield-exclamation"></i>
-                                    <p>No certifications uploaded yet</p>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Update Profile Action -->
-            <div class="section-actions">
-                <a href="{% url 'agent:update-agent' agent.agent_uuid %}" class="action-btn primary update-profile-btn">
-                    <i class="bi bi-pencil-square"></i>
-                    Update Professional Info
-                </a>
-            </div>
-        </div>
-
-        <!-- Security Tab -->
-        <div class="tab-pane" id="security">
-            <div class="content-grid">
-                
-                <!-- Account Security Status -->
-                <div class="content-card status-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-shield-fill-check"></i>
-                            Security Status
-                        </h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="security-status-grid">
-                            <div class="status-item verified">
-                                <div class="status-icon">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                </div>
-                                <div class="status-info">
-                                    <h4>Email Verified</h4>
-                                    <p>Your email is confirmed and secure</p>
-                                </div>
-                            </div>
-                            <div class="status-item pending">
-                                <div class="status-icon">
-                                    <i class="bi bi-exclamation-circle-fill"></i>
-                                </div>
-                                <div class="status-info">
-                                    <h4>Two-Factor Authentication</h4>
-                                    <p>Coming soon - Enhanced security feature</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Change Password Card -->
-                <div class="content-card featured">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-key-fill"></i>
-                            Password Management
-                        </h3>
-                        <p class="card-subtitle">Keep your account secure with a strong password</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="info-display-grid">
-                        </div>
-                        <div style="margin-top: 1.5rem;">
-                            <a href="{%url 'customer:change-password'%}" class="action-btn primary" style="display: inline-flex; text-decoration: none;">
-                                <i class="bi bi-shield-lock-fill"></i>
-                                Change Password
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coming Soon: Advanced Security Features -->
-                <div class="content-card coming-soon-card">
-                    <div class="card-content">
-                        
-                        <!-- Coming Soon Content -->
-                        <div class="coming-soon-wrapper">
-                            <div class="coming-soon-animation">
-                                <div class="settings-icon-stack">
-                                    <i class="bi bi-shield-fill-check icon-1"></i>
-                                    <i class="bi bi-phone-fill icon-2"></i>
-                                    <i class="bi bi-display icon-3"></i>
-                                </div>
-                                <div class="pulse-ring"></div>
-                                <div class="pulse-ring-2"></div>
-                            </div>
-                            
-                            <h2 class="coming-soon-heading">Advanced Security Coming Soon</h2>
-                            <p class="coming-soon-description">
-                                We're developing enterprise-grade security features to protect your account 
-                                and give you complete visibility over your login activity.
-                            </p>
-
-                            <!-- Feature Preview -->
-                            <div class="features-preview">
-                                <div class="preview-item">
-                                    <div class="preview-icon theme">
-                                        <i class="bi bi-phone-vibrate-fill"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Two-Factor Authentication</h4>
-                                        <p>Extra security layer with SMS or app codes</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon language">
-                                        <i class="bi bi-devices"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Active Sessions Manager</h4>
-                                        <p>See and control all logged-in devices</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon privacy">
-                                        <i class="bi bi-clock-history"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Login History</h4>
-                                        <p>Track all access attempts to your account</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon display">
-                                        <i class="bi bi-fingerprint"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Biometric Login</h4>
-                                        <p>Fingerprint and face recognition support</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Info Badge -->
-                            <div class="launch-timeline" style="margin-bottom: 1.5rem;">
-                                <i class="bi bi-info-circle-fill"></i>
-                                <span>Your account is protected by email verification and secure passwords</span>
-                            </div>
-
-                            <!-- Notify Button -->
-                            <button class="notify-launch-btn" type="button" onclick="notifyMeSecurity()">
-                                <i class="bi bi-bell-fill"></i>
-                                <span>Notify Me When Available</span>
-                            </button>
-
-                            <!-- Timeline -->
-                            <div class="launch-timeline">
-                                <i class="bi bi-rocket-takeoff-fill"></i>
-                                <span>Expected rollout: Q3 2027</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-        <!-- Notifications Tab -->
-        <div class="tab-pane" id="notifications">
-            <div class="content-grid">
-
-                <!-- Coming Soon: Additional Notification Channels -->
-                <div class="content-card coming-soon-card">
-                    <div class="card-content">
-                        
-                        <!-- Coming Soon Content -->
-                        <div class="coming-soon-wrapper">
-                            <div class="coming-soon-animation">
-                                <div class="settings-icon-stack">
-                                    <i class="bi bi-bell-fill icon-1"></i>
-                                    <i class="bi bi-phone-fill icon-2"></i>
-                                    <i class="bi bi-chat-dots-fill icon-3"></i>
-                                </div>
-                                <div class="pulse-ring"></div>
-                                <div class="pulse-ring-2"></div>
-                            </div>
-                            
-                            <h2 class="coming-soon-heading">More Channels Coming Soon</h2>
-                            <p class="coming-soon-description">
-                                We're currently setting up additional notification channels. For now, we'll keep you 
-                                updated via email, but exciting new ways to stay connected are on the way!
-                            </p>
-
-                            <!-- Feature Preview -->
-                            <div class="features-preview">
-                                <div class="preview-item">
-                                    <div class="preview-icon theme">
-                                        <i class="bi bi-phone-vibrate-fill"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Push Notifications</h4>
-                                        <p>Real-time alerts on your mobile device</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon language">
-                                        <i class="bi bi-chat-left-text-fill"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>SMS Alerts</h4>
-                                        <p>Critical updates via text message</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon privacy">
-                                        <i class="bi bi-broadcast"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>In-App Notifications</h4>
-                                        <p>Live updates while browsing the platform</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon display">
-                                        <i class="bi bi-telegram"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Instant Messaging</h4>
-                                        <p>WhatsApp and Telegram integration</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Info Badge -->
-                            <div class="launch-timeline" style="margin-bottom: 1.5rem;">
-                                <i class="bi bi-info-circle-fill"></i>
-                                <span>Currently available: Email notifications only</span>
-                            </div>
-
-                            <!-- Notify Button -->
-                            <button class="notify-launch-btn" type="button" onclick="notifyMeChannels()">
-                                <i class="bi bi-bell-fill"></i>
-                                <span>Notify Me When Available</span>
-                            </button>
-
-                            <!-- Timeline -->
-                            <div class="launch-timeline">
-                                <i class="bi bi-rocket-takeoff-fill"></i>
-                                <span>Expected rollout: Q2 2027</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-        <!-- Preferences Tab -->
-        <div class="tab-pane" id="preferences">
-            <div class="content-grid">
-                
-                <!-- Coming Soon Card -->
-                <div class="content-card coming-soon-card">
-                    <div class="card-content">
-                        
-                        <!-- Coming Soon Content -->
-                        <div class="coming-soon-wrapper">
-                            <div class="coming-soon-animation">
-                                <div class="settings-icon-stack">
-                                    <i class="bi bi-sliders icon-1"></i>
-                                    <i class="bi bi-palette-fill icon-2"></i>
-                                    <i class="bi bi-globe icon-3"></i>
-                                </div>
-                                <div class="pulse-ring"></div>
-                                <div class="pulse-ring-2"></div>
-                            </div>
-                            
-                            <h2 class="coming-soon-heading">Preferences Coming Soon</h2>
-                            <p class="coming-soon-description">
-                                We're building an enhanced preferences center with advanced customization options 
-                                to give you complete control over your agent experience.
-                            </p>
-
-                            <!-- Feature Preview -->
-                            <div class="features-preview">
-                                <div class="preview-item">
-                                    <div class="preview-icon theme">
-                                        <i class="bi bi-moon-stars-fill"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Dark Mode</h4>
-                                        <p>Eye-friendly theme for night browsing</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon language">
-                                        <i class="bi bi-translate"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Multi-Language Support</h4>
-                                        <p>Interface in English, Yoruba, Hausa, Igbo</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon privacy">
-                                        <i class="bi bi-shield-lock-fill"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Privacy Controls</h4>
-                                        <p>Manage your visibility and data sharing</p>
-                                    </div>
-                                </div>
-
-                                <div class="preview-item">
-                                    <div class="preview-icon display">
-                                        <i class="bi bi-layout-text-window-reverse"></i>
-                                    </div>
-                                    <div class="preview-content">
-                                        <h4>Display Options</h4>
-                                        <p>Customize layout and information density</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Notify Button -->
-                            <button class="notify-launch-btn" type="button" onclick="notifyMeLaunch()">
-                                <i class="bi bi-bell-fill"></i>
-                                <span>Get Notified at Launch</span>
-                            </button>
-
-                            <!-- Timeline -->
-                            <div class="launch-timeline">
-                                <i class="bi bi-rocket-takeoff-fill"></i>
-                                <span>Expected launch: Q2 2027</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Subscription Tab -->
-        <div class="tab-pane" id="subscription">
-            <div class="content-grid">
-                
-                <!-- Current Plan -->
-                <div class="content-card plan-card">
-                    <div class="plan-badge">Current Plan</div>
-                    <div class="card-content">
-                        <div class="plan-details">
-                            <h3 class="plan-name">Professional Agent</h3>
-                            <p class="plan-description">Unlimited listings • Advanced analytics • Priority support</p>
-                            <div class="plan-pricing">
-                                <span class="price-amount">₦15,000</span>
-                                <span class="price-period">per month</span>
-                            </div>
-                            <button class="upgrade-btn">
-                                <i class="bi bi-arrow-up-circle-fill"></i>
-                                Upgrade to Premium
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Method -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-credit-card"></i>
-                            Payment Method
-                        </h3>
-                        <button class="add-btn">
-                            <i class="bi bi-plus-circle"></i>
-                            Add Card
-                        </button>
-                    </div>
-                    <div class="card-content">
-                        <div class="payment-method-item">
-                            <div class="card-icon visa">
-                                <i class="bi bi-credit-card-fill"></i>
-                            </div>
-                            <div class="card-details">
-                                <h4>Visa •••• 4242</h4>
-                                <p>Expires 12/2025</p>
-                            </div>
-                            <span class="default-badge">Default</span>
-                            <button class="icon-btn">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Billing History -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-receipt"></i>
-                            Billing History
-                        </h3>
-                        <button class="text-btn">
-                            View All
-                            <i class="bi bi-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="card-content">
-                        <div class="billing-list">
-                            <div class="billing-row">
-                                <div class="billing-info">
-                                    <h4>Professional Plan</h4>
-                                    <p>Invoice #INV-2024-0045</p>
-                                </div>
-                                <div class="billing-meta">
-                                    <span class="billing-date">Jan 15, 2024</span>
-                                    <span class="billing-amount">₦15,000</span>
-                                    <span class="status-tag paid">Paid</span>
-                                    <button class="icon-btn">
-                                        <i class="bi bi-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="billing-row">
-                                <div class="billing-info">
-                                    <h4>Professional Plan</h4>
-                                    <p>Invoice #INV-2023-0234</p>
-                                </div>
-                                <div class="billing-meta">
-                                    <span class="billing-date">Dec 15, 2023</span>
-                                    <span class="billing-amount">₦15,000</span>
-                                    <span class="status-tag paid">Paid</span>
-                                    <button class="icon-btn">
-                                        <i class="bi bi-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="section-actions">
-                <button class="action-btn secondary">
-                    <i class="bi bi-question-circle"></i>
-                    Billing Support
-                </button>
-                <button class="action-btn primary">
-                    <i class="bi bi-arrow-clockwise"></i>
-                    Manage Subscription
-                </button>
-            </div>
-        </div>
-
-        <!-- Account Actions Tab -->
-        <div class="tab-pane" id="account-actions">
-            <div class="content-grid">
-                
-                <!-- Warning Card -->
-                <div class="content-card warning-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            Account Actions
-                        </h3>
-                        <p class="card-subtitle danger-text">These actions are permanent and cannot be undone</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="danger-action-item">
-                            <div class="danger-icon">
-                                <i class="bi bi-pause-circle-fill"></i>
-                            </div>
-                            <div class="danger-info">
-                                <h4>Deactivate Account</h4>
-                                <p>Temporarily disable your account. You can reactivate it anytime by logging back in.</p>
-                                <ul class="consequence-list">
-                                    <li>Your profile will be hidden from search</li>
-                                    <li>Listings will remain but won't be promoted</li>
-                                    <li>You'll stop receiving notifications</li>
-                                    <li>You can reactivate anytime</li>
-                                </ul>
-                            </div>
-                            <button class="danger-btn deactivate">
-                                <i class="bi bi-pause-circle"></i>
-                                Deactivate Account
-                            </button>
-                        </div>
-
-                        <div class="danger-divider"></div>
-
-                        <div class="danger-action-item critical">
-                            <div class="danger-icon">
-                                <i class="bi bi-trash-fill"></i>
-                            </div>
-                            <div class="danger-info">
-                                <h4>Delete Account Permanently</h4>
-                                <p>This will completely remove your account and all associated data. This action is irreversible.</p>
-                                <ul class="consequence-list">
-                                    <li>All your listings will be deleted</li>
-                                    <li>Your profile will be permanently removed</li>
-                                    <li>All leads and messages will be lost</li>
-                                    <li>This cannot be undone</li>
-                                </ul>
-                            </div>
-                            <button class="danger-btn delete" onclick="openDeleteModal()">
-                                <i class="bi bi-trash"></i>
-                                Delete Account Forever
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+      <button class="tab-btn danger-tab" data-tab="account-actions">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <span>Account</span>
+      </button>
 
     </div>
-    
-</div>
+  </div>
 
-<!-- Delete Account Confirmation Modal -->
-<div class="delete-modal-overlay" id="deleteModalOverlay">
-    <div class="delete-modal">
-        <div class="delete-modal-header">
-            <div class="delete-modal-icon">
-                <i class="bi bi-exclamation-triangle-fill"></i>
+  {# ── Tab Content ──────────────────────────────────────────────── #}
+  <div class="tabs-content">
+
+
+    <div class="tab-pane active" id="personal-info">
+      <div class="content-grid">
+
+        {# Profile picture + name #}
+        <div class="content-card featured">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title"><i class="bi bi-image"></i> Profile Picture</h3>
             </div>
-            <h2>Delete Account Permanently?</h2>
-            <p>This action cannot be undone. Please read carefully.</p>
+          </div>
+          <div class="card-content">
+            <div class="profile-display-area">
+              <div class="avatar-circle">
+                {% if agent.profile_picture %}
+                  <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}">
+                {% else %}
+                  <div class="avatar-placeholder">{{ agent.first_name|slice:":1"|upper }}</div>
+                {% endif %}
+              </div>
+              <div class="profile-info">
+                <h4>{{ agent.first_name }} {{ agent.last_name }}</h4>
+                <p class="profile-status">
+                  {% if agent.verified %}
+                    <i class="bi bi-patch-check-fill text-success"></i> Verified Agent
+                  {% else %}
+                    <i class="bi bi-clock-history text-warning"></i> Verification Pending
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div class="delete-modal-body">
-            <div class="warning-message">
+
+        {# Basic info #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-person-badge"></i> Basic Information</h3>
+          </div>
+          <div class="card-content">
+            <div class="info-display-grid">
+
+              <div class="info-item">
+                <label class="info-label">Full Name</label>
+                <p class="info-value">{{ agent.first_name }} {{ agent.last_name }}</p>
+              </div>
+
+              <div class="info-item">
+                <label class="info-label">Work Type</label>
+                <p class="info-value">{{ agent.work_type }}</p>
+              </div>
+
+              <div class="info-item">
+                <label class="info-label">Email Address</label>
+                <p class="info-value">{{ agent.email|default:"Not provided" }}</p>
+              </div>
+
+              <div class="info-item">
+                <label class="info-label">Phone Number</label>
+                <p class="info-value">{{ agent.phone_number }}</p>
+              </div>
+
+              <div class="info-item full-width">
+                <label class="info-label">Professional Bio</label>
+                <p class="info-value bio-text">{{ agent.bio }}</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {# Location & Contact #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-geo-alt-fill"></i> Location & Contact</h3>
+          </div>
+          <div class="card-content">
+            <div class="info-display-grid">
+              <div class="info-item">
+                <label class="info-label">Base Location</label>
+                <p class="info-value">{{ agent.location }}</p>
+              </div>
+              <div class="info-item">
+                <label class="info-label">Languages Spoken</label>
+                <p class="info-value">{{ agent.language }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Social links #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-share"></i> Social Media Links</h3>
+            <p class="card-subtitle">Your connected social profiles</p>
+          </div>
+          <div class="card-content">
+            {% if agent.social.exists %}
+              <div class="social-display-grid">
+                {% for link in agent.social.all %}
+                  {% if link.link_to_social %}
+                    <a href="{{ link.link_to_social }}" target="_blank" class="social-display-item">
+                      <div class="social-icon {{ link.social_platform|lower }}">
+                        <i class="bi bi-{{ link.social_platform|lower }}"></i>
+                      </div>
+                      <div class="social-details">
+                        <span class="social-name">{{ link.social_platform }}</span>
+                        <span class="social-link">View Profile</span>
+                      </div>
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <i class="bi bi-link-45deg"></i>
+                <p>No social media links added yet</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>{# end content-grid #}
+
+      <div class="section-actions">
+        <a href="{% url 'agent:update-agent' agent.agent_uuid %}" class="action-btn primary">
+          <i class="bi bi-pencil-square"></i> Update Agent Profile
+        </a>
+      </div>
+    </div>{# end personal-info #}
+
+    <div class="tab-pane" id="professional">
+      <div class="content-grid">
+
+        {# Experience #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-trophy"></i> Professional Experience</h3>
+          </div>
+          <div class="card-content">
+            {% if agent.experiences.exists %}
+              <div class="experience-timeline">
+                {% for exp in agent.experiences.all %}
+                  <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <h4 class="timeline-title">{{ exp.title }}</h4>
+                      <p class="timeline-company">{{ exp.company }}</p>
+                      <p class="timeline-date">
+                        <i class="bi bi-calendar3"></i>
+                        {{ exp.start_date|date:"M Y" }} —
+                        {% if exp.end_date %}{{ exp.end_date|date:"M Y" }}{% else %}Present{% endif %}
+                      </p>
+                      <p class="timeline-description">{{ exp.past_experence }}</p>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <i class="bi bi-briefcase"></i>
+                <p>No professional experience added yet</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Certifications #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-award-fill"></i> Certifications & Licences</h3>
+          </div>
+          <div class="card-content">
+            <div class="certifications-display">
+
+              {% if agent.government_id %}
+                <div class="cert-display-item">
+                  <div class="cert-icon verified">
+                    <i class="bi bi-file-earmark-check-fill"></i>
+                  </div>
+                  <div class="cert-details">
+                    <h4>Government ID</h4>
+                    <p>Verified identification document</p>
+                    <span class="cert-status verified">
+                      <i class="bi bi-check-circle-fill"></i> Submitted
+                    </span>
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if agent.certificate %}
+                <div class="cert-display-item">
+                  <div class="cert-icon verified">
+                    <i class="bi bi-award-fill"></i>
+                  </div>
+                  <div class="cert-details">
+                    <h4>Professional Certificate</h4>
+                    <p>Real estate certification</p>
+                    <span class="cert-status verified">
+                      <i class="bi bi-check-circle-fill"></i> Submitted
+                    </span>
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if not agent.government_id and not agent.certificate %}
+                <div class="empty-state">
+                  <i class="bi bi-shield-exclamation"></i>
+                  <p>No certifications uploaded yet</p>
+                </div>
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-actions">
+        <a href="{% url 'agent:update-agent' agent.agent_uuid %}" class="action-btn primary">
+          <i class="bi bi-pencil-square"></i> Update Professional Info
+        </a>
+      </div>
+    </div>{# end professional #}
+
+
+    <div class="tab-pane" id="security">
+      <div class="content-grid">
+
+        {# Security status #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-shield-fill-check"></i> Security Status</h3>
+          </div>
+          <div class="card-content">
+            <div class="security-status-grid">
+
+              <div class="status-item verified">
+                <div class="status-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="status-info">
+                  <h4>Email Verified</h4>
+                  <p>Your email is confirmed and secure</p>
+                </div>
+              </div>
+
+              <div class="status-item pending">
+                <div class="status-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div class="status-info">
+                  <h4>Two-Factor Authentication</h4>
+                  <p>Coming soon — enhanced security feature</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {# Password #}
+        <div class="content-card featured">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-key-fill"></i> Password Management</h3>
+            <p class="card-subtitle">Keep your account secure with a strong password</p>
+          </div>
+          <div class="card-content">
+            <div class="section-actions" style="padding-top:0; border-top:none;">
+              <a href="{% url 'customer:change-password' %}" class="action-btn primary">
+                <i class="bi bi-shield-lock-fill"></i> Change Password
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {# Coming soon — advanced security #}
+        <div class="content-card coming-soon-card">
+          <div class="card-content">
+            <div class="coming-soon-wrapper">
+
+              <div class="coming-soon-animation">
+                <div class="settings-icon-stack">
+                  <i class="bi bi-shield-fill-check icon-1"></i>
+                  <i class="bi bi-phone-fill icon-2"></i>
+                  <i class="bi bi-display icon-3"></i>
+                </div>
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring-2"></div>
+              </div>
+
+              <h2 class="coming-soon-heading">Advanced Security Coming Soon</h2>
+              <p class="coming-soon-description">
+                Enterprise-grade security features to protect your account and give you complete visibility over your login activity.
+              </p>
+
+              <div class="features-preview">
+                <div class="preview-item">
+                  <div class="preview-icon theme"><i class="bi bi-phone-vibrate-fill"></i></div>
+                  <div class="preview-content">
+                    <h4>Two-Factor Authentication</h4>
+                    <p>Extra security layer with SMS or app codes</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon language"><i class="bi bi-devices"></i></div>
+                  <div class="preview-content">
+                    <h4>Active Sessions Manager</h4>
+                    <p>See and control all logged-in devices</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon privacy"><i class="bi bi-clock-history"></i></div>
+                  <div class="preview-content">
+                    <h4>Login History</h4>
+                    <p>Track all access attempts to your account</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon display"><i class="bi bi-fingerprint"></i></div>
+                  <div class="preview-content">
+                    <h4>Biometric Login</h4>
+                    <p>Fingerprint and face recognition support</p>
+                  </div>
+                </div>
+              </div>
+
+              <button class="notify-launch-btn" type="button" onclick="notifyMeSecurity()">
+                <i class="bi bi-bell-fill"></i> Notify Me When Available
+              </button>
+
+              <div class="launch-timeline">
+                <i class="bi bi-rocket-takeoff-fill"></i>
+                <span>Expected rollout: Q3 2027</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>{# end security #}
+
+
+    <div class="tab-pane" id="notifications">
+      <div class="content-grid">
+
+        <div class="content-card coming-soon-card">
+          <div class="card-content">
+            <div class="coming-soon-wrapper">
+
+              <div class="coming-soon-animation">
+                <div class="settings-icon-stack">
+                  <i class="bi bi-bell-fill icon-1"></i>
+                  <i class="bi bi-phone-fill icon-2"></i>
+                  <i class="bi bi-chat-dots-fill icon-3"></i>
+                </div>
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring-2"></div>
+              </div>
+
+              <h2 class="coming-soon-heading">More Channels Coming Soon</h2>
+              <p class="coming-soon-description">
+                We're setting up additional notification channels. For now updates arrive via email — more ways to stay connected are on the way.
+              </p>
+
+              <div class="features-preview">
+                <div class="preview-item">
+                  <div class="preview-icon theme"><i class="bi bi-phone-vibrate-fill"></i></div>
+                  <div class="preview-content">
+                    <h4>Push Notifications</h4>
+                    <p>Real-time alerts on your mobile device</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon language"><i class="bi bi-chat-left-text-fill"></i></div>
+                  <div class="preview-content">
+                    <h4>SMS Alerts</h4>
+                    <p>Critical updates via text message</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon privacy"><i class="bi bi-broadcast"></i></div>
+                  <div class="preview-content">
+                    <h4>In-App Notifications</h4>
+                    <p>Live updates while browsing the platform</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon display"><i class="bi bi-telegram"></i></div>
+                  <div class="preview-content">
+                    <h4>Instant Messaging</h4>
+                    <p>WhatsApp and Telegram integration</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="launch-timeline" style="margin-bottom:1rem;">
                 <i class="bi bi-info-circle-fill"></i>
-                <p>You are about to permanently delete your account. This will:</p>
-            </div>
-            
-            <ul class="deletion-consequences">
-                <li><i class="bi bi-x-circle-fill"></i> Delete all your property listings</li>
-                <li><i class="bi bi-x-circle-fill"></i> Remove your profile permanently</li>
-                <li><i class="bi bi-x-circle-fill"></i> Erase all leads and messages</li>
-                <li><i class="bi bi-x-circle-fill"></i> Cancel your subscription</li>
-                <li><i class="bi bi-x-circle-fill"></i> Remove all associated data</li>
-            </ul>
-            
-            <div class="confirmation-input-wrapper">
-                <label for="deleteConfirmInput">
-                    To confirm deletion, type <strong>DELETE</strong> in the box below:
-                </label>
-                <input 
-                    type="text" 
-                    id="deleteConfirmInput" 
-                    class="delete-confirm-input" 
-                    placeholder="Type DELETE to confirm"
-                    autocomplete="off"
-                >
-                <span class="input-error" id="deleteInputError"></span>
-            </div>
-        </div>
-        
-        <div class="delete-modal-footer">
-            <button class="modal-btn cancel-btn" onclick="closeDeleteModal()">
-                <i class="bi bi-x-circle"></i>
-                Cancel
-            </button>
-            <button class="modal-btn confirm-delete-btn" id="confirmDeleteBtn" disabled onclick="executeDelete()">
-                <i class="bi bi-trash-fill"></i>
-                Yes, Delete My Account
-            </button>
-        </div>
-    </div>
-</div>
+                <span>Currently available: Email notifications only</span>
+              </div>
 
-<!-- Include Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+              <button class="notify-launch-btn" type="button" onclick="notifyMeChannels()">
+                <i class="bi bi-bell-fill"></i> Notify Me When Available
+              </button>
+
+              <div class="launch-timeline">
+                <i class="bi bi-rocket-takeoff-fill"></i>
+                <span>Expected rollout: Q2 2027</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>{# end notifications #}
+
+
+
+    <div class="tab-pane" id="preferences">
+      <div class="content-grid">
+
+        <div class="content-card coming-soon-card">
+          <div class="card-content">
+            <div class="coming-soon-wrapper">
+
+              <div class="coming-soon-animation">
+                <div class="settings-icon-stack">
+                  <i class="bi bi-sliders icon-1"></i>
+                  <i class="bi bi-palette-fill icon-2"></i>
+                  <i class="bi bi-globe icon-3"></i>
+                </div>
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring-2"></div>
+              </div>
+
+              <h2 class="coming-soon-heading">Preferences Coming Soon</h2>
+              <p class="coming-soon-description">
+                We're building an enhanced preferences centre with advanced customisation options to give you complete control over your experience.
+              </p>
+
+              <div class="features-preview">
+                <div class="preview-item">
+                  <div class="preview-icon theme"><i class="bi bi-moon-stars-fill"></i></div>
+                  <div class="preview-content">
+                    <h4>Dark Mode</h4>
+                    <p>Eye-friendly theme for night browsing</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon language"><i class="bi bi-translate"></i></div>
+                  <div class="preview-content">
+                    <h4>Multi-Language Support</h4>
+                    <p>English, Yoruba, Hausa, Igbo</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon privacy"><i class="bi bi-shield-lock-fill"></i></div>
+                  <div class="preview-content">
+                    <h4>Privacy Controls</h4>
+                    <p>Manage your visibility and data sharing</p>
+                  </div>
+                </div>
+                <div class="preview-item">
+                  <div class="preview-icon display"><i class="bi bi-layout-text-window-reverse"></i></div>
+                  <div class="preview-content">
+                    <h4>Display Options</h4>
+                    <p>Customise layout and information density</p>
+                  </div>
+                </div>
+              </div>
+
+              <button class="notify-launch-btn" type="button" onclick="notifyMeLaunch()">
+                <i class="bi bi-bell-fill"></i> Get Notified at Launch
+              </button>
+
+              <div class="launch-timeline">
+                <i class="bi bi-rocket-takeoff-fill"></i>
+                <span>Expected launch: Q2 2027</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>{# end preferences #}
+
+
+    <div class="tab-pane" id="subscription">
+      <div class="content-grid">
+
+        {# Current plan #}
+        <div class="content-card plan-card">
+          <div class="plan-badge">Current Plan</div>
+          <div class="card-content">
+            <div class="plan-details">
+              <h3 class="plan-name">Professional Agent</h3>
+              <p class="plan-description">Unlimited listings · Advanced analytics · Priority support</p>
+              <div class="plan-pricing">
+                <span class="price-amount">₦15,000</span>
+                <span class="price-period">/ month</span>
+              </div>
+              <button class="upgrade-btn">
+                <i class="bi bi-arrow-up-circle-fill"></i> Upgrade to Premium
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {# Payment method #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-credit-card"></i> Payment Method</h3>
+            <button class="add-btn"><i class="bi bi-plus-circle"></i> Add Card</button>
+          </div>
+          <div class="card-content">
+            <div class="payment-method-item">
+              <div class="card-icon visa"><i class="bi bi-credit-card-fill"></i></div>
+              <div class="card-details">
+                <h4>Visa •••• 4242</h4>
+                <p>Expires 12/2025</p>
+              </div>
+              <span class="default-badge">Default</span>
+              <button class="icon-btn"><i class="bi bi-three-dots-vertical"></i></button>
+            </div>
+          </div>
+        </div>
+
+        {# Billing history #}
+        <div class="content-card">
+          <div class="card-header">
+            <h3 class="card-title"><i class="bi bi-receipt"></i> Billing History</h3>
+            <button class="text-btn">View All <i class="bi bi-arrow-right"></i></button>
+          </div>
+          <div class="card-content">
+            <div class="billing-list">
+
+              <div class="billing-row">
+                <div class="billing-info">
+                  <h4>Professional Plan</h4>
+                  <p>Invoice #INV-2024-0045</p>
+                </div>
+                <div class="billing-meta">
+                  <span class="billing-date">Jan 15, 2024</span>
+                  <span class="billing-amount">₦15,000</span>
+                  <span class="status-tag paid">Paid</span>
+                  <button class="icon-btn"><i class="bi bi-download"></i></button>
+                </div>
+              </div>
+
+              <div class="billing-row">
+                <div class="billing-info">
+                  <h4>Professional Plan</h4>
+                  <p>Invoice #INV-2023-0234</p>
+                </div>
+                <div class="billing-meta">
+                  <span class="billing-date">Dec 15, 2023</span>
+                  <span class="billing-amount">₦15,000</span>
+                  <span class="status-tag paid">Paid</span>
+                  <button class="icon-btn"><i class="bi bi-download"></i></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-actions">
+        <button class="action-btn secondary">
+          <i class="bi bi-question-circle"></i> Billing Support
+        </button>
+        <button class="action-btn primary">
+          <i class="bi bi-arrow-clockwise"></i> Manage Subscription
+        </button>
+      </div>
+    </div>{# end subscription #}
+
+    <div class="tab-pane" id="account-actions">
+      <div class="content-grid">
+
+        <div class="content-card warning-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Danger Zone</h3>
+              <p class="card-subtitle danger-text">These actions are permanent and cannot be undone</p>
+            </div>
+          </div>
+          <div class="card-content">
+
+            {# Deactivate #}
+            <div class="danger-action-item">
+              <div class="danger-icon"><i class="bi bi-pause-circle-fill"></i></div>
+              <div class="danger-info">
+                <h4>Deactivate Account</h4>
+                <p>Temporarily disable your account. You can reactivate by logging back in.</p>
+                <ul class="consequence-list">
+                  <li>Your profile will be hidden from search</li>
+                  <li>Listings remain but won't be promoted</li>
+                  <li>You'll stop receiving notifications</li>
+                  <li>You can reactivate anytime</li>
+                </ul>
+              </div>
+              <button class="danger-btn deactivate">
+                <i class="bi bi-pause-circle"></i> Deactivate
+              </button>
+            </div>
+
+            <div class="danger-divider"></div>
+
+            {# Delete #}
+            <div class="danger-action-item critical">
+              <div class="danger-icon"><i class="bi bi-trash-fill"></i></div>
+              <div class="danger-info">
+                <h4>Delete Account Permanently</h4>
+                <p>Completely removes your account and all associated data. This is irreversible.</p>
+                <ul class="consequence-list">
+                  <li>All your listings will be deleted</li>
+                  <li>Your profile will be permanently removed</li>
+                  <li>All leads and messages will be lost</li>
+                  <li>Cannot be undone</li>
+                </ul>
+              </div>
+              <button class="danger-btn delete" onclick="openDeleteModal()">
+                <i class="bi bi-trash"></i> Delete Forever
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>{# end account-actions #}
+
+
+  </div>{# end tabs-content #}
+</div>{# end settings-container #}
+
+
+{# ── Delete Confirmation Modal ────────────────────────────────────── #}
+<div class="delete-modal-overlay" id="deleteModalOverlay">
+  <div class="delete-modal">
+
+    <div class="delete-modal-header">
+      <div class="delete-modal-icon">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </div>
+      <h2>Delete Account Permanently?</h2>
+      <p>This action cannot be undone. Please read carefully.</p>
+    </div>
+
+    <div class="delete-modal-body">
+      <div class="warning-message">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>You are about to permanently delete your account. This will:</p>
+      </div>
+
+      <ul class="deletion-consequences">
+        <li><i class="bi bi-x-circle-fill"></i> Delete all your property listings</li>
+        <li><i class="bi bi-x-circle-fill"></i> Remove your profile permanently</li>
+        <li><i class="bi bi-x-circle-fill"></i> Erase all leads and messages</li>
+        <li><i class="bi bi-x-circle-fill"></i> Cancel your subscription</li>
+        <li><i class="bi bi-x-circle-fill"></i> Remove all associated data</li>
+      </ul>
+
+      <div class="confirmation-input-wrapper">
+        <label for="deleteConfirmInput">
+          To confirm, type <strong>DELETE</strong> below:
+        </label>
+        <input type="text" id="deleteConfirmInput"
+               class="delete-confirm-input"
+               placeholder="Type DELETE to confirm"
+               autocomplete="off">
+        <span class="input-error" id="deleteInputError"></span>
+      </div>
+    </div>
+
+    <div class="delete-modal-footer">
+      <button class="modal-btn cancel-btn" onclick="closeDeleteModal()">
+        <i class="bi bi-x-circle"></i> Cancel
+      </button>
+      <button class="modal-btn confirm-delete-btn" id="confirmDeleteBtn"
+              disabled onclick="executeDelete()">
+        <i class="bi bi-trash-fill"></i> Yes, Delete My Account
+      </button>
+    </div>
+
+  </div>
+</div>
 
 {% endblock %}
 
+
 {% block extra_js %}
 <script>
-// Tab Navigation
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const targetTab = this.getAttribute('data-tab');
-        
-        // Update active button
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        // Update active content
-        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-        document.getElementById(targetTab).classList.add('active');
+(function () {
+  'use strict';
+
+  /* ── Tab switching ──────────────────────────────────────────────── */
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = this.getAttribute('data-tab');
+
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      this.classList.add('active');
+
+      document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+      document.getElementById(target).classList.add('active');
+
+      /* scroll nav item into view on mobile */
+      this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     });
-});
+  });
 
-// Password Toggle
-function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    const button = input.nextElementSibling;
-    const icon = button.querySelector('i');
-    
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('bi-eye');
-        icon.classList.add('bi-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('bi-eye-slash');
-        icon.classList.add('bi-eye');
-    }
-}
+  /* ── Delete modal ───────────────────────────────────────────────── */
+  var deleteUrl = "{% url 'agent:delete-agent' agent.agent_uuid %}";
 
-// Save All Settings
-function saveAllSettings() {
-    alert('All settings saved successfully!');
-}
+  window.openDeleteModal = function () {
+    var modal   = document.getElementById('deleteModalOverlay');
+    var input   = document.getElementById('deleteConfirmInput');
+    var btn     = document.getElementById('confirmDeleteBtn');
+    var errMsg  = document.getElementById('deleteInputError');
 
-// Notify Me Launch (for Preferences tab)
-function notifyMeLaunch() {
-    alert('Thank you! We\'ll notify you when Preferences are available.');
-    // In production, this would collect the user's email/preferences for notification
-}
+    input.value      = '';
+    btn.disabled     = true;
+    errMsg.textContent = '';
+    input.classList.remove('error', 'valid');
 
-// Delete Account Modal Functions
-const deleteUrl = "{% url 'agent:delete-agent' agent.agent_uuid %}";
-
-function openDeleteModal() {
-    const modal = document.getElementById('deleteModalOverlay');
-    const input = document.getElementById('deleteConfirmInput');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    const errorMsg = document.getElementById('deleteInputError');
-    
-    // Reset modal state
-    input.value = '';
-    confirmBtn.disabled = true;
-    errorMsg.textContent = '';
-    
-    // Show modal
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    
-    // Focus input after animation
-    setTimeout(() => input.focus(), 300);
-}
+    setTimeout(function () { input.focus(); }, 320);
+  };
 
-function closeDeleteModal() {
-    const modal = document.getElementById('deleteModalOverlay');
-    modal.classList.remove('active');
+  window.closeDeleteModal = function () {
+    document.getElementById('deleteModalOverlay').classList.remove('active');
     document.body.style.overflow = '';
-}
+  };
 
-// Validate DELETE input in real-time
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('deleteConfirmInput');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    const errorMsg = document.getElementById('deleteInputError');
-    
-    if (input) {
-        input.addEventListener('input', function() {
-            const value = this.value.trim();
-            
-            if (value === 'DELETE') {
-                confirmBtn.disabled = false;
-                errorMsg.textContent = '';
-                this.classList.remove('error');
-                this.classList.add('valid');
-            } else {
-                confirmBtn.disabled = true;
-                this.classList.remove('valid');
-                
-                if (value.length > 0) {
-                    errorMsg.textContent = 'Must type exactly "DELETE" (all caps)';
-                    this.classList.add('error');
-                } else {
-                    errorMsg.textContent = '';
-                    this.classList.remove('error');
-                }
-            }
-        });
-        
-        // Prevent spaces
-        input.addEventListener('keypress', function(e) {
-            if (e.key === ' ') {
-                e.preventDefault();
-            }
-        });
-    }
-});
-
-// Execute account deletion
-function executeDelete() {
-    const input = document.getElementById('deleteConfirmInput');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    
-    if (input.value.trim() !== 'DELETE') {
-        alert('Please type DELETE to confirm account deletion.');
-        return;
-    }
-    
-    // Disable button to prevent double-clicks
-    confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Deleting...';
-    
-    // Redirect to delete URL
+  window.executeDelete = function () {
+    var input = document.getElementById('deleteConfirmInput');
+    var btn   = document.getElementById('confirmDeleteBtn');
+    if (input.value.trim() !== 'DELETE') return;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Deleting…';
     window.location.href = deleteUrl;
-}
+  };
 
-// Close modal on overlay click
-document.addEventListener('DOMContentLoaded', function() {
-    const overlay = document.getElementById('deleteModalOverlay');
-    if (overlay) {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeDeleteModal();
-            }
-        });
-    }
-    
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            const modal = document.getElementById('deleteModalOverlay');
-            if (modal && modal.classList.contains('active')) {
-                closeDeleteModal();
-            }
-        }
-    });
-});
+  /* Live validate DELETE input */
+  var confirmInput = document.getElementById('deleteConfirmInput');
+  if (confirmInput) {
+    confirmInput.addEventListener('input', function () {
+      var val = this.value.trim();
+      var btn = document.getElementById('confirmDeleteBtn');
+      var err = document.getElementById('deleteInputError');
 
-// Custom Delete Account Confirmation
-function confirmDeleteAccount(deleteUrl) {
-    // Create modal overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'delete-modal-overlay';
-    overlay.innerHTML = `
-        <div class="delete-modal">
-            <div class="delete-modal-header">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <h3>Permanently Delete Account?</h3>
-            </div>
-            <div class="delete-modal-body">
-                <p class="warning-text">This action cannot be undone. All your data will be permanently deleted.</p>
-                <div class="confirmation-requirements">
-                    <p><strong>To confirm, please type <span class="delete-word">DELETE</span> below:</strong></p>
-                    <input type="text" id="deleteConfirmInput" class="delete-confirm-input" placeholder="Type DELETE here" autocomplete="off">
-                    <p class="input-hint" id="deleteHint"></p>
-                </div>
-            </div>
-            <div class="delete-modal-footer">
-                <button class="modal-btn cancel" onclick="closeDeleteModal()">
-                    <i class="bi bi-x-circle"></i>
-                    Cancel
-                </button>
-                <button class="modal-btn confirm-delete" id="confirmDeleteBtn" disabled onclick="proceedWithDeletion('${deleteUrl}')">
-                    <i class="bi bi-trash"></i>
-                    Delete My Account
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(overlay);
-    
-    // Focus on input
-    setTimeout(() => {
-        document.getElementById('deleteConfirmInput').focus();
-    }, 100);
-    
-    // Add input validation
-    const input = document.getElementById('deleteConfirmInput');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    const hint = document.getElementById('deleteHint');
-    
-    input.addEventListener('input', function() {
-        const value = this.value.trim();
-        
-        if (value === 'DELETE') {
-            confirmBtn.disabled = false;
-            confirmBtn.classList.add('enabled');
-            hint.textContent = '✓ Ready to delete';
-            hint.className = 'input-hint success';
-        } else if (value.length > 0) {
-            confirmBtn.disabled = true;
-            confirmBtn.classList.remove('enabled');
-            hint.textContent = '✗ Must type exactly "DELETE"';
-            hint.className = 'input-hint error';
+      if (val === 'DELETE') {
+        btn.disabled = false;
+        err.textContent = '';
+        this.classList.remove('error'); this.classList.add('valid');
+      } else {
+        btn.disabled = true;
+        this.classList.remove('valid');
+        if (val.length > 0) {
+          err.textContent = 'Must type exactly "DELETE" (all caps)';
+          this.classList.add('error');
         } else {
-            confirmBtn.disabled = true;
-            confirmBtn.classList.remove('enabled');
-            hint.textContent = '';
-            hint.className = 'input-hint';
+          err.textContent = '';
+          this.classList.remove('error');
         }
+      }
     });
-    
-    // Close on overlay click
-    overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) {
-            closeDeleteModal();
-        }
-    });
-    
-    // Close on Escape key
-    document.addEventListener('keydown', function escapeHandler(e) {
-        if (e.key === 'Escape') {
-            closeDeleteModal();
-            document.removeEventListener('keydown', escapeHandler);
-        }
-    });
-}
 
-function closeDeleteModal() {
-    const overlay = document.querySelector('.delete-modal-overlay');
-    if (overlay) {
-        overlay.remove();
-    }
-}
+    confirmInput.addEventListener('keypress', function (e) {
+      if (e.key === ' ') e.preventDefault();
+    });
+  }
 
-function proceedWithDeletion(deleteUrl) {
-    const input = document.getElementById('deleteConfirmInput');
-    if (input.value.trim() === 'DELETE') {
-        // Close the modal
-        closeDeleteModal();
-        
-        // Show loading state
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'delete-modal-overlay';
-        loadingOverlay.innerHTML = `
-            <div class="delete-modal loading">
-                <div class="loading-spinner"></div>
-                <p>Deleting your account...</p>
-            </div>
-        `;
-        document.body.appendChild(loadingOverlay);
-        
-        // Redirect to delete URL
-        window.location.href = deleteUrl;
+  /* Close modal on overlay click or Escape */
+  document.getElementById('deleteModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) window.closeDeleteModal();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var modal = document.getElementById('deleteModalOverlay');
+      if (modal.classList.contains('active')) window.closeDeleteModal();
     }
-}
-// Notify Me for Additional Notification Channels
-function notifyMeChannels() {
-    alert('Thank you! We\'ll notify you via email when push notifications, SMS, and other channels become available.');
-    // In production, this would save the user's preference to be notified
-}
+  });
+
+  /* ── Notify placeholders ─────────────────────────────────────────── */
+  window.notifyMeLaunch     = function () { alert("We'll notify you when Preferences launch."); };
+  window.notifyMeChannels   = function () { alert("We'll notify you when new notification channels are available."); };
+  window.notifyMeSecurity   = function () { alert("We'll notify you when Advanced Security features roll out."); };
+
+}());
 </script>
-
-
 {% endblock %}
