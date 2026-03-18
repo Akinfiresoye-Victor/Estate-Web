@@ -4,192 +4,196 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register - Estate Web</title>
-  
+  <title>Register as Agent — Estate Web</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
-  {%load static%}
   <link rel="stylesheet" href="{% static 'members/css/register.css' %}">
 </head>
 <body>
-  
-  <!-- Messages Container -->
-  <div class="messages-container">
-{% if messages %}
+
+{# ── Messages ─────────────────────────────────────────────────────── #}
+<div class="messages-container">
+  {% if messages %}
     {% for message in messages %}
-        {% if message.tags == 'error' %}
-            {% with 'danger' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% elif message.tags == 'info' %}
-            {% with 'info' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% elif message.tags == 'warning' %}
-            {% with 'warning' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% else %}
-            {% with 'success' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% endif %}
+      {% if message.tags == 'error' %}
+        {% with 'danger' as alert_class %}
+          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endwith %}
+      {% elif message.tags == 'info' %}
+        {% with 'info' as alert_class %}
+          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endwith %}
+      {% elif message.tags == 'warning' %}
+        {% with 'warning' as alert_class %}
+          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endwith %}
+      {% else %}
+        {% with 'success' as alert_class %}
+          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endwith %}
+      {% endif %}
     {% endfor %}
-{% endif %}
+  {% endif %}
+</div>
 
-  </div>
+<div class="register-wrapper">
+  <div class="register-container">
 
-  <!-- Register Card -->
-  <div class="register-wrapper">
-    <div class="register-container">
-      <div class="register-card">
-        
-        <!-- Brand Header -->
-        <div class="register-header">
-          <div class="brand-logo">
-            <i class="bi bi-award"></i>
-          </div>
-          <h1 class="brand-name">Estate Web</h1>
-          <h2 class="register-title">Create Account</h2>
-          <p class="register-subtitle">Join us to level up your career</p>
+    <div class="register-card">
+
+      <div class="register-header">
+        <div class="brand-logo">
+          <i class="bi bi-award"></i>
         </div>
+        <h1 class="brand-name">Estate Web</h1>
+        <h2 class="register-title">Create Account</h2>
+        <p class="register-subtitle">Boost your career in real estate</p>
+      </div>
 
-        <!-- Error Alert -->
-        {% if form.errors %}
-          <div class="error-alert">
-            <div class="error-header">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-              <span>Registration Error!</span>
-            </div>
-            <ul class="error-list">
-              {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                  <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
-                {% endfor %}
-              {% endfor %}
-            </ul>
+      {# Role Switcher — Agent is active #}
+      <div class="role-switcher">
+        <a href="{% url 'login' %}" class="role-tab">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span class="role-tab-label">Sign In</span>
+        </a>
+        <a href="{% url 'register-customer' %}" class="role-tab">
+          <i class="bi bi-person"></i>
+          <span class="role-tab-label">Customer</span>
+        </a>
+        <span class="role-tab active">
+          <i class="bi bi-award-fill"></i>
+          <span class="role-tab-label">Agent</span>
+        </span>
+        <a href="{% url 'register-company' %}" class="role-tab">
+          <i class="bi bi-building"></i>
+          <span class="role-tab-label">Company</span>
+        </a>
+      </div>
+
+      {% if form.errors %}
+        <div class="error-alert">
+          <div class="error-header">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Registration Error!</span>
           </div>
-        {% endif %}
+          <ul class="error-list">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
 
-        <!-- Register Form -->
-        <form method="POST" action="{% url 'register-agent' %}" class="register-form">
+      <form method="POST" action="{% url 'register-agent' %}" class="register-form">
         {% csrf_token %}
 
-        <!-- First Name & Last Name Row -->
         <div class="form-row">
-            <div class="form-group">
+          <div class="form-group">
             <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                <i class="bi bi-person-fill me-2"></i>First Name
+              <i class="bi bi-person-fill"></i> First Name
             </label>
             {{ form.first_name }}
-            </div>
-            <div class="form-group">
+          </div>
+          <div class="form-group">
             <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                <i class="bi bi-person-fill me-2"></i>Last Name
+              <i class="bi bi-person-fill"></i> Last Name
             </label>
             {{ form.last_name }}
-            </div>
+          </div>
         </div>
 
-        <!-- Username Row -->
-        <div class="form-row">
-            <div class="form-group">
+        <div class="form-row full">
+          <div class="form-group">
             <label for="{{ form.username.id_for_label }}" class="form-label">
-                <i class="bi bi-at me-2"></i>Username
+              <i class="bi bi-at"></i> Username
             </label>
             {{ form.username }}
-            </div>
+          </div>
         </div>
 
-        <!-- Password & Confirm Password Row -->
         <div class="form-row">
-            <div class="form-group">
+          <div class="form-group">
             <label for="{{ form.password1.id_for_label }}" class="form-label">
-                <i class="bi bi-lock-fill me-2"></i>Password
+              <i class="bi bi-lock-fill"></i> Password
             </label>
             {{ form.password1 }}
-            </div>
-            <div class="form-group">
+          </div>
+          <div class="form-group">
             <label for="{{ form.password2.id_for_label }}" class="form-label">
-                <i class="bi bi-shield-lock-fill me-2"></i>Confirm Password
+              <i class="bi bi-shield-lock-fill"></i> Confirm Password
             </label>
             {{ form.password2 }}
-            </div>
+          </div>
         </div>
 
         <button type="submit" class="btn-submit">
-            <span>Create Agent Account</span>
-            <i class="bi bi-arrow-right-circle-fill"></i>
+          <span>Create Agent Account</span>
+          <i class="bi bi-arrow-right-circle-fill"></i>
         </button>
 
         <div class="login-section">
-            <p class="login-text">Already have an account?</p>
-            <a href="{% url 'login' %}" class="btn-login">
-            Sign In
-            </a>
+          <p class="login-text">Already have an account?</p>
+          <a href="{% url 'login' %}" class="btn-login">Sign In</a>
         </div>
-        </form>
+      </form>
 
+    </div>
 
-      </div>
-
-      <!-- Decorative Side Panel -->
-      <div class="side-panel">
-        <div class="side-content">
-          <i class="bi bi-award"></i>
-          <h3>Boost Your Career</h3>
-          <p>Create an account to access exclusive job listings by top companies and also assist your company to grow</p>
-          <div class="features">
-            <div class="feature-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Frequesnt Job Listings</span>
-            </div>
-            <div class="feature-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Tools to manage your career in your place of work</span>
-            </div>
-            <div class="feature-item">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>Work Remotely with us</span>
-            </div>
+    {# Side Panel — gold for agents #}
+    <div class="side-panel side-panel-agent">
+      <div class="side-content">
+        <i class="bi bi-award-fill"></i>
+        <h3>Boost Your Career</h3>
+        <p>Access exclusive job listings by top companies and use powerful tools to manage your career.</p>
+        <div class="features">
+          <div class="feature-item">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Frequent job listings</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Career management tools</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Work remotely with us</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'members/js/password_rules.js' %}"></script>
-  
-  <!-- Auto-dismiss alerts -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const alerts = document.querySelectorAll('.alert');
-      alerts.forEach(function(alert) {
-        setTimeout(function() {
-          alert.classList.remove('show');
-          setTimeout(function() {
-            alert.remove();
-          }, 500);
-        }, 5000);
-      });
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'members/js/password_rules.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.alert').forEach(function (alert) {
+      setTimeout(function () {
+        alert.classList.remove('show');
+        setTimeout(function () { alert.remove(); }, 500);
+      }, 5000);
     });
-  </script>
+  });
+</script>
 </body>
 </html>

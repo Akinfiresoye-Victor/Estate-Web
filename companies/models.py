@@ -201,3 +201,10 @@ class InviteLink(models.Model):
     max_uses=models.IntegerField('Usage Possibility', default=200, null=True, blank=True)
     use_count=models.IntegerField('Use Count', default=0, null=False, blank=False)
     is_active= models.BooleanField('Is Link Active?',default=True )
+
+
+
+class CompanyAnnouncements(models.Model):
+    company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='company_announcements')
+    announcements=models.CharField('Announcemt', max_length=100, default=None, null=False, blank=False)
+    time_created=models.DateTimeField(auto_now_add=True)

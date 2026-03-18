@@ -9,252 +9,289 @@
 
 {% block content %}
 
+{# ── Back Button ─────────────────────────────────────────────────── #}
+<div class="container">
+  {% if role == 'customer' %}
+    <a href="{% url 'customer:buy-property' %}" class="back-button">
+      <i class="bi bi-arrow-left"></i> Go Back
+    </a>
+  {% else %}
+    <a href="javascript:history.back()" class="back-button">
+      <i class="bi bi-arrow-left"></i> Go Back
+    </a>
+  {% endif %}
+</div>
 
-{%if role == 'customer' %}
-<div class="container">
-  <a href="{%url 'customer:buy-property'%}" class="back-button">
-    <i class="bi bi-arrow-left"></i>
-    Go Back
+{# ── Sticky CTA Bar — mobile only ────────────────────────────────── #}
+<div class="sticky-cta">
+  <a href="{% url 'customer:inquiry-form' property.property_type property.id %}"
+     class="btn-contact primary">
+    <i class="bi bi-envelope-fill"></i> Book Property
+  </a>
+  <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}"
+     class="btn-contact secondary">
+    <i class="bi bi-telephone-fill"></i> Call Now
   </a>
 </div>
-{%else%}
-<div class="container">
-  <a href="javascript:history.back()" class="back-button">
-    <i class="bi bi-arrow-left"></i>
-    Go Back
-  </a>
-</div>
-{%endif%}
+
+{# ── Page Wrapper ────────────────────────────────────────────────── #}
 <div class="detail-wrapper">
-  
-  <!-- Property Header -->
-  <div class="property-header">
-    <div class="header-badge">
-      <i class="bi bi-tag-fill"></i>
-      For Sale
-    </div>
-    {%if property.property_category == 'Commercial' %}
-      <h1 class="property-title">{{ property.commercial }}</h1>
-    {%elif property.property_category == 'Land'%}
-      <h1 class="property-title">{{ property.lands }}</h1>
-    {%elif property.property_category == 'Residential'%}
-      <h1 class="property-title">{{ property.residential }}</h1>
-    {%else%}
-      <h1 class="property-title">Something went wrong.....</h1>
-    {%endif%}
-    <div class="property-location">
-      <div class="location-item">
-        <i class="bi bi-geo-alt-fill"></i>
-        <span>{{ property.location|default:"Unknown Location" }}</span>
+
+  {# ── Hero ─────────────────────────────────────────────────────── #}
+  <div class="property-hero">
+
+    <div class="hero-image">
+      {% if property.base_image %}
+        <img src="{{ property.base_image.url }}"
+             onerror="this.onerror=null;this.src='https://placehold.co/1200x600/eff6ff/2563eb?text=No+Image';"
+             alt="Property Image">
+      {% else %}
+        <img src="https://placehold.co/1200x600/eff6ff/2563eb?text=No+Image"
+             alt="Placeholder">
+      {% endif %}
+
+      <span class="hero-badge">
+        <i class="bi bi-tag-fill"></i> For Sale
+      </span>
+
+      <div class="hero-price-pill">
+        ₦{{ property.price|default:"N/A"|floatformat:2|intcomma }}
       </div>
-      <div class="location-item">
-        <i class="bi bi-globe"></i>
-        <span>{{ property.state|default:"Unspecified" }}</span>
+    </div>
+
+    {# Gallery strip #}
+    {% with property|get_images as images %}
+      {% if images %}
+        <div class="gallery-strip">
+          {% for img in images|slice:"1:8" %}
+            <div class="gallery-thumb">
+              <img src="{{ img.url }}"
+                   onerror="this.onerror=null;this.src='https://placehold.co/400x300/eff6ff/2563eb?text=No+Image';"
+                   alt="Property Image {{ forloop.counter }}">
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="hero-body">
+      <h1 class="property-title">
+        {% if property.property_category == 'Commercial' %}
+          {{ property.commercial }}
+        {% elif property.property_category == 'Land' %}
+          {{ property.lands }}
+        {% elif property.property_category == 'Residential' %}
+          {{ property.residential }}
+        {% else %}
+          Property Listing
+        {% endif %}
+      </h1>
+
+      <div class="property-location">
+        <div class="location-item">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>{{ property.location|default:"Unknown Location" }}</span>
+        </div>
+        <div class="location-item">
+          <i class="bi bi-globe"></i>
+          <span>{{ property.state|default:"Unspecified" }}</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Main Grid -->
+  {# ── Two-column layout ────────────────────────────────────────── #}
   <div class="property-card">
-    
-    <!-- Main Content -->
+
+    {# ── Left: Main Content ──────────────────────────────────────── #}
     <div class="main-content">
-      
-      <!-- Images Section -->
-      <div class="image-container">
-        <div class="main-image-section">
-          {% if property.base_image %}
-            <img src="{{ property.base_image.url }}"
-                 onerror="this.onerror=null;this.src='https://placehold.co/1200x600/e3f2fd/1976d2?text=No+Image+Available';"
-                 alt="Main Property Image">
-          {% else %}
-            <img src="https://placehold.co/1200x600/e3f2fd/1976d2?text=No+Base+Image"
-                 alt="Placeholder Image">
-          {% endif %}
-        </div>
 
-        {% with property|get_images as images %}
-          {% if images %}
-            <div class="gallery-grid">
-              {% for img in images|slice:"1:7" %}
-                <div class="gallery-item">
-                  <img src="{{ img.url }}"
-                       onerror="this.onerror=null;this.src='https://placehold.co/400x300/e3f2fd/1976d2?text=No+Image';"
-                       alt="Property Image {{ forloop.counter }}">
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-      </div>
-
-      <!-- Description Section -->
-      <div class="content-section">
-        <h3 class="section-title">
+      {# Description #}
+      <div class="section-card">
+        <div class="section-head">
           <i class="bi bi-text-paragraph"></i>
-          Description
-        </h3>
-        <p class="description-text">{{ property.property_description|default:"No detailed description available for this property." }}</p>
+          <h3>Description</h3>
+        </div>
+        <div class="section-body">
+          <p class="description-text">
+            {{ property.property_description|default:"No detailed description available for this property." }}
+          </p>
+        </div>
       </div>
 
-      <!-- Features Section -->
-      <div class="content-section">
-        <h3 class="section-title">
+      {# Key Features #}
+      <div class="section-card">
+        <div class="section-head">
           <i class="bi bi-stars"></i>
-          Key Features
-        </h3>
-        <div class="features-grid">
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="bi bi-door-closed-fill"></i>
-            </div>
-            <div class="feature-content">
-              <span class="feature-label">Bedrooms</span>
-              <div class="feature-value">{{ property.bedrooms|default:"N/A" }}</div>
-            </div>
-          </div>
+          <h3>Key Features</h3>
+        </div>
+        <div class="section-body">
+          <div class="features-grid">
 
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="bi bi-droplet-fill"></i>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-door-closed-fill"></i>
+              </div>
+              <div class="feature-content">
+                <span class="feature-label">Bedrooms</span>
+                <div class="feature-value">{{ property.bedrooms|default:"N/A" }}</div>
+              </div>
             </div>
-            <div class="feature-content">
-              <span class="feature-label">Bathrooms</span>
-              <div class="feature-value">{{ property.bathrooms|default:"N/A" }}</div>
-            </div>
-          </div>
 
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="bi bi-p-circle-fill"></i>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-droplet-fill"></i>
+              </div>
+              <div class="feature-content">
+                <span class="feature-label">Bathrooms</span>
+                <div class="feature-value">{{ property.bathrooms|default:"N/A" }}</div>
+              </div>
             </div>
-            <div class="feature-content">
-              <span class="feature-label">Parking Spaces</span>
-              <div class="feature-value">{{ property.parking_spaces|default:"0" }}</div>
-            </div>
-          </div>
 
-          <div class="feature-item">
-            <div class="feature-icon">
-              <i class="bi bi-rulers"></i>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-p-circle-fill"></i>
+              </div>
+              <div class="feature-content">
+                <span class="feature-label">Parking</span>
+                <div class="feature-value">{{ property.parking_spaces|default:"0" }}</div>
+              </div>
             </div>
-            <div class="feature-content">
-              <span class="feature-label">Property Size</span>
-              <div class="feature-value">{{ property.size|default:"N/A" }} sqft</div>
+
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="bi bi-rulers"></i>
+              </div>
+              <div class="feature-content">
+                <span class="feature-label">Size</span>
+                <div class="feature-value">{{ property.size|default:"N/A" }} <small>sqft</small></div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
 
-      <!-- Map Section -->
-      <div class="map-section">
-        <h3 class="section-title">
+      {# Map #}
+      <div class="section-card">
+        <div class="section-head">
           <i class="bi bi-pin-map-fill"></i>
-          Property Location
-        </h3>
-        <div class="map-placeholder">
-          <i class="bi bi-geo-alt-fill"></i>
-          <p>Map integration coming soon!</p>
-          <img src="https://placehold.co/1000x400/e3f2fd/42a5f5?text=Map+Placeholder" 
-               alt="Map Placeholder">
+          <h3>Property Location</h3>
+        </div>
+        <div class="section-body">
+          <div class="map-placeholder">
+            <i class="bi bi-geo-alt-fill"></i>
+            <p>Map integration coming soon!</p>
+            <img src="https://placehold.co/1000x300/eff6ff/2563eb?text=Map+Placeholder"
+                 alt="Map Placeholder">
+          </div>
         </div>
       </div>
 
-    </div>
+    </div>{# end main-content #}
 
-    <!-- Sidebar Content -->
+    {# ── Right: Sidebar ──────────────────────────────────────────── #}
     <div class="sidebar-content">
-      
-      <!-- Price Card -->
+
+      {# Price Card — desktop only #}
       <div class="price-card">
         <span class="price-label">Sale Price</span>
-        <span class="price-amount">₦{{ property.price|default:"N/A"|floatformat:2|intcomma }}</span>
-        
+        <span class="price-amount">
+          ₦{{ property.price|default:"N/A"|floatformat:2|intcomma }}
+        </span>
+
         <div class="price-divider"></div>
-        
+
         <div class="contact-buttons">
-          <a href="{% url 'customer:inquiry-form' property.property_type property.id %}" 
+          <a href="{% url 'customer:inquiry-form' property.property_type property.id %}"
              class="btn-contact primary">
-            <i class="bi bi-envelope-fill"></i>
-            Book Property
+            <i class="bi bi-envelope-fill"></i> Book Property
           </a>
-          
-          <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}" 
+          <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}"
              class="btn-contact secondary">
-            <i class="bi bi-telephone-fill"></i>
-            Call Now
+            <i class="bi bi-telephone-fill"></i> Call Now
           </a>
         </div>
       </div>
 
-      <!-- Contact Card -->
-      <div class="contact-card">
-        <h4 class="contact-card-title">
+      {# Agent / Company Details #}
+      <div class="section-card">
+        <div class="section-head">
           <i class="bi bi-person-badge"></i>
-          {% if company_info %}Company{% elif agent_info %}Agent{% else %}Seller{% endif %} Details
-        </h4>
-        
-        <div class="contact-info">
-          <div class="contact-item">
-            <span class="contact-label">Listed By</span>
-            <span class="contact-value">
-              {% if agent_info %}
-                {{ agent_info.profile_name|default:"" }}
-              {% elif company_info %}
-                {{ company_info.company_name|default:"" }}
-              {% else %}
-                {{ info.first_name|default:"N/A" }}
-              {% endif %}
-            </span>
-          </div>
-
-          <div class="contact-item">
-            <span class="contact-label">Phone Number</span>
-            <span class="contact-value">
-              {% if agent_info %}
-                {{ agent_info.phone_number|default:"N/A" }}
-              {% elif company_info %}
-                {{ company_info.phone_number|default:"N/A" }}
-              {% else %}
-                {{ property.phone_number|default:"N/A" }}
-              {% endif %}
-            </span>
-          </div>
-
-          <div class="contact-item">
-            <span class="contact-label">Last Updated</span>
-            <span class="contact-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
-          </div>
-
-          <div class="contact-item">
-            <span class="contact-label">Listed On</span>
-            <span class="contact-value">{{ property.listed_date|date:"M d, Y"|default:"N/A" }}</span>
-          </div>
+          <h3>
+            {% if company_info %}Company
+            {% elif agent_info %}Agent
+            {% else %}Seller
+            {% endif %} Details
+          </h3>
         </div>
+        <div class="section-body">
 
-        <div class="contact-buttons">
-          {% if agent_info %}
-          <a href="{% url 'agent:agent-profile' agent_uuid=property.agent_uuid %}" 
-             class="btn-contact secondary">
-            <i class="bi bi-person-circle"></i>
-            View Agent Profile
-          </a>
-          {% endif %}
-          
-          {% if company_info %}
-          <a href="{% url 'company:company-profile' company_uuid=property.company_uuid %}" 
-             class="btn-contact secondary">
-            <i class="bi bi-building"></i>
-            View Company Profile
-          </a>
-          {% endif %}
+          <div class="contact-info">
+            <div class="contact-item">
+              <span class="contact-label">Listed By</span>
+              <span class="contact-value">
+                {% if agent_info %}
+                  {{ agent_info.first_name|default:"N/A" }}
+                {% elif company_info %}
+                  {{ company_info.company_name|default:"N/A" }}
+                {% else %}
+                  {{ info.first_name|default:"N/A" }}
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-label">Phone</span>
+              <span class="contact-value">
+                {% if agent_info %}
+                  {{ agent_info.phone_number|default:"N/A" }}
+                {% elif company_info %}
+                  {{ company_info.phone_number|default:"N/A" }}
+                {% else %}
+                  {{ property.phone_number|default:"N/A" }}
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-label">Last Updated</span>
+              <span class="contact-value">
+                {{ property.last_updated|date:"M d, Y"|default:"N/A" }}
+              </span>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-label">Listed On</span>
+              <span class="contact-value">
+                {{ property.listed_date|date:"M d, Y"|default:"N/A" }}
+              </span>
+            </div>
+          </div>
+
+          <div class="contact-action-btns">
+            {% if agent_info %}
+              <a href="{% url 'agent:agent-profile' agent_uuid=property.agent_uuid %}"
+                 class="btn-contact secondary">
+                <i class="bi bi-person-circle"></i> View Agent Profile
+              </a>
+            {% endif %}
+
+            {% if company_info %}
+              <a href="{% url 'company:company-profile' company_uuid=company_info.unique_company_id %}"
+                 class="btn-contact secondary">
+                <i class="bi bi-building"></i> View Company Profile
+              </a>
+            {% endif %}
+          </div>
+
         </div>
       </div>
 
-    </div>
+    </div>{# end sidebar-content #}
 
-  </div>
+  </div>{# end property-card #}
 
-</div>
+</div>{# end detail-wrapper #}
 
 {% endblock %}

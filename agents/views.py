@@ -30,7 +30,7 @@ def dashboard(request):
         return redirect('landing')
     try:
         agent_data= AgentInformation.objects.get(user_id=request.user.id)
-        agent_name=agent_data.profile_name
+        agent_name=agent_data.first_name + ' ' + agent_data.last_name
         agent_profession=agent_data.work_type
         agent_email=agent_data.email
         agent_phone=agent_data.phone_number
@@ -75,6 +75,10 @@ def dashboard(request):
             if agent_prop_on_lease.exists() or agent_prop_on_sale.exists(): score+=25
             if agent_data.phone_number: score+=50
             return score
+        if agent_data.company_uuid:
+            company_name=CompanyInformation.objects.get(unique_company_id=agent_data.company_uuid)
+        else:
+            company_name=None
 
 # company_announcements — queryset with .title, .message, .created_at, .company.company_name TODO do this once companies and agents have been linked
         return render(request, 'agent/dashboard.html', {
@@ -98,7 +102,8 @@ def dashboard(request):
             'new_lead_count': new_leads.count(),
             'todays_appointment':today_appointments,
             'avg_rating': average_rating,
-            'total_reviews': total_reviews
+            'total_reviews': total_reviews,
+            'company_name':company_name
             })
     except AgentInformation.DoesNotExist:
         messages.error(request, 'Set up your Profile to access other pages')
@@ -506,7 +511,7 @@ def agent_profile(request, agent_uuid):
         
         context = {
             'agent': agent,
-            'name': agent.profile_name if hasattr(agent, 'profile_name') else agent.user.get_full_name(),
+            'name': f'{agent.first_name} {agent.last_name}' if hasattr(agent, 'first_name') else agent.user.get_full_name(),
             'work_type': agent.work_type if hasattr(agent, 'work_type') else 'Real Estate Agent',
             'email': agent.email if hasattr(agent, 'email') else agent.user.email,
             'phone': agent.phone_number if hasattr(agent, 'phone_number') else '',
@@ -1018,7 +1023,7 @@ def join_via_invite(request):
     try:
         Employees.objects.create(
             company=company,
-            agent_name=agent.profile_name,
+            agent_name=f'{agent.first_name} {agent.last_name}',
             company_department='Unassigned',
             company_role=agent.work_type,
             agent_email=agent.email,
@@ -1039,7 +1044,7 @@ def join_via_invite(request):
         # Log to company activity feed
         CompanyActivityLog.objects.create(
             company=company,
-            action=f'Agent {agent.profile_name} joined the team via invite link.'
+            action=f'Agent {agent.first_name} joined the team via invite link.'
         )
  
         # Fixed: original had messages.info(f'...') — missing request arg

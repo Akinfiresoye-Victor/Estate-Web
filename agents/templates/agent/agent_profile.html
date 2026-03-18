@@ -7,6 +7,14 @@
 
 {% block content %}
 
+<!-- Go Back Button -->
+<div class="back-button-container">
+  <button class="back-btn" onclick="history.back()" aria-label="Go back">
+    <i class="bi bi-chevron-left"></i>
+    <span>Back</span>
+  </button>
+</div>
+
 <!-- Agent Profile Hero -->
 <div class="agent-hero">
   <div class="hero-background"></div>
@@ -16,7 +24,7 @@
       <div class="agent-profile-card">
         <div class="profile-avatar-section">
           {% if agent.profile_picture %}
-            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.profile_name }}" class="profile-avatar">
+            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}" class="profile-avatar">
           {% else %}
             <div class="avatar-placeholder">
               <i class="bi bi-person"></i>
@@ -31,7 +39,7 @@
         </div>
 
         <div class="profile-info-section">
-          <h1 class="agent-name">{{ agent.profile_name }}</h1>
+          <h1 class="agent-name">{{ agent.first_name }} {{ agent.last_name }}</h1>
           <p class="agent-work-type">{{ agent.work_type }}</p>
           
           <div class="agent-rating-display">
@@ -111,7 +119,7 @@
         <div class="card-header">
           <h2 class="card-title">
             <i class="bi bi-person-badge"></i>
-            About {{ agent.profile_name }}
+            About {{ agent.first_name }} {{ agent.last_name }}
           </h2>
         </div>
         <div class="card-body">
@@ -239,7 +247,7 @@
             {% else %}
               <div class="no-reviews-message">
                 <i class="bi bi-chat-left-text"></i>
-                <p>No reviews yet. Be the first to review {{ agent.profile_name }}!</p>
+                <p>No reviews yet. Be the first to review {{ agent.first_name }}!</p>
               </div>
             {% endif %}
           </div>
@@ -331,7 +339,7 @@
           </h3>
         </div>
         <div class="sidebar-card-body">
-          <p class="inquiry-text">Interested in working with {{ agent.profile_name }}?</p>
+          <p class="inquiry-text">Interested in working with {{ agent.first_name }}?</p>
           <a href="mailto:{{ agent.email }}" class="btn-inquiry" target='_blank'>
             <i class="bi bi-send"></i>
             Send an Email
@@ -351,7 +359,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="reviewModalLabel">
-          <i class="bi bi-star-fill me-2"></i>Write a Review for {{ agent.profile_name }}
+          <i class="bi bi-star-fill me-2"></i>Write a Review for {{ agent.first_name }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -392,7 +400,7 @@
               <div class="mb-3">
                 <label class="form-label">Your Review *</label>
                 <textarea name="comment" class="form-control" rows="5" required 
-                          placeholder="Share your experience working with {{ agent.profile_name }}..."></textarea>
+                          placeholder="Share your experience working with {{ agent.first_name }}..."></textarea>
                 <small class="text-muted">Minimum 10 characters</small>
               </div>
               
@@ -415,6 +423,57 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+/* Back Button Styles */
+.back-button-container {
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 50px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 0.95rem;
+}
+
+.back-btn:hover {
+  background: #f8f9fa;
+  border-color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn i {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .back-button-container {
+    padding: 0.75rem 1rem;
+  }
+  
+  .back-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+</style>
+
 <script>
 (function() {
   'use strict';

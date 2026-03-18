@@ -1,5 +1,4 @@
 {% extends 'company/base.html' %}
-
 {% load static %}
 {% load humanize %}
 
@@ -8,36 +7,37 @@
 {% endblock %}
 
 {% block content %}
+
+{# ── Back Button ─────────────────────────────────────────────────── #}
 <a href="{% url 'company:dashboard' %}" class="back-button">
-    <i class="bi bi-arrow-left"></i>
-    <span>Back</span>
+  <i class="bi bi-arrow-left"></i>
+  <span>Back to Dashboard</span>
 </a>
 
-<!-- Analytics Header -->
+{# ── Page Header ─────────────────────────────────────────────────── #}
 <div class="analytics-header">
   <div class="container-fluid">
     <div class="header-content">
       <div class="header-text">
         <h1 class="page-title">
-          <i class="bi bi-graph-up-arrow"></i>Analytics Dashboard
+          <i class="bi bi-graph-up-arrow"></i>Analytics
         </h1>
         <p class="page-subtitle">Track your performance and insights</p>
       </div>
       <button class="btn-export" onclick="exportReport()">
         <i class="bi bi-download"></i>
-        <span>Export Report</span>
+        <span>Export</span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- Main Analytics Content -->
+{# ── Main Analytics Container ─────────────────────────────────────── #}
 <div class="container-fluid analytics-container">
-  
-  <!-- Key Metrics Grid -->
+
+  {# ── Metrics Grid — 2 col mobile, 4 col desktop ──────────────── #}
   <div class="metrics-grid">
-    
-    <!-- Profile Views -->
+
     <div class="metric-card">
       <div class="metric-icon profile-icon">
         <i class="bi bi-eye-fill"></i>
@@ -54,13 +54,12 @@
       </div>
     </div>
 
-    <!-- Total Property Views -->
     <div class="metric-card">
       <div class="metric-icon total-icon">
         <i class="bi bi-house-door-fill"></i>
       </div>
       <div class="metric-data">
-        <p class="metric-label">Total Property Views</p>
+        <p class="metric-label">Property Views</p>
         <h3 class="metric-value">{{ prop_views|intcomma }}</h3>
         {% if total_prop_incr_perc != 0 %}
         <div class="metric-trend {% if total_prop_incr_perc > 0 %}positive{% else %}negative{% endif %}">
@@ -71,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Market Ranking -->
     <div class="metric-card">
       <div class="metric-icon competition-icon {% if market_position < 10 %}elite{% elif market_position < 25 %}strong{% endif %}">
         <i class="bi bi-{% if market_position < 1 %}trophy-fill{% elif market_position < 5 %}award-fill{% elif market_position < 25 %}star-fill{% else %}graph-up{% endif %}"></i>
@@ -82,21 +80,20 @@
         <div class="metric-trend {% if market_position < 25 %}positive{% else %}neutral{% endif %}">
           <i class="bi bi-{% if market_position < 10 %}arrow-up-circle-fill{% elif market_position < 25 %}dash-circle-fill{% else %}arrow-right-circle{% endif %}"></i>
           <span>
-            {% if market_position < 1 %}Elite Performer
+            {% if market_position < 1 %}Elite
             {% elif market_position < 5 %}Top Tier
-            {% elif market_position < 10 %}Excellent Standing
-            {% elif market_position < 25 %}Above Average
-            {% elif market_position < 50 %}Average Performance
-            {% else %}Growing Market Presence{% endif %}
+            {% elif market_position < 10 %}Excellent
+            {% elif market_position < 25 %}Above Avg
+            {% elif market_position < 50 %}Average
+            {% else %}Growing{% endif %}
           </span>
         </div>
         <div class="percentile-indicator">
-          <small>Ranked {{ market_position|floatformat:1 }}th percentile</small>
+          <small>{{ market_position|floatformat:1 }}th percentile</small>
         </div>
       </div>
     </div>
 
-    <!-- Inquiry Rate -->
     <div class="metric-card">
       <div class="metric-icon inquiry-icon">
         <i class="bi bi-chat-dots-fill"></i>
@@ -106,29 +103,29 @@
         <h3 class="metric-value">{{ inq_rate|floatformat:1 }}%</h3>
         <div class="metric-trend {% if inq_rate > 40 %}positive{% else %}warning{% endif %}">
           <i class="bi bi-{% if inq_rate > 40 %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
-          <span>{% if inq_rate > 40 %}Strong{% else %}Needs Attention{% endif %}</span>
+          <span>{% if inq_rate > 40 %}Strong{% else %}Needs Work{% endif %}</span>
         </div>
       </div>
     </div>
 
-  </div>
+  </div>{# end metrics-grid #}
 
-  <!-- Main Content Grid -->
+
+  {# ── Content Grid — stacked mobile, 2-col desktop ────────────── #}
   <div class="content-grid">
-    
-    <!-- Sale vs Lease Comparison -->
+
+    {# ── Property Views Breakdown ──────────────────────────────── #}
     <div class="analytics-card">
       <div class="card-header">
         <h3 class="card-title">
-          <i class="bi bi-pie-chart-fill"></i>Property Views Breakdown
+          <i class="bi bi-pie-chart-fill"></i>Views Breakdown
         </h3>
       </div>
       <div class="card-body">
-        
+
         {% widthratio sale_view sale_view|add:leased_view 100 as sale_percentage %}
         {% widthratio leased_view sale_view|add:leased_view 100 as lease_percentage %}
-        
-        <!-- Sale Properties -->
+
         <div class="property-breakdown">
           <div class="breakdown-header">
             <div class="breakdown-label">
@@ -150,7 +147,6 @@
           {% endif %}
         </div>
 
-        <!-- Lease Properties -->
         <div class="property-breakdown">
           <div class="breakdown-header">
             <div class="breakdown-label">
@@ -172,7 +168,6 @@
           {% endif %}
         </div>
 
-        <!-- Market Insight -->
         <div class="market-insight">
           <i class="bi bi-lightbulb-fill"></i>
           {% if sale_percentage > lease_percentage %}
@@ -193,11 +188,11 @@
       </div>
     </div>
 
-    <!-- Top Performing Properties -->
+    {# ── Top Performing Properties ─────────────────────────────── #}
     <div class="analytics-card">
       <div class="card-header">
         <h3 class="card-title">
-          <i class="bi bi-star-fill"></i>Top Performing Properties
+          <i class="bi bi-star-fill"></i>Top Properties
         </h3>
         <a href="{% url 'listings' %}" class="view-all-link">
           View All <i class="bi bi-arrow-right"></i>
@@ -205,11 +200,9 @@
       </div>
       <div class="card-body">
         <div class="top-properties">
-          
           {% for rank, eyes in ranking %}
           <div class="property-item">
             <span class="property-rank">{{ forloop.counter }}</span>
-            
             <div class="property-info">
               <h5 class="property-name">
                 {% if rank.property_category == "Residential" %}{{ rank.residential }}
@@ -222,7 +215,6 @@
                 <i class="bi bi-geo-alt"></i>{{ rank.location }}, {{ rank.state }}
               </p>
             </div>
-            
             <div class="property-stats">
               <span class="stat-item">
                 <i class="bi bi-eye-fill"></i>{{ eyes }}
@@ -233,14 +225,14 @@
             </div>
           </div>
           {% endfor %}
-
         </div>
       </div>
     </div>
 
-  </div>
+  </div>{# end content-grid #}
 
-  <!-- Insights Section -->
+
+  {# ── Insights & Recommendations ───────────────────────────────── #}
   <div class="insights-section">
     <div class="section-header">
       <h3 class="section-title">
@@ -249,13 +241,10 @@
     </div>
 
     <div class="insights-grid">
-      
-      <!-- Profile Views Insight -->
+
       {% if profile_incr_perc > 0 %}
         <div class="insight-card success-card">
-          <div class="insight-icon">
-            <i class="bi bi-graph-up-arrow"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-graph-up-arrow"></i></div>
           <div class="insight-content">
             <h4>Strong Growth Trend</h4>
             <p>Profile views increased by <strong>{{ profile_incr_perc|floatformat:1 }}%</strong>. Keep up the momentum!</p>
@@ -263,9 +252,7 @@
         </div>
       {% elif profile_incr_perc < 0 %}
         <div class="insight-card danger-card">
-          <div class="insight-icon">
-            <i class="bi bi-graph-down-arrow"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-graph-down-arrow"></i></div>
           <div class="insight-content">
             <h4>Attention Required</h4>
             <p>Profile views dropped by <strong>{{ profile_incr_perc|floatformat:1|cut:"-" }}%</strong>. Share top listings on social media to boost traffic.</p>
@@ -273,35 +260,27 @@
         </div>
       {% endif %}
 
-      <!-- Inquiry Rate Insight -->
       {% if inq_rate > 40 %}
         <div class="insight-card success-card">
-          <div class="insight-icon">
-            <i class="bi bi-check-circle"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-check-circle"></i></div>
           <div class="insight-content">
             <h4>High Engagement</h4>
-            <p>Your <strong>{{ inq_rate|floatformat:1 }}%</strong> inquiry rate shows strong buyer interest. Keep it up!</p>
+            <p>Your <strong>{{ inq_rate|floatformat:1 }}%</strong> inquiry rate shows strong buyer interest.</p>
           </div>
         </div>
       {% else %}
         <div class="insight-card warning-card">
-          <div class="insight-icon">
-            <i class="bi bi-exclamation-triangle"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-exclamation-triangle"></i></div>
           <div class="insight-content">
             <h4>Low Inquiry Rate</h4>
-            <p>At <strong>{{ inq_rate|floatformat:1 }}%</strong>, consider updating descriptions or adjusting prices to attract leads.</p>
+            <p>At <strong>{{ inq_rate|floatformat:1 }}%</strong>, consider updating descriptions or adjusting prices.</p>
           </div>
         </div>
       {% endif %}
 
-      <!-- Property Views Insight -->
       {% if total_prop_incr_perc > 0 %}
         <div class="insight-card success-card">
-          <div class="insight-icon">
-            <i class="bi bi-rocket-takeoff"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-rocket-takeoff"></i></div>
           <div class="insight-content">
             <h4>Inventory Momentum</h4>
             <p>Properties gained <strong>{{ total_prop_incr_perc|floatformat:1 }}%</strong> more traction. Great time to push for closings!</p>
@@ -309,32 +288,25 @@
         </div>
       {% elif total_prop_incr_perc < -10 %}
         <div class="insight-card danger-card">
-          <div class="insight-icon">
-            <i class="bi bi-arrow-down-circle"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-arrow-down-circle"></i></div>
           <div class="insight-content">
             <h4>Listing Stagnation</h4>
-            <p>Views dropped <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Update cover photos or refresh listings to boost visibility.</p>
+            <p>Views dropped <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Update cover photos or refresh listings.</p>
           </div>
         </div>
       {% elif total_prop_incr_perc < 0 %}
         <div class="insight-card warning-card">
-          <div class="insight-icon">
-            <i class="bi bi-dash-circle"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-dash-circle"></i></div>
           <div class="insight-content">
             <h4>Slight Decline</h4>
-            <p>Views dipped <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Consistency is key—keep updating your listings regularly.</p>
+            <p>Views dipped <strong>{{ total_prop_incr_perc|floatformat:1|cut:"-" }}%</strong>. Keep updating your listings regularly.</p>
           </div>
         </div>
       {% endif %}
 
-      <!-- Market Ranking Insight -->
       {% if market_position < 10 %}
         <div class="insight-card success-card">
-          <div class="insight-icon">
-            <i class="bi bi-trophy-fill"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-trophy-fill"></i></div>
           <div class="insight-content">
             <h4>Elite Performance</h4>
             <p>You're in the <strong>{{ competition }}</strong> of companies. Outstanding work!</p>
@@ -342,9 +314,7 @@
         </div>
       {% elif market_position < 25 %}
         <div class="insight-card success-card">
-          <div class="insight-icon">
-            <i class="bi bi-award"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-award"></i></div>
           <div class="insight-content">
             <h4>Strong Market Position</h4>
             <p>You're in the <strong>{{ competition }}</strong>. Keep pushing to reach the top tier!</p>
@@ -352,9 +322,7 @@
         </div>
       {% else %}
         <div class="insight-card info-card">
-          <div class="insight-icon">
-            <i class="bi bi-info-circle"></i>
-          </div>
+          <div class="insight-icon"><i class="bi bi-info-circle"></i></div>
           <div class="insight-content">
             <h4>Room for Growth</h4>
             <p>Focus on quality listings and consistent updates to climb from <strong>{{ competition }}</strong> to a higher tier.</p>
@@ -365,33 +333,28 @@
     </div>
   </div>
 
-</div>
+</div>{# end analytics-container #}
 
 {% endblock %}
 
 {% block extra_js %}
 <script>
-(function() {
-    'use strict';
+(function () {
+  'use strict';
 
-    // Export Report Function
-    window.exportReport = function() {
-        // Create print-friendly view
-        window.print();
-    };
+  window.exportReport = function () {
+    window.print();
+  };
 
-    // Animate progress bars on load
-    document.addEventListener('DOMContentLoaded', function() {
-        const progressBars = document.querySelectorAll('.progress-bar');
-        progressBars.forEach(bar => {
-            const width = bar.style.width;
-            bar.style.width = '0%';
-            setTimeout(() => {
-                bar.style.width = width;
-            }, 100);
-        });
+  document.addEventListener('DOMContentLoaded', function () {
+    // Animate progress bars — start at 0 then expand to target width
+    const bars = document.querySelectorAll('.progress-bar');
+    bars.forEach(function (bar) {
+      const target = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(function () { bar.style.width = target; }, 120);
     });
-
-})();
+  });
+}());
 </script>
 {% endblock %}

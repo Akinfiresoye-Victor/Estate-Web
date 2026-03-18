@@ -26,4 +26,5 @@ urlpatterns = [
     path('onboard/agent/<agent_uuid>', views.onboard_agent, name='onboarding'),
     path('invite/generate/', views.generate_invite_link, name='generate_invite_link'),
     path('revoke_invite/<token>', views.revoke_invite_link, name='revoke-link'),
+    path('remove_agent/<agent_uuid>', views.remove_agent, name='remove-agent')
 ]

@@ -1,291 +1,232 @@
 {% extends 'estate/base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'estate/css/wishlist.css' %}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
-{% load humanize %}
 
 {% block content %}
-<a href="javascript:history.back()" class="back-button">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Go Back
-</a>
 
-<div class="page-hero">
-    <div class="container">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-                Wishlist
-            </div>
-            <h1>Your Saved Properties</h1>
-            <p>Curating your perfect collection of dream homes</p>
-        </div>
+<div class="wl-page">
+
+  <!-- ── HERO ─────────────────────────────────────── -->
+  <div class="wl-hero">
+    <div class="wl-hero-inner">
+      <a href="javascript:history.back()" class="wl-back">
+        <i class="bi bi-chevron-left"></i> Back
+      </a>
+      <div class="wl-hero-text">
+        <span class="wl-hero-pill"><i class="bi bi-heart-fill"></i> Wishlist</span>
+        <h1>Your Saved Properties</h1>
+        <p>Your curated collection of dream homes</p>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="container">
+
+  <div class="wl-content">
+
+    <!-- ── STATS ── -->
     {% if wishlist_rent or wishlist_sale %}
-    <div class="stats-dashboard">
-        <div class="stat-card stat-lease">
-            <div class="stat-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                </svg>
-            </div>
-            <div class="stat-content">
-                <div class="stat-number">{{ lease_count }}</div>
-                <div class="stat-label">For Lease</div>
-            </div>
-        </div>
+    <div class="wl-stats">
 
-        <div class="stat-card stat-sale">
-            <div class="stat-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-            </div>
-            <div class="stat-content">
-                <div class="stat-number">{{ sale_count }}</div>
-                <div class="stat-label">For Sale</div>
-            </div>
+      <div class="wl-stat lease">
+        <div class="wl-stat-icon"><i class="bi bi-geo-alt-fill"></i></div>
+        <div class="wl-stat-body">
+          <span class="wl-stat-num">{{ lease_count }}</span>
+          <span class="wl-stat-lbl">For Lease</span>
         </div>
+      </div>
 
-        <div class="stat-card stat-total">
-            <div class="stat-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-            </div>
-            <div class="stat-content">
-                <div class="stat-number">{{ total_saved }}</div>
-                <div class="stat-label">Total Saved</div>
-            </div>
+      <div class="wl-stat sale">
+        <div class="wl-stat-icon"><i class="bi bi-house-fill"></i></div>
+        <div class="wl-stat-body">
+          <span class="wl-stat-num">{{ sale_count }}</span>
+          <span class="wl-stat-lbl">For Sale</span>
         </div>
+      </div>
+
+      <div class="wl-stat total">
+        <div class="wl-stat-icon"><i class="bi bi-heart-fill"></i></div>
+        <div class="wl-stat-body">
+          <span class="wl-stat-num">{{ total_saved }}</span>
+          <span class="wl-stat-lbl">Total Saved</span>
+        </div>
+      </div>
+
     </div>
     {% endif %}
 
+
+    <!-- ── FOR LEASE ── -->
     {% if wishlist_rent %}
-    <section class="properties-section">
-        <div class="section-header">
-            <div class="section-title-wrapper">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="section-icon lease-icon">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                </svg>
-                <h2 class="section-title">For Lease</h2>
+    <section class="wl-section">
+      <div class="wl-section-header">
+        <div class="wl-section-title">
+          <span class="wl-section-dot lease"></span>
+          <h2>For Lease</h2>
+        </div>
+        <span class="wl-section-count lease">{{ lease_count }} {{ lease_count|pluralize:"property,properties" }}</span>
+      </div>
+
+      <div class="wl-grid">
+        {% for wishlist_item, property in wishlist_rent %}
+        <article class="wl-card">
+
+          <div class="wl-card-image">
+            <!-- Type badge -->
+            <span class="wl-badge lease"><i class="bi bi-geo-alt-fill"></i> Lease</span>
+
+            <!-- Remove from wishlist -->
+            <a href="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}"
+               class="wl-heart active" aria-label="Remove from wishlist">
+              <i class="bi bi-heart-fill"></i>
+            </a>
+
+            {% if property.base_image %}
+              <img src="{{ property.base_image.url }}"
+                   alt="{{ property.residential }}"
+                   class="wl-img" loading="lazy">
+            {% else %}
+              <div class="wl-img-placeholder lease">
+                <i class="bi bi-house-door"></i>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="wl-card-body">
+
+            <h3 class="wl-card-title">
+              {% if property.property_category == 'Commercial' %}
+                {{ property.commercial }}
+              {% elif property.property_category == 'Land' %}
+                {{ property.lands }}
+              {% elif property.property_category == 'Residential' %}
+                {{ property.residential }}
+              {% else %}
+                Property Details Unavailable
+              {% endif %}
+            </h3>
+
+            <div class="wl-location">
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ property.location }}, {{ property.state }}</span>
             </div>
-            <div class="section-count lease-count">{{ lease_count }} Properties</div>
-        </div>
 
-        <div class="properties-grid">
-            {% for wishlist_item, property in wishlist_rent %}
-            <article class="property-card lease-card">
-                <div class="property-image-wrapper">
-                    <div class="property-badge lease-badge">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Lease
-                    </div>
-                    
-                    <a href="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}" 
-                       class="wishlist-toggle active"
-                       aria-label="Remove from wishlist">
-                        <svg class="heart-outline" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        <svg class="heart-filled" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                    </a>
+            <div class="wl-price lease">
+              <span class="wl-price-amount">₦{{ property.price_range|floatformat:2|intcomma }}</span>
+              <span class="wl-price-period">/month</span>
+            </div>
 
-                    {% if property.base_image %}
-                    <img src="{{ property.base_image.url }}" 
-                         alt="{{ property.residential }}" 
-                         class="property-image"
-                         loading="lazy">
-                    {% else %}
-                    <div class="property-placeholder lease-placeholder">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        </svg>
-                    </div>
-                    {% endif %}
-                </div>
+            <p class="wl-desc">{{ property.description|truncatewords:18 }}</p>
 
-                <div class="property-body">
-                    <h3 class="property-title">
-                        {% if property.property_category == 'Commercial' %}
-                            {{ property.commercial }}
-                        {% elif property.property_category == 'Land' %}
-                            {{ property.lands }}
-                        {% elif property.property_category == 'Residential' %}
-                            {{ property.residential }}
-                        {% else %}
-                            Property Details Unavailable
-                        {% endif %}
-                    </h3>
+            <a href="{% url 'customer:view-property-r' property_id=wishlist_item.property_id %}"
+               class="wl-btn lease">
+              View Details <i class="bi bi-arrow-right-short"></i>
+            </a>
 
-                    <div class="property-location">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <span>{{ property.location }}, {{ property.state }}</span>
-                    </div>
-
-                    <div class="property-price lease-price">
-                        <span class="price-amount">₦{{ property.price_range|floatformat:2|intcomma }}</span>
-                        <span class="price-period">/month</span>
-                    </div>
-
-                    <p class="property-description">{{ property.description|truncatewords:18 }}</p>
-
-                    <a href="{% url 'customer:view-property-r' property_id=wishlist_item.property_id %}" 
-                       class="btn-view lease-btn">
-                        View Details
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
     </section>
     {% endif %}
 
+
+    <!-- ── FOR SALE ── -->
     {% if wishlist_sale %}
-    <section class="properties-section">
-        <div class="section-header">
-            <div class="section-title-wrapper">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="section-icon sale-icon">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-                <h2 class="section-title">For Sale</h2>
+    <section class="wl-section">
+      <div class="wl-section-header">
+        <div class="wl-section-title">
+          <span class="wl-section-dot sale"></span>
+          <h2>For Sale</h2>
+        </div>
+        <span class="wl-section-count sale">{{ sale_count }} {{ sale_count|pluralize:"property,properties" }}</span>
+      </div>
+
+      <div class="wl-grid">
+        {% for wishlist_item, property in wishlist_sale %}
+        <article class="wl-card">
+
+          <div class="wl-card-image">
+            <span class="wl-badge sale"><i class="bi bi-tag-fill"></i> Sale</span>
+
+            <a href="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}"
+               class="wl-heart active" aria-label="Remove from wishlist">
+              <i class="bi bi-heart-fill"></i>
+            </a>
+
+            {% if property.base_image %}
+              <img src="{{ property.base_image.url }}"
+                   alt="{{ property.residential }}"
+                   class="wl-img" loading="lazy">
+            {% else %}
+              <div class="wl-img-placeholder sale">
+                <i class="bi bi-house-door"></i>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="wl-card-body">
+
+            <h3 class="wl-card-title">
+              {% if property.property_category == 'Commercial' %}
+                {{ property.commercial }}
+              {% elif property.property_category == 'Land' %}
+                {{ property.lands }}
+              {% elif property.property_category == 'Residential' %}
+                {{ property.residential }}
+              {% else %}
+                Property Details Unavailable
+              {% endif %}
+            </h3>
+
+            <div class="wl-location">
+              <i class="bi bi-geo-alt"></i>
+              <span>{{ property.location }}, {{ property.state }}</span>
             </div>
-            <div class="section-count sale-count">{{ sale_count }} Properties</div>
-        </div>
 
-        <div class="properties-grid">
-            {% for wishlist_item, property in wishlist_sale %}
-            <article class="property-card sale-card">
-                <div class="property-image-wrapper">
-                    <div class="property-badge sale-badge">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                            <line x1="7" y1="7" x2="7.01" y2="7"/>
-                        </svg>
-                        Sale
-                    </div>
-                    
-                    <a href="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}" 
-                       class="wishlist-toggle active"
-                       aria-label="Remove from wishlist">
-                        <svg class="heart-outline" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        <svg class="heart-filled" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                    </a>
+            <div class="wl-price sale">
+              <span class="wl-price-amount">₦{{ property.price|floatformat|intcomma }}</span>
+            </div>
 
-                    {% if property.base_image %}
-                    <img src="{{ property.base_image.url }}" 
-                         alt="{{ property.residential }}" 
-                         class="property-image"
-                         loading="lazy">
-                    {% else %}
-                    <div class="property-placeholder sale-placeholder">
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        </svg>
-                    </div>
-                    {% endif %}
-                </div>
+            <p class="wl-desc">{{ property.property_description|truncatewords:18 }}</p>
 
-                <div class="property-body">
-                    <h3 class="property-title">
-                        {% if property.property_category == 'Commercial' %}
-                            {{ property.commercial }}
-                        {% elif property.property_category == 'Land' %}
-                            {{ property.lands }}
-                        {% elif property.property_category == 'Residential' %}
-                            {{ property.residential }}
-                        {% else %}
-                            Property Details Unavailable
-                        {% endif %}
-                    </h3>
+            <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property_id %}"
+               class="wl-btn sale">
+              View Details <i class="bi bi-arrow-right-short"></i>
+            </a>
 
-                    <div class="property-location">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        <span>{{ property.location }}, {{ property.state }}</span>
-                    </div>
-
-                    <div class="property-price sale-price">
-                        <span class="price-amount">₦{{ property.price|floatformat|intcomma }}</span>
-                    </div>
-
-                    <p class="property-description">{{ property.property_description|truncatewords:18 }}</p>
-
-                    <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property_id %}" 
-                       class="btn-view sale-btn">
-                        View Details
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-            </article>
-            {% endfor %}
-        </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
     </section>
     {% endif %}
 
+
+    <!-- ── EMPTY STATE ── -->
     {% if not wishlist_rent and not wishlist_sale %}
-    <div class="empty-state">
-        <div class="empty-illustration">
-            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-            <div class="empty-pulse"></div>
-        </div>
-        <h2 class="empty-title">No Saved Properties Yet</h2>
-        <p class="empty-description">Start building your collection of dream properties. Browse our listings and save the ones you love.</p>
-        <div class="empty-actions">
-            <a href="{% url 'customer:rent-property' %}" class="empty-btn lease-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                </svg>
-                Browse For Lease
-            </a>
-            <a href="{% url 'customer:buy-property' %}" class="empty-btn sale-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-                Browse For Sale
-            </a>
-        </div>
+    <div class="wl-empty">
+      <div class="wl-empty-icon">
+        <i class="bi bi-heart"></i>
+      </div>
+      <h2>No Saved Properties Yet</h2>
+      <p>Start building your collection. Browse our listings and tap the heart to save properties you love.</p>
+      <div class="wl-empty-actions">
+        <a href="{% url 'customer:rent-property' %}" class="wl-btn lease">
+          <i class="bi bi-geo-alt-fill"></i> Browse For Lease
+        </a>
+        <a href="{% url 'customer:buy-property' %}" class="wl-btn sale">
+          <i class="bi bi-house-fill"></i> Browse For Sale
+        </a>
+      </div>
     </div>
     {% endif %}
-</div>
+
+  </div><!-- end .wl-content -->
+
+</div><!-- end .wl-page -->
 
 {% endblock %}

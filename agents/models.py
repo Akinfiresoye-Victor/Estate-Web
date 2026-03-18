@@ -9,11 +9,9 @@ from django.utils import timezone
 
 
 def agent_picture_path(instance, filename):
-    return f"Agent/{instance.profile_name}/profile/{filename}"
+    return f"Agent/{instance.first_name}/profile/{filename}"
 
 
-def company_file_path(instance, filename):
-    return f"Agent/{instance.profile_name}/ID/{filename}"
 
 
 
@@ -21,7 +19,8 @@ def company_file_path(instance, filename):
 class AgentInformation(models.Model):
     users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     user_id = models.IntegerField(blank=False)
-    profile_name = models.CharField('Full Name', max_length=50, blank=False)
+    first_name = models.CharField('First Name', max_length=50, blank=False, default='Unspecified')
+    last_name = models.CharField('Last Name', max_length=50, blank=False, default='j')
     agent_uuid = models.CharField('Agent uuid', unique=True, max_length=36, blank=False, default=uuid.uuid4)
     company_uuid = models.CharField('Company uuid', blank=True, null=True, max_length=36)
     universal_agent = models.BooleanField('Universal agent', default=False)
@@ -36,7 +35,7 @@ class AgentInformation(models.Model):
     certificate = models.FileField('Professional Certificate', blank=True, null=True)
     verified = models.BooleanField('Verified agent', default=False)
     def __str__(self):
-        return self.profile_name
+        return f'{self.first_name}-{self.last_name}'
 
 
 class Experience(models.Model):
@@ -51,14 +50,14 @@ class Experience(models.Model):
     class Meta:
         unique_together = ('')
     def __str__(self):
-        return(self.agent.profile_name)
+        return(f'{self.agent.first_name} {self.agent.last_name}')
     
 class SocialLinks(models.Model):
     agent = models.ForeignKey(AgentInformation, on_delete=models.CASCADE, related_name='social')
     social_platform = models.CharField(max_length=20, choices=AGENT_SOCIAL_LINKS, blank=False)
     link_to_social = models.URLField(max_length=200, blank=False)
     def __str__(self):
-        return(self.agent.profile_name)
+        return(f'{self.agent.first_name} {self.agent.last_name}')
 
 class AgentAnalytics(models.Model):
     agent = models.OneToOneField(AgentInformation, on_delete=models.CASCADE, related_name='analytics')
@@ -74,7 +73,7 @@ class AgentAnalytics(models.Model):
     reviews = models.IntegerField('Number Of Reviews', default=0, blank=True, null=True)
     
     def __str__(self):
-        return f"{self.agent.profile_name} - Analytics"
+        return(f'{self.agent.first_name} {self.agent.last_name} - Analytics')
 
 class SessionId(models.Model):
     agent=models.ForeignKey(AgentInformation, on_delete= models.CASCADE, related_name='session_id')

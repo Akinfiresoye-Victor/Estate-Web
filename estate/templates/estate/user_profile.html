@@ -1,6 +1,5 @@
 {% extends 'estate/base.html' %}
-
-{% load static%}
+{% load static %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/user_profile.css' %}">
@@ -8,112 +7,121 @@
 
 {% block content %}
 
-<div class="dashboard-header">
-  <div class="container">
-    <h2>Your Profile Dashboard</h2>
-  </div>
-</div>
+<div class="cp-page">
 
-<div class="container pb-5">
-  <!-- News Card -->
-  <div class="card news-card mb-4">
-    <div class="card-body">
-      <h5>Today's Real Estate News</h5>
-      <p class="card-text">
-        <strong>{{ headline }}</strong>
-      </p>
-      <a href="{%url 'articles'%}" class="btn">Read Full Article</a>
-    </div>
-  </div>
+  <!-- ── PROFILE HEADER ───────────────────────────── -->
+  <div class="cp-profile-header">
+    <div class="cp-cover"></div>
+    <div class="cp-header-body">
 
-  <!-- Profile Card -->
-  <div class="card profile-card mb-4">
-    <div class="card-body d-flex flex-column flex-md-row align-items-center">
-      {% if user.profile.image %}
-        <img src="{{ user.profile.image.url }}" class="rounded-circle profile-avatar me-md-4 mb-3 mb-md-0" alt="Profile">
-      {% else %}
-        <div class="rounded-circle profile-avatar-placeholder text-white d-flex align-items-center justify-content-center me-md-4 mb-3 mb-md-0">
-          {{ user.username|first|upper }}
-        </div>
-      {% endif %}
+      <div class="cp-avatar-wrap">
+        {% if user.profile.image %}
+          <img src="{{ user.profile.image.url }}" class="cp-avatar" alt="Profile Photo">
+        {% else %}
+          <div class="cp-avatar cp-avatar-initial">
+            {{ user.username|first|upper }}
+          </div>
+        {% endif %}
+      </div>
 
-      <div class="profile-info flex-grow-1">
-        <h5>
+      <div class="cp-user-info">
+        <h1 class="cp-name">
           {% if user.first_name and user.last_name %}
             {{ user.first_name }} {{ user.last_name }}
           {% else %}
             {{ user.username }}
           {% endif %}
-        </h5>
+        </h1>
         {% if user.first_name and user.last_name %}
-          <div class="username">@{{ user.username }}</div>
+          <p class="cp-username">@{{ user.username }}</p>
         {% endif %}
-        <p class="email">{{ user.email }}</p>
+        <p class="cp-email">
+          <i class="bi bi-envelope-fill"></i> {{ user.email }}
+        </p>
       </div>
+
+      <a href="{% url 'customer:settings' %}" class="cp-edit-btn">
+        <i class="bi bi-pencil-fill"></i> Edit Profile
+      </a>
+
     </div>
   </div>
 
-  <!-- Dashboard Cards -->
-  <div class="row g-4">
-    <div class="col-md-6">
-      <div class="card dashboard-card">
-        <span class="card-icon">🏘️</span>
-        <div class="card-body d-flex flex-column">
-          <h5>My Property Listings (Landlords Section)
-            <span class="coming-soon-badge">Coming Soon</span>
-          </h5>
-          <p class="card-text flex-grow-1">View, edit, or add new properties to showcase your listings.</p>
-          <div class="d-flex flex-wrap gap-2 mt-auto">
-            <a href="#" class="btn btn-primary-custom">Manage Listings</a>
-            <div class="dropdown">
-              <button class="btn btn-success-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-              Add New Property
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">List for Sale</a></li>
-                <li><a class="dropdown-item" href="#">List for Lease</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-md-6">
-      <div class="card dashboard-card">
-        <span class="card-icon">❤️</span>
-        <div class="card-body d-flex flex-column">
-          <h5>My Saved Properties</h5>
-          <p class="card-text flex-grow-1">Track properties you favorited and revisit them anytime.</p>
-          <a href="{% url 'customer:wishlist' %}" class="btn btn-primary-custom mt-auto">View Wishlist</a>
-        </div>
-      </div>
+  <!-- ── NEWS BANNER ──────────────────────────────── -->
+  {% if headline %}
+  <div class="cp-news">
+    <div class="cp-news-left">
+      <span class="cp-news-pill"><i class="bi bi-newspaper"></i> News</span>
+      <p class="cp-news-text">{{ headline }}</p>
     </div>
-
-    <div class="col-md-6">
-      <div class="card dashboard-card">
-        <span class="card-icon">📋</span>
-        <div class="card-body d-flex flex-column">
-          <h5>
-            Send feedback/Complaint
-          </h5>
-          <p class="card-text flex-grow-1">Your feedback will make Estate Web better</p>
-            <a href="{%url 'feedback'%}" class="btn btn-outline-custom mt-auto">Help Us Improve</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="card dashboard-card">
-        <span class="card-icon">⚙️</span>
-        <div class="card-body d-flex flex-column">
-          <h5>Account & Privacy</h5>
-          <p class="card-text flex-grow-1">Adjust your personal details, visibility, and privacy settings.</p>
-          <a href="{% url 'customer:settings' %}" class="btn btn-outline-custom mt-auto">Manage Account</a>
-        </div>
-      </div>
-    </div>
+    <a href="{% url 'articles' %}" class="cp-news-link">
+      Read <i class="bi bi-arrow-right-short"></i>
+    </a>
   </div>
+  {% endif %}
+
+
+  <!-- ── SECTION LABEL ────────────────────────────── -->
+  <p class="cp-section-label">My Dashboard</p>
+
+
+  <!-- ── CARDS GRID ───────────────────────────────── -->
+  <div class="cp-grid">
+
+    <!-- Saved Properties -->
+    <a href="{% url 'customer:wishlist' %}" class="cp-card cp-card-wishlist">
+      <div class="cp-card-icon">
+        <i class="bi bi-heart-fill"></i>
+      </div>
+      <div class="cp-card-content">
+        <h3>Saved Properties</h3>
+        <p>Properties you have favourited — view and compare them anytime.</p>
+      </div>
+      <i class="bi bi-chevron-right cp-card-caret"></i>
+    </a>
+
+    <!-- Feedback -->
+    <a href="{% url 'feedback' %}" class="cp-card cp-card-feedback">
+      <div class="cp-card-icon">
+        <i class="bi bi-chat-square-text-fill"></i>
+      </div>
+      <div class="cp-card-content">
+        <h3>Send Feedback</h3>
+        <p>Help us improve Estate Web by sharing your experience or complaints.</p>
+      </div>
+      <i class="bi bi-chevron-right cp-card-caret"></i>
+    </a>
+
+    <!-- Account Settings -->
+    <a href="{% url 'customer:settings' %}" class="cp-card cp-card-settings">
+      <div class="cp-card-icon">
+        <i class="bi bi-gear-fill"></i>
+      </div>
+      <div class="cp-card-content">
+        <h3>Account &amp; Privacy</h3>
+        <p>Update your details, change your password, and manage privacy options.</p>
+      </div>
+      <i class="bi bi-chevron-right cp-card-caret"></i>
+    </a>
+
+    <!-- Landlord Listings (coming soon) -->
+    <div class="cp-card cp-card-listings cp-card-locked">
+      <div class="cp-card-icon">
+        <i class="bi bi-house-door-fill"></i>
+      </div>
+      <div class="cp-card-content">
+        <h3>
+          My Listings
+          <span class="cp-coming-soon">Coming Soon</span>
+        </h3>
+        <p>List your own properties for rent or sale — landlord tools launching soon.</p>
+      </div>
+      <i class="bi bi-lock-fill cp-card-caret locked-icon"></i>
+    </div>
+
+  </div>
+
 </div>
 
 {% endblock %}

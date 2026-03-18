@@ -69,15 +69,28 @@
 
       <div class="form-grid">
         <div class="form-group full-width">
-          <label for="{{ form.profile_name.id_for_label }}">
-            {{ form.profile_name.label }}
-            {% if form.profile_name.field.required %}
+          <label for="{{ form.first_name.id_for_label }}">
+            {{ form.first_name.label }}
+            {% if form.first_name.field.required %}
               <span class="required">*</span>
             {% endif %}
           </label>
-          {{ form.profile_name }}
-          {% if form.profile_name.errors %}
-            <span class="error-text">{{ form.profile_name.errors }}</span>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <span class="error-text">{{ form.first_name.errors }}</span>
+          {% endif %}
+        </div>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="{{ form.last_name.id_for_label }}">
+            {{ form.last_name.label }}
+            {% if form.last_name.field.required %}
+              <span class="required">*</span>
+            {% endif %}
+          </label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <span class="error-text">{{ form.last_name.errors }}</span>
           {% endif %}
         </div>
 

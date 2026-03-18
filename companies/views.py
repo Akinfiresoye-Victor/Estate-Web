@@ -14,7 +14,7 @@ from datetime import date, timedelta
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg, Count, Sum
+from django.db.models import Avg, Count, Sum,Q
 from core.utils import *
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -840,7 +840,8 @@ def find_talents(request):
         return redirect('landing')
     
     try:
-        return render(request, 'company/find_talents.html')
+        agents = AgentInformation.objects.all()
+        return render(request, 'company/find_talents.html',{'agents':agents})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 
@@ -901,11 +902,10 @@ def manage_company(request):
         # Delete inactive links that expired more than 24 hours ago
         InviteLink.objects.filter(
             company=company,
-            is_active=False,
             expires_at__lt=timezone.now() - timedelta(hours=24)
         ).delete()
 
-        # Fetch ALL links (active + revoked) for display in the panel
+        # Fetch ALL links (active + revoked) for displa y in the panel
         invite_links=InviteLink.objects.filter(company=company).order_by('-created_at')
         employees=Employees.objects.filter(company=company)
         employee_count=employees.count()
@@ -1159,7 +1159,7 @@ def onboard_agent(request, agent_uuid):
         except ObjectDoesNotExist:
             Employees.objects.create(
                 company=company,
-                agent_name=agent.profile_name,
+                agent_name=f'{agent.first_name} {agent.first_name}',
                 company_department='Unassigned',
                 company_role=agent.work_type,
                 agent_email=agent.email,
@@ -1260,10 +1260,43 @@ def revoke_invite_link(request, token):
         invite_link.save()
         CompanyActivityLog.objects.create(
             company=company,
-            activity='Invite Link Deactivated'
+            action='Invite Link Deactivated'
         )
+        
         messages.success(request, 'Invite Link Revoked')
         return redirect('company:manage-company')
     except Exception as e:
         messages.error(request,'An error occured')
+        return render(request, 'estate/error_page.html', {'e':e})
+
+
+def remove_agent(request, agent_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.warning(request, 'Access Denied')
+        return redirect('landing')
+    
+    try:
+        company=CompanyInformation.objects.get(user_id=request.user.id)
+        employee=Employees.objects.get(agent_uuid=agent_uuid)
+        if not employee.company == company:
+            messages.warning(request, 'Unauthorized Action')
+            return redirect('landing')
+        agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        agent.company_uuid = None
+        agent.save()
+        employee.delete()
+        messages.success(request, 'Agent Removed Successfully')
+        CompanyActivityLog.objects.create(
+            company=company,
+            action='Agent Deleted'
+        )
+        #TODO make sure if agent put in link they are taken to the invite side after sign up and shii
+        return redirect('company:manage-company')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Agent data not Found')
+        return redirect('company:manage-company')
+    except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})

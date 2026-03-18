@@ -615,7 +615,7 @@ def appointment(request):
         except ObjectDoesNotExist:
             agent= AgentInformation.objects.get(user_id=request.user.id)
             total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
-            return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':agent.profile_name})
+            return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':f'{agent.first_name} {agent.last_name}'})
     except Exception as e:
         messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})

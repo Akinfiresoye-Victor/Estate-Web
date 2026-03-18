@@ -1,156 +1,191 @@
 {% extends 'estate/base.html' %}
-{% load static%}
+{% load static %}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/settings.css' %}">
 {% endblock %}
+
 {% block content %}
-<a href="{%url 'customer:user-profile'%}" class="attractive-back-button">
-    &larr; Go back
+
+{# ── Back Button ─────────────────────────────────────────────────── #}
+<a href="{% url 'customer:user-profile' %}" class="attractive-back-button">
+  <i class="bi bi-arrow-left"></i> Go back
 </a>
 
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
-
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
-
+{# ── Page Header ─────────────────────────────────────────────────── #}
 <div class="page-header">
   <div class="container">
-    <h1><i class="fas fa-cog"></i> Account & Privacy Settings</h1>
+    <h1><i class="fas fa-cog"></i> Settings</h1>
     <p>Manage your account preferences and privacy options</p>
   </div>
 </div>
 
+{# ── Pill Nav — visible on mobile only, hidden on desktop ───────── #}
+{# Lets users tap to jump to any section without scrolling endlessly #}
+<div class="settings-pill-nav">
+  <div class="pill-nav-inner">
+    <button class="pill-nav-btn active" onclick="scrollToSection('section-info')">
+      <i class="fas fa-user"></i> Info
+    </button>
+    <button class="pill-nav-btn" onclick="scrollToSection('section-notifications')">
+      <i class="fas fa-bell"></i> Notifications
+    </button>
+    <button class="pill-nav-btn" onclick="scrollToSection('section-actions')">
+      <i class="fas fa-sliders-h"></i> Actions
+    </button>
+    <button class="pill-nav-btn" onclick="scrollToSection('section-danger')">
+      <i class="fas fa-exclamation-triangle"></i> Danger
+    </button>
+  </div>
+</div>
+
+{# ── Main Layout ──────────────────────────────────────────────────── #}
 <div class="container settings-container">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      
-      <!-- Main Settings Card -->
-      <div class="settings-card">
-        <form method="POST" action="#">
-          {% csrf_token %}
+  <div class="settings-layout">
 
-          <!-- Personal Information Section -->
-          <div class="settings-section">
-            <div class="section-header">
-              <i class="fas fa-user"></i>
-              <div>
-                <h3>Personal Information</h3>
-                <span class="readonly-badge">Read Only</span>
-              </div>
-            </div>
+    {# ── Sidebar — visible on desktop only ─────────────────────── #}
+    <aside class="settings-sidebar">
+      <div class="sidebar-head">
+        <span>Navigation</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-link active" onclick="scrollToSection('section-info')">
+          <i class="fas fa-user"></i> Personal Info
+        </button>
+        <button class="sidebar-link" onclick="scrollToSection('section-notifications')">
+          <i class="fas fa-bell"></i> Notifications
+        </button>
+        <button class="sidebar-link" onclick="scrollToSection('section-actions')">
+          <i class="fas fa-sliders-h"></i> Actions
+        </button>
+        <button class="sidebar-link" onclick="scrollToSection('section-danger')">
+          <i class="fas fa-exclamation-triangle"></i> Danger Zone
+        </button>
+      </nav>
+    </aside>
 
-            <div class="form-group">
-              <label for="first_name" class="form-label">
-                <i class="fas fa-user-circle me-2"></i>First Name
-              </label>
-              <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" readonly>
-            </div>
+    {# ── Content ────────────────────────────────────────────────── #}
+    <div class="settings-content">
 
-            <div class="form-group">
-              <label for="last_name" class="form-label">
-                <i class="fas fa-user-circle me-2"></i>Last Name
-              </label>
-              <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" readonly>
-            </div>
+      {# ── 1. Personal Information ──────────────────────────────── #}
+      <div class="settings-card" id="section-info">
+        <div class="section-head">
+          <div class="section-head-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="section-head-text">
+            <h3>Personal Information</h3>
+            <span class="readonly-badge">Read Only</span>
+          </div>
+        </div>
 
-            <div class="form-group">
-              <label for="email" class="form-label">
-                <i class="fas fa-envelope me-2"></i>Email Address
-              </label>
-              <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
-            </div>
-
-            <div class="info-box">
-              <i class="fas fa-info-circle"></i>
-              <span>To update your personal information, use the "Update Profile" button below</span>
-            </div>
+        <div class="section-body">
+          <div class="form-group">
+            <label for="first_name" class="form-label">
+              <i class="fas fa-user-circle"></i> First Name
+            </label>
+            <input type="text" class="form-control" id="first_name"
+                   name="first_name" value="{{ user.first_name }}" readonly>
           </div>
 
-          <!-- Communication Preferences Section -->
-          <div class="settings-section">
-            <div class="section-header">
-              <i class="fas fa-bell"></i>
-              <div>
-                <h3>Communication Preferences</h3>
-              </div>
-            </div>
-
-            <div class="checkbox-group">
-              <div class="custom-checkbox">
-                <input class="checkbox-input" type="checkbox" value="1" id="notifyEmail" checked>
-                <label class="checkbox-label" for="notifyEmail">
-                  <div class="checkbox-icon">
-                    <i class="fas fa-envelope"></i>
-                  </div>
-                  <div class="checkbox-content">
-                    <span class="checkbox-title">Email Notifications</span>
-                    <span class="checkbox-desc">Receive property updates and news via email</span>
-                  </div>
-                </label>
-              </div>
-
-              <div class="custom-checkbox">
-                <input class="checkbox-input" type="checkbox" value="1" id="notifySMS">
-                <label class="checkbox-label" for="notifySMS">
-                  <div class="checkbox-icon">
-                    <i class="fas fa-sms"></i>
-                  </div>
-                  <div class="checkbox-content">
-                    <span class="checkbox-title">SMS Notifications(Coming Soon)</span>
-                    <span class="checkbox-desc">Receive alerts and updates via text message</span>
-                  </div>
-                </label>
-              </div>
-            </div>
+          <div class="form-group">
+            <label for="last_name" class="form-label">
+              <i class="fas fa-user-circle"></i> Last Name
+            </label>
+            <input type="text" class="form-control" id="last_name"
+                   name="last_name" value="{{ user.last_name }}" readonly>
           </div>
 
-          
-          <!-- Action Buttons -->
-          <div class="action-buttons">
-            <a href="{% url 'customer:update-profile' user.id %}" class="btn btn-primary">
-              <i class="fas fa-user-edit"></i> Update Profile
-            </a>
-            <a href="{% url 'customer:user-profile' %}" class="btn btn-outline">
-              <i class="fas fa-home"></i> Dashboard
-            </a>
-            <a href="{% url 'customer:change-password' %}" class="btn btn-outline">
-              <i class="fas fa-key"></i> Change Password
-            </a>
+          <div class="form-group">
+            <label for="email" class="form-label">
+              <i class="fas fa-envelope"></i> Email Address
+            </label>
+            <input type="email" class="form-control" id="email"
+                   name="email" value="{{ user.email }}" readonly>
           </div>
-        </form>
+
+          <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <span>To update your personal information, use the <strong>Update Profile</strong> button in the Actions section below.</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Danger Zone Card -->
-      <div class="danger-card">
+      {# ── 2. Notification Preferences ──────────────────────────── #}
+      <div class="settings-card" id="section-notifications">
+        <div class="section-head">
+          <div class="section-head-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="section-head-text">
+            <h3>Communication Preferences</h3>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <div class="checkbox-group">
+
+            <div class="custom-checkbox">
+              <input class="checkbox-input" type="checkbox" value="1" id="notifyEmail" checked>
+              <label class="checkbox-label" for="notifyEmail">
+                <div class="checkbox-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <div class="checkbox-content">
+                  <span class="checkbox-title">Email Notifications</span>
+                  <span class="checkbox-desc">Receive property updates and news via email</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="custom-checkbox">
+              <input class="checkbox-input" type="checkbox" value="1" id="notifySMS">
+              <label class="checkbox-label" for="notifySMS">
+                <div class="checkbox-icon">
+                  <i class="fas fa-sms"></i>
+                </div>
+                <div class="checkbox-content">
+                  <span class="checkbox-title">SMS Notifications <small style="font-weight:400;color:#aaa;">(Coming Soon)</small></span>
+                  <span class="checkbox-desc">Receive alerts and updates via text message</span>
+                </div>
+              </label>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {# ── 3. Actions ───────────────────────────────────────────── #}
+      <div class="settings-card" id="section-actions">
+        <div class="section-head">
+          <div class="section-head-icon">
+            <i class="fas fa-sliders-h"></i>
+          </div>
+          <div class="section-head-text">
+            <h3>Account Actions</h3>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <p style="font-size:0.88rem;color:var(--text-light);margin-bottom:0;">
+            Manage your profile, navigate to your dashboard, or change your password below.
+          </p>
+        </div>
+
+        <div class="action-buttons">
+          <a href="{% url 'customer:update-profile' user.id %}" class="btn btn-primary">
+            <i class="fas fa-user-edit"></i> Update Profile
+          </a>
+          <a href="{% url 'customer:user-profile' %}" class="btn btn-outline">
+            <i class="fas fa-home"></i> Dashboard
+          </a>
+          <a href="{% url 'customer:change-password' %}" class="btn btn-outline">
+            <i class="fas fa-key"></i> Change Password
+          </a>
+        </div>
+      </div>
+
+      {# ── 4. Danger Zone ───────────────────────────────────────── #}
+      <div class="danger-card" id="section-danger">
         <div class="danger-header">
           <i class="fas fa-exclamation-triangle"></i>
           <h3>Danger Zone</h3>
@@ -160,35 +195,46 @@
             <h4>Delete Account</h4>
             <p>This action is <strong>permanent and irreversible</strong>. All your listings, saved properties, and profile data will be permanently deleted.</p>
           </div>
-          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+          <button type="button" class="btn-danger"
+                  data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
             <i class="fas fa-trash-alt"></i> Delete My Account
           </button>
         </div>
       </div>
 
-    </div>
-  </div>
+    </div>{# end .settings-content #}
+  </div>{# end .settings-layout #}
 </div>
 
-<!-- Delete Account Confirmation Modal -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+
+{# ── Delete Account Confirmation Modal — unchanged ────────────────── #}
+<div class="modal fade" id="deleteAccountModal" tabindex="-1"
+     aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
+
       <div class="modal-header bg-danger text-white border-0">
         <h5 class="modal-title" id="deleteAccountModalLabel">
           <i class="fas fa-exclamation-triangle me-2"></i>Delete Account Confirmation
         </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+
       <div class="modal-body">
         <div class="text-center mb-4">
-          <i class="fas fa-exclamation-circle text-danger" style="font-size: 4rem;"></i>
+          <i class="fas fa-exclamation-circle text-danger" style="font-size:4rem;"></i>
         </div>
         <h5 class="text-center fw-bold mb-3">Are you absolutely sure?</h5>
-        <p class="text-center mb-4">This action <strong class="text-danger">cannot be undone</strong>. This will permanently delete your account.</p>
-        
+        <p class="text-center mb-4">
+          This action <strong class="text-danger">cannot be undone</strong>.
+          This will permanently delete your account.
+        </p>
+
         <div class="alert alert-danger">
-          <h6 class="alert-heading"><i class="fas fa-trash me-2"></i>The following will be permanently deleted:</h6>
+          <h6 class="alert-heading">
+            <i class="fas fa-trash me-2"></i>The following will be permanently deleted:
+          </h6>
           <ul class="mb-0">
             <li>Your profile and personal information</li>
             <li>All saved properties and wishlist items</li>
@@ -206,41 +252,75 @@
         <p class="text-muted small text-center mb-0">
           Please type <strong>DELETE</strong> to confirm this action:
         </p>
-        <input type="text" class="form-control text-center mt-2 mb-3" id="deleteConfirmInput" placeholder="Type DELETE here">
+        <input type="text" class="form-control text-center mt-2 mb-3"
+               id="deleteConfirmInput" placeholder="Type DELETE here">
       </div>
+
       <div class="modal-footer border-0">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           <i class="fas fa-times me-2"></i>Cancel
         </button>
-        <form method="post" action="{% url 'customer:delete-account' %}" id="deleteAccountForm" class="d-inline">
+        <form method="post" action="{% url 'customer:delete-account' %}"
+              id="deleteAccountForm" class="d-inline">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+          <button type="submit" class="btn btn-danger"
+                  id="confirmDeleteBtn" disabled>
             <i class="fas fa-trash-alt me-2"></i>Yes, Delete My Account
           </button>
         </form>
       </div>
+
     </div>
   </div>
 </div>
 
-<script>
-// Enable delete button only when user types "DELETE"
-document.getElementById('deleteConfirmInput').addEventListener('input', function(e) {
-  const confirmBtn = document.getElementById('confirmDeleteBtn');
-  if (e.target.value === 'DELETE') {
-    confirmBtn.disabled = false;
-    confirmBtn.classList.remove('btn-danger');
-    confirmBtn.classList.add('btn-danger');
-  } else {
-    confirmBtn.disabled = true;
-  }
-});
 
-// Reset input when modal is closed
-document.getElementById('deleteAccountModal').addEventListener('hidden.bs.modal', function() {
-  document.getElementById('deleteConfirmInput').value = '';
-  document.getElementById('confirmDeleteBtn').disabled = true;
-});
+<script>
+  // ── Scroll to section on pill nav / sidebar tap ─────────────────
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Update active state on whichever nav is visible
+    document.querySelectorAll('.pill-nav-btn, .sidebar-link').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    document.querySelectorAll('[onclick="scrollToSection(\'' + id + '\')"]').forEach(function(btn) {
+      btn.classList.add('active');
+    });
+  }
+
+  // ── Highlight active nav item on scroll ──────────────────────────
+  const sections = ['section-info','section-notifications','section-actions','section-danger'];
+
+  window.addEventListener('scroll', function() {
+    let current = sections[0];
+    sections.forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 160) {
+        current = id;
+      }
+    });
+    document.querySelectorAll('.pill-nav-btn, .sidebar-link').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    document.querySelectorAll('[onclick="scrollToSection(\'' + current + '\')"]').forEach(function(btn) {
+      btn.classList.add('active');
+    });
+  });
+
+  // ── Delete confirmation — enable button only when "DELETE" typed ─
+  document.getElementById('deleteConfirmInput').addEventListener('input', function(e) {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    confirmBtn.disabled = (e.target.value !== 'DELETE');
+  });
+
+  // ── Reset modal on close ─────────────────────────────────────────
+  document.getElementById('deleteAccountModal').addEventListener('hidden.bs.modal', function() {
+    document.getElementById('deleteConfirmInput').value = '';
+    document.getElementById('confirmDeleteBtn').disabled = true;
+  });
 </script>
 
 {% endblock %}

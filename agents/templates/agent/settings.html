@@ -86,16 +86,16 @@
                             <div class="profile-preview">
                                 <div class="avatar-circle">
                                     {% if agent.profile_picture %}
-                                        <img src="{{ agent.profile_picture.url }}" alt="{{ agent.profile_name }}">
+                                        <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}">
                                     {% else %}
                                         <div class="avatar-placeholder">
-                                            {{ agent.profile_name|slice:":1"|upper }}
+                                            {{ agent.first_name|slice:":1"|upper }}
                                         </div>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="profile-info">
-                                <h4>{{ agent.profile_name }}</h4>
+                                <h4>{{ agent.first_name }} {{ agent.last_name }}</h4>
                                 <p class="profile-status">
                                     {% if agent.verified %}
                                         <i class="bi bi-patch-check-fill text-success"></i>
@@ -122,7 +122,7 @@
                         <div class="info-display-grid">
                             <div class="info-item">
                                 <label class="info-label">Full Name</label>
-                                <p class="info-value">{{ agent.profile_name }}</p>
+                                <p class="info-value">{{ agent.first_name }} {{ agent.last_name }}</p>
                             </div>
                             <div class="info-item">
                                 <label class="info-label">Work Type</label>

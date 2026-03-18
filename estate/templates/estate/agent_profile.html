@@ -16,7 +16,7 @@
       <div class="agent-profile-card">
         <div class="profile-avatar-section">
           {% if agent.profile_picture %}
-            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.profile_name }}" class="profile-avatar">
+            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}" class="profile-avatar">
           {% else %}
             <div class="avatar-placeholder">
               <i class="bi bi-person"></i>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="profile-info-section">
-          <h1 class="agent-name">{{ agent.profile_name }}</h1>
+          <h1 class="agent-name">{{ agent.first_name }}</h1>
           <p class="agent-work-type">{{ agent.work_type }}</p>
           
           <div class="agent-rating-display">
@@ -99,7 +99,7 @@
         <div class="card-header">
           <h2 class="card-title">
             <i class="bi bi-person-badge"></i>
-            About {{ agent.profile_name }}
+            About {{ agent.first_name }} {{ agent.last_name }}
           </h2>
         </div>
         <div class="card-body">
@@ -296,7 +296,7 @@
               <div class="review-body">
                 <h5 class="review-title">Excellent Service!</h5>
                 <p class="review-text">
-                  {{ agent.profile_name }} helped me find the perfect apartment in Lekki. 
+                  {{ agent.first_name }} helped me find the perfect apartment in Lekki. 
                   Very professional, responsive, and knowledgeable about the area. 
                   Highly recommend!
                 </p>
@@ -491,7 +491,7 @@
           </h3>
         </div>
         <div class="sidebar-card-body">
-          <p class="inquiry-text">Interested in working with {{ agent.profile_name }}?</p>
+          <p class="inquiry-text">Interested in working with {{ agent.first_name }}?</p>
           <a href="#" class="btn-inquiry">
             <i class="bi bi-send"></i>
             Send Message

@@ -1,5 +1,4 @@
 {% extends 'company/base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
@@ -8,514 +7,214 @@
 
 {% block content %}
 
-<div class="talents-container">
-  
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Find Talents</h1>
-      <p class="page-subtitle">Discover skilled real estate agents on Estate Web</p>
+<div class="ft-page">
+
+  <!-- PAGE HEADER -->
+  <div class="ft-header">
+    <div class="ft-header-text">
+      <h1 class="ft-title">Find Talents</h1>
+      <p class="ft-subtitle">Discover skilled real estate agents on Estate Web</p>
     </div>
   </div>
 
-  <!-- Filters Section -->
-  <div class="filters-section">
-    <div class="filters-grid">
-      
-      <div class="filter-group">
-        <label for="location" class="filter-label">Location</label>
-        <select class="filter-select" id="location">
-          <option value="">All Locations</option>
-          <option value="lagos">Lagos</option>
-          <option value="abuja">Abuja</option>
-          <option value="ibadan">Ibadan</option>
-          <option value="port-harcourt">Port Harcourt</option>
-          <option value="kano">Kano</option>
-          <option value="enugu">Enugu</option>
-        </select>
-      </div>
 
-      <div class="filter-group">
-        <label for="workType" class="filter-label">Nature of Work</label>
-        <select class="filter-select" id="workType">
-          <option value="">All Work Types</option>
-          <option value="residential">Residential Sales</option>
-          <option value="commercial">Commercial Properties</option>
-          <option value="rentals">Property Rentals</option>
-          <option value="property-manager">Property Management</option>
-        </select>
-      </div>
+  <!-- FILTERS -->
+  <div class="ft-filters">
 
-      <div class="filter-group">
-        <label for="experience" class="filter-label">Experience</label>
-        <select class="filter-select" id="experience">
-          <option value="">All Experience Levels</option>
-          <option value="0-1">0-1 years</option>
-          <option value="1-3">1-3 years</option>
-          <option value="3-5">3-5 years</option>
-          <option value="5-10">5-10 years</option>
-          <option value="10+">10+ years</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="verification" class="filter-label">Status</label>
-        <select class="filter-select" id="verification">
-          <option value="">All Agents</option>
-          <option value="verified">Verified Only</option>
-          <option value="universal">Universal Agents</option>
-        </select>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Agent Listings -->
-  <div class="agent-listings">
-    
-    <!-- Agent Card 1 -->
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-avatar">
-          <img src="https://ui-avatars.com/api/?name=Chukwudi+Okafor&size=80&background=1a3c4e&color=fff&bold=true" alt="Chukwudi Okafor">
-        </div>
-        <div class="agent-info">
-          <div class="agent-title-row">
-            <h2 class="agent-name">Chukwudi Okafor</h2>
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-            </span>
-          </div>
-          <p class="agent-work-type">Residential & Commercial Sales</p>
-          <div class="agent-meta">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              Lagos
-            </span>
-            <span class="meta-divider">•</span>
-            <span class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              5-10 years
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-stats">
-        <div class="stat-item">
-          <i class="bi bi-eye-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">1,247</span>
-            <span class="stat-label">Profile Views</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-star-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">4.9</span>
-            <span class="stat-label">Rating</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-chat-dots"></i>
-          <div class="stat-content">
-            <span class="stat-value">89</span>
-            <span class="stat-label">Reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-language">
-        <i class="bi bi-translate"></i>
-        <span>English, Igbo, Yoruba</span>
-      </div>
-
-      <p class="agent-bio">
-        Experienced professional helping clients find quality properties across Lagos. Strong negotiation skills and deep understanding of the local real estate market.
-      </p>
-
-      <div class="agent-actions">
-        <a href="#" class="btn-primary">
-          <i class="bi bi-person-check"></i>
-          <span>View Profile</span>
-        </a>
-        <a href="#" class="btn-secondary">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </div>
+    <div class="filter-group">
+      <label class="filter-label">Location</label>
+      <select class="filter-select" id="filterLocation">
+        <option value="">All Locations</option>
+        <option value="lagos">Lagos</option>
+        <option value="abuja">Abuja</option>
+        <option value="ibadan">Ibadan</option>
+        <option value="port harcourt">Port Harcourt</option>
+        <option value="kano">Kano</option>
+        <option value="enugu">Enugu</option>
+      </select>
     </div>
 
-    <!-- Agent Card 2 -->
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-avatar">
-          <img src="https://ui-avatars.com/api/?name=Amaka+Nwosu&size=80&background=1a3c4e&color=fff&bold=true" alt="Amaka Nwosu">
-        </div>
-        <div class="agent-info">
-          <div class="agent-title-row">
-            <h2 class="agent-name">Amaka Nwosu</h2>
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-            </span>
-          </div>
-          <p class="agent-work-type">Property Rentals Specialist</p>
-          <div class="agent-meta">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              Abuja
-            </span>
-            <span class="meta-divider">•</span>
-            <span class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              3-5 years
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-stats">
-        <div class="stat-item">
-          <i class="bi bi-eye-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">892</span>
-            <span class="stat-label">Profile Views</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-star-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">4.8</span>
-            <span class="stat-label">Rating</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-chat-dots"></i>
-          <div class="stat-content">
-            <span class="stat-value">67</span>
-            <span class="stat-label">Reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-language">
-        <i class="bi bi-translate"></i>
-        <span>English, Igbo</span>
-      </div>
-
-      <p class="agent-bio">
-        Passionate about matching families with their ideal rental homes in Abuja. Known for excellent customer service and attention to client needs.
-      </p>
-
-      <div class="agent-actions">
-        <a href="#" class="btn-primary">
-          <i class="bi bi-person-check"></i>
-          <span>View Profile</span>
-        </a>
-        <a href="#" class="btn-secondary">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </div>
+    <div class="filter-group">
+      <label class="filter-label">Nature of Work</label>
+      <select class="filter-select" id="filterWork">
+        <option value="">All Work Types</option>
+        <option value="residential">Residential Sales</option>
+        <option value="commercial">Commercial Properties</option>
+        <option value="rental">Property Rentals</option>
+        <option value="management">Property Management</option>
+      </select>
     </div>
 
-    <!-- Agent Card 3 -->
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-avatar">
-          <img src="https://ui-avatars.com/api/?name=Tunde+Adeyemi&size=80&background=1a3c4e&color=fff&bold=true" alt="Tunde Adeyemi">
-        </div>
-        <div class="agent-info">
-          <div class="agent-title-row">
-            <h2 class="agent-name">Tunde Adeyemi</h2>
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-            </span>
-            <span class="universal-badge">
-              <i class="bi bi-star-fill"></i>
-            </span>
-          </div>
-          <p class="agent-work-type">Commercial Properties Expert</p>
-          <div class="agent-meta">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              Lagos
-            </span>
-            <span class="meta-divider">•</span>
-            <span class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              10+ years
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-stats">
-        <div class="stat-item">
-          <i class="bi bi-eye-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">2,156</span>
-            <span class="stat-label">Profile Views</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-star-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">5.0</span>
-            <span class="stat-label">Rating</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-chat-dots"></i>
-          <div class="stat-content">
-            <span class="stat-value">112</span>
-            <span class="stat-label">Reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-language">
-        <i class="bi bi-translate"></i>
-        <span>English, Yoruba, Hausa</span>
-      </div>
-
-      <p class="agent-bio">
-        Veteran commercial real estate specialist with extensive network in Lagos business districts. Focus on office spaces, retail locations, and investment properties.
-      </p>
-
-      <div class="agent-actions">
-        <a href="#" class="btn-primary">
-          <i class="bi bi-person-check"></i>
-          <span>View Profile</span>
-        </a>
-        <a href="#" class="btn-secondary">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </div>
+    <div class="filter-group">
+      <label class="filter-label">Status</label>
+      <select class="filter-select" id="filterStatus">
+        <option value="">All Agents</option>
+        <option value="verified">Verified Only</option>
+        <option value="universal">Universal Agents</option>
+      </select>
     </div>
 
-    <!-- Agent Card 4 -->
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-avatar">
-          <img src="https://ui-avatars.com/api/?name=Blessing+Ibrahim&size=80&background=1a3c4e&color=fff&bold=true" alt="Blessing Ibrahim">
-        </div>
-        <div class="agent-info">
-          <div class="agent-title-row">
-            <h2 class="agent-name">Blessing Ibrahim</h2>
-          </div>
-          <p class="agent-work-type">Residential Sales Agent</p>
-          <div class="agent-meta">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              Port Harcourt
-            </span>
-            <span class="meta-divider">•</span>
-            <span class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              1-3 years
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-stats">
-        <div class="stat-item">
-          <i class="bi bi-eye-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">534</span>
-            <span class="stat-label">Profile Views</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-star-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">4.7</span>
-            <span class="stat-label">Rating</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-chat-dots"></i>
-          <div class="stat-content">
-            <span class="stat-value">34</span>
-            <span class="stat-label">Reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-language">
-        <i class="bi bi-translate"></i>
-        <span>English, Pidgin</span>
-      </div>
-
-      <p class="agent-bio">
-        Energetic agent helping people find quality homes in Port Harcourt. Known for responsiveness, transparency, and dedication to client satisfaction.
-      </p>
-
-      <div class="agent-actions">
-        <a href="#" class="btn-primary">
-          <i class="bi bi-person-check"></i>
-          <span>View Profile</span>
-        </a>
-        <a href="#" class="btn-secondary">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Agent Card 5 -->
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-avatar">
-          <img src="https://ui-avatars.com/api/?name=Emeka+Eze&size=80&background=1a3c4e&color=fff&bold=true" alt="Emeka Eze">
-        </div>
-        <div class="agent-info">
-          <div class="agent-title-row">
-            <h2 class="agent-name">Emeka Eze</h2>
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-            </span>
-            <span class="universal-badge">
-              <i class="bi bi-star-fill"></i>
-            </span>
-          </div>
-          <p class="agent-work-type">Property Management</p>
-          <div class="agent-meta">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              Lagos
-            </span>
-            <span class="meta-divider">•</span>
-            <span class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              5-10 years
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-stats">
-        <div class="stat-item">
-          <i class="bi bi-eye-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">1,673</span>
-            <span class="stat-label">Profile Views</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-star-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">4.9</span>
-            <span class="stat-label">Rating</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-chat-dots"></i>
-          <div class="stat-content">
-            <span class="stat-value">56</span>
-            <span class="stat-label">Reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-language">
-        <i class="bi bi-translate"></i>
-        <span>English, Igbo, Yoruba</span>
-      </div>
-
-      <p class="agent-bio">
-        Professional property manager overseeing multiple residential and commercial portfolios. Expertise in tenant relations and property maintenance coordination.
-      </p>
-
-      <div class="agent-actions">
-        <a href="#" class="btn-primary">
-          <i class="bi bi-person-check"></i>
-          <span>View Profile</span>
-        </a>
-        <a href="#" class="btn-secondary">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Agent Card 6 -->
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-avatar">
-          <img src="https://ui-avatars.com/api/?name=Fatima+Yusuf&size=80&background=1a3c4e&color=fff&bold=true" alt="Fatima Yusuf">
-        </div>
-        <div class="agent-info">
-          <div class="agent-title-row">
-            <h2 class="agent-name">Fatima Yusuf</h2>
-            <span class="verified-badge">
-              <i class="bi bi-patch-check-fill"></i>
-            </span>
-          </div>
-          <p class="agent-work-type">Residential & Rental Properties</p>
-          <div class="agent-meta">
-            <span class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              Kano
-            </span>
-            <span class="meta-divider">•</span>
-            <span class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              3-5 years
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-stats">
-        <div class="stat-item">
-          <i class="bi bi-eye-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">1,023</span>
-            <span class="stat-label">Profile Views</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-star-fill"></i>
-          <div class="stat-content">
-            <span class="stat-value">4.8</span>
-            <span class="stat-label">Rating</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <i class="bi bi-chat-dots"></i>
-          <div class="stat-content">
-            <span class="stat-value">78</span>
-            <span class="stat-label">Reviews</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="agent-language">
-        <i class="bi bi-translate"></i>
-        <span>English, Hausa</span>
-      </div>
-
-      <p class="agent-bio">
-        Dedicated agent helping clients find homes and rental properties in Kano. Strong local market knowledge and commitment to client satisfaction.
-      </p>
-
-      <div class="agent-actions">
-        <a href="#" class="btn-primary">
-          <i class="bi bi-person-check"></i>
-          <span>View Profile</span>
-        </a>
-        <a href="#" class="btn-secondary">
-          <i class="bi bi-envelope"></i>
-          <span>Contact</span>
-        </a>
+    <div class="filter-group">
+      <label class="filter-label">Search</label>
+      <div class="search-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" class="filter-select search-input" id="filterSearch" placeholder="Search by name...">
       </div>
     </div>
 
   </div>
 
-</div>
+
+  <!-- AGENT GRID -->
+  {% if agents %}
+  <div class="agent-grid" id="agentGrid">
+
+    {% for agent in agents %}
+    <div class="agent-card"
+         data-location="{{ agent.location|lower }}"
+         data-work="{{ agent.work_type|lower }}"
+         data-status="{% if agent.universal_agent %}universal{% elif agent.verified %}verified{% else %}standard{% endif %}"
+         data-name="{{ agent.first_name|lower }} {{ agent.last_name|lower }}">
+
+      <!-- Card Top: Avatar + Name block -->
+      <div class="card-top">
+
+        <div class="agent-avatar-wrap">
+          {% if agent.profile_picture %}
+            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }} {{ agent.last_name }}" class="agent-avatar">
+          {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ agent.first_name|urlencode }}+{{ agent.last_name|urlencode }}&size=80&background=1a3c4e&color=fff&bold=true"
+                 alt="{{ agent.first_name }} {{ agent.last_name }}" class="agent-avatar">
+          {% endif %}
+
+          <!-- Badge overlays -->
+          {% if agent.universal_agent %}
+            <span class="avatar-badge universal" title="Universal Agent"><i class="bi bi-star-fill"></i></span>
+          {% elif agent.verified %}
+            <span class="avatar-badge verified" title="Verified Agent"><i class="bi bi-patch-check-fill"></i></span>
+          {% endif %}
+        </div>
+
+        <div class="agent-headline">
+          <h2 class="agent-name">{{ agent.first_name }} {{ agent.last_name }}</h2>
+          <p class="agent-work">{{ agent.work_type }}</p>
+          <div class="agent-meta">
+            <span class="meta-chip"><i class="bi bi-geo-alt-fill"></i> {{ agent.location }}</span>
+            {% if agent.verified %}<span class="meta-chip verified-chip"><i class="bi bi-patch-check-fill"></i> Verified</span>{% endif %}
+            {% if agent.universal_agent %}<span class="meta-chip universal-chip"><i class="bi bi-star-fill"></i> Universal</span>{% endif %}
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- Language / Bio -->
+      {% if agent.language %}
+      <div class="agent-lang">
+        <i class="bi bi-translate"></i>
+        <span>{{ agent.language }}</span>
+      </div>
+      {% endif %}
+
+      {% if agent.bio %}
+      <p class="agent-bio">{{ agent.bio|truncatechars:140 }}</p>
+      {% endif %}
+
+
+      <!-- Experience preview (first entry) -->
+      {% with agent.experiences.first as exp %}
+      {% if exp %}
+      <div class="exp-preview">
+        <i class="bi bi-briefcase-fill"></i>
+        <span>{{ exp.title }} at {{ exp.company }}</span>
+      </div>
+      {% endif %}
+      {% endwith %}
+
+
+      <!-- Social links -->
+      {% if agent.social.exists %}
+      <div class="social-row">
+        {% for link in agent.social.all %}
+        <a href="{{ link.link_to_social }}" target="_blank" rel="noopener noreferrer"
+           class="social-link" title="{{ link.social_platform }}">
+          <i class="bi bi-{{ link.social_platform|lower }}"></i>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <a href="{%url 'agent:agent-profile' agent.agent_uuid%}" class="btn-view">
+          <i class="bi bi-person-lines-fill"></i>
+          View Profile
+        </a>
+        <a href="mailto:{{ agent.email }}" class="btn-contact">
+          <i class="bi bi-envelope-fill"></i>
+          Contact
+        </a>
+      </div>
+
+    </div>
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+
+  <!-- EMPTY STATE -->
+  <div class="ft-empty">
+    <div class="ft-empty-icon"><i class="bi bi-people"></i></div>
+    <h3>No agents found</h3>
+    <p>No agents are available yet. Check back soon!</p>
+  </div>
+
+  {% endif %}
+
+</div><!-- end .ft-page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  var cards = document.querySelectorAll('.agent-card');
+
+  function applyFilters() {
+    var loc    = document.getElementById('filterLocation').value.toLowerCase();
+    var work   = document.getElementById('filterWork').value.toLowerCase();
+    var status = document.getElementById('filterStatus').value.toLowerCase();
+    var search = document.getElementById('filterSearch').value.toLowerCase();
+
+    cards.forEach(function (card) {
+      var cloc  = card.dataset.location || '';
+      var cwork = card.dataset.work     || '';
+      var cstat = card.dataset.status   || '';
+      var cname = card.dataset.name     || '';
+
+      var show =
+        (!loc    || cloc.includes(loc))   &&
+        (!work   || cwork.includes(work)) &&
+        (!status || cstat === status)     &&
+        (!search || cname.includes(search));
+
+      card.style.display = show ? '' : 'none';
+    });
+
+    /* Show/hide empty state message */
+    var visible = Array.from(cards).filter(function (c) { return c.style.display !== 'none'; });
+    var noResult = document.getElementById('noResult');
+    if (noResult) noResult.style.display = visible.length ? 'none' : 'block';
+  }
+
+  ['filterLocation', 'filterWork', 'filterStatus', 'filterSearch'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', applyFilters);
+  });
+
+}());
+</script>
 
 {% endblock %}

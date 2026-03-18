@@ -16,7 +16,7 @@ from core.models import *
 from companies.models import CompanyInformation, CompanyRating
 import uuid
 from django.db.models import Avg, Count
-
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -167,41 +167,64 @@ def rent_property(request):
 
 
 def view_property_on_sale(request, property_id):
-    """
-    View Listed Property in details
-    """
+    """View Listed Property in detail"""
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
         return redirect('login')
+
     try:
-        user_role=request.user.role
-        if user_role == 'company':
-            base_template = 'company/base.html'
-        elif user_role == 'agent':
-            base_template = 'agent/base.html'
-        else:
-            base_template='estate/base.html'
+        base_template = {
+            'company': 'company/base.html',
+            'agent':   'agent/base.html',
+        }.get(request.user.role, 'estate/base.html')
 
-        property_to_be_viewed= PropertyManagementSale.objects.get(pk=property_id)
+        prop = PropertyManagementSale.objects.get(pk=property_id)
+
+        # ── Resolve who listed the property ──────────────────
         try:
-            company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            agent_in_charge=None
-            property_view_count(property_id, "Sale", request.user.id,company_in_charge.unique_company_id)
-        except CompanyInformation.DoesNotExist:
-            agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            company_in_charge=None
-            property_view_count(property_id, "Sale", request.user.id, agent_in_charge.agent_uuid)
-        context={
-            'property': property_to_be_viewed,
-            'agent_info': agent_in_charge,
-            'company_info': company_in_charge,
-            'base_template':base_template,
-            'role':user_role
-        }
-        return render(request, 'estate/view_property_s.html', context)
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+            company_in_charge = CompanyInformation.objects.get(user_id=prop.user_id)
+            agent_in_charge   = (
+                AgentInformation.objects.get(agent_uuid=prop.agent_uuid)
+                if prop.agent_uuid != 'None' else None
+            )
+            view_id = company_in_charge.unique_company_id
+            msg = (
+                f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
+                if agent_in_charge
+                else f'Listed by {company_in_charge.company_name}'
+            )
 
+        except CompanyInformation.DoesNotExist:
+            agent_in_charge   = AgentInformation.objects.get(user_id=prop.user_id)
+            company_in_charge = (
+                CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
+                if agent_in_charge.company_uuid else None
+            )
+            view_id = agent_in_charge.agent_uuid
+            msg = (
+                f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
+                if company_in_charge
+                else f'Listed by {agent_in_charge.first_name} (Independent)'
+            )
+
+        # ── Single call for both branches ────────────────────
+        messages.info(request, msg)
+        property_view_count(property_id, "Sale", request.user.id, view_id)
+
+        return render(request, 'estate/view_property_s.html', {
+            'property':      prop,
+            'agent_info':    agent_in_charge,
+            'company_info':  company_in_charge,
+            'base_template': base_template,
+            'role':          request.user.role,
+        })
+
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property unavailable')
+        return redirect(request.META.get('HTTP_REFERER', 'customer:buy-property'))
+
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})  
 
 
 def view_property_on_lease(request, property_id):
@@ -224,14 +247,30 @@ def view_property_on_lease(request, property_id):
         
         try:
             company_in_charge=CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            agent_in_charge=None
-            property_view_count(property_id, "Rent", request.user.id, company_in_charge.unique_company_id)
-            messages.info(request, 'Cooperate Listing')
+            agent_in_charge=(AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
+                            if property_to_be_viewed.agent_uuid !='None' else None
+                                )
+            view_id=company_in_charge.unique_company_id
+            msg=(
+                f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
+                if agent_in_charge
+                else f'Listed by {company_in_charge.company_name}'
+            )
+            
         except CompanyInformation.DoesNotExist:
-            agent_in_charge= AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            messages.info(request, 'Agent Listing')
-            company_in_charge=None
-            property_view_count(property_id, "Rent", request.user.id, agent_in_charge.agent_uuid)
+            agent_in_charge   = AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
+            company_in_charge = (
+                CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
+                if agent_in_charge.company_uuid else None
+            )
+            view_id = agent_in_charge.agent_uuid
+            msg = (
+                f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
+                if company_in_charge
+                else f'Listed by {agent_in_charge.first_name} (Independent)'
+            )
+        messages.info(request, msg)
+        property_view_count(property_id, "Rent", request.user.id, view_id)
         context={
             'property': property_to_be_viewed,
             'agent_info': agent_in_charge,
@@ -240,6 +279,12 @@ def view_property_on_lease(request, property_id):
             'role':user_role,
         }
         return render(request, 'estate/view_property_r.html', context)
+    except ObjectDoesNotExist:
+        messages.error(request, 'An error occured')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            return redirect('customer:rent-property')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 

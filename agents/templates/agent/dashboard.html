@@ -369,7 +369,11 @@
   <!-- Company News -->
   <div class="accordion-card">
     <button class="accordion-trigger" onclick="toggleAccordion(this)">
-      <span class="acc-title"><i class="bi bi-megaphone-fill"></i> Company News</span>
+      {%if agent_info.company_uuid%}
+        <span class="acc-title"><i class="bi bi-megaphone-fill"></i> {{company_name}} Announcements</span>
+      {%else%}
+        <span class="acc-title"><i class="bi bi-megaphone-fill"></i> Company News</span>
+      {%endif%}
       <i class="bi bi-chevron-down acc-chevron"></i>
     </button>
     <div class="accordion-body">
@@ -384,10 +388,16 @@
           <p class="news-body">{{ announcement.message }}</p>
         </div>
         {% endfor %}
-      {% else %}
+      {% elif agent_info.company_uuid %}
         <div class="acc-empty">
           <i class="bi bi-megaphone"></i>
           <p>No announcements yet from your company admin.</p>
+          <small class="text-muted">Check back later for updates.</small>
+        </div>
+      {% else %}
+        <div class="acc-empty">
+          <i class="bi bi-megaphone"></i>
+          <p>Join a company to see Live Updates</p>
         </div>
       {% endif %}
     </div>

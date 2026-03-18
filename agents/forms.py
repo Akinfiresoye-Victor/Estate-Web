@@ -16,14 +16,18 @@ class AgentInformationForm(forms.ModelForm):
     class Meta:
         model = AgentInformation
         fields = [
-            'profile_name', 'phone_number', 'email', 'location', 
+            'first_name','last_name', 'phone_number', 'email', 'location', 
             'language', 'work_type', 'bio', 'profile_picture', 
             'government_id', 'certificate'
         ]
         widgets = {
-            'profile_name': forms.TextInput(attrs={
+            'first_name': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter your full name'
+                'placeholder': 'Enter your first name'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your last name'
             }),
             'phone_number': forms.TextInput(attrs={
                 'class': 'form-control',
