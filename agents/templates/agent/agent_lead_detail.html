@@ -8,64 +8,57 @@
 
 {% block content %}
 
-<!-- Delete Confirmation Modal-->
+{# ── Hidden data — status/stage JS logic depends on these ─────────── #}
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+<div id="agent_lead_data" data-lead-id="{{ lead.id }}" style="display:none;"></div>
+
+{# ── Delete Modal ─────────────────────────────────────────────────── #}
 <div class="delete-modal-overlay" id="deleteModal">
-    <div class="delete-modal">
-        <div class="delete-modal-icon">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-        </div>
-        <h3>Confirm Deletion</h3>
-        <p>Are you sure you want to delete this lead? This action cannot be undone and all associated data will be permanently removed.</p>
-        <div class="delete-modal-actions">
-            <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">
-                <i class="bi bi-x-circle me-2"></i>Cancel
-            </button>
-            <a href="#" id="confirmDeleteBtn" class="modal-btn modal-btn-delete">
-                <i class="bi bi-trash me-2"></i>Yes, Delete
-            </a>
-        </div>
+  <div class="delete-modal">
+    <div class="delete-modal-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
     </div>
+    <h3>Confirm Deletion</h3>
+    <p>Are you sure you want to delete this lead? This action cannot be undone and all associated data will be permanently removed.</p>
+    <div class="delete-modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">
+        <i class="bi bi-x-circle"></i> Cancel
+      </button>
+      <a href="#" id="confirmDeleteBtn" class="modal-btn modal-btn-delete">
+        <i class="bi bi-trash"></i> Yes, Delete
+      </a>
+    </div>
+  </div>
 </div>
 
 
-
-
-
-<!-- Premium Hero Header -->
+{# ── Hero ─────────────────────────────────────────────────────────── #}
 <div class="hero-section">
   <div class="container-fluid">
-    
-    <!-- Navigation Bar -->
+
     <div class="nav-bar">
       <a href="{% url 'agent:leads' %}" class="nav-back">
         <i class="bi bi-arrow-left-circle-fill"></i>
         <span>Back to Leads</span>
       </a>
-      <div class="nav-badges">
-        <span class="status-pill {{ lead.status|slugify }}">
-          <span class="pill-dot"></span>
-          {{ lead.status }}
-        </span>
-      </div>
+      <span class="status-pill {{ lead.status|slugify }}">
+        <span class="pill-dot"></span>
+        {{ lead.status }}
+      </span>
     </div>
-    
-    <!-- Lead Profile Header -->
+
     <div class="profile-header">
-      <div class="profile-avatar-section">
-        <div class="avatar-wrapper">
-          <div class="avatar-circle">
-            {{ lead.name|slice:":1"|upper }}
-          </div>
-          <div class="avatar-ring"></div>
-        </div>
+      <div class="avatar-wrapper">
+        <div class="avatar-circle">{{ lead.name|slice:":1"|upper }}</div>
+        <div class="avatar-ring"></div>
       </div>
-      
+
       <div class="profile-details">
         <h1 class="profile-name">{{ lead.name }}</h1>
         <div class="profile-meta">
           <span class="meta-chip">
             <i class="bi bi-calendar-check-fill"></i>
-            Inquired {{ lead.date_created|date:"F d, Y" }}
+            {{ lead.date_created|date:"M d, Y" }}
           </span>
           <span class="meta-divider">•</span>
           <span class="meta-chip">
@@ -74,35 +67,33 @@
           </span>
         </div>
       </div>
-      
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <a href="tel:{{ lead.phone_no }}" class="quick-btn phone">
-          <i class="bi bi-telephone-fill"></i>
-          <span>Call</span>
-        </a>
-        <a href="mailto:{{ lead.email }}" class="quick-btn email">
-          <i class="bi bi-envelope-fill"></i>
-          <span>Email</span>
-        </a>
-        <a href="https://wa.me/{{ lead.phone_no }}" target="_blank" class="quick-btn whatsapp">
-          <i class="bi bi-whatsapp"></i>
-          <span>WhatsApp</span>
-        </a>
-      </div>
     </div>
-    
+
+    {# Contact quick actions — horizontal scroll on mobile #}
+    <div class="quick-actions">
+      <a href="tel:{{ lead.phone_no }}" class="quick-btn phone">
+        <i class="bi bi-telephone-fill"></i> Call
+      </a>
+      <a href="mailto:{{ lead.email }}" class="quick-btn email">
+        <i class="bi bi-envelope-fill"></i> Email
+      </a>
+      <a href="https://wa.me/{{ lead.phone_no }}" target="_blank" class="quick-btn whatsapp">
+        <i class="bi bi-whatsapp"></i> WhatsApp
+      </a>
+    </div>
+
   </div>
 </div>
 
-<!-- Main Content Area -->
+
+{# ── Main Content ────────────────────────────────────────────────── #}
 <div class="container-fluid main-content">
   <div class="content-layout">
-    
-    <!-- Primary Column -->
+
+    {# ── Primary column ───────────────────────────────────────────── #}
     <section class="primary-section">
-      
-      <!-- Contact Details Card -->
+
+      {# Contact Information #}
       <div class="info-card">
         <div class="info-card-header">
           <div class="header-title">
@@ -112,21 +103,17 @@
         </div>
         <div class="info-card-body">
           <div class="details-grid">
-            
+
             <div class="detail-item">
-              <div class="detail-icon">
-                <i class="bi bi-person-fill"></i>
-              </div>
+              <div class="detail-icon"><i class="bi bi-person-fill"></i></div>
               <div class="detail-content">
                 <span class="detail-label">Full Name</span>
                 <span class="detail-value">{{ lead.name }}</span>
               </div>
             </div>
-            
+
             <div class="detail-item">
-              <div class="detail-icon">
-                <i class="bi bi-envelope-fill"></i>
-              </div>
+              <div class="detail-icon"><i class="bi bi-envelope-fill"></i></div>
               <div class="detail-content">
                 <span class="detail-label">Email Address</span>
                 <a href="mailto:{{ lead.email }}" class="detail-value link-value">
@@ -134,11 +121,9 @@
                 </a>
               </div>
             </div>
-            
+
             <div class="detail-item">
-              <div class="detail-icon">
-                <i class="bi bi-telephone-fill"></i>
-              </div>
+              <div class="detail-icon"><i class="bi bi-telephone-fill"></i></div>
               <div class="detail-content">
                 <span class="detail-label">Phone Number</span>
                 <a href="tel:{{ lead.phone_no }}" class="detail-value link-value">
@@ -146,11 +131,9 @@
                 </a>
               </div>
             </div>
-            
+
             <div class="detail-item">
-              <div class="detail-icon">
-                <i class="bi bi-chat-dots-fill"></i>
-              </div>
+              <div class="detail-icon"><i class="bi bi-chat-dots-fill"></i></div>
               <div class="detail-content">
                 <span class="detail-label">Preferred Contact</span>
                 <span class="detail-value">
@@ -161,12 +144,12 @@
                 </span>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
 
-      <!-- Property Interest Card -->
+      {# Property of Interest #}
       <div class="info-card">
         <div class="info-card-header">
           <div class="header-title">
@@ -176,58 +159,43 @@
         </div>
         <div class="info-card-body">
           <div class="property-showcase">
-            
+
             <div class="property-thumbnail">
               {% if property.base_image %}
-                <img src="{{ property.base_image.url }}" alt="{{ property.residential }}">
-                <div class="thumbnail-overlay">
-                  <i class="bi bi-eye-fill"></i>
-                </div>
+                <img src="{{ property.base_image.url }}" alt="Property">
+                <div class="thumbnail-overlay"><i class="bi bi-eye-fill"></i></div>
               {% else %}
-                <div class="thumbnail-placeholder">
-                  <i class="bi bi-house-fill"></i>
-                </div>
+                <div class="thumbnail-placeholder"><i class="bi bi-house-fill"></i></div>
               {% endif %}
             </div>
-            
+
             <div class="property-details">
-              {%if property.property_category == 'Residential' %}
+              {% if property.property_category == 'Residential' %}
                 <h4>{{ property.residential }}</h4>
-              {%elif property.property_category == 'Commercial'%}
+              {% elif property.property_category == 'Commercial' %}
                 <h4>{{ property.commercial }}</h4>
-              {%elif property.property_category == 'Land'%}
+              {% elif property.property_category == 'Land' %}
                 <h4>{{ property.lands }}</h4>
-              {%else%}
-                <h4>Something went wrong.....</h4>
-              {%endif%}
+              {% else %}
+                <h4>Property details unavailable</h4>
+              {% endif %}
+
               <p class="property-address">
                 <i class="bi bi-geo-alt-fill"></i>
                 {{ property.location }}
               </p>
-              
+
               <div class="property-specs">
                 <div class="spec-item">
-                  <i class="bi bi-house-door-fill"></i>
-                  {%if property.property_category == 'Residential' %}
-                    <span>{{ property.residential }}</span>
-                  {%elif property.property_category == 'Commercial'%}
-                    <span>{{ property.commercial }}</span>
-                  {%elif property.property_category == 'Land'%}
-                    <span>{{ property.lands }}</span>
-                  {%else%}
-                    <span>Something went wrong.....</span>
-                  {%endif%}
-                </div>
-                <div class="spec-item">
                   <i class="bi bi-door-closed-fill"></i>
-                  <span>{{ property.bedrooms }} Bedrooms</span>
+                  <span>{{ property.bedrooms }} Beds</span>
                 </div>
                 <div class="spec-item">
                   <i class="bi bi-droplet-fill"></i>
-                  <span>{{ property.bathrooms }} Bathrooms</span>
+                  <span>{{ property.bathrooms }} Baths</span>
                 </div>
               </div>
-              
+
               <div class="property-pricing">
                 <div class="price-tag">
                   {% if property.price_range %}
@@ -237,26 +205,25 @@
                     ₦{{ property.price|floatformat:2|intcomma }}
                   {% endif %}
                 </div>
-                
                 {% if property.price_range %}
-                  <a href="{%url 'customer:view-property-r' property.id%}" target="_blank" class="view-property-btn">
-                    <span>View Full Details</span>
+                  <a href="{% url 'customer:view-property-r' property.id %}" target="_blank" class="view-property-btn">
+                    <span>View Details</span>
                     <i class="bi bi-arrow-right-circle-fill"></i>
                   </a>
                 {% else %}
-                  <a href="{%url 'customer:view-property-s' property.id%}" target="_blank" class="view-property-btn">
-                    <span>View Full Details</span>
+                  <a href="{% url 'customer:view-property-s' property.id %}" target="_blank" class="view-property-btn">
+                    <span>View Details</span>
                     <i class="bi bi-arrow-right-circle-fill"></i>
                   </a>
                 {% endif %}
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
 
-      <!-- Inquiry Details Card -->
+      {# Inquiry Message #}
       <div class="info-card">
         <div class="info-card-header">
           <div class="header-title">
@@ -272,7 +239,7 @@
             <div class="inquiry-footer">
               <span class="tour-badge">
                 <i class="bi bi-calendar-event-fill"></i>
-                Tour Scheduled: {{ lead.schedule_tour|date:"F d, Y" }}
+                Tour: {{ lead.schedule_tour|date:"M d, Y" }}
               </span>
             </div>
           </div>
@@ -281,10 +248,10 @@
 
     </section>
 
-    <!-- Secondary Column (Sidebar) -->
+    {# ── Sidebar ──────────────────────────────────────────────────── #}
     <aside class="secondary-section">
-      
-      <!-- Lead Status Management -->
+
+      {# Lead Status — selects fire updateAgentLeadStatus / updateAgentLeadStage #}
       <div class="info-card sticky-card">
         <div class="info-card-header">
           <div class="header-title">
@@ -293,51 +260,50 @@
           </div>
         </div>
         <div class="info-card-body">
-          
+
           <div class="control-group">
             <label class="control-label">Current Status</label>
+            {# onchange must remain — this fires updateAgentLeadStatus #}
             <select class="control-select" id="leadStatus" onchange="updateAgentLeadStatus(this.value)">
-              <option value="Contacted" {% if lead.status == 'Contacted' %}selected{% endif %}>Contacted</option>
+              <option value="Contacted"     {% if lead.status == 'Contacted'     %}selected{% endif %}>Contacted</option>
               <option value="Not Contacted" {% if lead.status == 'Not Contacted' %}selected{% endif %}>Not Contacted</option>
-              <option value="Cold Lead" {% if lead.status == 'Cold Lead' %}selected{% endif %}>Cold Lead</option>
-              <option value="Warm Lead" {% if lead.status == 'Warm Lead' %}selected{% endif %}>Warm Lead</option>
-              <option value="Hot Lead" {% if lead.status == 'Hot Lead' %}selected{% endif %}>Hot Lead</option>
+              <option value="Cold Lead"     {% if lead.status == 'Cold Lead'     %}selected{% endif %}>Cold Lead</option>
+              <option value="Warm Lead"     {% if lead.status == 'Warm Lead'     %}selected{% endif %}>Warm Lead</option>
+              <option value="Hot Lead"      {% if lead.status == 'Hot Lead'      %}selected{% endif %}>Hot Lead</option>
             </select>
           </div>
 
           <div class="control-group">
             <label class="control-label">Lead Stage</label>
+            {# onchange must remain — this fires updateAgentLeadStage #}
             <select class="control-select" id="leadStage" onchange="updateAgentLeadStage(this.value)">
-              <option value="New" {% if lead.stages == 'New' %}selected{% endif %}>New Lead</option>
+              <option value="New"              {% if lead.stages == 'New'              %}selected{% endif %}>New Lead</option>
               <option value="Potential Friend" {% if lead.stages == 'Potential Friend' %}selected{% endif %}>Potential Friend</option>
-              <option value="True Friend" {% if lead.stages == 'True Friend' %}selected{% endif %}>True Friend</option>
-              <option value="Contracted" {% if lead.stages == 'Contracted' %}selected{% endif %}>Contracted</option>
-              <option value="Closed/Won" {% if lead.stages == 'Closed/Won' %}selected{% endif %}>Closed/Won</option>
+              <option value="True Friend"      {% if lead.stages == 'True Friend'      %}selected{% endif %}>True Friend</option>
+              <option value="Contracted"       {% if lead.stages == 'Contracted'       %}selected{% endif %}>Contracted</option>
+              <option value="Closed/Won"       {% if lead.stages == 'Closed/Won'       %}selected{% endif %}>Closed/Won</option>
             </select>
           </div>
 
           <div class="control-group">
             <label class="control-label">Priority Level</label>
             <div class="priority-grid">
-              <button class="priority-chip low" onclick="setAgentPriority('low')">
-                <i class="bi bi-flag"></i>
-                <span>Low</span>
+              <button class="priority-chip low"    onclick="setAgentPriority('low')">
+                <i class="bi bi-flag"></i> <span>Low</span>
               </button>
               <button class="priority-chip medium" onclick="setAgentPriority('medium')">
-                <i class="bi bi-flag-fill"></i>
-                <span>Medium</span>
+                <i class="bi bi-flag-fill"></i> <span>Medium</span>
               </button>
               <button class="priority-chip high active" onclick="setAgentPriority('high')">
-                <i class="bi bi-flag-fill"></i>
-                <span>High</span>
+                <i class="bi bi-flag-fill"></i> <span>High</span>
               </button>
             </div>
           </div>
-          
+
         </div>
       </div>
 
-      <!-- Quick Actions -->
+      {# Quick Actions #}
       <div class="info-card">
         <div class="info-card-header">
           <div class="header-title">
@@ -347,23 +313,29 @@
         </div>
         <div class="info-card-body">
           <div class="action-list">
-            <button class="action-button" onclick="scheduleAgentFollowUp()">
+
+            <a href="{% url 'add-schedule' %}" class="action-button">
               <i class="bi bi-calendar-plus-fill"></i>
               <span>Schedule Follow-up</span>
-            </button>
+            </a>
+
             <button class="action-button" onclick="shareLeadInfo()">
               <i class="bi bi-share-fill"></i>
               <span>Share Lead Info</span>
             </button>
-            <button class="action-button danger" onclick="showDeleteModal('{% url 'agent:delete-lead' lead.lead_id%}')" title="Delete">
+
+            <button class="action-button danger"
+                    onclick="showDeleteModal('{% url 'agent:delete-lead' lead.lead_id %}')"
+                    title="Delete">
               <i class="bi bi-trash-fill"></i>
               <span>Delete Lead</span>
             </button>
+
           </div>
         </div>
       </div>
 
-      <!-- Tags Management -->
+      {# Tags — coming soon #}
       <div class="info-card">
         <div class="info-card-header">
           <div class="header-title">
@@ -384,113 +356,96 @@
   </div>
 </div>
 
-<!-- Hidden Data -->
-<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-<div id="agent_lead_data" data-lead-id="{{ lead.id }}" style="display: none;"></div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
-(function() {
-    'use strict';
+(function () {
+  'use strict';
 
-    // Update Lead Status
-    window.updateAgentLeadStatus = function(newStatus) {
-        const leadData = document.getElementById('agent_lead_data');
-        if (!leadData) {
-            alert('Error: Lead ID not found');
-            return;
-        }
-        
-        const leadId = leadData.getAttribute('data-lead-id');
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const url = `/agent/lead/update_status/${leadId}/`;
-        
-        if (!url) {
-            alert('Error: Update URL not configured');
-            return;
-        }
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `new_status=${encodeURIComponent(newStatus)}`
-        })
-        .then(() => window.location.reload())
-        .catch(error => console.error('Error:', error));
-    };
+  /* ── Update Lead Status ─────────────────────────────────────────────
+     Fires when #leadStatus select changes.
+     POSTs to /agent/lead/update_status/{id}/ then reloads.
+     Logic preserved exactly — do not modify.
+  ─────────────────────────────────────────────────────────────────── */
+  window.updateAgentLeadStatus = function (newStatus) {
+    var leadData = document.getElementById('agent_lead_data');
+    if (!leadData) { alert('Error: Lead ID not found'); return; }
 
-    // Update Lead Stage
-    window.updateAgentLeadStage = function(newStage) {
-        const leadData = document.getElementById('agent_lead_data');
-        if (!leadData) return;
-        
-        const leadId = leadData.getAttribute('data-lead-id');
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const url = `/agent/lead/update_stage/${leadId}/`;
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `new_stage=${encodeURIComponent(newStage)}`
-        })
-        .then(response => { if (response.ok) window.location.reload(); })
-        .catch(error => console.error('Error:', error));
-    };
+    var leadId    = leadData.getAttribute('data-lead-id');
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    var url       = '/agent/lead/update_status/' + leadId + '/';
 
-    // Priority Management
-    window.setAgentPriority = function(priority) {
-        document.querySelectorAll('.priority-chip').forEach(btn => btn.classList.remove('active'));
-        event.target.closest('.priority-chip').classList.add('active');
-    };
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'new_status=' + encodeURIComponent(newStatus)
+    })
+    .then(function () { window.location.reload(); })
+    .catch(function (err) { console.error('Error:', err); });
+  };
 
-    // Quick Actions
-    window.scheduleAgentFollowUp = function() {
-        alert('Schedule follow-up feature - Coming soon!');
-    };
+  /* ── Update Lead Stage ──────────────────────────────────────────────
+     Fires when #leadStage select changes.
+     POSTs to /agent/lead/update_stage/{id}/ then reloads.
+     Logic preserved exactly — do not modify.
+  ─────────────────────────────────────────────────────────────────── */
+  window.updateAgentLeadStage = function (newStage) {
+    var leadData = document.getElementById('agent_lead_data');
+    if (!leadData) return;
 
-    window.shareLeadInfo = function() {
-        alert('Share lead info feature - Coming soon!');
-    };
+    var leadId    = leadData.getAttribute('data-lead-id');
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    var url       = '/agent/lead/update_stage/' + leadId + '/';
 
-})();
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'new_stage=' + encodeURIComponent(newStage)
+    })
+    .then(function (res) { if (res.ok) window.location.reload(); })
+    .catch(function (err) { console.error('Error:', err); });
+  };
 
-// Delete Modal Functions
+  /* ── Priority ───────────────────────────────────────────────────── */
+  window.setAgentPriority = function (priority) {
+    document.querySelectorAll('.priority-chip').forEach(function (btn) {
+      btn.classList.remove('active');
+    });
+    event.target.closest('.priority-chip').classList.add('active');
+  };
+
+  /* ── Stubs ──────────────────────────────────────────────────────── */
+  window.scheduleAgentFollowUp = function () { alert('Coming soon!'); };
+  window.shareLeadInfo         = function () { alert('Share lead info — coming soon!'); };
+
+}());
+
+/* ── Delete Modal ─────────────────────────────────────────────────── */
 function showDeleteModal(deleteUrl) {
-    const modal = document.getElementById('deleteModal');
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-
-    if (modal && confirmBtn) {
-        confirmBtn.href = deleteUrl;
-        modal.classList.add('active');
-    }
+  var modal = document.getElementById('deleteModal');
+  var btn   = document.getElementById('confirmDeleteBtn');
+  if (modal && btn) { btn.href = deleteUrl; modal.classList.add('active'); }
 }
 
-function closeDeleteModal(){
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+function closeDeleteModal() {
+  var modal = document.getElementById('deleteModal');
+  if (modal) modal.classList.remove('active');
 }
 
-document.addEventListener('click', function(e){
-    const modal = document.getElementById('deleteModal');
-    if (e.target === modal) {
-        closeDeleteModal();
-    }
+document.addEventListener('click', function (e) {
+  var modal = document.getElementById('deleteModal');
+  if (e.target === modal) closeDeleteModal();
 });
 
-document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') {
-        closeDeleteModal();
-    }
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeDeleteModal();
 });
 </script>
 {% endblock %}

@@ -6,14 +6,18 @@
 {% endblock %}
 
 {% block content %}
-<a href="{%url 'agent:dashboard'%}" class="back-btn">
-    <i class="bi bi-arrow-left-circle-fill"></i> 
-    <span>Back</span>
+
+{# ── Back Button ─────────────────────────────────────────────────── #}
+<a href="{% url 'agent:dashboard' %}" class="back-btn">
+  <i class="bi bi-arrow-left-circle-fill"></i>
+  <span>Back</span>
 </a>
 
-<!-- Hero Header with Gradient -->
+
+{# ── Hero Header ─────────────────────────────────────────────────── #}
 <div class="hero-header">
   <div class="container">
+
     <div class="hero-content">
       <div class="hero-badge">
         <i class="bi bi-lightning-charge-fill"></i>
@@ -25,14 +29,13 @@
       </h1>
       <p class="hero-subtitle">Track and manage your assigned opportunities</p>
     </div>
-    
-    <!-- Animated Stats Cards -->
+
+    {# Stats #}
     <div class="stats-cards">
+
       <div class="stat-card stat-primary">
         <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="bi bi-collection-fill"></i>
-          </div>
+          <div class="stat-icon"><i class="bi bi-collection-fill"></i></div>
           <div class="stat-pulse"></div>
         </div>
         <div class="stat-details">
@@ -40,28 +43,22 @@
           <div class="stat-label">Total Leads</div>
         </div>
       </div>
-      
+
       <div class="stat-card stat-new">
         <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="bi bi-star-fill"></i>
-          </div>
+          <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
           <div class="stat-pulse"></div>
         </div>
         <div class="stat-details">
           <div class="stat-number">{{ new_leads|default:"0" }}</div>
           <div class="stat-label">New Today</div>
-          <div class="stat-trend">
-            <i class="bi bi-arrow-up"></i> Active
-          </div>
+          <div class="stat-trend"><i class="bi bi-arrow-up"></i> Active</div>
         </div>
       </div>
-      
+
       <div class="stat-card stat-active">
         <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="bi bi-rocket-takeoff-fill"></i>
-          </div>
+          <div class="stat-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
           <div class="stat-pulse"></div>
         </div>
         <div class="stat-details">
@@ -69,42 +66,37 @@
           <div class="stat-label">In Progress</div>
         </div>
       </div>
-      
+
       <div class="stat-card stat-success">
         <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="bi bi-trophy-fill"></i>
-          </div>
+          <div class="stat-icon"><i class="bi bi-trophy-fill"></i></div>
           <div class="stat-pulse"></div>
         </div>
         <div class="stat-details">
           <div class="stat-number">{{ closed_count|default:"0" }}</div>
           <div class="stat-label">Closed Deals</div>
-          <div class="stat-trend success">
-            <i class="bi bi-graph-up"></i> Success
-          </div>
+          <div class="stat-trend success"><i class="bi bi-graph-up"></i> Success</div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- Enhanced Search & Filter -->
+
+{# ── Search & Filter ─────────────────────────────────────────────── #}
 <div class="search-filter-container">
   <div class="container">
     <div class="search-filter-card">
-      <!-- Search with Icon -->
+
       <div class="search-wrapper">
-        <div class="search-icon">
-          <i class="bi bi-search"></i>
-        </div>
-        <input type="text" id="searchLeads" placeholder="Search by name, email, or phone..." class="search-input">
-        <div class="search-clear" id="clearSearch" style="display: none;">
+        <div class="search-icon"><i class="bi bi-search"></i></div>
+        <input type="text" id="searchLeads" class="search-input" placeholder="Search by name, email, or phone...">
+        <div class="search-clear" id="clearSearch">
           <i class="bi bi-x-circle-fill"></i>
         </div>
       </div>
 
-      <!-- Stylish Filters -->
       <div class="filters-wrapper">
         <div class="filter-item">
           <label class="filter-label">
@@ -136,51 +128,47 @@
           <i class="bi bi-arrow-clockwise"></i> Reset
         </button>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- Premium Leads Grid -->
+
+{# ── Leads Grid ──────────────────────────────────────────────────── #}
 <div class="leads-section">
   <div class="container">
-    
+
     {% if leads %}
+
     <div class="leads-grid">
       {% for lead in leads %}
-      <div class="lead-card-premium" 
+      <div class="lead-card-premium"
            data-status="{{ lead.status }}"
            data-date="{{ lead.date_created|date:'Y-m-d' }}">
-        
-        <!-- Gradient Border Top -->
+
         <div class="card-gradient-top"></div>
-        
-        <!-- Status Indicator Badge -->
+
         <div class="status-indicator status-{{ lead.status|lower|cut:' ' }}">
           <div class="status-pulse"></div>
           <span>{{ lead.status }}</span>
         </div>
 
-        <!-- Card Header -->
         <div class="premium-card-header">
           <div class="lead-avatar-modern">
-            <div class="avatar-inner">
-              {{ lead.name.0|upper }}
-            </div>
+            <div class="avatar-inner">{{ lead.name.0|upper }}</div>
             <div class="avatar-ring"></div>
           </div>
           <div class="lead-identity">
             <h3 class="lead-name-modern">{{ lead.name }}</h3>
-            <div class="lead-meta">
-              <span class="lead-date-badge">
-                <i class="bi bi-clock-fill"></i>
-                {{ lead.date_created|date:"M d" }}
-              </span>
-            </div>
+            <span class="lead-date-badge">
+              <i class="bi bi-clock-fill"></i>
+              {{ lead.date_created|date:"M d" }}
+            </span>
           </div>
         </div>
 
-        <!-- Card Body with Icons -->
         <div class="premium-card-body">
+
           <div class="info-block">
             <div class="info-icon property-icon">
               <i class="bi bi-building"></i>
@@ -193,51 +181,48 @@
 
           <div class="contact-section">
             <div class="contact-item">
-              <div class="contact-icon phone-icon">
-                <i class="bi bi-telephone-fill"></i>
-              </div>
+              <div class="contact-icon phone-icon"><i class="bi bi-telephone-fill"></i></div>
               <div class="contact-details">
                 <span class="contact-label">Phone</span>
                 <a href="tel:{{ lead.phone_no }}" class="contact-value">{{ lead.phone_no }}</a>
               </div>
             </div>
-
             <div class="contact-item">
-              <div class="contact-icon email-icon">
-                <i class="bi bi-envelope-fill"></i>
-              </div>
+              <div class="contact-icon email-icon"><i class="bi bi-envelope-fill"></i></div>
               <div class="contact-details">
                 <span class="contact-label">Email</span>
-                <a href="mailto:{{ lead.email }}" class="contact-value">{{ lead.email|truncatechars:22 }}</a>
+                <a href="mailto:{{ lead.email }}" class="contact-value">{{ lead.email|truncatechars:24 }}</a>
               </div>
             </div>
           </div>
+
         </div>
 
-        <!-- Enhanced Card Footer -->
         <div class="premium-card-footer">
           <div class="footer-info">
             <i class="bi bi-calendar2-check"></i>
-            <span>{{ lead.date_created|date:"F d, Y" }}</span>
+            <span>{{ lead.date_created|date:"M d, Y" }}</span>
           </div>
-          <a href="{%url 'agent:lead-detail' lead_id=lead.lead_id%}" class="view-details-btn">
-            <span>View Details</span>
+          <a href="{% url 'agent:lead-detail' lead_id=lead.lead_id %}" class="view-details-btn">
+            <span>View</span>
             <i class="bi bi-arrow-right-circle-fill"></i>
           </a>
         </div>
+
       </div>
       {% endfor %}
     </div>
 
-    <!-- Enhanced Pagination -->
+    {# Pagination #}
     {% if leads.paginator.num_pages > 1 %}
     <div class="pagination-container">
       <div class="pagination-card">
         <nav class="pagination-nav">
           <ul class="pagination-modern">
+
             {% if leads.has_previous %}
               <li>
-                <a href="?page=1" class="page-btn first-page" title="First Page">
+                <a href="?page=1" class="page-btn first-page" title="First">
                   <i class="bi bi-chevron-double-left"></i>
                 </a>
               </li>
@@ -251,7 +236,7 @@
 
             {% for i in nums %}
               <li>
-                <a href="?page={{ forloop.counter }}" 
+                <a href="?page={{ forloop.counter }}"
                    class="page-btn page-number {% if leads.number == forloop.counter %}active{% endif %}">
                   {{ forloop.counter }}
                 </a>
@@ -266,21 +251,20 @@
                 </a>
               </li>
               <li>
-                <a href="?page={{ leads.paginator.num_pages }}" class="page-btn last-page" title="Last Page">
+                <a href="?page={{ leads.paginator.num_pages }}" class="page-btn last-page" title="Last">
                   <i class="bi bi-chevron-double-right"></i>
                 </a>
               </li>
             {% endif %}
+
           </ul>
         </nav>
-        
         <div class="pagination-details">
           <div class="page-indicator">
             Page <strong>{{ leads.number }}</strong> of <strong>{{ leads.paginator.num_pages }}</strong>
           </div>
           <div class="results-indicator">
-            <i class="bi bi-grid-3x3-gap-fill"></i>
-            Showing leads
+            <i class="bi bi-grid-3x3-gap-fill"></i> Showing leads
           </div>
         </div>
       </div>
@@ -288,12 +272,11 @@
     {% endif %}
 
     {% else %}
-    <!-- Beautiful Empty State -->
+
+    {# Empty state #}
     <div class="empty-state-modern">
       <div class="empty-illustration">
-        <div class="empty-icon-circle">
-          <i class="bi bi-inbox"></i>
-        </div>
+        <div class="empty-icon-circle"><i class="bi bi-inbox"></i></div>
         <div class="empty-particles">
           <span class="particle"></span>
           <span class="particle"></span>
@@ -312,6 +295,7 @@
         </button>
       </div>
     </div>
+
     {% endif %}
 
   </div>
@@ -321,108 +305,88 @@
 
 {% block extra_js %}
 <script>
-(function() {
-    'use strict';
+(function () {
+  'use strict';
 
-    const searchInput = document.getElementById('searchLeads');
-    const statusFilter = document.getElementById('statusFilter');
-    const dateFilter = document.getElementById('dateFilter');
-    const clearSearch = document.getElementById('clearSearch');
-    const resetFilters = document.getElementById('resetFilters');
+  var searchInput  = document.getElementById('searchLeads');
+  var statusFilter = document.getElementById('statusFilter');
+  var dateFilter   = document.getElementById('dateFilter');
+  var clearSearch  = document.getElementById('clearSearch');
+  var resetFilters = document.getElementById('resetFilters');
 
-    // Show/hide clear button
-    if (searchInput && clearSearch) {
-        searchInput.addEventListener('input', function() {
-            clearSearch.style.display = this.value ? 'flex' : 'none';
-            filterLeads();
-        });
-        
-        clearSearch.addEventListener('click', function() {
-            searchInput.value = '';
-            this.style.display = 'none';
-            filterLeads();
-        });
-    }
-
-    // Filter listeners
-    if (statusFilter) statusFilter.addEventListener('change', filterLeads);
-    if (dateFilter) dateFilter.addEventListener('change', filterLeads);
-
-    // Reset filters
-    if (resetFilters) {
-        resetFilters.addEventListener('click', function() {
-            if (searchInput) searchInput.value = '';
-            if (statusFilter) statusFilter.value = 'all';
-            if (dateFilter) dateFilter.value = 'all';
-            if (clearSearch) clearSearch.style.display = 'none';
-            filterLeads();
-        });
-    }
-
-    function filterLeads() {
-        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-        const selectedStatus = statusFilter ? statusFilter.value : 'all';
-        const selectedDate = dateFilter ? dateFilter.value : 'all';
-
-        const cards = document.querySelectorAll('.lead-card-premium');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        let visibleCount = 0;
-
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            const cardStatus = card.dataset.status;
-            const cardDate = new Date(card.dataset.date);
-            cardDate.setHours(0, 0, 0, 0);
-
-            const matchesSearch = text.includes(searchTerm);
-            const matchesStatus = selectedStatus === 'all' || cardStatus === selectedStatus;
-
-            let matchesDate = true;
-            if (selectedDate === 'today') {
-                matchesDate = cardDate.getTime() === today.getTime();
-            } else if (selectedDate === 'week') {
-                const weekAgo = new Date(today);
-                weekAgo.setDate(today.getDate() - 7);
-                matchesDate = cardDate >= weekAgo && cardDate <= today;
-            } else if (selectedDate === 'month') {
-                const monthAgo = new Date(today);
-                monthAgo.setMonth(today.getMonth() - 1);
-                matchesDate = cardDate >= monthAgo && cardDate <= today;
-            }
-
-            if (matchesSearch && matchesStatus && matchesDate) {
-                card.style.display = '';
-                visibleCount++;
-                // Animate in
-                setTimeout(() => card.style.opacity = '1', 10);
-            } else {
-                card.style.opacity = '0';
-                setTimeout(() => card.style.display = 'none', 300);
-            }
-        });
-
-        // Show empty state if no results
-        const emptyState = document.querySelector('.empty-state-modern');
-        if (emptyState && visibleCount === 0 && cards.length > 0) {
-            // Could show "no results" message
-        }
-    }
-
-    // Refresh button in empty state
-    const refreshBtn = document.querySelector('.refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            location.reload();
-        });
-    }
-
-    // Add entrance animation to cards
-    const cards = document.querySelectorAll('.lead-card-premium');
-    cards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
+  /* Search clear button visibility */
+  if (searchInput && clearSearch) {
+    searchInput.addEventListener('input', function () {
+      clearSearch.style.display = this.value ? 'flex' : 'none';
+      filterLeads();
     });
-})();
+    clearSearch.addEventListener('click', function () {
+      searchInput.value = '';
+      this.style.display = 'none';
+      filterLeads();
+    });
+  }
+
+  if (statusFilter) statusFilter.addEventListener('change', filterLeads);
+  if (dateFilter)   dateFilter.addEventListener('change',   filterLeads);
+
+  if (resetFilters) {
+    resetFilters.addEventListener('click', function () {
+      if (searchInput)  searchInput.value  = '';
+      if (statusFilter) statusFilter.value = 'all';
+      if (dateFilter)   dateFilter.value   = 'all';
+      if (clearSearch)  clearSearch.style.display = 'none';
+      filterLeads();
+    });
+  }
+
+  function filterLeads() {
+    var term     = searchInput  ? searchInput.value.toLowerCase()  : '';
+    var status   = statusFilter ? statusFilter.value               : 'all';
+    var period   = dateFilter   ? dateFilter.value                 : 'all';
+    var today    = new Date(); today.setHours(0,0,0,0);
+    var cards    = document.querySelectorAll('.lead-card-premium');
+
+    cards.forEach(function (card) {
+      var text       = card.textContent.toLowerCase();
+      var cardStatus = card.dataset.status;
+      var cardDate   = new Date(card.dataset.date); cardDate.setHours(0,0,0,0);
+
+      var okSearch = text.includes(term);
+      var okStatus = status === 'all' || cardStatus === status;
+
+      var okDate = true;
+      if (period === 'today') {
+        okDate = cardDate.getTime() === today.getTime();
+      } else if (period === 'week') {
+        var w = new Date(today); w.setDate(today.getDate() - 7);
+        okDate = cardDate >= w && cardDate <= today;
+      } else if (period === 'month') {
+        var m = new Date(today); m.setMonth(today.getMonth() - 1);
+        okDate = cardDate >= m && cardDate <= today;
+      }
+
+      if (okSearch && okStatus && okDate) {
+        card.style.display = '';
+        setTimeout(function () { card.style.opacity = '1'; }, 10);
+      } else {
+        card.style.opacity = '0';
+        setTimeout(function () { card.style.display = 'none'; }, 260);
+      }
+    });
+  }
+
+  /* Refresh button */
+  var refreshBtn = document.querySelector('.refresh-btn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function () { location.reload(); });
+  }
+
+  /* Staggered entrance animation */
+  document.querySelectorAll('.lead-card-premium').forEach(function (card, i) {
+    card.style.animationDelay = (i * 0.07) + 's';
+  });
+
+}());
 </script>
 {% endblock %}

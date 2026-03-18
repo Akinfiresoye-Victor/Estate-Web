@@ -1,5 +1,4 @@
 {% extends 'company/base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
@@ -7,489 +6,453 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hidden CSRF Token for JavaScript -->
+
 {% csrf_token %}
 
 <a href="{% url 'company:dashboard' %}" class="attractive-back-button">
-    &larr; Go back
+  <i class="bi bi-arrow-left"></i> Go back
 </a>
 
-<!-- Page Header -->
+{# ── Page Header ─────────────────────────────────────────────────── #}
 <div class="settings-header">
   <div class="container-fluid">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <h1 class="page-title">
-          <i class="bi bi-gear me-3"></i>Settings
-        </h1>
-        <p class="page-subtitle">Manage your company profile and platform preferences</p>
-      </div>
-    </div>
+    <h1 class="page-title"><i class="bi bi-gear"></i> Settings</h1>
+    <p class="page-subtitle">Manage your company profile and platform preferences</p>
   </div>
 </div>
 
-<!-- Main Content -->
-<div class="container-fluid mt-4">
-  <div class="row g-4">
-    
-    <!-- Sidebar Navigation -->
-    <div class="col-xl-3 col-lg-4">
-      <div class="settings-sidebar">
-        <ul class="settings-nav">
-          <li class="nav-item active" data-section="profile">
-            <i class="bi bi-person-circle"></i>
-            <span>Public Profile</span>
-            <i class="bi bi-chevron-right"></i>
-          </li>
-          <li class="nav-item" data-section="account">
-            <i class="bi bi-shield-lock"></i>
-            <span>Account Security</span>
-            <i class="bi bi-chevron-right"></i>
-          </li>
-          <li class="nav-item" data-section="notifications">
-            <i class="bi bi-bell"></i>
-            <span>Notifications</span>
-            <i class="bi bi-chevron-right"></i>
-          </li>
-          <li class="nav-item" data-section="preferences">
-            <i class="bi bi-sliders"></i>
-            <span>Preferences</span>
-            <i class="bi bi-chevron-right"></i>
-          </li>
-          <li class="nav-item" data-section="billing">
-            <i class="bi bi-credit-card"></i>
-            <span>Billing & Plans</span>
-            <i class="bi bi-chevron-right"></i>
-          </li>
-          <li class="nav-item danger" data-section="danger">
-            <i class="bi bi-exclamation-triangle"></i>
-            <span>Danger Zone</span>
-            <i class="bi bi-chevron-right"></i>
-          </li>
-        </ul>
-      </div>
-    </div>
+{# ── Pill Nav — mobile only ───────────────────────────────────────── #}
+<div class="settings-pill-nav">
+  <div class="pill-nav-inner">
+    <button class="pill-nav-btn active" data-section="profile">
+      <i class="bi bi-person-circle"></i> Profile
+    </button>
+    <button class="pill-nav-btn" data-section="account">
+      <i class="bi bi-shield-lock"></i> Security
+    </button>
+    <button class="pill-nav-btn" data-section="notifications">
+      <i class="bi bi-bell"></i> Notifications
+    </button>
+    <button class="pill-nav-btn" data-section="preferences">
+      <i class="bi bi-sliders"></i> Preferences
+    </button>
+    <button class="pill-nav-btn" data-section="billing">
+      <i class="bi bi-credit-card"></i> Billing
+    </button>
+    <button class="pill-nav-btn danger-tab" data-section="danger">
+      <i class="bi bi-exclamation-triangle"></i> Danger
+    </button>
+  </div>
+</div>
 
-    <!-- Settings Content -->
-    <div class="col-xl-9 col-lg-8">
-      
-      <!-- Public Profile Section -->
-      <div class="settings-section active" id="profile">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-person-circle me-2"></i>Public Profile</h3>
-              <p>This information will be displayed publicly on your company profile</p>
-            </div>
-            <span class="readonly-badge">Read Only</span>
+{# ── Main Layout ──────────────────────────────────────────────────── #}
+<div class="container-fluid settings-layout">
+
+  {# ── Sidebar Nav — desktop only ───────────────────────────────── #}
+  <aside class="settings-sidebar">
+    <ul class="settings-nav">
+      <li class="nav-item active" data-section="profile">
+        <i class="bi bi-person-circle"></i>
+        <span>Public Profile</span>
+        <i class="bi bi-chevron-right"></i>
+      </li>
+      <li class="nav-item" data-section="account">
+        <i class="bi bi-shield-lock"></i>
+        <span>Account Security</span>
+        <i class="bi bi-chevron-right"></i>
+      </li>
+      <li class="nav-item" data-section="notifications">
+        <i class="bi bi-bell"></i>
+        <span>Notifications</span>
+        <i class="bi bi-chevron-right"></i>
+      </li>
+      <li class="nav-item" data-section="preferences">
+        <i class="bi bi-sliders"></i>
+        <span>Preferences</span>
+        <i class="bi bi-chevron-right"></i>
+      </li>
+      <li class="nav-item" data-section="billing">
+        <i class="bi bi-credit-card"></i>
+        <span>Billing & Plans</span>
+        <i class="bi bi-chevron-right"></i>
+      </li>
+      <li class="nav-item danger" data-section="danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span>Danger Zone</span>
+        <i class="bi bi-chevron-right"></i>
+      </li>
+    </ul>
+  </aside>
+
+  {# ── Content ─────────────────────────────────────────────────────── #}
+  <div class="settings-main">
+
+    {# ── Public Profile ───────────────────────────────────────────── #}
+    <div class="settings-section active" id="profile">
+      <div class="settings-card">
+        <div class="card-header-settings">
+          <div>
+            <h3><i class="bi bi-person-circle"></i>Public Profile</h3>
+            <p>Displayed publicly on your company profile</p>
           </div>
-          <div class="card-body-settings">
-            
-            <!-- Company Logo -->
-            <div class="form-group">
-              <label>Company Logo</label>
-              <div class="logo-upload-section">
-                <div class="current-logo">
-                  {% if company.company_logo %}
-                    <img src="{{ company.company_logo.url }}" alt="Company Logo" id="logoPreview">
-                  {% else %}
-                    <img src="{% static 'estate/images/default-company.png' %}" alt="Company Logo" id="logoPreview">
-                  {% endif %}
-                </div>
-                <div class="logo-upload-controls">
-                  <p class="upload-hint">
-                    <i class="bi bi-info-circle me-1"></i>Logo managed through company profile settings
-                  </p>
-                </div>
+          <span class="readonly-badge">Read Only</span>
+        </div>
+        <div class="card-body-settings">
+
+          {# Logo #}
+          <div class="form-group">
+            <label>Company Logo</label>
+            <div class="logo-upload-section">
+              <div class="current-logo">
+                {% if company.company_logo %}
+                  <img src="{{ company.company_logo.url }}" alt="Company Logo" id="logoPreview">
+                {% else %}
+                  <img src="{% static 'estate/images/default-company.png' %}" alt="Company Logo" id="logoPreview">
+                {% endif %}
+              </div>
+              <div>
+                <p class="upload-hint"><i class="bi bi-info-circle me-1"></i>Logo managed through company profile settings</p>
               </div>
             </div>
+          </div>
 
-            <!-- Company Name -->
-            <div class="form-group">
-              <label for="companyName">Company Name</label>
-              <input type="text" class="form-control" id="companyName" value="{{ company.company_name }}" readonly>
-            </div>
+          <div class="form-group">
+            <label for="companyName">Company Name</label>
+            <input type="text" class="form-control" id="companyName" value="{{ company.company_name }}" readonly>
+          </div>
 
-            <!-- Company Bio -->
-            <div class="form-group">
-              <label for="companyBio">Company Bio</label>
-              <textarea class="form-control" id="companyBio" rows="4" readonly>{{ company.company_bio }}</textarea>
-            </div>
+          <div class="form-group">
+            <label for="companyBio">Company Bio</label>
+            <textarea class="form-control" id="companyBio" rows="4" readonly>{{ company.company_bio }}</textarea>
+          </div>
 
-            <!-- Contact Information -->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="phoneNumber">Phone Number</label>
-                  <input type="tel" class="form-control" id="phoneNumber" value="{{ company.phone_number }}" readonly>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="emailAddress">Email Address</label>
-                  <input type="email" class="form-control" id="emailAddress" value="{{ company.email }}" readonly>
-                </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" class="form-control" id="phoneNumber" value="{{ company.phone_number }}" readonly>
               </div>
             </div>
-
-            <!-- Address -->
-            <div class="form-group">
-              <label for="address">Office Address</label>
-              <input type="text" class="form-control" id="address" value="{{ company.address }}" readonly>
-            </div>
-
-            <!-- Service Areas & Principal Broker -->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="serviceAreas">Service Areas</label>
-                  <input type="text" class="form-control" id="serviceAreas" value="{{ company.service_areas }}" readonly>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="principalBroker">Principal Broker</label>
-                  <input type="text" class="form-control" id="principalBroker" value="{{ company.principal_broker }}" readonly>
-                </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="emailAddress">Email Address</label>
+                <input type="email" class="form-control" id="emailAddress" value="{{ company.email }}" readonly>
               </div>
             </div>
+          </div>
 
-            <!-- Year Established & Verification Status -->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="yearEstablished">Year Established</label>
-                  <input type="text" class="form-control" id="yearEstablished" value="{{ company.year_established }}" readonly>
-                </div>
+          <div class="form-group">
+            <label for="address">Office Address</label>
+            <input type="text" class="form-control" id="address" value="{{ company.address }}" readonly>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="serviceAreas">Service Areas</label>
+                <input type="text" class="form-control" id="serviceAreas" value="{{ company.service_areas }}" readonly>
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label>Verification Status</label>
-                  <div class="verification-status">
-                    {% if company.verified %}
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="principalBroker">Principal Broker</label>
+                <input type="text" class="form-control" id="principalBroker" value="{{ company.principal_broker }}" readonly>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="yearEstablished">Year Established</label>
+                <input type="text" class="form-control" id="yearEstablished" value="{{ company.year_established }}" readonly>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Verification Status</label>
+                <div class="verification-status">
+                  {% if company.verified %}
                     <span class="status-badge verified">
                       <i class="bi bi-check-circle-fill"></i> Verified
                     </span>
-                    {% else %}
+                  {% else %}
                     <span class="status-badge pending">
-                      <i class="bi bi-clock-fill"></i> Pending Verification
+                      <i class="bi bi-clock-fill"></i> Pending
                     </span>
-                    {% endif %}
-                  </div>
+                  {% endif %}
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Social Links -->
-            <div class="form-group">
-              <label>Social Media Links</label>
-              {% if company.social.all %}
+          {# Social Links #}
+          <div class="form-group">
+            <label>Social Media Links</label>
+            {% if company.social.all %}
               <div class="social-links-inputs">
                 {% for social in company.social.all %}
-                <div class="social-input-group">
-                  <i class="bi bi-{% if social.social_platform == 'Facebook' %}facebook{% elif social.social_platform == 'Twitter' %}twitter{% elif social.social_platform == 'Instagram' %}instagram{% elif social.social_platform == 'LinkedIn' %}linkedin{% elif social.social_platform == 'Company Website' %}globe{% else %}link-45deg{% endif %}"></i>
-                  <input type="url" class="form-control" placeholder="{{ social.social_platform }}" value="{{ social.link_to_social }}" readonly>
-                </div>
+                  <div class="social-input-group">
+                    <i class="bi bi-{% if social.social_platform == 'Facebook' %}facebook{% elif social.social_platform == 'Twitter' %}twitter{% elif social.social_platform == 'Instagram' %}instagram{% elif social.social_platform == 'LinkedIn' %}linkedin{% elif social.social_platform == 'Company Website' %}globe{% else %}link-45deg{% endif %}"></i>
+                    <input type="url" class="form-control" placeholder="{{ social.social_platform }}" value="{{ social.link_to_social }}" readonly>
+                  </div>
                 {% endfor %}
               </div>
-              {% else %}
-              <p class="social-empty-state">
-                <i class="bi bi-info-circle me-1"></i>No social links added yet
-              </p>
-              {% endif %}
-            </div>
-
-            <!-- Info Box -->
-            <div class="info-box">
-              <i class="bi bi-info-circle"></i>
-              <span>To update your company information, use the "Update Profile" button below</span>
-            </div>
-
-            <div class="form-actions">
-              <a href="{% url 'company:dashboard' %}" class="btn-cancel">
-                <i class="bi bi-arrow-left-circle me-2"></i>Back to Dashboard
-              </a>
-              <a href="{% url 'company:edit-profile' company.unique_company_id %}" class="btn-save">
-                <i class="bi bi-pencil-square me-2"></i>Update Profile
-              </a>
-            </div>
-
+            {% else %}
+              <p class="social-empty-state"><i class="bi bi-info-circle me-1"></i>No social links added yet</p>
+            {% endif %}
           </div>
+
+          <div class="info-box">
+            <i class="bi bi-info-circle"></i>
+            <span>To update your company information, use the "Update Profile" button below</span>
+          </div>
+
+          <div class="form-actions">
+            <a href="{% url 'company:dashboard' %}" class="btn-cancel">
+              <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+            </a>
+            <a href="{% url 'company:edit-profile' company.unique_company_id %}" class="btn-save">
+              <i class="bi bi-pencil-square"></i> Update Profile
+            </a>
+          </div>
+
         </div>
       </div>
-
-      <!-- Account Security Section -->
-      <div class="settings-section" id="account">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-shield-lock me-2"></i>Account Security</h3>
-              <p>Manage your password and security settings</p>
-            </div>
-          </div>
-          <div class="card-body-settings">
-            
-            <!-- Email Verification -->
-            <div class="security-item verified">
-              <div class="security-icon">
-                <i class="bi bi-envelope-check"></i>
-              </div>
-              <div class="security-content">
-                <h4>Email Verification</h4>
-                <p>Your email address is verified</p>
-              </div>
-              <div class="security-status">
-                <span class="status-badge verified">
-                  <i class="bi bi-check-circle"></i> Verified
-                </span>
-              </div>
-            </div>
-
-            <!-- Two-Factor Authentication -->
-            <div class="security-item coming-soon-item">
-              <div class="security-icon">
-                <i class="bi bi-shield-check"></i>
-              </div>
-              <div class="security-content">
-                <h4>Two-Factor Authentication <span class="coming-soon-label">Coming Soon</span></h4>
-                <p>Add an extra layer of security to your account</p>
-              </div>
-              <div class="security-status">
-                <label class="toggle-switch disabled" title="Coming Soon">
-                  <input type="checkbox" disabled>
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Change Password Link -->
-            <div class="security-item">
-              <div class="security-icon">
-                <i class="bi bi-key-fill"></i>
-              </div>
-              <div class="security-content">
-                <h4>Change Password</h4>
-                <p>Update your account password</p>
-              </div>
-              <div class="security-status">
-                <a href="{% url 'customer:change-password' %}" class="btn-change-password">
-                  <i class="bi bi-arrow-right-circle-fill"></i>
-                  Change Password
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Notifications Section -->
-      <div class="settings-section" id="notifications">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-bell me-2"></i>Notification Preferences</h3>
-              <p>Manage your notification settings</p>
-            </div>
-          </div>
-          <div class="card-body-settings">
-            
-            <!-- Coming Soon Message -->
-            <div class="coming-soon-container">
-              <div class="coming-soon-icon">
-                <i class="bi bi-bell-fill"></i>
-                <div class="icon-pulse"></div>
-              </div>
-              <h3 class="coming-soon-title">Notification Preferences Coming Soon</h3>
-              <p class="coming-soon-text">
-                We're building advanced notification controls for you! In the meantime, all important 
-                updates and notifications will be sent directly to your registered email address.
-              </p>
-              <div class="notification-info-box">
-                <i class="bi bi-info-circle-fill"></i>
-                <div>
-                  <h4>Current Notification System</h4>
-                  <p>You'll receive email notifications for:</p>
-                  <ul>
-                    <li>Property inquiries from potential clients</li>
-                    <li>Important account updates and changes</li>
-                    <li>System announcements and new features</li>
-                    <li>Weekly performance summaries</li>
-                  </ul>
-                </div>
-              </div>
-              <div class="coming-soon-features">
-                <div class="feature-badge">
-                  <i class="bi bi-envelope-fill"></i>
-                  <span>Email Controls</span>
-                </div>
-                <div class="feature-badge">
-                  <i class="bi bi-phone-vibrate"></i>
-                  <span>Push Notifications</span>
-                </div>
-                <div class="feature-badge">
-                  <i class="bi bi-app-indicator"></i>
-                  <span>In-App Alerts</span>
-                </div>
-              </div>
-              <button class="notify-btn" type="button">
-                <i class="bi bi-bell"></i>
-                Notify Me When Available
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Preferences Section -->
-      <div class="settings-section" id="preferences">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-sliders me-2"></i>Platform Preferences</h3>
-              <p>Customize your experience on Estate Web</p>
-            </div>
-          </div>
-          <div class="card-body-settings">
-            
-            <!-- Coming Soon Message -->
-            <div class="coming-soon-container">
-              <div class="coming-soon-icon">
-                <i class="bi bi-gear-fill"></i>
-                <div class="icon-pulse"></div>
-              </div>
-              <h3 class="coming-soon-title">Preferences Coming Soon</h3>
-              <p class="coming-soon-text">
-                We're working on bringing you advanced customization options including dark mode, 
-                language preferences, and display settings. Stay tuned!
-              </p>
-              <div class="coming-soon-features">
-                <div class="feature-badge">
-                  <i class="bi bi-moon-stars"></i>
-                  <span>Dark Mode</span>
-                </div>
-                <div class="feature-badge">
-                  <i class="bi bi-translate"></i>
-                  <span>Multi-Language</span>
-                </div>
-                <div class="feature-badge">
-                  <i class="bi bi-sliders"></i>
-                  <span>Custom Settings</span>
-                </div>
-              </div>
-              <button class="notify-btn" type="button">
-                <i class="bi bi-bell"></i>
-                Notify Me When Available
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Billing Section -->
-      <div class="settings-section" id="billing">
-        <div class="settings-card">
-          <div class="card-header-settings">
-            <div>
-              <h3><i class="bi bi-credit-card me-2"></i>Billing & Subscription</h3>
-              <p>Manage your subscription and payment methods</p>
-            </div>
-          </div>
-          <div class="card-body-settings">
-            
-            <!-- Current Plan -->
-            <div class="current-plan">
-              <div class="plan-info">
-                <h4>Professional Plan</h4>
-                <p>Unlimited listings • Team collaboration • Priority support</p>
-                <div class="plan-price">
-                  <span class="price">₦25,000</span>
-                  <span class="period">/month</span>
-                </div>
-              </div>
-              <button class="btn-upgrade" type="button">
-                <i class="bi bi-arrow-up-circle me-2"></i>Upgrade Plan
-              </button>
-            </div>
-
-            <!-- Billing History -->
-            <div class="form-section">
-              <h4 class="section-title">Billing History</h4>
-              <div class="billing-history">
-                <div class="billing-item">
-                  <div class="billing-info">
-                    <h5>Professional Plan</h5>
-                    <p>Invoice #INV-2024-001</p>
-                  </div>
-                  <div class="billing-details">
-                    <span class="billing-date">Jan 15, 2024</span>
-                    <span class="billing-amount">₦25,000</span>
-                    <span class="billing-status paid">Paid</span>
-                  </div>
-                </div>
-                <div class="billing-item">
-                  <div class="billing-info">
-                    <h5>Professional Plan</h5>
-                    <p>Invoice #INV-2023-012</p>
-                  </div>
-                  <div class="billing-details">
-                    <span class="billing-date">Dec 15, 2023</span>
-                    <span class="billing-amount">₦25,000</span>
-                    <span class="billing-status paid">Paid</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Danger Zone Section -->
-      <div class="settings-section" id="danger">
-        <div class="settings-card danger-card">
-          <div class="card-header-settings danger">
-            <div>
-              <h3><i class="bi bi-exclamation-triangle me-2"></i>Danger Zone</h3>
-              <p>Irreversible actions that affect your account</p>
-            </div>
-          </div>
-          <div class="card-body-settings">
-            
-            <div class="danger-item">
-              <div class="danger-info">
-                <h4>Deactivate Account</h4>
-                <p>Temporarily disable your account. You can reactivate anytime.</p>
-              </div>
-              <button class="btn-danger-action" type="button">
-                <i class="bi bi-pause-circle me-2"></i>Deactivate
-              </button>
-            </div>
-
-            <div class="danger-item">
-              <div class="danger-info">
-                <h4>Delete Account</h4>
-                <p>Permanently delete your account and all associated data. This cannot be undone.</p>
-              </div>
-              <button class="btn-danger-action critical" type="button" id="deleteAccountBtn">
-                <i class="bi bi-trash me-2"></i>Delete Account
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
     </div>
 
-  </div>
-</div>
+    {# ── Account Security ─────────────────────────────────────────── #}
+    <div class="settings-section" id="account">
+      <div class="settings-card">
+        <div class="card-header-settings">
+          <div>
+            <h3><i class="bi bi-shield-lock"></i>Account Security</h3>
+            <p>Manage your password and security settings</p>
+          </div>
+        </div>
+        <div class="card-body-settings">
 
-<!-- Delete Account Modal -->
+          <div class="security-item verified">
+            <div class="security-icon"><i class="bi bi-envelope-check"></i></div>
+            <div class="security-content">
+              <h4>Email Verification</h4>
+              <p>Your email address is verified</p>
+            </div>
+            <div class="security-status">
+              <span class="status-badge verified"><i class="bi bi-check-circle"></i> Verified</span>
+            </div>
+          </div>
+
+          <div class="security-item coming-soon-item">
+            <div class="security-icon"><i class="bi bi-shield-check"></i></div>
+            <div class="security-content">
+              <h4>Two-Factor Authentication <span class="coming-soon-label">Coming Soon</span></h4>
+              <p>Add an extra layer of security to your account</p>
+            </div>
+            <div class="security-status">
+              <label class="toggle-switch disabled" title="Coming Soon">
+                <input type="checkbox" disabled>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="security-item">
+            <div class="security-icon"><i class="bi bi-key-fill"></i></div>
+            <div class="security-content">
+              <h4>Change Password</h4>
+              <p>Update your account password</p>
+            </div>
+            <div class="security-status">
+              <a href="{% url 'customer:change-password' %}" class="btn-change-password">
+                <i class="bi bi-arrow-right-circle-fill"></i> Change Password
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {# ── Notifications ────────────────────────────────────────────── #}
+    <div class="settings-section" id="notifications">
+      <div class="settings-card">
+        <div class="card-header-settings">
+          <div>
+            <h3><i class="bi bi-bell"></i>Notification Preferences</h3>
+            <p>Manage your notification settings</p>
+          </div>
+        </div>
+        <div class="card-body-settings">
+          <div class="coming-soon-container">
+            <div class="coming-soon-icon">
+              <i class="bi bi-bell-fill"></i>
+              <div class="icon-pulse"></div>
+            </div>
+            <h3 class="coming-soon-title">Notification Preferences Coming Soon</h3>
+            <p class="coming-soon-text">
+              We're building advanced notification controls. In the meantime, all important
+              updates are sent to your registered email address.
+            </p>
+            <div class="notification-info-box">
+              <i class="bi bi-info-circle-fill"></i>
+              <div>
+                <h4>Current Notification System</h4>
+                <p>You'll receive email notifications for:</p>
+                <ul>
+                  <li>Property inquiries from potential clients</li>
+                  <li>Important account updates and changes</li>
+                  <li>System announcements and new features</li>
+                  <li>Weekly performance summaries</li>
+                </ul>
+              </div>
+            </div>
+            <div class="coming-soon-features">
+              <div class="feature-badge"><i class="bi bi-envelope-fill"></i><span>Email Controls</span></div>
+              <div class="feature-badge"><i class="bi bi-phone-vibrate"></i><span>Push Notifications</span></div>
+              <div class="feature-badge"><i class="bi bi-app-indicator"></i><span>In-App Alerts</span></div>
+            </div>
+            <button class="notify-btn" type="button">
+              <i class="bi bi-bell"></i> Notify Me When Available
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Preferences ──────────────────────────────────────────────── #}
+    <div class="settings-section" id="preferences">
+      <div class="settings-card">
+        <div class="card-header-settings">
+          <div>
+            <h3><i class="bi bi-sliders"></i>Platform Preferences</h3>
+            <p>Customize your experience on Estate Web</p>
+          </div>
+        </div>
+        <div class="card-body-settings">
+          <div class="coming-soon-container">
+            <div class="coming-soon-icon">
+              <i class="bi bi-gear-fill"></i>
+              <div class="icon-pulse"></div>
+            </div>
+            <h3 class="coming-soon-title">Preferences Coming Soon</h3>
+            <p class="coming-soon-text">
+              Advanced customization options including dark mode, language preferences,
+              and display settings are on the way!
+            </p>
+            <div class="coming-soon-features">
+              <div class="feature-badge"><i class="bi bi-moon-stars"></i><span>Dark Mode</span></div>
+              <div class="feature-badge"><i class="bi bi-translate"></i><span>Multi-Language</span></div>
+              <div class="feature-badge"><i class="bi bi-sliders"></i><span>Custom Settings</span></div>
+            </div>
+            <button class="notify-btn" type="button">
+              <i class="bi bi-bell"></i> Notify Me When Available
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Billing ──────────────────────────────────────────────────── #}
+    <div class="settings-section" id="billing">
+      <div class="settings-card">
+        <div class="card-header-settings">
+          <div>
+            <h3><i class="bi bi-credit-card"></i>Billing & Subscription</h3>
+            <p>Manage your subscription and payment methods</p>
+          </div>
+        </div>
+        <div class="card-body-settings">
+
+          <div class="current-plan">
+            <div class="plan-info">
+              <h4>Professional Plan</h4>
+              <p>Unlimited listings · Team collaboration · Priority support</p>
+              <div class="plan-price">
+                <span class="price">₦25,000</span>
+                <span class="period">/month</span>
+              </div>
+            </div>
+            <button class="btn-upgrade" type="button">
+              <i class="bi bi-arrow-up-circle"></i> Upgrade Plan
+            </button>
+          </div>
+
+          <div class="form-section">
+            <h4 class="section-title">Billing History</h4>
+            <div class="billing-history">
+              <div class="billing-item">
+                <div class="billing-info">
+                  <h5>Professional Plan</h5>
+                  <p>Invoice #INV-2024-001</p>
+                </div>
+                <div class="billing-details">
+                  <span class="billing-date">Jan 15, 2024</span>
+                  <span class="billing-amount">₦25,000</span>
+                  <span class="billing-status paid">Paid</span>
+                </div>
+              </div>
+              <div class="billing-item">
+                <div class="billing-info">
+                  <h5>Professional Plan</h5>
+                  <p>Invoice #INV-2023-012</p>
+                </div>
+                <div class="billing-details">
+                  <span class="billing-date">Dec 15, 2023</span>
+                  <span class="billing-amount">₦25,000</span>
+                  <span class="billing-status paid">Paid</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {# ── Danger Zone ──────────────────────────────────────────────── #}
+    <div class="settings-section" id="danger">
+      <div class="settings-card danger-card">
+        <div class="card-header-settings danger">
+          <div>
+            <h3><i class="bi bi-exclamation-triangle"></i>Danger Zone</h3>
+            <p>Irreversible actions that affect your account</p>
+          </div>
+        </div>
+        <div class="card-body-settings">
+
+          <div class="danger-item">
+            <div class="danger-info">
+              <h4>Deactivate Account</h4>
+              <p>Temporarily disable your account. You can reactivate anytime.</p>
+            </div>
+            <button class="btn-danger-action" type="button">
+              <i class="bi bi-pause-circle"></i> Deactivate
+            </button>
+          </div>
+
+          <div class="danger-item">
+            <div class="danger-info">
+              <h4>Delete Account</h4>
+              <p>Permanently delete your account and all associated data. This cannot be undone.</p>
+            </div>
+            <button class="btn-danger-action critical" type="button" id="deleteAccountBtn">
+              <i class="bi bi-trash"></i> Delete Account
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>{# end settings-main #}
+</div>{# end settings-layout #}
+
+
+{# ── Delete Account Modal ─────────────────────────────────────────── #}
 <div class="delete-modal-overlay" id="deleteModal">
   <div class="delete-modal">
+
     <div class="delete-modal-header">
       <div class="delete-modal-icon">
         <i class="bi bi-exclamation-triangle-fill"></i>
@@ -499,27 +462,27 @@
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
-    
+
     <div class="delete-modal-body">
       <div class="delete-warning-box">
         <i class="bi bi-shield-exclamation"></i>
         <p><strong>Warning:</strong> This action is irreversible and will permanently delete:</p>
       </div>
-      
+
       <ul class="delete-consequences">
         <li><i class="bi bi-x-circle"></i> All company data and settings</li>
         <li><i class="bi bi-x-circle"></i> All property listings</li>
         <li><i class="bi bi-x-circle"></i> All client information</li>
         <li><i class="bi bi-x-circle"></i> All transaction history</li>
       </ul>
-      
+
       <div class="delete-confirmation-section">
         <p class="delete-instruction">
-          To confirm deletion, type <strong>DELETE</strong> in the box below:
+          To confirm, type <strong>DELETE</strong> below:
         </p>
-        <input 
-          type="text" 
-          class="delete-confirmation-input" 
+        <input
+          type="text"
+          class="delete-confirmation-input"
           id="deleteConfirmInput"
           placeholder="Type DELETE here"
           autocomplete="off"
@@ -530,28 +493,54 @@
         </p>
       </div>
     </div>
-    
+
     <div class="delete-modal-footer">
       <button class="btn-modal-cancel" id="cancelDeleteBtn">
-        <i class="bi bi-arrow-left-circle me-2"></i>Cancel
+        <i class="bi bi-arrow-left-circle"></i> Cancel
       </button>
-      <button 
-        class="btn-modal-delete" 
-        id="confirmDeleteBtn" 
+      <button
+        class="btn-modal-delete"
+        id="confirmDeleteBtn"
         data-company-uuid="{{ company.unique_company_id }}"
         disabled
       >
-        <i class="bi bi-trash me-2"></i>Delete Company Forever
+        <i class="bi bi-trash"></i> Delete Company Forever
       </button>
     </div>
+
   </div>
 </div>
 
-<!-- Include Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'company/js/company_settings.js' %}"></script>
+
+{# Sync pill nav with sidebar nav active state #}
+<script>
+(function () {
+  // Both pill buttons and sidebar items share data-section
+  // The existing company_settings.js handles .active on .nav-item
+  // This syncs the pill nav to match.
+  const allNavBtns = document.querySelectorAll('.pill-nav-btn, .nav-item');
+
+  allNavBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const section = this.dataset.section;
+
+      // Sync pill buttons
+      document.querySelectorAll('.pill-nav-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.section === section);
+      });
+
+      // Sync sidebar items
+      document.querySelectorAll('.nav-item').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.section === section);
+      });
+    });
+  });
+}());
+</script>
 {% endblock %}
