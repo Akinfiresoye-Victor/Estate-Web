@@ -1,0 +1,667 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'core/css/partnership.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ─────────────────────────────────────── -->
+<div class="pt-hero">
+  <div class="pt-hero-inner">
+    <span class="pt-hero-pill"><i class="bi bi-handshake-fill"></i> Partnerships</span>
+    <h1>Partnership Terms</h1>
+    <p>Effective Date: <strong>February 15, 2026</strong> &nbsp;·&nbsp; Governed by Nigerian Law</p>
+    <div class="pt-hero-badges">
+      <span><i class="bi bi-shield-check-fill"></i> NDPR Compliant</span>
+      <span><i class="bi bi-patch-check-fill"></i> Legally Binding</span>
+      <span><i class="bi bi-geo-alt-fill"></i> Lagos, Nigeria</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── QUICK INTRO BANNER ── -->
+<div class="pt-intro-banner">
+  <div class="pt-intro-banner-inner">
+    <i class="bi bi-exclamation-circle-fill"></i>
+    <p>
+      These terms govern all partnerships with Estate Web — including agents, agencies, service providers, and advertisers.
+      By accessing our platform as a partner, you agree to be bound by these terms.
+      <strong>Please read them carefully.</strong>
+    </p>
+  </div>
+</div>
+
+
+<!-- ── TIER COMPARISON TABLE ── -->
+<div class="pt-tier-section">
+  <div class="pt-tier-header">
+    <span class="pt-label"><i class="bi bi-grid-3x3-gap-fill"></i> Partnership Tiers</span>
+    <h2>What's included in each plan</h2>
+    <p>Choose the tier that fits your business. Both are governed by these partnership terms.</p>
+  </div>
+
+  <div class="pt-tier-scroll">
+    <table class="pt-tier-table">
+      <thead>
+        <tr>
+          <th class="pt-feature-col">Feature</th>
+          <th>
+            <div class="pt-tier-badge basic">Basic Partner</div>
+          </th>
+          <th>
+            <div class="pt-tier-badge premium">Premium Partner</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Listing Limit</td><td>Up to 10</td><td class="pt-highlight">Unlimited</td></tr>
+        <tr><td>Lead Routing</td><td>Email Only</td><td class="pt-highlight">Email, WhatsApp &amp; CRM Sync</td></tr>
+        <tr><td>Branding</td><td>Portal Branding</td><td class="pt-highlight">Firm Logo &amp; Agent Profiles</td></tr>
+        <tr><td>Analytics</td><td>Monthly PDF Report</td><td class="pt-highlight">Real-time Dashboard</td></tr>
+        <tr><td>Featured Placement</td><td><i class="bi bi-x-lg pt-no"></i></td><td class="pt-highlight"><i class="bi bi-check-lg pt-yes"></i></td></tr>
+        <tr><td>API / CRM Integration</td><td><i class="bi bi-x-lg pt-no"></i></td><td class="pt-highlight"><i class="bi bi-check-lg pt-yes"></i></td></tr>
+        <tr><td>Dedicated Support</td><td><i class="bi bi-x-lg pt-no"></i></td><td class="pt-highlight"><i class="bi bi-check-lg pt-yes"></i></td></tr>
+        <tr><td>Lead Response SLA</td><td>Best effort</td><td class="pt-highlight">4-hour response required</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="pt-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="pt-sidebar" id="ptSidebar">
+    <p class="pt-sidebar-label"><i class="bi bi-list-ul"></i> Contents</p>
+    <nav>
+      <a href="#pt-parties"       class="pt-nav-link">1. Parties Involved</a>
+      <a href="#pt-purpose"       class="pt-nav-link">2. Purpose of Partnership</a>
+      <a href="#pt-scope"         class="pt-nav-link">3. Scope of Services</a>
+      <a href="#pt-partner-resp"  class="pt-nav-link">4. Partner Responsibilities</a>
+      <a href="#pt-ew-resp"       class="pt-nav-link">5. Estate Web Responsibilities</a>
+      <a href="#pt-payment"       class="pt-nav-link">6. Payment Terms</a>
+      <a href="#pt-data"          class="pt-nav-link">7. Data Integrity &amp; Content</a>
+      <a href="#pt-ip"            class="pt-nav-link">8. Intellectual Property</a>
+      <a href="#pt-privacy"       class="pt-nav-link">9. Data Protection &amp; Privacy</a>
+      <a href="#pt-confidential"  class="pt-nav-link">10. Confidentiality</a>
+      <a href="#pt-fraud"         class="pt-nav-link fraud-link">11. Fraud &amp; Misconduct</a>
+      <a href="#pt-liability"     class="pt-nav-link">12. Limitation of Liability</a>
+      <a href="#pt-indemnity"     class="pt-nav-link">13. Indemnification</a>
+      <a href="#pt-sla"           class="pt-nav-link">14. Service Level Agreement</a>
+      <a href="#pt-suspension"    class="pt-nav-link">15. Suspension Rights</a>
+      <a href="#pt-noncircum"     class="pt-nav-link">16. Non-Circumvention</a>
+      <a href="#pt-compliance"    class="pt-nav-link">17. Legal Compliance</a>
+      <a href="#pt-ads"           class="pt-nav-link">18. Advertising &amp; Promotion</a>
+      <a href="#pt-term"          class="pt-nav-link">19. Term &amp; Termination</a>
+      <a href="#pt-disputes"      class="pt-nav-link">20. Dispute Resolution</a>
+      <a href="#pt-changes"       class="pt-nav-link">21. Changes to Terms</a>
+      <a href="#pt-misc"          class="pt-nav-link">22. Miscellaneous</a>
+      <a href="#pt-contact"       class="pt-nav-link">23. Contact</a>
+    </nav>
+  </aside>
+
+
+  <!-- CONTENT -->
+  <main class="pt-content">
+
+    <!-- 1. Parties -->
+    <section class="pt-section" id="pt-parties">
+      <h3 class="pt-section-title"><span class="pt-num">1</span> Parties Involved</h3>
+      <p class="pt-text">This agreement is entered into between:</p>
+      <div class="pt-party-grid">
+        <div class="pt-party-card ew">
+          <div class="pt-party-icon"><i class="bi bi-building-fill"></i></div>
+          <div>
+            <h4>Estate Web</h4>
+            <p>A Nigerian real estate listing and property management platform ("the Platform", "we", "us", or "our").</p>
+            <span class="pt-contact-line"><i class="bi bi-envelope"></i> legal@estateweb.com</span>
+          </div>
+        </div>
+        <div class="pt-party-card partner">
+          <div class="pt-party-icon"><i class="bi bi-person-badge-fill"></i></div>
+          <div>
+            <h4>The Partner</h4>
+            <p>Any agent, agency, service provider, or advertiser who has registered and been approved to use Estate Web's platform under these terms ("you", "Partner").</p>
+            <span class="pt-contact-line"><i class="bi bi-info-circle"></i> As registered in your account</span>
+          </div>
+        </div>
+      </div>
+      <div class="pt-callout info">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>Both parties must provide accurate legal names, addresses, and contact information at the time of registration. No ambiguity is permitted in the identity of either party.</p>
+      </div>
+    </section>
+
+
+    <!-- 2. Purpose -->
+    <section class="pt-section" id="pt-purpose">
+      <h3 class="pt-section-title"><span class="pt-num">2</span> Purpose of Partnership</h3>
+      <p class="pt-text">This partnership allows the Partner to list, promote, and manage properties on Estate Web's platform for the purpose of connecting with buyers, renters, and property seekers across Nigeria.</p>
+      <p class="pt-text">The Partner acknowledges that Estate Web is a <strong>listing and technology platform only</strong> — not a real estate broker, agent, or legal adviser — and that the Partner is solely responsible for the accuracy, legality, and conduct of their listings and transactions.</p>
+    </section>
+
+
+    <!-- 3. Scope -->
+    <section class="pt-section" id="pt-scope">
+      <h3 class="pt-section-title"><span class="pt-num">3</span> Scope of Services</h3>
+      <p class="pt-text">The following services are available to Partners depending on their tier. Nothing beyond what is defined here is implied or granted.</p>
+
+      <div class="pt-scope-grid">
+        <div class="pt-scope-item">
+          <div class="pt-scope-icon"><i class="bi bi-house-door-fill"></i></div>
+          <div>
+            <h4>Property Listings</h4>
+            <p>Post and manage property listings (for sale, lease, or rent) within your tier limits. Standard vs. Featured/Sponsored placement available on Premium.</p>
+          </div>
+        </div>
+        <div class="pt-scope-item">
+          <div class="pt-scope-icon"><i class="bi bi-people-fill"></i></div>
+          <div>
+            <h4>Lead Generation</h4>
+            <p>Receive property enquiries via email, WhatsApp, or direct call. Premium Partners may receive CRM-synced leads via our API.</p>
+          </div>
+        </div>
+        <div class="pt-scope-item">
+          <div class="pt-scope-icon"><i class="bi bi-building"></i></div>
+          <div>
+            <h4>Company Profile &amp; Branding</h4>
+            <p>Premium Partners receive a branded Company Profile page including agent bios, office locations, and logo display.</p>
+          </div>
+        </div>
+        <div class="pt-scope-item">
+          <div class="pt-scope-icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <div>
+            <h4>Analytics &amp; Reporting</h4>
+            <p>Access to dashboard data covering listing views, clicks, and lead conversion rates. Basic Partners receive monthly PDF summaries; Premium receive real-time dashboards.</p>
+          </div>
+        </div>
+        <div class="pt-scope-item">
+          <div class="pt-scope-icon"><i class="bi bi-plug-fill"></i></div>
+          <div>
+            <h4>CRM &amp; API Integration</h4>
+            <p>Premium Partners may access our API to push leads directly into their internal CRM software. Subject to separate API terms.</p>
+          </div>
+        </div>
+        <div class="pt-scope-item">
+          <div class="pt-scope-icon"><i class="bi bi-megaphone-fill"></i></div>
+          <div>
+            <h4>Advertising &amp; Promotion</h4>
+            <p>Estate Web may feature Partner listings in marketing campaigns, social media, and promotional content. See Section 18 for full details.</p>
+          </div>
+        </div>
+      </div>
+      <div class="pt-callout warn">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <p>If a service is not listed in this section or your tier plan, the Partner does not have permission to use it. Unauthorised use constitutes a material breach of this agreement.</p>
+      </div>
+    </section>
+
+
+    <!-- 4. Partner Responsibilities -->
+    <section class="pt-section" id="pt-partner-resp">
+      <h3 class="pt-section-title"><span class="pt-num">4</span> Partner Responsibilities</h3>
+      <p class="pt-text">By entering this partnership, the Partner <strong>must</strong>:</p>
+      <ul class="pt-list must">
+        <li><i class="bi bi-check-circle-fill"></i> Provide accurate, complete, and up-to-date property information at all times</li>
+        <li><i class="bi bi-check-circle-fill"></i> Only list properties they own or are legally authorised to represent</li>
+        <li><i class="bi bi-check-circle-fill"></i> Update or remove listings within <strong>24–48 hours</strong> of any status change (sold, leased, price change)</li>
+        <li><i class="bi bi-check-circle-fill"></i> Respond to buyer/tenant enquiries professionally and within the timeframe required by their tier</li>
+        <li><i class="bi bi-check-circle-fill"></i> Comply with all applicable Nigerian laws including the Land Use Act, NDPR 2019, NDPA 2023, and Consumer Protection laws</li>
+        <li><i class="bi bi-check-circle-fill"></i> Maintain a valid means of identification and business registration documents on file with Estate Web</li>
+        <li><i class="bi bi-check-circle-fill"></i> Ensure all listing images, descriptions, and pricing are genuine and not copied without authorisation</li>
+        <li><i class="bi bi-check-circle-fill"></i> Cooperate with Estate Web in any investigation into suspected fraud or misconduct</li>
+      </ul>
+
+      <div class="pt-callout danger">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <p><strong>The Partner is solely responsible for their listings, content, and all transactions with users.</strong> Estate Web is not a party to any property transaction and assumes no liability for Partner conduct.</p>
+      </div>
+    </section>
+
+
+    <!-- 5. Estate Web Responsibilities -->
+    <section class="pt-section" id="pt-ew-resp">
+      <h3 class="pt-section-title"><span class="pt-num">5</span> Estate Web Responsibilities</h3>
+      <p class="pt-text">Estate Web agrees to:</p>
+      <ul class="pt-list">
+        <li><i class="bi bi-check-circle-fill"></i> Provide platform access in accordance with the Partner's selected tier</li>
+        <li><i class="bi bi-check-circle-fill"></i> Maintain reasonable uptime (target 99.9% — see Section 14 for SLA details)</li>
+        <li><i class="bi bi-check-circle-fill"></i> Offer support as per the Partner's plan</li>
+        <li><i class="bi bi-check-circle-fill"></i> Notify Partners of material changes to these terms with reasonable notice</li>
+        <li><i class="bi bi-check-circle-fill"></i> Protect Partner and user data in accordance with our Privacy Policy and NDPR obligations</li>
+      </ul>
+
+      <div class="pt-callout warn">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <p>Estate Web does <strong>not</strong> guarantee sales, leads, listing visibility, or the success of any property transaction. Platform performance depends on many factors outside our direct control.</p>
+      </div>
+    </section>
+
+
+    <!-- 6. Payment -->
+    <section class="pt-section" id="pt-payment">
+      <h3 class="pt-section-title"><span class="pt-num">6</span> Payment Terms</h3>
+
+      <h4 class="pt-sub">6.1 Subscription Fees</h4>
+      <p class="pt-text">Partnership access is subject to subscription fees as published on the Estate Web pricing page at the time of registration. Fees are charged on a monthly or annual billing cycle as selected by the Partner.</p>
+
+      <h4 class="pt-sub">6.2 Billing &amp; Payment</h4>
+      <p class="pt-text">Payments are processed through authorised third-party payment providers (Paystack, Flutterwave). The Partner authorises Estate Web to charge the applicable fee at the start of each billing cycle.</p>
+
+      <h4 class="pt-sub">6.3 Refund Policy</h4>
+      <p class="pt-text">All subscription fees are <strong>non-refundable</strong> unless otherwise stated in writing. Partial-period refunds will not be issued upon early termination.</p>
+
+      <h4 class="pt-sub">6.4 Non-Payment &amp; Suspension</h4>
+      <p class="pt-text">Failure to pay within <strong>7 days</strong> of the due date will result in automatic account suspension. Access will be restored upon full payment of outstanding amounts. Continued non-payment beyond 30 days may result in permanent termination and removal of all listings.</p>
+
+      <h4 class="pt-sub">6.5 Future Revenue Models</h4>
+      <p class="pt-text">Estate Web reserves the right to introduce Pay-Per-Lead (PPL) or commission-based pricing structures in the future. Partners will be notified with a minimum of 30 days' written notice before any such model takes effect.</p>
+
+      <div class="pt-highlight-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>Late payments may attract a fee of up to <strong>5% of the outstanding balance per month</strong> at Estate Web's discretion. All amounts are in Nigerian Naira (₦) unless otherwise stated.</p>
+      </div>
+    </section>
+
+
+    <!-- 7. Data Integrity -->
+    <section class="pt-section" id="pt-data">
+      <h3 class="pt-section-title"><span class="pt-num">7</span> Data Integrity &amp; Content Ownership</h3>
+
+      <h4 class="pt-sub">7.1 Licence to Display</h4>
+      <p class="pt-text">The Partner grants Estate Web a non-exclusive, royalty-free, worldwide licence to use, display, reproduce, and distribute their property photos, videos, descriptions, and other listing content for the purpose of operating and promoting the platform.</p>
+
+      <h4 class="pt-sub">7.2 Data Accuracy</h4>
+      <p class="pt-text">The Partner warrants that all listing information — including price, property status, features, and availability — is accurate at the time of posting and will be updated within <strong>24–48 hours</strong> of any change. Failure to maintain accurate listings may result in suspension.</p>
+
+      <h4 class="pt-sub">7.3 No Data Scraping or Resale</h4>
+      <p class="pt-text">The Partner is strictly prohibited from scraping, harvesting, or extracting any data from the Estate Web platform, including user data, lead data, or listing data, for use outside the platform. Estate Web data may not be sold, licensed, or transferred to any third party without express written permission.</p>
+
+      <h4 class="pt-sub">7.4 Compiled Data Ownership</h4>
+      <p class="pt-text">The Partner owns their original listing content (photos, descriptions). Estate Web owns the compiled dataset, platform algorithms, user interface, search infrastructure, and any derived analytics.</p>
+
+      <h4 class="pt-sub">7.5 Stale Listings</h4>
+      <p class="pt-text">"Stale" listings — properties that have been sold, rented, or are no longer available — must be removed immediately and in any event within 48 hours of the status change. Repeated stale listings may result in account suspension without refund.</p>
+    </section>
+
+
+    <!-- 8. IP -->
+    <section class="pt-section" id="pt-ip">
+      <h3 class="pt-section-title"><span class="pt-num">8</span> Intellectual Property</h3>
+      <p class="pt-text">All platform content, design, logos, trademarks, software, and technology are owned by Estate Web or licensed to us. The Partner may not:</p>
+      <ul class="pt-list prohibited">
+        <li><i class="bi bi-x-circle-fill"></i> Copy, reverse engineer, or replicate any part of the Estate Web platform</li>
+        <li><i class="bi bi-x-circle-fill"></i> Use the Estate Web name, logo, or branding without prior written approval</li>
+        <li><i class="bi bi-x-circle-fill"></i> Create derivative works based on Estate Web's proprietary tools or systems</li>
+        <li><i class="bi bi-x-circle-fill"></i> Represent themselves as affiliated with or endorsed by Estate Web beyond the scope of this agreement</li>
+      </ul>
+      <p class="pt-text">For clarity: Partners may state they are "listed on Estate Web" but may not imply a deeper commercial or endorsement relationship without written permission.</p>
+    </section>
+
+
+    <!-- 9. Privacy -->
+    <section class="pt-section" id="pt-privacy">
+      <h3 class="pt-section-title"><span class="pt-num">9</span> Data Protection &amp; Privacy</h3>
+      <p class="pt-text">This section is governed by and should be read alongside Estate Web's full Privacy Policy. Both parties agree to comply with the <strong>Nigeria Data Protection Regulation (NDPR) 2019</strong> and the <strong>Nigeria Data Protection Act (NDPA) 2023</strong>.</p>
+      <p class="pt-text">The Partner agrees to:</p>
+      <ul class="pt-list">
+        <li><i class="bi bi-check-circle-fill"></i> Handle all user data — including buyer/renter enquiries and contact details — with strict confidentiality</li>
+        <li><i class="bi bi-check-circle-fill"></i> Use lead data only for the purpose of responding to the specific enquiry received</li>
+        <li><i class="bi bi-check-circle-fill"></i> Not sell, share, or transfer user data to any third party without the user's express consent</li>
+        <li><i class="bi bi-check-circle-fill"></i> Not use Estate Web-sourced leads for any marketing purpose unrelated to the original enquiry</li>
+        <li><i class="bi bi-check-circle-fill"></i> Report any suspected data breach involving Estate Web user data within 24 hours</li>
+      </ul>
+      <div class="pt-callout danger">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <p>Misuse of user data — including unsolicited marketing, data resale, or scraping — will result in immediate termination and may be reported to the Nigeria Data Protection Bureau (NDPB).</p>
+      </div>
+    </section>
+
+
+    <!-- 10. Confidentiality -->
+    <section class="pt-section" id="pt-confidential">
+      <h3 class="pt-section-title"><span class="pt-num">10</span> Confidentiality</h3>
+      <p class="pt-text">The Partner agrees to keep strictly confidential all non-public information received from or about Estate Web, including but not limited to:</p>
+      <ul class="pt-list">
+        <li><i class="bi bi-check-circle-fill"></i> Business strategies and roadmap</li>
+        <li><i class="bi bi-check-circle-fill"></i> Pricing structures and discount arrangements</li>
+        <li><i class="bi bi-check-circle-fill"></i> Internal tools, algorithms, and technical infrastructure</li>
+        <li><i class="bi bi-check-circle-fill"></i> User data, lead volumes, and conversion metrics</li>
+        <li><i class="bi bi-check-circle-fill"></i> Any information marked as confidential or that a reasonable person would understand to be confidential</li>
+      </ul>
+      <p class="pt-text">This obligation survives the termination of the partnership for a period of <strong>3 years</strong>.</p>
+    </section>
+
+
+    <!-- 11. Fraud -->
+    <section class="pt-section" id="pt-fraud">
+      <div class="pt-fraud-warning">
+        <div class="pt-fraud-header">
+          <i class="bi bi-shield-x-fill"></i>
+          <h3>11. Fraud &amp; Misconduct — Zero Tolerance</h3>
+        </div>
+        <p class="pt-text" style="color:#7f1d1d;">Estate Web operates a zero-tolerance policy on fraud, deception, and misconduct. The following actions will result in <strong>immediate account termination without notice or refund</strong>:</p>
+        <ul class="pt-list prohibited">
+          <li><i class="bi bi-x-circle-fill"></i> Posting fake, fabricated, or fraudulent property listings</li>
+          <li><i class="bi bi-x-circle-fill"></i> Misrepresenting ownership or authorisation to list a property</li>
+          <li><i class="bi bi-x-circle-fill"></i> "Bait and switch" tactics — advertising properties at false prices to capture leads</li>
+          <li><i class="bi bi-x-circle-fill"></i> Collecting payments, deposits, or "inspection fees" outside the scope of a legitimate transaction</li>
+          <li><i class="bi bi-x-circle-fill"></i> Listing properties with disputed ownership, active litigation, or 'Omo Onile' conflicts without disclosure</li>
+          <li><i class="bi bi-x-circle-fill"></i> Harassing, threatening, or abusing users or Estate Web staff</li>
+          <li><i class="bi bi-x-circle-fill"></i> Creating multiple accounts to circumvent a suspension</li>
+          <li><i class="bi bi-x-circle-fill"></i> Using the platform to facilitate money laundering or other illegal activities</li>
+        </ul>
+        <div class="pt-fraud-note">
+          <i class="bi bi-info-circle-fill"></i>
+          Estate Web reserves the right to remove listings, suspend accounts, and permanently ban users <strong>without prior warning</strong> where fraud or misconduct is suspected. We may also report suspected fraud to the EFCC, Nigerian Police, or other relevant authorities.
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 12. Liability -->
+    <section class="pt-section" id="pt-liability">
+      <h3 class="pt-section-title"><span class="pt-num">12</span> Limitation of Liability</h3>
+      <div class="pt-callout danger">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <p>To the maximum extent permitted by Nigerian law, Estate Web shall not be liable for any loss or damage arising from the Partner's use of the platform.</p>
+      </div>
+      <p class="pt-text">Specifically, Estate Web is not liable for:</p>
+      <ul class="pt-list prohibited">
+        <li><i class="bi bi-x-circle-fill"></i> Failed, disputed, or fraudulent property transactions</li>
+        <li><i class="bi bi-x-circle-fill"></i> Financial losses resulting from incorrect listing data</li>
+        <li><i class="bi bi-x-circle-fill"></i> Disputes between Partners and users</li>
+        <li><i class="bi bi-x-circle-fill"></i> Loss of leads, visibility, or revenue due to platform downtime</li>
+        <li><i class="bi bi-x-circle-fill"></i> Data loss, security breaches, or system failures beyond our reasonable control</li>
+        <li><i class="bi bi-x-circle-fill"></i> Indirect, consequential, punitive, or special damages of any kind</li>
+      </ul>
+      <div class="pt-highlight-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>Our total liability for any claim under this agreement shall not exceed the total fees paid by the Partner in the <strong>3 months preceding the claim</strong>, or <strong>₦100,000</strong>, whichever is lower.</p>
+      </div>
+    </section>
+
+
+    <!-- 13. Indemnification -->
+    <section class="pt-section" id="pt-indemnity">
+      <h3 class="pt-section-title"><span class="pt-num">13</span> Indemnification</h3>
+      <p class="pt-text">The Partner agrees to indemnify, defend, and hold harmless Estate Web, its officers, directors, employees, and agents from and against any and all claims, damages, losses, costs, and legal fees arising from:</p>
+      <ul class="pt-list">
+        <li><i class="bi bi-check-circle-fill"></i> The Partner's violation of these terms</li>
+        <li><i class="bi bi-check-circle-fill"></i> Incorrect, misleading, or fraudulent listing information</li>
+        <li><i class="bi bi-check-circle-fill"></i> Any transaction between the Partner and a user of the platform</li>
+        <li><i class="bi bi-check-circle-fill"></i> The Partner's violation of any Nigerian law or regulation</li>
+        <li><i class="bi bi-check-circle-fill"></i> Any third-party intellectual property claim arising from the Partner's content</li>
+      </ul>
+    </section>
+
+
+    <!-- 14. SLA -->
+    <section class="pt-section" id="pt-sla">
+      <h3 class="pt-section-title"><span class="pt-num">14</span> Service Level Agreement (SLA)</h3>
+
+      <div class="pt-sla-grid">
+        <div class="pt-sla-item">
+          <div class="pt-sla-icon"><i class="bi bi-server"></i></div>
+          <div>
+            <h4>Platform Uptime</h4>
+            <p>Estate Web targets <strong>99.9% uptime</strong> monthly. Scheduled maintenance will be communicated at least 24 hours in advance where possible.</p>
+          </div>
+        </div>
+        <div class="pt-sla-item">
+          <div class="pt-sla-icon"><i class="bi bi-clock-history"></i></div>
+          <div>
+            <h4>Lead Response Time (Premium)</h4>
+            <p>Premium Partners are required to respond to all leads within <strong>4 business hours</strong>. Failure to maintain this standard may result in demotion from Preferred Partner status.</p>
+          </div>
+        </div>
+        <div class="pt-sla-item">
+          <div class="pt-sla-icon"><i class="bi bi-headset"></i></div>
+          <div>
+            <h4>Partner Support</h4>
+            <p>Support is available via email and the platform's help centre. Response times vary by tier. Estate Web does not guarantee same-day resolution for all requests.</p>
+          </div>
+        </div>
+        <div class="pt-sla-item">
+          <div class="pt-sla-icon"><i class="bi bi-trash3-fill"></i></div>
+          <div>
+            <h4>Listing Removal on Termination</h4>
+            <p>Upon termination of partnership, Estate Web will remove all of the Partner's listings within <strong>5 business days</strong> of the termination date.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 15. Suspension -->
+    <section class="pt-section" id="pt-suspension">
+      <h3 class="pt-section-title"><span class="pt-num">15</span> Suspension Rights</h3>
+      <p class="pt-text">Estate Web reserves the right to suspend a Partner's account <strong>immediately and without notice</strong> in any of the following circumstances:</p>
+      <ul class="pt-list prohibited">
+        <li><i class="bi bi-x-circle-fill"></i> Suspected or confirmed fraudulent activity</li>
+        <li><i class="bi bi-x-circle-fill"></i> Non-payment of subscription fees beyond the grace period</li>
+        <li><i class="bi bi-x-circle-fill"></i> Repeated posting of stale or inaccurate listings</li>
+        <li><i class="bi bi-x-circle-fill"></i> Complaints from multiple users regarding the same Partner</li>
+        <li><i class="bi bi-x-circle-fill"></i> Breach of any provision of these terms</li>
+        <li><i class="bi bi-x-circle-fill"></i> Any action that poses a risk to users, the platform, or third parties</li>
+      </ul>
+      <p class="pt-text">Suspended accounts may appeal the suspension by contacting <a href="mailto:legal@estateweb.com" class="pt-link">legal@estateweb.com</a>. Estate Web will review and respond within 5 business days.</p>
+    </section>
+
+
+    <!-- 16. Non-Circumvention -->
+    <section class="pt-section" id="pt-noncircum">
+      <h3 class="pt-section-title"><span class="pt-num">16</span> Non-Circumvention</h3>
+      <p class="pt-text">The Partner agrees <strong>not to circumvent</strong> the Estate Web platform to gain unfair advantage or to avoid platform fees. Specifically, the Partner must not:</p>
+      <ul class="pt-list prohibited">
+        <li><i class="bi bi-x-circle-fill"></i> Direct users sourced through Estate Web to complete transactions entirely off-platform to avoid fees</li>
+        <li><i class="bi bi-x-circle-fill"></i> Use Estate Web-sourced lead data to build competing property databases or platforms</li>
+        <li><i class="bi bi-x-circle-fill"></i> Solicit Estate Web users directly in ways that undermine the platform relationship</li>
+        <li><i class="bi bi-x-circle-fill"></i> Embed external platform links or referrals in listings without authorisation</li>
+      </ul>
+      <p class="pt-text">This obligation does not prevent the Partner from conducting normal business activities outside the platform with clients who were not sourced through Estate Web.</p>
+    </section>
+
+
+    <!-- 17. Legal Compliance -->
+    <section class="pt-section" id="pt-compliance">
+      <h3 class="pt-section-title"><span class="pt-num">17</span> Legal Compliance</h3>
+      <p class="pt-text">The Partner must comply with all applicable Nigerian laws and regulations including but not limited to:</p>
+      <div class="pt-chips">
+        <span class="pt-chip"><i class="bi bi-bank2"></i> Land Use Act (Cap L5, LFN 2004)</span>
+        <span class="pt-chip"><i class="bi bi-shield-fill"></i> NDPR 2019 &amp; NDPA 2023</span>
+        <span class="pt-chip"><i class="bi bi-person-fill"></i> Consumer Protection Law</span>
+        <span class="pt-chip"><i class="bi bi-cash-coin"></i> FIRS Tax Obligations</span>
+        <span class="pt-chip"><i class="bi bi-file-earmark-text-fill"></i> Anti-Money Laundering Act</span>
+        <span class="pt-chip"><i class="bi bi-house-gear-fill"></i> State Property Laws</span>
+      </div>
+      <p class="pt-text">The Partner is solely responsible for ensuring their listings comply with local zoning laws, building codes, and planning regulations. Estate Web does not verify legal compliance of listed properties.</p>
+      <div class="pt-callout warn">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <p>Partners listing properties in Lagos State must be aware of the <strong>Lagos State Real Estate Regulatory Authority (LASRERA)</strong> requirements. Estate Web may require evidence of LASRERA registration for Lagos-based agencies.</p>
+      </div>
+    </section>
+
+
+    <!-- 18. Ads & Promotion -->
+    <section class="pt-section" id="pt-ads">
+      <h3 class="pt-section-title"><span class="pt-num">18</span> Advertising &amp; Promotion Rights</h3>
+      <p class="pt-text">By entering this partnership, the Partner grants Estate Web the right to:</p>
+      <ul class="pt-list">
+        <li><i class="bi bi-check-circle-fill"></i> Feature their listings in marketing campaigns, social media posts, and email newsletters</li>
+        <li><i class="bi bi-check-circle-fill"></i> Use listing photos and descriptions in platform-wide promotional content</li>
+        <li><i class="bi bi-check-circle-fill"></i> Highlight the Partner as a listed partner on the Estate Web platform</li>
+        <li><i class="bi bi-check-circle-fill"></i> Use aggregated, anonymised partner data for market insights and research reports</li>
+      </ul>
+      <p class="pt-text">Estate Web will not use the Partner's logo, brand name, or personal information in external advertising without express prior written consent.</p>
+    </section>
+
+
+    <!-- 19. Term & Termination -->
+    <section class="pt-section" id="pt-term">
+      <h3 class="pt-section-title"><span class="pt-num">19</span> Term &amp; Termination</h3>
+
+      <h4 class="pt-sub">19.1 Commencement</h4>
+      <p class="pt-text">This agreement commences on the date the Partner's account is approved by Estate Web and continues for the duration of the active subscription.</p>
+
+      <h4 class="pt-sub">19.2 Termination by Partner</h4>
+      <p class="pt-text">The Partner may terminate this agreement at any time by providing <strong>30 days' written notice</strong> to <a href="mailto:legal@estateweb.com" class="pt-link">legal@estateweb.com</a>. No refund will be issued for the remaining subscription period.</p>
+
+      <h4 class="pt-sub">19.3 Termination by Estate Web</h4>
+      <p class="pt-text">Estate Web may terminate this agreement immediately, without notice, for:</p>
+      <ul class="pt-list prohibited">
+        <li><i class="bi bi-x-circle-fill"></i> Material breach of any provision of these terms</li>
+        <li><i class="bi bi-x-circle-fill"></i> Fraudulent, illegal, or unethical conduct</li>
+        <li><i class="bi bi-x-circle-fill"></i> Actions that damage the reputation or integrity of the platform</li>
+        <li><i class="bi bi-x-circle-fill"></i> Persistent non-payment</li>
+      </ul>
+      <p class="pt-text">For non-critical breaches, Estate Web may provide <strong>14 days' written notice</strong> to remedy the breach before termination.</p>
+
+      <h4 class="pt-sub">19.4 Effect of Termination</h4>
+      <p class="pt-text">Upon termination: all platform access ceases, all listings are removed within 5 business days, any outstanding fees remain due and payable, and confidentiality obligations continue for 3 years.</p>
+    </section>
+
+
+    <!-- 20. Disputes -->
+    <section class="pt-section" id="pt-disputes">
+      <h3 class="pt-section-title"><span class="pt-num">20</span> Dispute Resolution</h3>
+
+      <h4 class="pt-sub">20.1 Informal Resolution</h4>
+      <p class="pt-text">Before initiating formal proceedings, both parties agree to attempt good-faith resolution by contacting <a href="mailto:legal@estateweb.com" class="pt-link">legal@estateweb.com</a>. Estate Web will respond within 10 business days.</p>
+
+      <h4 class="pt-sub">20.2 Arbitration</h4>
+      <p class="pt-text">Any unresolved dispute shall be submitted to binding arbitration under the <strong>Arbitration and Conciliation Act of Nigeria</strong>. Arbitration shall be conducted in Lagos, Nigeria, in the English language.</p>
+
+      <h4 class="pt-sub">20.3 Governing Law</h4>
+      <p class="pt-text">These terms are governed by the laws of the <strong>Federal Republic of Nigeria</strong>. Any court proceedings not subject to arbitration shall be brought exclusively in the courts of Lagos State.</p>
+    </section>
+
+
+    <!-- 21. Changes -->
+    <section class="pt-section" id="pt-changes">
+      <h3 class="pt-section-title"><span class="pt-num">21</span> Changes to Terms</h3>
+      <p class="pt-text">Estate Web reserves the right to modify these Partnership Terms at any time. Material changes will be communicated via email or platform notification with a minimum of <strong>14 days' notice</strong>.</p>
+      <p class="pt-text">Continued use of the platform after the effective date of any changes constitutes acceptance of the updated terms. If the Partner disagrees with any change, they must terminate their account before the change takes effect.</p>
+    </section>
+
+
+    <!-- 22. Miscellaneous -->
+    <section class="pt-section" id="pt-misc">
+      <h3 class="pt-section-title"><span class="pt-num">22</span> Miscellaneous</h3>
+      <div class="pt-misc-grid">
+        <div class="pt-misc-item">
+          <h4>Entire Agreement</h4>
+          <p>These terms, together with the Privacy Policy and any tier-specific addenda, constitute the entire agreement. No verbal or WhatsApp agreements are binding.</p>
+        </div>
+        <div class="pt-misc-item">
+          <h4>Severability</h4>
+          <p>If any provision is found invalid or unenforceable, the remaining provisions continue in full force and effect.</p>
+        </div>
+        <div class="pt-misc-item">
+          <h4>Waiver</h4>
+          <p>Failure by Estate Web to enforce any right does not constitute a waiver of that right for future breaches.</p>
+        </div>
+        <div class="pt-misc-item">
+          <h4>Assignment</h4>
+          <p>The Partner may not assign or transfer this agreement without written consent. Estate Web may assign its rights without restriction.</p>
+        </div>
+        <div class="pt-misc-item">
+          <h4>Force Majeure</h4>
+          <p>Neither party is liable for delays or failures caused by events beyond their reasonable control including natural disasters, government actions, or infrastructure failures.</p>
+        </div>
+        <div class="pt-misc-item">
+          <h4>No Partnership or Agency</h4>
+          <p>Nothing in this agreement creates a joint venture, employment, or agency relationship between Estate Web and the Partner.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 23. Contact -->
+    <section class="pt-section" id="pt-contact">
+      <h3 class="pt-section-title"><span class="pt-num">23</span> Contact Information</h3>
+      <p class="pt-text">For questions, notices, or concerns regarding this agreement:</p>
+      <div class="pt-contact-grid">
+        <a href="mailto:legal@estateweb.com" class="pt-contact-card">
+          <div class="pt-contact-icon"><i class="bi bi-briefcase-fill"></i></div>
+          <div>
+            <span class="pt-contact-label">Legal &amp; Partnerships</span>
+            <span class="pt-contact-value">legal@estateweb.com</span>
+          </div>
+        </a>
+        <a href="mailto:support@estateweb.com" class="pt-contact-card">
+          <div class="pt-contact-icon"><i class="bi bi-headset"></i></div>
+          <div>
+            <span class="pt-contact-label">Partner Support</span>
+            <span class="pt-contact-value">support@estateweb.com</span>
+          </div>
+        </a>
+        <a href="mailto:privacy@estateweb.com" class="pt-contact-card">
+          <div class="pt-contact-icon"><i class="bi bi-lock-fill"></i></div>
+          <div>
+            <span class="pt-contact-label">Privacy &amp; Data</span>
+            <span class="pt-contact-value">privacy@estateweb.com</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+
+    <!-- Footer note -->
+    <div class="pt-footer-note">
+      <i class="bi bi-handshake-fill"></i>
+      <p>By registering as a partner on Estate Web, you acknowledge that you have read, understood, and agreed to be bound by these Partnership Terms.</p>
+      <span>© 2026 Estate Web. All Rights Reserved. &nbsp;·&nbsp; Lagos, Nigeria</span>
+    </div>
+
+  </main>
+</div>
+
+
+<!-- Back to top -->
+<button class="pt-back-top" id="ptBackTop"
+        onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        aria-label="Back to top">
+  <i class="bi bi-chevron-up"></i>
+</button>
+
+
+<script>
+(function () {
+  'use strict';
+
+  var navLinks = document.querySelectorAll('.pt-nav-link');
+  var sections = document.querySelectorAll('.pt-section[id]');
+
+  /* Active link on scroll */
+  function onScroll() {
+    var y = window.scrollY + 130;
+    var cur = '';
+    sections.forEach(function (s) { if (s.offsetTop <= y) cur = s.id; });
+    navLinks.forEach(function (l) {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
+    });
+    var btn = document.getElementById('ptBackTop');
+    if (btn) btn.classList.toggle('visible', window.scrollY > 400);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* Smooth scroll */
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var t = document.querySelector(link.getAttribute('href'));
+      if (t) {
+        e.preventDefault();
+        window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' });
+      }
+    });
+  });
+
+}());
+</script>
+
+{% endblock %}

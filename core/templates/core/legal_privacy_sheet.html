@@ -1,0 +1,699 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'core/css/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ─────────────────────────────────────── -->
+<div class="lg-hero">
+  <div class="lg-hero-inner">
+    <span class="lg-hero-pill"><i class="bi bi-shield-check-fill"></i> Legal</span>
+    <h1>Privacy &amp; Terms</h1>
+    <p>Effective Date: <strong>February 15, 2026</strong> &nbsp;·&nbsp; Governed by Nigerian Law</p>
+  </div>
+</div>
+
+
+<!-- ── TAB BAR (mobile) ──────────────────────────── -->
+<div class="lg-tab-bar" id="lgTabBar">
+  <button class="lg-tab active" onclick="switchTab('privacy', this)">
+    <i class="bi bi-lock-fill"></i> Privacy Policy
+  </button>
+  <button class="lg-tab" onclick="switchTab('terms', this)">
+    <i class="bi bi-file-text-fill"></i> Terms of Service
+  </button>
+</div>
+
+
+<!-- ── MAIN LAYOUT ───────────────────────────────── -->
+<div class="lg-layout">
+
+  <!-- ── SIDEBAR (desktop) ── -->
+  <aside class="lg-sidebar" id="lgSidebar">
+
+    <div class="lg-sidebar-section" id="sidePrivacy">
+      <p class="lg-sidebar-label"><i class="bi bi-lock-fill"></i> Privacy Policy</p>
+      <nav>
+        <a href="#tldr"            class="lg-nav-link">Quick Summary</a>
+        <a href="#p-collect"       class="lg-nav-link">1. Information We Collect</a>
+        <a href="#p-use"           class="lg-nav-link">2. How We Use Your Data</a>
+        <a href="#p-share"         class="lg-nav-link">3. Data Sharing</a>
+        <a href="#p-ndpr"          class="lg-nav-link">4. NDPR Compliance</a>
+        <a href="#p-rights"        class="lg-nav-link">5. Your Rights</a>
+        <a href="#p-retention"     class="lg-nav-link">6. Data Retention</a>
+        <a href="#p-security"      class="lg-nav-link">7. Security</a>
+        <a href="#p-cookies"       class="lg-nav-link">8. Cookies</a>
+      </nav>
+    </div>
+
+    <div class="lg-sidebar-section" id="sideTerms">
+      <p class="lg-sidebar-label"><i class="bi bi-file-text-fill"></i> Terms of Service</p>
+      <nav>
+        <a href="#t-fraud"         class="lg-nav-link fraud-link">⚠ Fraud Warning</a>
+        <a href="#t-accept"        class="lg-nav-link">1. Acceptance of Terms</a>
+        <a href="#t-accounts"      class="lg-nav-link">2. Accounts &amp; Registration</a>
+        <a href="#t-listings"      class="lg-nav-link">3. Property Listings</a>
+        <a href="#t-conduct"       class="lg-nav-link">4. User Conduct</a>
+        <a href="#t-payments"      class="lg-nav-link">5. Transactions &amp; Payments</a>
+        <a href="#t-liability"     class="lg-nav-link">6. Disclaimers &amp; Liability</a>
+        <a href="#t-indemnity"     class="lg-nav-link">7. Indemnification</a>
+        <a href="#t-ip"            class="lg-nav-link">8. Intellectual Property</a>
+        <a href="#t-disputes"      class="lg-nav-link">9. Dispute Resolution</a>
+        <a href="#t-governing"     class="lg-nav-link">10. Governing Law</a>
+        <a href="#t-changes"       class="lg-nav-link">11. Changes to Terms</a>
+        <a href="#t-termination"   class="lg-nav-link">12. Termination</a>
+        <a href="#t-misc"          class="lg-nav-link">13. Miscellaneous</a>
+        <a href="#t-contact"       class="lg-nav-link">14. Contact</a>
+      </nav>
+    </div>
+
+  </aside>
+
+
+  <!-- ── CONTENT ── -->
+  <main class="lg-content">
+
+    <!-- ════════════════════════════════════════
+         PRIVACY POLICY
+         ════════════════════════════════════════ -->
+    <div class="lg-part" id="partPrivacy">
+
+      <div class="lg-part-header">
+        <i class="bi bi-lock-fill"></i>
+        <div>
+          <h2>Privacy Policy</h2>
+          <p>How we collect, use, and protect your personal information</p>
+        </div>
+      </div>
+
+      <!-- Quick Summary -->
+      <section class="lg-section" id="tldr">
+        <div class="lg-tldr">
+          <div class="lg-tldr-header">
+            <i class="bi bi-lightning-charge-fill"></i>
+            <h3>Quick Summary — The Important Bits</h3>
+          </div>
+          <div class="lg-tldr-grid">
+            <div class="tldr-item good">
+              <i class="bi bi-check-circle-fill"></i>
+              <div>
+                <strong>We collect only what we need</strong>
+                <span>Name, email, phone, and property data to run the platform.</span>
+              </div>
+            </div>
+            <div class="tldr-item good">
+              <i class="bi bi-check-circle-fill"></i>
+              <div>
+                <strong>We don't sell your data</strong>
+                <span>Your personal information is never sold to third parties.</span>
+              </div>
+            </div>
+            <div class="tldr-item good">
+              <i class="bi bi-check-circle-fill"></i>
+              <div>
+                <strong>You control your data</strong>
+                <span>You can access, correct, or delete your data at any time.</span>
+              </div>
+            </div>
+            <div class="tldr-item warn">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div>
+                <strong>We are a listing platform only</strong>
+                <span>We do not verify property ownership or guarantee transactions.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Section 1: Information We Collect -->
+      <section class="lg-section" id="p-collect">
+        <h3 class="lg-section-title"><span class="lg-num">1</span> Information We Collect</h3>
+
+        <h4 class="lg-subsection-title">1.1 Personal Information</h4>
+        <p class="lg-text">When you register, list properties, or use our services, we may collect:</p>
+        <ul class="lg-list">
+          <li>Full name, email address, and phone number</li>
+          <li>Business information (for agents and agencies)</li>
+          <li>Government-issued ID for identity verification</li>
+          <li>Payment information (bank account details, BVN for verified agents)</li>
+          <li>Property ownership documents and CAC registration (for agencies)</li>
+        </ul>
+
+        <h4 class="lg-subsection-title">1.2 Property Information</h4>
+        <p class="lg-text">For property listings, we collect:</p>
+        <ul class="lg-list">
+          <li>Property addresses, descriptions, and images</li>
+          <li>Pricing information and terms of sale/lease</li>
+          <li>Property features, amenities, and specifications</li>
+          <li>Land documents and property verification records</li>
+        </ul>
+
+        <h4 class="lg-subsection-title">1.3 Usage Data</h4>
+        <p class="lg-text">We automatically collect:</p>
+        <ul class="lg-list">
+          <li>IP addresses, browser type, and device information</li>
+          <li>Pages viewed, search queries, and time spent on the Platform</li>
+          <li>Interaction data (properties viewed, saved, compared)</li>
+          <li>Cookies and similar tracking technologies</li>
+          <li>Approximate location data derived from IP address (city/state level only)</li>
+        </ul>
+      </section>
+
+
+      <!-- Section 2: How We Use -->
+      <section class="lg-section" id="p-use">
+        <h3 class="lg-section-title"><span class="lg-num">2</span> How We Use Your Information</h3>
+        <p class="lg-text">We use collected information to:</p>
+        <ul class="lg-list">
+          <li>Provide, maintain, and improve our Platform services</li>
+          <li>Facilitate property listings, searches, and transactions</li>
+          <li>Verify user identities and prevent fraud</li>
+          <li>Process payments and manage subscriptions</li>
+          <li>Send notifications about listings, messages, and account activity</li>
+          <li>Conduct market analysis and provide property price predictions</li>
+          <li>Personalise your experience and show relevant properties</li>
+          <li>Comply with legal obligations and enforce our Terms</li>
+          <li>Communicate with you about services, updates, and promotional offers</li>
+        </ul>
+      </section>
+
+
+      <!-- Section 3: Data Sharing -->
+      <section class="lg-section" id="p-share">
+        <h3 class="lg-section-title"><span class="lg-num">3</span> Data Sharing and Disclosure</h3>
+        <p class="lg-text">We may share your information with:</p>
+
+        <div class="lg-info-cards">
+          <div class="lg-info-card">
+            <div class="lg-info-icon"><i class="bi bi-people-fill"></i></div>
+            <div>
+              <h4>Other Users</h4>
+              <p>Property listings are public and visible to all users. Agent contact information is displayed on listings.</p>
+            </div>
+          </div>
+          <div class="lg-info-card">
+            <div class="lg-info-icon"><i class="bi bi-gear-fill"></i></div>
+            <div>
+              <h4>Service Providers</h4>
+              <p>Third-party vendors who help us operate — payment processors like Paystack/Flutterwave, hosting providers, analytics services, and email services.</p>
+            </div>
+          </div>
+          <div class="lg-info-card">
+            <div class="lg-info-icon"><i class="bi bi-bank2"></i></div>
+            <div>
+              <h4>Legal Requirements</h4>
+              <p>When required by Nigerian law, court orders, or government authorities (EFCC, Police, NDPR enforcement).</p>
+            </div>
+          </div>
+          <div class="lg-info-card">
+            <div class="lg-info-icon"><i class="bi bi-arrow-left-right"></i></div>
+            <div>
+              <h4>Business Transfers</h4>
+              <p>If Estate Web is acquired, merged, or sold, your data may be transferred to the new entity.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Section 4: NDPR -->
+      <section class="lg-section" id="p-ndpr">
+        <h3 class="lg-section-title"><span class="lg-num">4</span> Data Protection &amp; NDPR Compliance</h3>
+        <p class="lg-text">Estate Web is committed to complying with the <strong>Nigeria Data Protection Regulation (NDPR) 2019</strong> and the <strong>Nigeria Data Protection Act (NDPA) 2023</strong>. We implement data protection principles including:</p>
+        <ul class="lg-list">
+          <li>Obtaining your consent before collecting personal data</li>
+          <li>Using data only for lawful, specified, and legitimate purposes</li>
+          <li>Implementing reasonable technical and organisational security measures</li>
+          <li>Allowing you to access, correct, or delete your personal data</li>
+          <li>Reporting data breaches to the Nigeria Data Protection Bureau (NDPB) and affected users within 72 hours when required by law</li>
+          <li>Processing data transparently and minimising collection to what is necessary</li>
+        </ul>
+      </section>
+
+
+      <!-- Section 5: Your Rights -->
+      <section class="lg-section" id="p-rights">
+        <h3 class="lg-section-title"><span class="lg-num">5</span> Your Rights</h3>
+        <p class="lg-text">You have the right to:</p>
+        <ul class="lg-list">
+          <li>Access your personal data we hold</li>
+          <li>Correct inaccurate or incomplete data</li>
+          <li>Request deletion of your data (subject to legal retention requirements)</li>
+          <li>Object to processing for marketing purposes</li>
+          <li>Withdraw consent at any time</li>
+          <li>Lodge a complaint with the Nigeria Data Protection Bureau</li>
+        </ul>
+        <div class="lg-contact-box">
+          <i class="bi bi-envelope-fill"></i>
+          <p>To exercise these rights, contact us at: <a href="mailto:privacy@estateweb.com">privacy@estateweb.com</a></p>
+        </div>
+      </section>
+
+
+      <!-- Section 6: Retention -->
+      <section class="lg-section" id="p-retention">
+        <h3 class="lg-section-title"><span class="lg-num">6</span> Data Retention</h3>
+        <p class="lg-text">We retain your personal data for as long as necessary to provide services, comply with legal obligations, resolve disputes, and enforce agreements. Property listing data may be archived for market analysis purposes.</p>
+        <p class="lg-text">When your account is deleted, we will remove your personal data within <strong>30 days</strong>, except where we are required to retain it by law.</p>
+      </section>
+
+
+      <!-- Section 7: Security -->
+      <section class="lg-section" id="p-security">
+        <h3 class="lg-section-title"><span class="lg-num">7</span> Security Measures</h3>
+        <p class="lg-text">We implement industry-standard security measures including:</p>
+        <div class="lg-chips">
+          <span class="lg-chip"><i class="bi bi-lock-fill"></i> Data Encryption</span>
+          <span class="lg-chip"><i class="bi bi-person-check-fill"></i> Secure Authentication</span>
+          <span class="lg-chip"><i class="bi bi-search"></i> Regular Security Audits</span>
+          <span class="lg-chip"><i class="bi bi-shield-fill"></i> Access Controls</span>
+          <span class="lg-chip"><i class="bi bi-server"></i> Secure Hosting</span>
+        </div>
+        <div class="lg-callout warn">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <p>No system is completely secure. We cannot guarantee absolute security of your data. Please use strong passwords and do not share your login credentials with anyone.</p>
+        </div>
+      </section>
+
+
+      <!-- Section 8: Cookies -->
+      <section class="lg-section" id="p-cookies">
+        <h3 class="lg-section-title"><span class="lg-num">8</span> Cookies Policy</h3>
+        <p class="lg-text">We use cookies and similar tracking technologies to improve your experience on Estate Web. A cookie is a small text file stored on your device when you visit our Platform.</p>
+
+        <div class="lg-table-wrap">
+          <table class="lg-table">
+            <thead>
+              <tr>
+                <th>Cookie Type</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="lg-badge essential">Essential</span></td>
+                <td>Login sessions, security, CSRF protection</td>
+                <td>Session</td>
+              </tr>
+              <tr>
+                <td><span class="lg-badge functional">Functional</span></td>
+                <td>Remembering your preferences and saved searches</td>
+                <td>30 days</td>
+              </tr>
+              <tr>
+                <td><span class="lg-badge analytics">Analytics</span></td>
+                <td>Understanding how users use the Platform (page views, traffic sources)</td>
+                <td>90 days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lg-text">You can control cookies through your browser settings. Disabling essential cookies may affect Platform functionality.</p>
+      </section>
+
+    </div><!-- end partPrivacy -->
+
+
+    <!-- Divider -->
+    <div class="lg-part-divider"></div>
+
+
+    <!-- ════════════════════════════════════════
+         TERMS OF SERVICE
+         ════════════════════════════════════════ -->
+    <div class="lg-part" id="partTerms">
+
+      <div class="lg-part-header">
+        <i class="bi bi-file-text-fill"></i>
+        <div>
+          <h2>Terms of Service</h2>
+          <p>Rules and conditions governing your use of Estate Web</p>
+        </div>
+      </div>
+
+      <!-- FRAUD WARNING -->
+      <section class="lg-section" id="t-fraud">
+        <div class="lg-fraud-warning">
+          <div class="lg-fraud-header">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <h3>⚠ Critical Fraud Warning — Nigeria-Specific</h3>
+          </div>
+          <p class="lg-fraud-intro"><strong>Estate Web is a LISTING PLATFORM ONLY. We do NOT:</strong></p>
+          <ul class="lg-fraud-list dont">
+            <li><i class="bi bi-x-circle-fill"></i> Own, verify, or guarantee any property</li>
+            <li><i class="bi bi-x-circle-fill"></i> Confirm land titles or conduct title searches</li>
+            <li><i class="bi bi-x-circle-fill"></i> Act as real estate agents, brokers, or legal advisers</li>
+            <li><i class="bi bi-x-circle-fill"></i> Handle payments, escrow, or money transfers</li>
+            <li><i class="bi bi-x-circle-fill"></i> Protect against 'Omo Onile' disputes, government acquisition, or fraudulent sellers</li>
+          </ul>
+          <p class="lg-fraud-intro"><strong>YOU MUST:</strong></p>
+          <ul class="lg-fraud-list must">
+            <li><i class="bi bi-check-circle-fill"></i> Verify land titles at the Land Registry (e.g., Alausa for Lagos State)</li>
+            <li><i class="bi bi-check-circle-fill"></i> Conduct physical property inspections before any payment</li>
+            <li><i class="bi bi-check-circle-fill"></i> Hire a lawyer to review all property documents</li>
+            <li><i class="bi bi-check-circle-fill"></i> Confirm the identity of sellers/agents through government-issued ID</li>
+            <li><i class="bi bi-check-circle-fill"></i> NEVER pay 'inspection fees', 'processing fees', or deposits without verified legal documentation</li>
+          </ul>
+          <div class="lg-fraud-note">
+            <i class="bi bi-info-circle-fill"></i>
+            A "Verified" badge only means we checked a form of identification — NOT that the property title is valid or that the person owns the property. Estate Web cannot and does not guarantee any property transaction.
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Section 1: Acceptance -->
+      <section class="lg-section" id="t-accept">
+        <h3 class="lg-section-title"><span class="lg-num">1</span> Acceptance of Terms</h3>
+        <p class="lg-text">By creating an account, listing properties, or using any service on Estate Web, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you are using our Platform on behalf of a company or entity, you represent that you have authority to bind that entity.</p>
+      </section>
+
+
+      <!-- Section 2: Accounts -->
+      <section class="lg-section" id="t-accounts">
+        <h3 class="lg-section-title"><span class="lg-num">2</span> User Accounts &amp; Registration</h3>
+
+        <h4 class="lg-subsection-title">2.1 Eligibility</h4>
+        <p class="lg-text">You must be at least <strong>18 years old</strong> to use Estate Web. By registering, you confirm that all information provided is accurate and complete.</p>
+
+        <h4 class="lg-subsection-title">2.2 Account Security</h4>
+        <p class="lg-text">You are responsible for maintaining the confidentiality of your account credentials. You must immediately notify us of any unauthorised access. You are liable for all activities under your account.</p>
+
+        <h4 class="lg-subsection-title">2.3 Account Termination</h4>
+        <p class="lg-text">We reserve the right to suspend or terminate accounts that violate these Terms, engage in fraudulent activity, or pose security risks.</p>
+      </section>
+
+
+      <!-- Section 3: Listings -->
+      <section class="lg-section" id="t-listings">
+        <h3 class="lg-section-title"><span class="lg-num">3</span> Property Listings &amp; Content</h3>
+
+        <h4 class="lg-subsection-title">3.1 Listing Requirements</h4>
+        <p class="lg-text">All property listings must:</p>
+        <ul class="lg-list">
+          <li>Be accurate, truthful, and not misleading</li>
+          <li>Contain genuine property information and recent, unaltered images</li>
+          <li>Comply with Nigerian property and advertising laws</li>
+          <li>Not infringe on third-party intellectual property rights</li>
+          <li>Include valid contact information for enquiries</li>
+          <li>Represent properties that are actually available for sale, rent, or lease</li>
+          <li>Be updated or removed within 48 hours if the property is sold, rented, or no longer available</li>
+        </ul>
+
+        <h4 class="lg-subsection-title">3.2 Prohibited Listings</h4>
+        <p class="lg-text">You may <strong>NOT</strong> list:</p>
+        <ul class="lg-list prohibited">
+          <li>Properties you do not own or have authorisation to list</li>
+          <li>Fake, duplicate, or fraudulent properties</li>
+          <li>'Stale' listings — properties already sold, rented, or no longer available</li>
+          <li>Properties with disputed ownership, pending litigation, or 'Omo Onile' conflicts</li>
+          <li>Properties under government acquisition or with unresolved title issues</li>
+          <li>Content containing hate speech, violence, or promotion of illegal activities</li>
+          <li>Properties that violate zoning or land use regulations</li>
+          <li>Images or descriptions copied from other websites without permission</li>
+        </ul>
+
+        <h4 class="lg-subsection-title">3.3 Content Ownership &amp; Licence</h4>
+        <p class="lg-text">You retain ownership of content you upload. By posting on Estate Web, you grant us a worldwide, non-exclusive, royalty-free licence to use, display, reproduce, and distribute your content for operating and promoting our Platform.</p>
+
+        <h4 class="lg-subsection-title">3.4 Content Removal</h4>
+        <p class="lg-text">We reserve the right to remove, edit, or refuse any listing or content that violates these Terms, without prior notice or liability.</p>
+      </section>
+
+
+      <!-- Section 4: Conduct -->
+      <section class="lg-section" id="t-conduct">
+        <h3 class="lg-section-title"><span class="lg-num">4</span> User Conduct &amp; Prohibited Activities</h3>
+        <p class="lg-text">You agree <strong>NOT</strong> to:</p>
+        <ul class="lg-list prohibited">
+          <li>Impersonate others or provide false information</li>
+          <li>Use the Platform for fraudulent, illegal, or unauthorised purposes</li>
+          <li>Scrape, harvest, or collect user data without permission</li>
+          <li>Interfere with or disrupt Platform security or functionality</li>
+          <li>Upload viruses, malware, or malicious code</li>
+          <li>Harass, abuse, or threaten other users</li>
+          <li>Attempt to bypass any security or access control measures</li>
+          <li>Use automated tools (bots, scripts) without authorisation</li>
+          <li>Manipulate property prices or engage in price-fixing</li>
+          <li>Solicit personal information from minors</li>
+        </ul>
+      </section>
+
+
+      <!-- Section 5: Payments -->
+      <section class="lg-section" id="t-payments">
+        <h3 class="lg-section-title"><span class="lg-num">5</span> Transactions &amp; Payments</h3>
+
+        <h4 class="lg-subsection-title">5.1 Third-Party Transactions</h4>
+        <p class="lg-text">Estate Web is a listing platform. All property transactions occur directly between buyers/tenants and sellers/agents. <strong>We are not a party to these transactions</strong> and assume no responsibility for their completion, payment disputes, property condition, or legal compliance.</p>
+
+        <h4 class="lg-subsection-title">5.2 Platform Fees</h4>
+        <p class="lg-text">We may charge fees for premium listings, featured placements, or subscriptions. All fees are non-refundable unless explicitly stated. Prices are subject to change with <strong>30 days' notice</strong>.</p>
+
+        <h4 class="lg-subsection-title">5.3 Payment Processing</h4>
+        <p class="lg-text">Payments are processed through third-party providers (Paystack, Flutterwave). We do not store your full payment card details. You agree to the payment processor's terms.</p>
+      </section>
+
+
+      <!-- Section 6: Liability -->
+      <section class="lg-section" id="t-liability">
+        <h3 class="lg-section-title"><span class="lg-num">6</span> Disclaimers &amp; Limitations of Liability</h3>
+
+        <div class="lg-callout danger">
+          <i class="bi bi-exclamation-octagon-fill"></i>
+          <p>The Platform is provided <strong>"as is"</strong> without warranties of any kind. We do not guarantee accuracy, completeness, or reliability of listings, uninterrupted service, or the success of any transaction.</p>
+        </div>
+
+        <h4 class="lg-subsection-title">6.2 Verification Disclaimer</h4>
+        <p class="lg-text">Verification services are <strong>LIMITED</strong> to confirming that an ID document appears genuine and that submitted documents are readable. Verification <strong>does not</strong> mean we confirm legal ownership, conduct title searches, or guarantee authority to sell or lease.</p>
+        <div class="lg-callout warn">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <p><strong>Verification reduces risk but does not replace your own due diligence.</strong> You must still verify everything independently with lawyers and at the Land Registry.</p>
+        </div>
+
+        <h4 class="lg-subsection-title">6.3 Third-Party Content</h4>
+        <p class="lg-text">We are not responsible for content, actions, or omissions of third-party users, agents, or external websites linked from our Platform.</p>
+
+        <h4 class="lg-subsection-title">6.4 Limitation of Liability</h4>
+        <p class="lg-text">To the maximum extent permitted by Nigerian law, Estate Web shall not be liable for financial losses from property transactions, fraud or disputes between users, property defects or title issues, data loss or security breaches, or indirect, consequential, or punitive damages.</p>
+        <div class="lg-highlight-box">
+          <i class="bi bi-info-circle-fill"></i>
+          <p>Our total liability for any claim shall not exceed the fees you paid us in the 12 months preceding the claim, or <strong>₦50,000</strong>, whichever is lower.</p>
+        </div>
+      </section>
+
+
+      <!-- Section 7: Indemnification -->
+      <section class="lg-section" id="t-indemnity">
+        <h3 class="lg-section-title"><span class="lg-num">7</span> Indemnification</h3>
+        <p class="lg-text">You agree to indemnify, defend, and hold harmless Estate Web, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:</p>
+        <ul class="lg-list">
+          <li>Your violation of these Terms</li>
+          <li>Your property listings or content</li>
+          <li>Your transactions with other users</li>
+          <li>Your violation of any law or third-party rights</li>
+        </ul>
+      </section>
+
+
+      <!-- Section 8: IP -->
+      <section class="lg-section" id="t-ip">
+        <h3 class="lg-section-title"><span class="lg-num">8</span> Intellectual Property</h3>
+        <p class="lg-text">All Platform content, design, logos, trademarks, and software are owned by Estate Web or licensed to us. You may not copy, reproduce, distribute, or create derivative works without written permission.</p>
+      </section>
+
+
+      <!-- Section 9: Disputes -->
+      <section class="lg-section" id="t-disputes">
+        <h3 class="lg-section-title"><span class="lg-num">9</span> Dispute Resolution &amp; Arbitration</h3>
+
+        <h4 class="lg-subsection-title">9.1 Informal Resolution</h4>
+        <p class="lg-text">Before initiating legal action, you agree to contact us at <a href="mailto:support@estateweb.com" class="lg-link">support@estateweb.com</a> to seek informal resolution.</p>
+
+        <h4 class="lg-subsection-title">9.2 Arbitration Agreement</h4>
+        <p class="lg-text">Any dispute arising from these Terms or your use of the Platform shall be resolved through binding arbitration under the <strong>Arbitration and Conciliation Act (Nigeria)</strong>, rather than in court. Arbitration shall be conducted in Lagos, Nigeria, in English.</p>
+
+        <h4 class="lg-subsection-title">9.3 Exceptions</h4>
+        <p class="lg-text">Either party may seek injunctive relief in court for intellectual property violations or urgent matters.</p>
+      </section>
+
+
+      <!-- Section 10: Governing Law -->
+      <section class="lg-section" id="t-governing">
+        <h3 class="lg-section-title"><span class="lg-num">10</span> Governing Law &amp; Jurisdiction</h3>
+        <p class="lg-text">These Terms are governed by the laws of the <strong>Federal Republic of Nigeria</strong>. Any legal action not subject to arbitration shall be brought exclusively in the courts of Lagos State, Nigeria.</p>
+      </section>
+
+
+      <!-- Section 11: Changes -->
+      <section class="lg-section" id="t-changes">
+        <h3 class="lg-section-title"><span class="lg-num">11</span> Changes to Terms &amp; Privacy Policy</h3>
+        <p class="lg-text">We may update these Terms and Privacy Policy at any time. Material changes will be notified via email or Platform notice. Continued use after changes constitutes acceptance. If you disagree, you must stop using the Platform.</p>
+      </section>
+
+
+      <!-- Section 12: Termination -->
+      <section class="lg-section" id="t-termination">
+        <h3 class="lg-section-title"><span class="lg-num">12</span> Termination</h3>
+        <p class="lg-text">We may terminate or suspend your access immediately, without notice, for conduct violating these Terms or harmful to other users, us, or third parties. Upon termination, your right to use the Platform ceases.</p>
+      </section>
+
+
+      <!-- Section 13: Miscellaneous -->
+      <section class="lg-section" id="t-misc">
+        <h3 class="lg-section-title"><span class="lg-num">13</span> Miscellaneous</h3>
+        <div class="lg-misc-grid">
+          <div class="lg-misc-item">
+            <h4>Severability</h4>
+            <p>If any provision is invalid, the remaining provisions remain in effect.</p>
+          </div>
+          <div class="lg-misc-item">
+            <h4>Waiver</h4>
+            <p>Our failure to enforce any right does not waive that right.</p>
+          </div>
+          <div class="lg-misc-item">
+            <h4>Assignment</h4>
+            <p>You may not assign these Terms. We may assign them without restriction.</p>
+          </div>
+          <div class="lg-misc-item">
+            <h4>Entire Agreement</h4>
+            <p>These Terms constitute the entire agreement between you and Estate Web.</p>
+          </div>
+          <div class="lg-misc-item">
+            <h4>Force Majeure</h4>
+            <p>We are not liable for delays or failures due to events beyond our control.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Section 14: Contact -->
+      <section class="lg-section" id="t-contact">
+        <h3 class="lg-section-title"><span class="lg-num">14</span> Contact Information</h3>
+        <p class="lg-text">For questions about these Terms or Privacy Policy, contact us at:</p>
+        <div class="lg-contact-grid">
+          <a href="mailto:legal@estateweb.com" class="lg-contact-card">
+            <div class="lg-contact-icon"><i class="bi bi-briefcase-fill"></i></div>
+            <div>
+              <span class="lg-contact-label">Legal</span>
+              <span class="lg-contact-value">legal@estateweb.com</span>
+            </div>
+          </a>
+          <a href="mailto:privacy@estateweb.com" class="lg-contact-card">
+            <div class="lg-contact-icon"><i class="bi bi-lock-fill"></i></div>
+            <div>
+              <span class="lg-contact-label">Privacy</span>
+              <span class="lg-contact-value">privacy@estateweb.com</span>
+            </div>
+          </a>
+          <a href="mailto:support@estateweb.com" class="lg-contact-card">
+            <div class="lg-contact-icon"><i class="bi bi-headset"></i></div>
+            <div>
+              <span class="lg-contact-label">Support</span>
+              <span class="lg-contact-value">support@estateweb.com</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+    </div><!-- end partTerms -->
+
+
+    <!-- ── FOOTER NOTE ── -->
+    <div class="lg-footer-note">
+      <i class="bi bi-patch-check-fill"></i>
+      <p>By using Estate Web, you acknowledge that you have read, understood, and agree to be bound by these Terms and Privacy Policy.</p>
+      <span>© 2026 Estate Web. All Rights Reserved.</span>
+    </div>
+
+  </main><!-- end .lg-content -->
+
+</div><!-- end .lg-layout -->
+
+
+<!-- ── BACK TO TOP ── -->
+<button class="lg-back-top" id="lgBackTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <i class="bi bi-chevron-up"></i>
+</button>
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Tab switching (mobile) ──────────────────── */
+  window.switchTab = function (tab, btn) {
+    document.querySelectorAll('.lg-tab').forEach(function (t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+
+    if (tab === 'privacy') {
+      document.getElementById('partPrivacy').style.display = '';
+      document.getElementById('partTerms').style.display   = 'none';
+      document.getElementById('sidePrivacy').style.display = '';
+      document.getElementById('sideTerms').style.display   = 'none';
+      document.querySelector('.lg-part-divider').style.display = 'none';
+    } else {
+      document.getElementById('partPrivacy').style.display = 'none';
+      document.getElementById('partTerms').style.display   = '';
+      document.getElementById('sidePrivacy').style.display = 'none';
+      document.getElementById('sideTerms').style.display   = '';
+      document.querySelector('.lg-part-divider').style.display = 'none';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  /* On desktop always show both — reset any tab-hide */
+  function handleResize() {
+    if (window.innerWidth >= 900) {
+      ['partPrivacy','partTerms','sidePrivacy','sideTerms'].forEach(function (id) {
+        document.getElementById(id).style.display = '';
+      });
+      var div = document.querySelector('.lg-part-divider');
+      if (div) div.style.display = '';
+    }
+  }
+  window.addEventListener('resize', handleResize);
+
+  /* ── Active nav link on scroll ──────────────── */
+  var sections = document.querySelectorAll('.lg-section[id]');
+  var navLinks = document.querySelectorAll('.lg-nav-link');
+
+  function onScroll() {
+    var scrollY = window.scrollY + 140;
+    var current = '';
+    sections.forEach(function (sec) {
+      if (sec.offsetTop <= scrollY) current = sec.id;
+    });
+    navLinks.forEach(function (link) {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+
+    /* Back to top */
+    var btn = document.getElementById('lgBackTop');
+    if (btn) btn.classList.toggle('visible', window.scrollY > 400);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ── Smooth scroll for sidebar links ─────────── */
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        var offset = target.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+      }
+    });
+  });
+
+}());
+</script>
+
+{% endblock %}

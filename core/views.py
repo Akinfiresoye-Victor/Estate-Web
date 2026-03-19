@@ -521,9 +521,49 @@ def delete_property_on_sale(request, property_id):
 
 
 
-def partner_with_us(request):
-    return render(request, 'core/partner.html')
 
+
+
+def partner_with_us(request):
+    """
+    Renders the partnership application form.
+    GET  → empty form
+    POST → validate, save (including M2M), redirect to success
+    """
+    if request.method == 'POST':
+        form = PartnershipForm(request.POST)
+
+        if form.is_valid():
+            # save() with commit=False gives us the instance without writing
+            # M2M yet — we need to call save_m2m() after saving the instance
+            partnership = form.save(commit=False)
+            partnership.save()           # writes the main row to the database
+            form.save_m2m()              # now writes the M2M (property_types, partnership_benefits)
+
+            messages.success(
+                request,
+                "Thank you for applying! Our partnerships team will review your application "
+                "and reach out within 3–5 business days."
+            )
+            return redirect('partner-success')   # change this URL name to match your urls.py
+
+        else:
+            # Form has errors — re-render with the same POST data so the user
+            # doesn't have to retype everything
+            messages.error(
+                request,
+                "Please correct the errors below and resubmit your application."
+            )
+
+    else:
+        form = PartnershipForm()
+
+    return render(request, 'core/partner.html', {'form': form})
+
+
+def partner_success(request):
+    """Simple success page after a partnership application is submitted."""
+    return render(request, 'core/partner_success.html')
 
 
 
@@ -941,3 +981,9 @@ def delete_client(request, appointment_id):
         return render(request, 'estate/error_page.html', {'e': e})
 
 
+
+def privacy_terms_sheet(request):
+    return render(request, 'core/legal_privacy_sheet.html')
+
+def partnership_terms(request):
+    return render(request, 'core/partnership_terms.html')

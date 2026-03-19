@@ -217,3 +217,44 @@ EXPIRY_CHOICES = [
     ('48', '48 Hours'),
     ('168', '7 Days'),  
 ]
+
+
+COMPANY_TYPE=[
+    ('Real Estate Agency', 'Real Estate Agency'),
+    ('Startup', 'Fast-Grwoing Startup'),
+    ('Property Developer', 'Property Developer'),
+    ('Investmentn Firm', 'Investment Firm'),
+    ('other', 'Other')
+]
+
+YEARS_IN_BUISNESS=[
+    ('Less than 1 year', 'Less than 1 year'),
+    ('1-3 years', '1-3 years'), 
+    ('3-5 years', '3-5 years'), 
+    ('5-10 years', '5-10 years'), 
+    ('10+ years', '10+ years'), 
+]
+
+TEAM_SIZE=[
+    ('1-5 People', '1-5 People'),
+    ('6-20 People', '6-20 People'),
+    ('21-50 People', '21-50 People'),
+    ('50+ People', '50+ People')
+]
+
+
+AVERAGE_MONTHLY_LISTINGS=[
+    ('1-10 listings', '1-10 listings'),
+    ('11-25 listings', '11-25 listings'),
+    ('26-50 listings', '26-50 listings'),
+    ('51-100 listings', '26-100 listings'),
+    ('100+ listings', '100+ listings'),
+]
+
+ESTIMATED_ANNUAL_REVENUE=[
+    ('Below ₦10 Million', 'Below ₦10 Million'),
+    ('₦10M - ₦50M', '₦10M - ₦50M'),
+    ('₦50M - ₦100M', '₦50M - ₦100M'),
+    ('₦100M - ₦500M', '₦100M - ₦500M'),
+    ('₦500M+', '₦500M+')
+]

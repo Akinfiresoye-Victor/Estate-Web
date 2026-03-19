@@ -1,0 +1,257 @@
+/* ═══════════════════════════════════════════════════
+   partner_success.css — Partnership Application Success
+   Mobile-first. Estate Web dark/gold palette.
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  --primary:    #1a3c4e;
+  --primary-lt: #2d5a73;
+  --secondary:  #c19b76;
+  --accent:     #8b7355;
+  --text-dark:  #1e293b;
+  --text-mid:   #4a5568;
+  --text-light: #6b7280;
+  --bg:         #f4f6f8;
+  --white:      #ffffff;
+  --border:     #e5e7eb;
+  --success:    #16a34a;
+  --shadow-sm:  0 1px 4px rgba(26,60,78,.07), 0 2px 8px rgba(26,60,78,.05);
+  --shadow-md:  0 4px 16px rgba(26,60,78,.10);
+  --shadow-lg:  0 8px 32px rgba(26,60,78,.14);
+  --radius:     16px;
+  --radius-sm:  10px;
+  --ease:       all 0.28s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Poppins', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+  line-height: 1.6;
+  min-height: 100svh;
+}
+
+
+/* ── Full-page centred layout ── */
+.ps-page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+
+/* ── Card ── */
+.ps-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem 1.5rem;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  animation: cardIn .55s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(28px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+
+/* ── Animated icon with pulse rings ── */
+.ps-icon-wrap {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ps-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(22,163,74,.25);
+  animation: ringPulse 2.5s ease-out infinite;
+}
+.ps-ring-2 { animation-delay: 1.25s; }
+
+@keyframes ringPulse {
+  0%   { transform: scale(1);   opacity: .7; }
+  100% { transform: scale(1.7); opacity: 0;  }
+}
+
+.ps-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--success), #22c55e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  color: var(--white);
+  box-shadow: 0 8px 24px rgba(22,163,74,.28);
+  position: relative;
+  z-index: 1;
+  animation: iconPop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes iconPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+
+/* ── Typography ── */
+.ps-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.ps-body {
+  font-size: .88rem;
+  color: var(--text-mid);
+  line-height: 1.75;
+  max-width: 400px;
+}
+.ps-body strong { color: var(--primary); font-weight: 700; }
+
+
+/* ── Steps ── */
+.ps-steps {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1.25rem 0;
+  text-align: left;
+}
+
+.ps-step {
+  display: flex;
+  align-items: flex-start;
+  gap: .9rem;
+}
+
+.ps-step-connector {
+  width: 2px;
+  height: 22px;
+  background: var(--border);
+  margin: 4px 0 4px 18px; /* aligns under circle centre */
+}
+
+.ps-step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .82rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: var(--ease);
+}
+
+.ps-step--done .ps-step-circle {
+  background: var(--success);
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(22,163,74,.28);
+}
+
+.ps-step--pending .ps-step-circle {
+  background: var(--bg);
+  color: var(--text-light);
+  border: 2px solid var(--border);
+}
+
+.ps-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-top: 6px;
+}
+
+.ps-step-content strong {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  display: block;
+}
+
+.ps-step-content span {
+  font-size: .75rem;
+  color: var(--text-light);
+}
+
+
+/* ── Contact line ── */
+.ps-contact {
+  font-size: .82rem;
+  color: var(--text-light);
+}
+.ps-contact a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color .2s;
+}
+.ps-contact a:hover { color: var(--secondary); }
+
+
+/* ── CTA button ── */
+.ps-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: .85rem 2rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: .88rem;
+  font-weight: 700;
+  transition: var(--ease);
+  box-shadow: var(--shadow-sm);
+}
+.ps-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: var(--white);
+}
+.ps-btn i { font-size: 1rem; }
+
+
+/* ── 640px+ ── */
+@media (min-width: 640px) {
+  .ps-card { padding: 3.5rem 3rem; gap: 1.5rem; }
+  .ps-icon { width: 90px; height: 90px; font-size: 2.6rem; }
+  .ps-icon-wrap { width: 100px; height: 100px; }
+  .ps-step-connector { margin: 4px 0 4px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ─────────────────────────────────────────────────────
+   APPEND THIS TO static/core/css/partner.css
+   (the pa-checkbox-item additions below fix the HTML
+   that now wraps everything in a <label> tag)
+───────────────────────────────────────────────────── */

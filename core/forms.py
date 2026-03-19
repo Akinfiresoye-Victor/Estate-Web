@@ -253,3 +253,79 @@ class AppointmentForm(ModelForm):
         return note.strip()
 
 
+
+
+
+class PartnershipForm(forms.ModelForm):
+
+    property_types = forms.ModelMultipleChoiceField(
+        queryset=PropertyFocus.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='Primary Property Focus',
+    )
+
+    partnership_benefits = forms.ModelMultipleChoiceField(
+        queryset=PartnershipGoal.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='Benefits You Are Most Interested In',
+    )
+
+    class Meta:
+        model = Partnership
+        fields = [
+            'company_name', 'company_type', 'years_in_buisness', 'team_size',
+            'company_website', 'city', 'state',
+            'person_of_contact', 'person_position', 'email', 'phone_number',
+            'average_listings', 'annual_revenue',
+            'property_types', 'partnership_benefits',
+            'growth_goals', 'why_question',
+        ]
+        widgets = {
+            'company_name':      forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Okafor & Sons Properties'}),
+            'company_type':      forms.Select(attrs={'class': 'form-control'}),
+            'years_in_buisness': forms.Select(attrs={'class': 'form-control'}),
+            'team_size':         forms.Select(attrs={'class': 'form-control'}),
+            'company_website':   forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://yourcompany.com'}),
+            'city':              forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Lagos, Abuja'}),
+            'state':             forms.Select(attrs={'class': 'form-control'}),
+            'person_of_contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Full legal name'}),
+            'person_position':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. CEO, Director, Manager'}),
+            'email':             forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contact@yourcompany.com'}),
+            'phone_number':      forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0801 234 5678'}),
+            'average_listings':  forms.Select(attrs={'class': 'form-control'}),
+            'annual_revenue':    forms.Select(attrs={'class': 'form-control'}),
+            'growth_goals':      forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Key growth targets for the next 12 months...'}),
+            'why_question':      forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell us why you want to partner with Estate Web...'}),
+        }
+        labels = {
+            'company_name':      'Company Name',
+            'company_type':      'Type of Company',
+            'years_in_buisness': 'Years in Business',
+            'team_size':         'Team Size',
+            'company_website':   'Company Website (Optional)',
+            'city':              'Primary City',
+            'state':             'State',
+            'person_of_contact': 'Contact Person Full Name',
+            'person_position':   'Their Position / Role',
+            'email':             'Contact Email Address',
+            'phone_number':      'Contact Phone Number',
+            'average_listings':  'Average Monthly Listings',
+            'annual_revenue':    'Estimated Annual Revenue',
+            'growth_goals':      'Growth Goals for the Next 12 Months (Optional)',
+            'why_question':      'Why Do You Want to Partner with Estate Web?',
+        }
+
+    def clean_phone_number(self):
+        phone = self.cleaned_data.get('phone_number', '').strip()
+        digits = ''.join(filter(str.isdigit, phone))
+        if len(digits) < 10 or len(digits) > 14:
+            raise forms.ValidationError('Enter a valid Nigerian phone number.')
+        return phone
+
+    def clean_why_question(self):
+        text = self.cleaned_data.get('why_question', '').strip()
+        if len(text) < 30:
+            raise forms.ValidationError('Please give us a bit more detail — at least 30 characters.')
+        return text

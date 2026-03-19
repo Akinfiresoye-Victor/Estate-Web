@@ -208,3 +208,44 @@ class Appointments(models.Model):
     appointment_uuid=models.CharField('UUID', default=uuid.uuid4(), blank=False, null=False, unique=True)
     def __str__(self):
         return f'Appointment: {self.pk}- {self.note}'
+
+
+# 1. New model for Property Types (Residential, Commercial, etc.)
+class PropertyFocus(models.Model):
+    name = models.CharField(max_length=50)
+    
+    class Meta:
+        verbose_name_plural = "Property Focus Areas"
+
+    def __str__(self):
+        return self.name
+
+# 2. New model for Partnership Goals (Boosts, Analytics, etc.)
+class PartnershipGoal(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+# 3. Your existing model with the new fields added at the bottom
+class Partnership(models.Model):
+    company_name = models.CharField('Company Name', max_length=100, null=False, blank=False)
+    company_type = models.CharField('Company Type', choices=COMPANY_TYPE, default='other', blank=True)
+    years_in_buisness = models.CharField('Years In Buisness', choices=YEARS_IN_BUISNESS, blank=True, default='Less than 1 year')
+    team_size = models.CharField('Team Size', choices=TEAM_SIZE, blank=True, default='1-5 People')
+    company_website = models.URLField('Company Website', max_length=200, null=True, blank=True)
+    city = models.CharField('City', max_length=20, null=False, blank=False, default='Akure')
+    state = models.CharField('State', choices=STATES, default='Lagos', blank=False )
+    person_of_contact = models.CharField('Full Name', null=False, blank=False, max_length=70)
+    person_position = models.CharField('Position', null=False, blank=False,  max_length=20)
+    email = models.EmailField('Persons Email', null=False, blank=False, max_length=50)
+    phone_number = models.CharField('Persons Phone Number', blank=False, null=False,max_length=12)
+    average_listings = models.CharField('Mothly Listings', choices=AVERAGE_MONTHLY_LISTINGS, default='1-10 listings', null=True, blank=True)
+    annual_revenue = models.CharField('Annual Revenue', choices=ESTIMATED_ANNUAL_REVENUE, default='Below ₦10 Million', null=False, blank=False)
+    growth_goals = models.CharField('Growth Goals', null=True, blank=True, max_length=200)
+    why_question = models.CharField('Why Partner with us', null=False, blank=False, max_length=200)
+    property_types = models.ManyToManyField(PropertyFocus, blank=True)
+    partnership_benefits = models.ManyToManyField(PartnershipGoal, blank=True)
+    def __str__(self):
+        return(f'{self.company_name}- {self.company_type}')
+    

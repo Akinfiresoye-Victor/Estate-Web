@@ -247,8 +247,6 @@ def property_views_count(property_type, property_id):
 
 
 
-from datetime import timedelta
-from django.utils import timezone
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────

@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Application Received — Estate Web</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/partner_success.css' %}">
+</head>
+<body>
+
+<div class="ps-page">
+  <div class="ps-card">
+
+    {# Animated checkmark icon #}
+    <div class="ps-icon-wrap">
+      <div class="ps-ring ps-ring-1"></div>
+      <div class="ps-ring ps-ring-2"></div>
+      <div class="ps-icon">
+        <i class="bi bi-patch-check-fill"></i>
+      </div>
+    </div>
+
+    <h1 class="ps-title">Application Received!</h1>
+
+    <p class="ps-body">
+      Thank you for applying to partner with <strong>Estate Web</strong>.
+      Our partnerships team will review your details and reach out within
+      <strong>3–5 business days</strong>.
+    </p>
+
+    {# Progress steps #}
+    <div class="ps-steps">
+
+      <div class="ps-step ps-step--done">
+        <div class="ps-step-circle">
+          <i class="bi bi-check-lg"></i>
+        </div>
+        <div class="ps-step-content">
+          <strong>Application Submitted</strong>
+          <span>We have received your details</span>
+        </div>
+      </div>
+
+      <div class="ps-step-connector"></div>
+
+      <div class="ps-step ps-step--pending">
+        <div class="ps-step-circle">2</div>
+        <div class="ps-step-content">
+          <strong>Team Review</strong>
+          <span>We'll assess your application within 3–5 business days</span>
+        </div>
+      </div>
+
+      <div class="ps-step-connector"></div>
+
+      <div class="ps-step ps-step--pending">
+        <div class="ps-step-circle">3</div>
+        <div class="ps-step-content">
+          <strong>Onboarding Call</strong>
+          <span>Our team will contact you to get you fully set up</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="ps-contact">
+      Questions? Reach us at
+      <a href="mailto:legal@estateweb.com">legal@estateweb.com</a>
+    </p>
+
+    <a href="{% url 'landing' %}" class="ps-btn">
+      <i class="bi bi-house-fill"></i> Back to Homepage
+    </a>
+
+  </div>
+</div>
+
+</body>
+</html>

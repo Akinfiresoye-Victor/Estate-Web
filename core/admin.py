@@ -11,5 +11,6 @@ from estate.models import LeadInfo
 admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedbacks, AgentInformation,
                     Experience, SocialLinks, PropertyRentImage, PropertySaleImage, User, CompanyInformation,
                     CompanyAnalytics, LeadInfo,WishlistStorageUnit, SessionId, PropertyViews,Appointments, 
-                    AgentAnalytics, agent_session, CompanyRating,JobPost, CompanyActivityLog,Employees, InviteLink
+                    AgentAnalytics, agent_session, CompanyRating,JobPost, CompanyActivityLog,Employees, InviteLink,
+                    Partnership,PartnershipGoal
                     ])

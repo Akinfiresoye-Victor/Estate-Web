@@ -22,5 +22,8 @@ urlpatterns = [
     path('edit_schedule/<appointment_id>', views.edit_appointment, name='edit-schedule'),
     path('lead_list/<appointment_id>', views.view_client, name='view-client'),
     path('add_client/<lead_uuid>/<appointment_id>', views.add_client, name='add-client'),
-    path('del_client_info/<appointment_id>', views.delete_client, name='delete-client-info')
+    path('del_client_info/<appointment_id>', views.delete_client, name='delete-client-info'),
+    path('terms/privacy_terms', views.privacy_terms_sheet, name='terms-agreement'),
+    path('terms/partnership_terms', views.partnership_terms, name='partnership-terms'),
+    path('patner_form_filled', views.partner_success, name='partner-success')
 ]
