@@ -764,7 +764,7 @@ def manage_listings(request):
         return render(request, 'estate/error_page.html', {'e':e})
 
 
-def edit_appointment(request, appointment_id):
+def edit_appointment(request, appointment_uuid):
     if not request.user.is_authenticated:
         messages.info(request, 'Log In required')
         return redirect('login')
@@ -785,7 +785,7 @@ def edit_appointment(request, appointment_id):
         # Get the appointment based on user role
         if request.user.role == 'company':
             company = CompanyInformation.objects.get(user_id=request.user.id)
-            item= Appointments.objects.filter(company_uuid=company.unique_company_id).get(pk=appointment_id)
+            item= Appointments.objects.filter(company_uuid=company.unique_company_id).get(appointment_uuid=appointment_uuid)
             CompanyActivityLog.objects.create(
                 company=company,
                 action= 'Appointment Updated'
@@ -797,7 +797,7 @@ def edit_appointment(request, appointment_id):
                 return redirect('landing')
         else:
             agent = AgentInformation.objects.get(user_id=request.user.id)
-            item = Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(pk=appointment_id)
+            item = Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(appointment_uuid=appointment_uuid)
             if item.agent_uuid == agent.agent_uuid:
                 appointment= item
             else:
@@ -833,7 +833,7 @@ def edit_appointment(request, appointment_id):
                 appointment.save()
                 
                 messages.success(request, 'Appointment updated successfully!')
-                return redirect('view-schedule', lead_id=appointment_id)
+                return redirect('view-schedule', lead_id=appointment_uuid)
                 
             except Exception as e:
                 messages.error(request, f'Error updating appointment: {str(e)}')
@@ -858,7 +858,7 @@ def edit_appointment(request, appointment_id):
 
 
 
-def view_client(request, appointment_id):
+def view_client(request, appointment_uuid):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -889,12 +889,12 @@ def view_client(request, appointment_id):
             else:
                 messages.warning(request, 'Access Denied')
                 return redirect('landing')
-        return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_id})
+        return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_uuid})
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
 
 
-def add_client(request, lead_uuid, appointment_id):
+def add_client(request, lead_uuid, appointment_uuid):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -904,7 +904,7 @@ def add_client(request, lead_uuid, appointment_id):
     try:
         if request.user.role == 'company':
             company= CompanyInformation.objects.get(user_id=request.user.id)
-            raw_data= Appointments.objects.get(pk=appointment_id)
+            raw_data= Appointments.objects.get(appointment_uuid=appointment_uuid)
             raw_lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
             if raw_data.company_uuid == company.unique_company_id and raw_lead_data.company_uuid == company.unique_company_id:
                 appointment_data= raw_data
@@ -914,7 +914,7 @@ def add_client(request, lead_uuid, appointment_id):
                 return redirect('landing')
         elif request.user.role == 'agent':
             agent= AgentInformation.objects.get(user_id=request.user.id)
-            raw_data= Appointments.objects.get(pk=appointment_id)
+            raw_data= Appointments.objects.get(appointment_uuid=appointment_uuid)
             raw_lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
             if raw_data.agent_uuid == agent.agent_uuid and raw_lead_data.agent_id == agent.agent_uuid:
                 appointment_data=raw_data
@@ -932,8 +932,7 @@ def add_client(request, lead_uuid, appointment_id):
     except Exception as e:
         return render(request, 'estate/error_page', {'e':e})
     
-    
-def delete_client(request, appointment_id):
+def delete_appointment(request, appointment_uuid):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -941,7 +940,53 @@ def delete_client(request, appointment_id):
         messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
-        appointment=Appointments.objects.get(pk=appointment_id)
+        appointment=Appointments.objects.get(appointment_uuid=appointment_uuid)
+        if request.user.role == 'company':
+            try:
+                company= CompanyInformation.objects.get(user_id=request.user.id)
+                if appointment.company_uuid == company.unique_company_id:
+                    appointment.delete()
+                    CompanyActivityLog.objects.create(
+                        company=company,
+                        action= 'Appointment Deleted'
+                    )
+                    messages.success(request, 'Appointment Deleted')
+                    return redirect('appointment')
+                else:
+                    messages.error(request, 'Access Denied')
+                    return redirect('landing')
+            except ObjectDoesNotExist:
+                messages.error(request, 'An error occured')
+                return redirect('landing')
+        elif request.user.role == 'agent':
+            try:
+                agent=AgentInformation.objects.get(user_id=request.user.id)
+                if appointment.agent_uuid == agent.agent_uuid:
+                    appointment.delete()
+                    messages.success(request, 'Appointment Deleted')
+                    return redirect('appointment')
+                else:
+                    messages.error(request, 'Access Denied')
+                    return redirect('landing')
+            except ObjectDoesNotExist:
+                messages.error(request, 'An error occured')
+                return redirect('landing')
+        else:
+            messages.error(request, 'Access Denied')
+            return redirect('landing')
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
+
+
+def delete_client(request, appointment_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'customer':
+        messages.error(request, 'Access Denied')
+        return redirect('landing')
+    try:
+        appointment=Appointments.objects.get(appointment_uuid=appointment_uuid)
         if request.user.role == 'company':
             try:
                 company= CompanyInformation.objects.get(user_id=request.user.id)
@@ -967,7 +1012,7 @@ def delete_client(request, appointment_id):
                     appointment.lead_uuid = None
                     appointment.save()
                     messages.success(request, 'Client Info Removed')
-                    return redirect('view-schedule', appointment_id)
+                    return redirect('view-schedule', appointment_uuid)
                 else:
                     messages.error(request, 'Access Denied')
                     return redirect('landing')
@@ -987,3 +1032,7 @@ def privacy_terms_sheet(request):
 
 def partnership_terms(request):
     return render(request, 'core/partnership_terms.html')
+
+
+def estate_web_guide(request):
+    return render(request, 'core/faq.html')

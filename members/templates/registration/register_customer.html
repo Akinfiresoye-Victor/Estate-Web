@@ -15,38 +15,17 @@
 </head>
 <body>
 
-{# ── Messages ─────────────────────────────────────────────────────── #}
 <div class="messages-container">
   {% if messages %}
     {% for message in messages %}
       {% if message.tags == 'error' %}
-        {% with 'danger' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% elif message.tags == 'info' %}
-        {% with 'info' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% elif message.tags == 'warning' %}
-        {% with 'warning' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% else %}
-        {% with 'success' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% endif %}
     {% endfor %}
   {% endif %}
@@ -55,21 +34,18 @@
 <div class="register-wrapper">
   <div class="register-container">
 
-    {# ── Form Card ──────────────────────────────────────────────── #}
     <div class="register-card">
 
       <div class="register-header">
-        <div class="brand-logo">
-          <i class="bi bi-house-door-fill"></i>
-        </div>
+        <div class="brand-logo"><i class="bi bi-house-door-fill"></i></div>
         <h1 class="brand-name">Estate Web</h1>
         <h2 class="register-title">Create Account</h2>
         <p class="register-subtitle">Your dream property at your fingertips</p>
       </div>
 
-      {# Role Switcher — Customer is active #}
+      {# Role Switcher — carry ?next= on every link so it's never lost #}
       <div class="role-switcher">
-        <a href="{% url 'login' %}" class="role-tab">
+        <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
           <i class="bi bi-box-arrow-in-right"></i>
           <span class="role-tab-label">Sign In</span>
         </a>
@@ -77,17 +53,16 @@
           <i class="bi bi-person-fill"></i>
           <span class="role-tab-label">Customer</span>
         </span>
-        <a href="{% url 'register-agent' %}" class="role-tab">
+        <a href="{% url 'register-agent' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
           <i class="bi bi-award"></i>
           <span class="role-tab-label">Agent</span>
         </a>
-        <a href="{% url 'register-company' %}" class="role-tab">
+        <a href="{% url 'register-company' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
           <i class="bi bi-building"></i>
           <span class="role-tab-label">Company</span>
         </a>
       </div>
 
-      {# Error Alert #}
       {% if form.errors %}
         <div class="error-alert">
           <div class="error-header">
@@ -104,9 +79,13 @@
         </div>
       {% endif %}
 
-      {# Register Form #}
       <form method="POST" action="{% url 'register-customer' %}" class="register-form">
         {% csrf_token %}
+
+        {# Hidden next field — survives the POST and gets picked up by the view #}
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
 
         <div class="form-row">
           <div class="form-group">
@@ -154,31 +133,21 @@
 
         <div class="login-section">
           <p class="login-text">Already have an account?</p>
-          <a href="{% url 'login' %}" class="btn-login">Sign In</a>
+          <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="btn-login">Sign In</a>
         </div>
       </form>
 
     </div>
 
-    {# ── Side Panel ─────────────────────────────────────────────── #}
     <div class="side-panel side-panel-customer">
       <div class="side-content">
         <i class="bi bi-house-door-fill"></i>
         <h3>Start Your Journey</h3>
         <p>Access exclusive listings and personalised recommendations in Nigeria's growing property market.</p>
         <div class="features">
-          <div class="feature-item">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Trusted & verified listings</span>
-          </div>
-          <div class="feature-item">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>24/7 customer support</span>
-          </div>
-          <div class="feature-item">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Save favourites & compare</span>
-          </div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Trusted & verified listings</span></div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>24/7 customer support</span></div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Save favourites & compare</span></div>
         </div>
       </div>
     </div>
@@ -190,11 +159,8 @@
 <script src="{% static 'members/js/password_rules.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.alert').forEach(function (alert) {
-      setTimeout(function () {
-        alert.classList.remove('show');
-        setTimeout(function () { alert.remove(); }, 500);
-      }, 5000);
+    document.querySelectorAll('.alert').forEach(function (a) {
+      setTimeout(function () { a.classList.remove('show'); setTimeout(function () { a.remove(); }, 500); }, 5000);
     });
   });
 </script>

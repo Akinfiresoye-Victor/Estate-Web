@@ -15,38 +15,17 @@
 </head>
 <body>
 
-{# ── Messages ─────────────────────────────────────────────────────── #}
 <div class="messages-container">
   {% if messages %}
     {% for message in messages %}
       {% if message.tags == 'error' %}
-        {% with 'danger' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% elif message.tags == 'info' %}
-        {% with 'info' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% elif message.tags == 'warning' %}
-        {% with 'warning' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% else %}
-        {% with 'success' as alert_class %}
-          <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endwith %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
       {% endif %}
     {% endfor %}
   {% endif %}
@@ -58,21 +37,18 @@
     <div class="register-card">
 
       <div class="register-header">
-        <div class="brand-logo">
-          <i class="bi bi-award"></i>
-        </div>
+        <div class="brand-logo"><i class="bi bi-award"></i></div>
         <h1 class="brand-name">Estate Web</h1>
         <h2 class="register-title">Create Account</h2>
         <p class="register-subtitle">Boost your career in real estate</p>
       </div>
 
-      {# Role Switcher — Agent is active #}
       <div class="role-switcher">
-        <a href="{% url 'login' %}" class="role-tab">
+        <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
           <i class="bi bi-box-arrow-in-right"></i>
           <span class="role-tab-label">Sign In</span>
         </a>
-        <a href="{% url 'register-customer' %}" class="role-tab">
+        <a href="{% url 'register-customer' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
           <i class="bi bi-person"></i>
           <span class="role-tab-label">Customer</span>
         </a>
@@ -80,7 +56,7 @@
           <i class="bi bi-award-fill"></i>
           <span class="role-tab-label">Agent</span>
         </span>
-        <a href="{% url 'register-company' %}" class="role-tab">
+        <a href="{% url 'register-company' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
           <i class="bi bi-building"></i>
           <span class="role-tab-label">Company</span>
         </a>
@@ -104,6 +80,10 @@
 
       <form method="POST" action="{% url 'register-agent' %}" class="register-form">
         {% csrf_token %}
+
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
 
         <div class="form-row">
           <div class="form-group">
@@ -151,31 +131,21 @@
 
         <div class="login-section">
           <p class="login-text">Already have an account?</p>
-          <a href="{% url 'login' %}" class="btn-login">Sign In</a>
+          <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="btn-login">Sign In</a>
         </div>
       </form>
 
     </div>
 
-    {# Side Panel — gold for agents #}
     <div class="side-panel side-panel-agent">
       <div class="side-content">
         <i class="bi bi-award-fill"></i>
         <h3>Boost Your Career</h3>
         <p>Access exclusive job listings by top companies and use powerful tools to manage your career.</p>
         <div class="features">
-          <div class="feature-item">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Frequent job listings</span>
-          </div>
-          <div class="feature-item">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Career management tools</span>
-          </div>
-          <div class="feature-item">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Work remotely with us</span>
-          </div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Frequent job listings</span></div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Career management tools</span></div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Work remotely with us</span></div>
         </div>
       </div>
     </div>
@@ -187,11 +157,8 @@
 <script src="{% static 'members/js/password_rules.js' %}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.alert').forEach(function (alert) {
-      setTimeout(function () {
-        alert.classList.remove('show');
-        setTimeout(function () { alert.remove(); }, 500);
-      }, 5000);
+    document.querySelectorAll('.alert').forEach(function (a) {
+      setTimeout(function () { a.classList.remove('show'); setTimeout(function () { a.remove(); }, 500); }, 5000);
     });
   });
 </script>

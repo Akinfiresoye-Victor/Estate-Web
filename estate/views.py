@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from .forms import *
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,JsonResponse
 from django.contrib import messages
 from members.forms import UpdateUserForm
 from django.contrib.auth.forms import PasswordChangeForm
@@ -18,7 +18,7 @@ import uuid
 from django.db.models import Avg, Count
 from django.core.exceptions import ObjectDoesNotExist
 from core.utils import refresh_activity_score
-
+from django.urls import reverse
 
 
 '''Algorithms Start👇'''
@@ -76,27 +76,33 @@ def property_view_count(property_id, property_type, users_id, users_uuid):
         )
         new_object.save()
 
+
+def _wishlist_for_user(properties_list, user):
+    """
+    Returns a list of True/False for each property.
+    If the user is not authenticated we return all False
+    so the page renders fine without crashing on user.id == None.
+    """
+    if not user or not user.is_authenticated:
+        return [False] * len(properties_list)
+    return wishlist_generator(properties_list, user.id)
+
+
 '''Algorithms End👆 '''
 
 
 
 def buy_property(request):
-    """Lists all properties on sale, ordered by listing score."""
- 
-    if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('login')
-    if not request.user.role == 'customer':
-        messages.error(request, 'Customer Access Only')
-        return redirect('landing')
- 
+    """
+    Lists all properties on sale, ordered by listing score.
+    Works for both authenticated and unauthenticated users.
+    Unauthenticated users see all listings but hearts show as empty.
+    """
     try:
-        # ── Order by score (highest first), then recency as tiebreaker ──
         sale_qs = PropertyManagementSale.objects.all().order_by(
             '-listing_score', '-listed_date'
         )
  
-        # Filtering
         myfilter = PropertySaleFilter(request.GET, queryset=sale_qs)
         sale_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementSale.objects.none()
  
@@ -105,8 +111,8 @@ def buy_property(request):
         on_sale = p.get_page(page)
         nums    = "a" * on_sale.paginator.num_pages
  
-        properties_list       = list(sale_qs)
-        in_wishlist           = wishlist_generator(properties_list, request.user.id)
+        properties_list          = list(on_sale)  # only paginated slice, not full qs
+        in_wishlist              = _wishlist_for_user(properties_list, request.user)
         properties_with_wishlist = zip(on_sale, in_wishlist)
  
         context = {
@@ -121,27 +127,18 @@ def buy_property(request):
         return render(request, 'estate/error_page.html', {'e': e})
  
  
-# ─────────────────────────────────────────────────────────────────────────────
-# rent_property — ordered by listing_score, activity refresh on detail views
-# ─────────────────────────────────────────────────────────────────────────────
+# ─── rent_property ────────────────────────────────────────────────────────────
  
 def rent_property(request):
-    """Lists all properties on rent, ordered by listing score."""
- 
-    if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
-        return redirect('login')
-    if not request.user.role == 'customer':
-        messages.error(request, 'Customer Access Only')
-        return redirect('landing')
- 
+    """
+    Lists all rental properties, ordered by listing score.
+    Works for both authenticated and unauthenticated users.
+    """
     try:
-        # ── Order by score (highest first), then recency as tiebreaker ──
         rent_qs = PropertyManagementRent.objects.all().order_by(
             '-listing_score', '-listed_date'
         )
  
-        # Filtering
         myfilter = PropertyRentFilter(request.GET, queryset=rent_qs)
         rent_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementRent.objects.none()
  
@@ -150,8 +147,8 @@ def rent_property(request):
         on_lease = p.get_page(page)
         nums     = "a" * on_lease.paginator.num_pages
  
-        properties_list         = list(rent_qs)
-        in_wishlist             = wishlist_generator(properties_list, request.user.id)
+        properties_list          = list(on_lease)  # paginated slice only
+        in_wishlist              = _wishlist_for_user(properties_list, request.user)
         properties_with_wishlist = zip(on_lease, in_wishlist)
  
         context = {
@@ -164,7 +161,7 @@ def rent_property(request):
  
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
-
+ 
 
 # Add this import at the top of your views.py alongside the other scoring import:
 #
@@ -174,8 +171,7 @@ def rent_property(request):
 def view_property_on_sale(request, property_id):
     """View Listed Property in detail"""
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('login')
+        return redirect(f"{reverse('login')}?next={request.get_full_path()}")
 
     try:
         base_template = {
@@ -214,9 +210,6 @@ def view_property_on_sale(request, property_id):
 
         messages.info(request, msg)
         property_view_count(property_id, "Sale", request.user.id, view_id)
-
-        # ── Refresh score (24-hour gate means this only does real
-        #    work once per day regardless of how many users view it) ──
         refresh_activity_score(prop, 'Sale')
 
         return render(request, 'estate/view_property_s.html', {
@@ -236,19 +229,15 @@ def view_property_on_sale(request, property_id):
 
 
 def view_property_on_lease(request, property_id):
-    """View Listed Property in details"""
+    """View Listed Property in detail"""
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
-        return redirect('login')
+        return redirect(f"{reverse('login')}?next={request.get_full_path()}")
 
     try:
-        user_role = request.user.role
-        if user_role == 'company':
-            base_template = 'company/base.html'
-        elif user_role == 'agent':
-            base_template = 'agent/base.html'
-        else:
-            base_template = 'estate/base.html'
+        base_template = {
+            'company': 'company/base.html',
+            'agent':   'agent/base.html',
+        }.get(request.user.role, 'estate/base.html')
 
         property_to_be_viewed = PropertyManagementRent.objects.get(pk=property_id)
 
@@ -280,30 +269,22 @@ def view_property_on_lease(request, property_id):
 
         messages.info(request, msg)
         property_view_count(property_id, "Rent", request.user.id, view_id)
-
-        # ── Refresh score (24-hour gate means this only does real
-        #    work once per day regardless of how many users view it) ──
         refresh_activity_score(property_to_be_viewed, 'Rent')
 
-        context = {
+        return render(request, 'estate/view_property_r.html', {
             'property':      property_to_be_viewed,
             'agent_info':    agent_in_charge,
             'company_info':  company_in_charge,
             'base_template': base_template,
-            'role':          user_role,
-        }
-        return render(request, 'estate/view_property_r.html', context)
+            'role':          request.user.role,
+        })
 
     except ObjectDoesNotExist:
-        messages.error(request, 'An error occurred')
-        if 'HTTP_REFERER' in request.META:
-            return redirect(request.META['HTTP_REFERER'])
-        else:
-            return redirect('customer:rent-property')
+        messages.error(request, 'Property unavailable')
+        return redirect(request.META.get('HTTP_REFERER', 'customer:rent-property'))
 
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
-
 
 
 def user_profile(request):
@@ -347,122 +328,154 @@ def listed_properties(request):
 
 
 
+
+
 def toggle_wishlist_rent(request, property_id):
     """
-    Toggling ON/OFF Favourite for property on lease
+    Toggle wishlist for a rent property.
+    Unauthenticated users are redirected to login with ?next= so they come
+    straight back here after signing in.
+    AJAX: returns JSON {"added": true/false}
     """
     if not request.user.is_authenticated:
-        messages.info(request, "Log in to gain access")
-        return redirect('login')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'login_required'}, status=401)
+        # Pass the current full path so the user returns here after login
+        return redirect(f"{reverse('login')}?next={request.get_full_path()}")
+ 
     if not request.user.role == 'customer':
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'forbidden'}, status=403)
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
+ 
     try:
-        wishlist_storage=WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Rent")
-        if wishlist_storage.exists():
-            wishlist_storage.delete()
-            property_like_decrement=PropertyManagementRent.objects.get(pk=property_id)
-            property_like_decrement.total_likes-=1
-            property_like_decrement.save()
-            messages.success(request, 'Property Removed From wishlist')
+        wishlist_qs = WishlistStorageUnit.objects.filter(
+            user_id=request.user.id,
+            property_id=property_id,
+            property_type="Rent"
+        )
+ 
+        if wishlist_qs.exists():
+            wishlist_qs.delete()
+            prop = PropertyManagementRent.objects.get(pk=property_id)
+            prop.total_likes = max(0, prop.total_likes - 1)
+            prop.save(update_fields=['total_likes'])
+            added = False
         else:
-            favourite=WishlistStorageUnit.objects.create(
+            WishlistStorageUnit.objects.create(
                 user_id=request.user.id,
                 property_id=property_id,
                 property_type="Rent"
             )
-            favourite.save()
-            property_like_increment=PropertyManagementRent.objects.get(pk=property_id)
-            property_like_increment.total_likes+=1
-            property_like_increment.save()
-            messages.success(request, 'Property Added to wishlist')
-        if 'HTTP_REFERER' in request.META:
-            return redirect(request.META['HTTP_REFERER'])  
-        else:
-            return redirect('customer:rent-property')
+            prop = PropertyManagementRent.objects.get(pk=property_id)
+            prop.total_likes += 1
+            prop.save(update_fields=['total_likes'])
+            added = True
+ 
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'added': added, 'likes': prop.total_likes})
+ 
+        return redirect(request.META.get('HTTP_REFERER', 'customer:rent-property'))
+ 
     except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
         return render(request, 'estate/error_page.html', {'e': e})
-
-
-
+ 
+ 
+# ─── toggle_wishlist_buy ──────────────────────────────────────────────────────
+ 
 def toggle_wishlist_buy(request, property_id):
     """
-    Toggling ON/OFF Favourite for property on sale
+    Toggle wishlist for a sale property.
+    Unauthenticated users are redirected to login with ?next=.
+    AJAX: returns JSON {"added": true/false}
     """
     if not request.user.is_authenticated:
-        messages.info(request, "Log in to gain access")
-        return redirect('login')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'login_required'}, status=401)
+        return redirect(f"{reverse('login')}?next={request.get_full_path()}")
+ 
     if not request.user.role == 'customer':
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'forbidden'}, status=403)
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
+ 
     try:
-        wishlist_storage= WishlistStorageUnit.objects.filter(user_id=request.user.id, property_id=property_id, property_type="Sale")
-        if wishlist_storage.exists():
-            wishlist_storage.delete()
-            property_like_decrement=PropertyManagementSale.objects.get(pk=property_id)
-            property_like_decrement.total_likes-=1
-            property_like_decrement.save()
-            messages.success(request, 'Property Removed From wishlist')
+        wishlist_qs = WishlistStorageUnit.objects.filter(
+            user_id=request.user.id,
+            property_id=property_id,
+            property_type="Sale"
+        )
+ 
+        if wishlist_qs.exists():
+            wishlist_qs.delete()
+            prop = PropertyManagementSale.objects.get(pk=property_id)
+            prop.total_likes = max(0, prop.total_likes - 1)
+            prop.save(update_fields=['total_likes'])
+            added = False
         else:
-            favourite=WishlistStorageUnit.objects.create(
+            WishlistStorageUnit.objects.create(
                 user_id=request.user.id,
                 property_id=property_id,
                 property_type="Sale"
             )
-            favourite.save()
-            property_like_increment=PropertyManagementSale.objects.get(pk=property_id)
-            property_like_increment.total_likes+=1
-            property_like_increment.save()
-            messages.success(request, 'Property Added Successfully')
-        if 'HTTP_REFERER' in request.META:
-            return redirect(request.META['HTTP_REFERER'])  
-        else:
-            return redirect('customer:buy-property')
-    
+            prop = PropertyManagementSale.objects.get(pk=property_id)
+            prop.total_likes += 1
+            prop.save(update_fields=['total_likes'])
+            added = True
+ 
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'added': added, 'likes': prop.total_likes})
+ 
+        return redirect(request.META.get('HTTP_REFERER', 'customer:buy-property'))
+ 
     except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
         return render(request, 'estate/error_page.html', {'e': e})
-
-
 
 def wishlist(request):
     """
-    Listing each users favourited property
+    Lists each user's favourited properties.
+    Unauthenticated users are redirected to login with ?next= so they
+    come straight back here after signing in.
     """
     if not request.user.is_authenticated:
-        messages.info(request, "Log in to gain access")
-        return redirect('login')
+        return redirect(f"{reverse('login')}?next={request.get_full_path()}")
     if not request.user.role == 'customer':
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
     try:
         wishlist_rent = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Rent")
         wishlist_sale = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Sale")
-        
-        rent_list=[]
-        sale_list=[]
+ 
+        rent_list = []
+        sale_list = []
+ 
         for rent in wishlist_rent:
-            rent=rent.property_id
-            on_lease=PropertyManagementRent.objects.get(pk=rent)
+            on_lease = PropertyManagementRent.objects.get(pk=rent.property_id)
             rent_list.append(on_lease)
-        
+ 
         for sale in wishlist_sale:
-            sale=sale.property_id
-            on_sale=PropertyManagementSale.objects.get(pk=sale)
+            on_sale = PropertyManagementSale.objects.get(pk=sale.property_id)
             sale_list.append(on_sale)
-        
+ 
         total_saved = wishlist_rent.count() + wishlist_sale.count()
         context = {
             'wishlist_rent': zip(wishlist_rent, rent_list),
             'wishlist_sale': zip(wishlist_sale, sale_list),
-            'lease_count': wishlist_rent.count(),
-            'sale_count': wishlist_sale.count(),
-            'total_saved': total_saved,
+            'lease_count':   wishlist_rent.count(),
+            'sale_count':    wishlist_sale.count(),
+            'total_saved':   total_saved,
         }
         return render(request, 'estate/wishlist.html', context)
-    
+ 
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e': e})
-
+ 
 
 
 def update_profile(request, user_id):

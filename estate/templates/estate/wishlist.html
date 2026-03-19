@@ -29,12 +29,12 @@
 
     <!-- ── STATS ── -->
     {% if wishlist_rent or wishlist_sale %}
-    <div class="wl-stats">
+    <div class="wl-stats" id="wlStats">
 
       <div class="wl-stat lease">
         <div class="wl-stat-icon"><i class="bi bi-geo-alt-fill"></i></div>
         <div class="wl-stat-body">
-          <span class="wl-stat-num">{{ lease_count }}</span>
+          <span class="wl-stat-num" id="leaseCount">{{ lease_count }}</span>
           <span class="wl-stat-lbl">For Lease</span>
         </div>
       </div>
@@ -42,7 +42,7 @@
       <div class="wl-stat sale">
         <div class="wl-stat-icon"><i class="bi bi-house-fill"></i></div>
         <div class="wl-stat-body">
-          <span class="wl-stat-num">{{ sale_count }}</span>
+          <span class="wl-stat-num" id="saleCount">{{ sale_count }}</span>
           <span class="wl-stat-lbl">For Sale</span>
         </div>
       </div>
@@ -50,39 +50,68 @@
       <div class="wl-stat total">
         <div class="wl-stat-icon"><i class="bi bi-heart-fill"></i></div>
         <div class="wl-stat-body">
-          <span class="wl-stat-num">{{ total_saved }}</span>
+          <span class="wl-stat-num" id="totalCount">{{ total_saved }}</span>
           <span class="wl-stat-lbl">Total Saved</span>
         </div>
       </div>
 
+    </div>
+    {% else %}
+    {# Stats bar hidden initially when empty — JS won't need to touch it #}
+    <div class="wl-stats" id="wlStats" style="display:none">
+      <div class="wl-stat lease">
+        <div class="wl-stat-icon"><i class="bi bi-geo-alt-fill"></i></div>
+        <div class="wl-stat-body">
+          <span class="wl-stat-num" id="leaseCount">0</span>
+          <span class="wl-stat-lbl">For Lease</span>
+        </div>
+      </div>
+      <div class="wl-stat sale">
+        <div class="wl-stat-icon"><i class="bi bi-house-fill"></i></div>
+        <div class="wl-stat-body">
+          <span class="wl-stat-num" id="saleCount">0</span>
+          <span class="wl-stat-lbl">For Sale</span>
+        </div>
+      </div>
+      <div class="wl-stat total">
+        <div class="wl-stat-icon"><i class="bi bi-heart-fill"></i></div>
+        <div class="wl-stat-body">
+          <span class="wl-stat-num" id="totalCount">0</span>
+          <span class="wl-stat-lbl">Total Saved</span>
+        </div>
+      </div>
     </div>
     {% endif %}
 
 
     <!-- ── FOR LEASE ── -->
     {% if wishlist_rent %}
-    <section class="wl-section">
+    <section class="wl-section" id="leaseSection">
       <div class="wl-section-header">
         <div class="wl-section-title">
           <span class="wl-section-dot lease"></span>
           <h2>For Lease</h2>
         </div>
-        <span class="wl-section-count lease">{{ lease_count }} {{ lease_count|pluralize:"property,properties" }}</span>
+        <span class="wl-section-count lease" id="leaseLabel">
+          {{ lease_count }} {{ lease_count|pluralize:"property,properties" }}
+        </span>
       </div>
 
-      <div class="wl-grid">
+      <div class="wl-grid" id="leaseGrid">
         {% for wishlist_item, property in wishlist_rent %}
-        <article class="wl-card">
+        <article class="wl-card" id="rent-card-{{ wishlist_item.property_id }}">
 
           <div class="wl-card-image">
-            <!-- Type badge -->
             <span class="wl-badge lease"><i class="bi bi-geo-alt-fill"></i> Lease</span>
 
-            <!-- Remove from wishlist -->
-            <a href="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}"
-               class="wl-heart active" aria-label="Remove from wishlist">
+            {# Button — no href, driven by AJAX #}
+            <button class="wl-heart active wl-remove"
+                    data-url="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}"
+                    data-card-id="rent-card-{{ wishlist_item.property_id }}"
+                    data-type="lease"
+                    aria-label="Remove from wishlist">
               <i class="bi bi-heart-fill"></i>
-            </a>
+            </button>
 
             {% if property.base_image %}
               <img src="{{ property.base_image.url }}"
@@ -131,31 +160,48 @@
         {% endfor %}
       </div>
     </section>
+    {% else %}
+    {# Section exists in DOM even when empty so JS can target it #}
+    <section class="wl-section" id="leaseSection" style="display:none">
+      <div class="wl-section-header">
+        <div class="wl-section-title">
+          <span class="wl-section-dot lease"></span>
+          <h2>For Lease</h2>
+        </div>
+        <span class="wl-section-count lease" id="leaseLabel">0 properties</span>
+      </div>
+      <div class="wl-grid" id="leaseGrid"></div>
+    </section>
     {% endif %}
 
 
     <!-- ── FOR SALE ── -->
     {% if wishlist_sale %}
-    <section class="wl-section">
+    <section class="wl-section" id="saleSection">
       <div class="wl-section-header">
         <div class="wl-section-title">
           <span class="wl-section-dot sale"></span>
           <h2>For Sale</h2>
         </div>
-        <span class="wl-section-count sale">{{ sale_count }} {{ sale_count|pluralize:"property,properties" }}</span>
+        <span class="wl-section-count sale" id="saleLabel">
+          {{ sale_count }} {{ sale_count|pluralize:"property,properties" }}
+        </span>
       </div>
 
-      <div class="wl-grid">
+      <div class="wl-grid" id="saleGrid">
         {% for wishlist_item, property in wishlist_sale %}
-        <article class="wl-card">
+        <article class="wl-card" id="sale-card-{{ wishlist_item.property_id }}">
 
           <div class="wl-card-image">
             <span class="wl-badge sale"><i class="bi bi-tag-fill"></i> Sale</span>
 
-            <a href="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}"
-               class="wl-heart active" aria-label="Remove from wishlist">
+            <button class="wl-heart active wl-remove"
+                    data-url="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}"
+                    data-card-id="sale-card-{{ wishlist_item.property_id }}"
+                    data-type="sale"
+                    aria-label="Remove from wishlist">
               <i class="bi bi-heart-fill"></i>
-            </a>
+            </button>
 
             {% if property.base_image %}
               <img src="{{ property.base_image.url }}"
@@ -203,12 +249,22 @@
         {% endfor %}
       </div>
     </section>
+    {% else %}
+    <section class="wl-section" id="saleSection" style="display:none">
+      <div class="wl-section-header">
+        <div class="wl-section-title">
+          <span class="wl-section-dot sale"></span>
+          <h2>For Sale</h2>
+        </div>
+        <span class="wl-section-count sale" id="saleLabel">0 properties</span>
+      </div>
+      <div class="wl-grid" id="saleGrid"></div>
+    </section>
     {% endif %}
 
 
     <!-- ── EMPTY STATE ── -->
-    {% if not wishlist_rent and not wishlist_sale %}
-    <div class="wl-empty">
+    <div class="wl-empty" id="wlEmpty" {% if wishlist_rent or wishlist_sale %}style="display:none"{% endif %}>
       <div class="wl-empty-icon">
         <i class="bi bi-heart"></i>
       </div>
@@ -223,10 +279,131 @@
         </a>
       </div>
     </div>
-    {% endif %}
 
   </div><!-- end .wl-content -->
 
 </div><!-- end .wl-page -->
+
+
+<script>
+(function () {
+  'use strict';
+
+  var CSRF = '{{ csrf_token }}';
+
+  /* ── Live counters (integers, so JS can do maths on them) ── */
+  var counts = {
+    lease: parseInt(document.getElementById('leaseCount').textContent, 10) || 0,
+    sale:  parseInt(document.getElementById('saleCount').textContent,  10) || 0,
+  };
+
+  /* ── Attach click handler to every remove button ── */
+  document.querySelectorAll('.wl-remove').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.disabled) return;
+
+      var url    = btn.dataset.url;
+      var cardId = btn.dataset.cardId;
+      var type   = btn.dataset.type;   /* "lease" or "sale" */
+
+      btn.disabled = true;
+      /* Shrink the heart immediately so the user gets instant feedback */
+      btn.querySelector('i').style.transform = 'scale(0.7)';
+
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': CSRF,
+        },
+        credentials: 'same-origin',
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Request failed: ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        /* Server confirmed removal (added === false) */
+        if (!data.added) {
+          removeCard(cardId, type);
+        } else {
+          /* Unexpected — server added it instead of removing. Restore btn. */
+          btn.disabled = false;
+          btn.querySelector('i').style.transform = '';
+        }
+      })
+      .catch(function () {
+        /* Network error — restore button */
+        btn.disabled = false;
+        btn.querySelector('i').style.transform = '';
+      });
+    });
+  });
+
+
+  /* ── Remove a card from the DOM and update all counters ── */
+  function removeCard(cardId, type) {
+    var card = document.getElementById(cardId);
+    if (!card) return;
+
+    /* Fade + shrink the card out */
+    card.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
+    card.style.opacity    = '0';
+    card.style.transform  = 'scale(0.94)';
+
+    setTimeout(function () {
+      card.remove();
+      updateCounters(type);
+    }, 280);
+  }
+
+
+  /* ── Update every counter and show/hide sections + empty state ── */
+  function updateCounters(type) {
+
+    /* Decrement the right counter */
+    counts[type] = Math.max(0, counts[type] - 1);
+
+    var leaseEl = document.getElementById('leaseCount');
+    var saleEl  = document.getElementById('saleCount');
+    var totalEl = document.getElementById('totalCount');
+    var leaseLabel = document.getElementById('leaseLabel');
+    var saleLabel  = document.getElementById('saleLabel');
+
+    leaseEl.textContent = counts.lease;
+    saleEl.textContent  = counts.sale;
+    totalEl.textContent = counts.lease + counts.sale;
+
+    /* Update section label text ("2 properties" / "1 property") */
+    if (leaseLabel) leaseLabel.textContent = counts.lease + (counts.lease === 1 ? ' property' : ' properties');
+    if (saleLabel)  saleLabel.textContent  = counts.sale  + (counts.sale  === 1 ? ' property' : ' properties');
+
+    /* Hide/show the lease section */
+    var leaseSection = document.getElementById('leaseSection');
+    if (leaseSection) {
+      leaseSection.style.display = counts.lease === 0 ? 'none' : '';
+    }
+
+    /* Hide/show the sale section */
+    var saleSection = document.getElementById('saleSection');
+    if (saleSection) {
+      saleSection.style.display = counts.sale === 0 ? 'none' : '';
+    }
+
+    /* Hide/show the stats bar */
+    var stats = document.getElementById('wlStats');
+    if (stats) {
+      stats.style.display = (counts.lease + counts.sale === 0) ? 'none' : '';
+    }
+
+    /* Show empty state if everything is gone */
+    var empty = document.getElementById('wlEmpty');
+    if (empty) {
+      empty.style.display = (counts.lease + counts.sale === 0) ? '' : 'none';
+    }
+  }
+
+}());
+</script>
 
 {% endblock %}

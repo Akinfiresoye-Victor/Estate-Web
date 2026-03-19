@@ -238,6 +238,74 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   .messages-container { top: 0.75rem; right: 0.75rem; left: 0.75rem; max-width: none; }
 }
 
+/* ── BROWSE STRIP ── */
+.browse-strip {
+  background: var(--ink-soft);
+  border-bottom: 1px solid rgba(193,155,118,.15);
+  padding: 0.75rem 0;
+}
+
+.browse-strip-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.browse-strip-text {
+  display: flex; align-items: center; gap: 0.55rem;
+  font-size: 0.82rem; color: rgba(255,255,255,.6);
+}
+.browse-strip-text i { color: var(--gold); font-size: 0.88rem; flex-shrink: 0; }
+.browse-strip-text strong { color: rgba(255,255,255,.85); }
+
+.browse-strip-btns {
+  display: flex; gap: 0.6rem;
+}
+
+.browse-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0.45rem 1.1rem;
+  border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+  text-decoration: none; transition: var(--ease);
+  border: 1.5px solid transparent;
+}
+.browse-btn.sale {
+  background: rgba(37,99,235,.18);
+  border-color: rgba(37,99,235,.35);
+  color: #93c5fd;
+}
+.browse-btn.sale:hover {
+  background: rgba(37,99,235,.3);
+  color: #bfdbfe;
+  transform: translateY(-1px);
+}
+.browse-btn.lease {
+  background: rgba(22,163,74,.18);
+  border-color: rgba(22,163,74,.35);
+  color: #86efac;
+}
+.browse-btn.lease:hover {
+  background: rgba(22,163,74,.3);
+  color: #bbf7d0;
+  transform: translateY(-1px);
+}
+
+@media (min-width: 640px) {
+  .browse-strip-inner {
+    flex-direction: row;
+    justify-content: center;
+    text-align: left;
+  }
+}
+
+@media (min-width: 900px) {
+  .browse-strip { padding: 0.85rem 0; }
+  .browse-strip-text { font-size: 0.88rem; }
+  .browse-btn { font-size: 0.82rem; padding: 0.5rem 1.25rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .ticker-track { animation: none; }
@@ -259,6 +327,26 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center">
         <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About Us</a></li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="browseDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Browse</a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="browseDropdown">
+            <li>
+              <a class="dropdown-item" href="{% url 'customer:buy-property' %}">
+                <i class="bi bi-house-fill"></i>
+                <div><strong>Properties For Sale</strong><small class="d-block">Browse homes and land for purchase</small></div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'customer:rent-property' %}">
+                <i class="bi bi-key-fill"></i>
+                <div><strong>Properties For Rent</strong><small class="d-block">Find homes and spaces to lease</small></div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Register</a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
@@ -381,6 +469,29 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
     </div>
   </div>
 </section>
+
+
+<!-- BROWSE STRIP — no account needed -->
+<div class="browse-strip">
+  <div class="container">
+    <div class="browse-strip-inner">
+      <div class="browse-strip-text">
+        <i class="bi bi-eye-fill"></i>
+        <span>Browse properties without an account — <strong>no sign-up required</strong></span>
+      </div>
+      <div class="browse-strip-btns">
+        <a href="{% url 'customer:buy-property' %}" class="browse-btn sale">
+          <i class="bi bi-house-fill"></i>
+          <span>For Sale</span>
+        </a>
+        <a href="{% url 'customer:rent-property' %}" class="browse-btn lease">
+          <i class="bi bi-key-fill"></i>
+          <span>For Rent</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <!-- TICKER -->
@@ -544,6 +655,11 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <ul class="footer-links">
           <li><a href="{% url 'about' %}"><i class="bi bi-arrow-right"></i> About Us</a></li>
         </ul>
+        <h5 class="footer-heading" style="margin-top:1.5rem">Browse Properties</h5>
+        <ul class="footer-links">
+          <li><a href="{% url 'customer:buy-property' %}"><i class="bi bi-arrow-right"></i> Properties For Sale</a></li>
+          <li><a href="{% url 'customer:rent-property' %}"><i class="bi bi-arrow-right"></i> Properties For Rent</a></li>
+        </ul>
       </div>
       <div class="col-12 col-lg-5">
         <h5 class="footer-heading">Contact Us</h5>
@@ -560,7 +676,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2025 Estate Web. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+      <p>&copy; 2025 Estate Web. All rights reserved. | <a href="{%url 'terms-agreement'%}">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
     </div>
   </div>
 </footer>

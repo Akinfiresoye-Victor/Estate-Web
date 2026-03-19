@@ -82,7 +82,6 @@
       {% if lease.available %}
       <article class="rent-card">
 
-        <!-- Image -->
         <div class="rent-card-image">
           {% if lease.base_image %}
             <img src="{{ lease.base_image.url }}" alt="Property" class="rent-img" loading="lazy">
@@ -94,31 +93,26 @@
 
           <span class="rent-for-lease-badge">For Lease</span>
 
-          <button class="rent-wishlist-btn"
-                  onclick="location.href='{% url 'customer:toggle-wishlist-rent' lease.id %}'"
+          {# data-url and data-added drive the AJAX logic below #}
+          <button class="rent-wishlist-btn wl-toggle"
+                  data-url="{% url 'customer:toggle-wishlist-rent' lease.id %}"
+                  data-added="{% if wishlist %}true{% else %}false{% endif %}"
                   aria-label="{% if wishlist %}Remove from wishlist{% else %}Add to wishlist{% endif %}">
             <i class="bi bi-heart{% if wishlist %}-fill{% endif %}"></i>
           </button>
         </div>
 
-        <!-- Body -->
         <div class="rent-card-body">
-
           <div class="rent-price">
             ₦{{ lease.price_range|floatformat:2|intcomma }}
             <span class="rent-price-period">/mo</span>
           </div>
 
           <h3 class="rent-card-title">
-            {% if lease.residential %}
-              {{ lease.residential }}
-            {% elif lease.commercial %}
-              {{ lease.commercial }}
-            {% elif lease.lands %}
-              {{ lease.lands }}
-            {% else %}
-              Property Listing
-            {% endif %}
+            {% if lease.residential %}{{ lease.residential }}
+            {% elif lease.commercial %}{{ lease.commercial }}
+            {% elif lease.lands %}{{ lease.lands }}
+            {% else %}Property Listing{% endif %}
           </h3>
 
           <div class="rent-location">
@@ -130,20 +124,16 @@
 
           <div class="rent-meta">
             <span class="rent-meta-item">
-              <i class="bi bi-telephone-fill"></i>
-              {{ lease.phone_number }}
+              <i class="bi bi-telephone-fill"></i> {{ lease.phone_number }}
             </span>
             <span class="rent-meta-item">
-              <i class="bi bi-calendar3"></i>
-              {{ lease.listed_date|date:"M d, Y" }}
+              <i class="bi bi-calendar3"></i> {{ lease.listed_date|date:"M d, Y" }}
             </span>
           </div>
 
-          <a href="{% url 'customer:view-property-r' property_id=lease.id %}"
-             class="rent-btn-view">
+          <a href="{% url 'customer:view-property-r' property_id=lease.id %}" class="rent-btn-view">
             View Details <i class="bi bi-arrow-right-short"></i>
           </a>
-
         </div>
       </article>
       {% endif %}
@@ -155,16 +145,10 @@
   {% if leased.paginator.num_pages > 1 %}
   <div class="rent-pagination">
     <nav class="rent-pag-nav" aria-label="Property pages">
-
       {% if leased.has_previous %}
-        <a href="?page=1" class="pag-btn" aria-label="First">
-          <i class="bi bi-chevron-bar-left"></i>
-        </a>
-        <a href="?page={{ leased.previous_page_number }}" class="pag-btn" aria-label="Previous">
-          <i class="bi bi-chevron-left"></i>
-        </a>
+        <a href="?page=1" class="pag-btn" aria-label="First"><i class="bi bi-chevron-bar-left"></i></a>
+        <a href="?page={{ leased.previous_page_number }}" class="pag-btn" aria-label="Previous"><i class="bi bi-chevron-left"></i></a>
       {% endif %}
-
       {% for i in nums %}
         <a href="?page={{ forloop.counter }}"
            class="pag-btn {% if leased.number == forloop.counter %}pag-active{% endif %}"
@@ -172,27 +156,17 @@
           {{ forloop.counter }}
         </a>
       {% endfor %}
-
       {% if leased.has_next %}
-        <a href="?page={{ leased.next_page_number }}" class="pag-btn" aria-label="Next">
-          <i class="bi bi-chevron-right"></i>
-        </a>
-        <a href="?page={{ leased.paginator.num_pages }}" class="pag-btn" aria-label="Last">
-          <i class="bi bi-chevron-bar-right"></i>
-        </a>
+        <a href="?page={{ leased.next_page_number }}" class="pag-btn" aria-label="Next"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ leased.paginator.num_pages }}" class="pag-btn" aria-label="Last"><i class="bi bi-chevron-bar-right"></i></a>
       {% endif %}
-
     </nav>
-    <p class="pag-summary">
-      Page <strong>{{ leased.number }}</strong> of <strong>{{ leased.paginator.num_pages }}</strong>
-    </p>
+    <p class="pag-summary">Page <strong>{{ leased.number }}</strong> of <strong>{{ leased.paginator.num_pages }}</strong></p>
   </div>
   {% endif %}
 
 
   {% else %}
-
-  <!-- EMPTY STATE -->
   <div class="rent-empty">
     <div class="rent-empty-icon"><i class="bi bi-house-x"></i></div>
     <h2>No Properties Found</h2>
@@ -201,19 +175,78 @@
       <i class="bi bi-arrow-clockwise"></i> Clear Filters
     </button>
   </div>
-
   {% endif %}
 
 </div><!-- end .rent-page -->
 
 
 <script>
+/* ── Filter toggle ─────────────────────────────── */
 function toggleFilters() {
   var body = document.getElementById('filterContent');
   var text = document.getElementById('filterToggleText');
   body.classList.toggle('open');
   text.textContent = body.classList.contains('open') ? 'Hide Filters' : 'Show Filters';
 }
+
+/* ── AJAX Wishlist ─────────────────────────────── */
+(function () {
+  var CSRF = '{{ csrf_token }}';
+
+  document.querySelectorAll('.wl-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var url   = btn.dataset.url;
+      var icon  = btn.querySelector('i');
+      var added = btn.dataset.added === 'true';
+
+      /* Optimistic update — flips immediately so it feels instant */
+      setHeart(icon, !added);
+      btn.dataset.added = String(!added);
+      btn.disabled = true;
+
+      fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': CSRF,
+        },
+        credentials: 'same-origin',
+      })
+      .then(function (res) {
+        if (res.status === 401) {
+          /* Not logged in — revert and go to login */
+          setHeart(icon, added);
+          btn.dataset.added = String(added);
+          window.location.href = '{% url "login" %}?next=' + encodeURIComponent(window.location.pathname);
+          return null;
+        }
+        if (!res.ok) throw new Error('Server error ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data) return;
+        /* Confirm with server's actual state */
+        setHeart(icon, data.added);
+        btn.dataset.added = String(data.added);
+        btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+      })
+      .catch(function () {
+        /* Network failure — roll back */
+        setHeart(icon, added);
+        btn.dataset.added = String(added);
+      })
+      .finally(function () {
+        btn.disabled = false;
+      });
+    });
+  });
+
+  function setHeart(icon, isAdded) {
+    icon.classList.toggle('bi-heart',      !isAdded);
+    icon.classList.toggle('bi-heart-fill',  isAdded);
+    icon.style.color = isAdded ? '#ef4444' : '';
+  }
+}());
 </script>
 
 {% endblock %}

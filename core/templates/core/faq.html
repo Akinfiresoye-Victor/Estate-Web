@@ -1,0 +1,871 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'core/css/faq.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ─────────────────────────────────────── -->
+<div class="fq-hero">
+  <div class="fq-hero-inner">
+    <span class="fq-hero-pill"><i class="bi bi-question-circle-fill"></i> Help Centre</span>
+    <h1>How can we help you?</h1>
+    <p>Everything you need to know about using Estate Web</p>
+
+    <div class="fq-search-bar">
+      <i class="bi bi-search"></i>
+      <input type="text" id="fqSearch" placeholder="Search help topics…" autocomplete="off">
+    </div>
+
+    <div class="fq-role-pills">
+      <a href="#sec-browse"   class="fq-role-pill customer"><i class="bi bi-person-fill"></i> I'm a Customer</a>
+      <a href="#sec-listings" class="fq-role-pill agent"><i class="bi bi-award-fill"></i> I'm an Agent</a>
+      <a href="#sec-company"  class="fq-role-pill company"><i class="bi bi-building-fill"></i> I'm a Company</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── TAB BAR (mobile) ── -->
+<div class="fq-tab-bar">
+  <button class="fq-tab active" onclick="switchFaqTab('all',      this)">All</button>
+  <button class="fq-tab"        onclick="switchFaqTab('customer', this)">Customer</button>
+  <button class="fq-tab"        onclick="switchFaqTab('agent',    this)">Agent</button>
+  <button class="fq-tab"        onclick="switchFaqTab('company',  this)">Company</button>
+</div>
+
+
+<!-- ── LAYOUT ─────────────────────────────────── -->
+<div class="fq-layout">
+
+  <!-- SIDEBAR (desktop only) -->
+  <aside class="fq-sidebar">
+    <p class="fq-sidebar-label"><i class="bi bi-list-ul"></i> Topics</p>
+    <nav>
+      <a href="#sec-roles"        class="fq-nav-link">Account Types</a>
+      <a href="#sec-getting-started" class="fq-nav-link">Getting Started</a>
+      <a href="#sec-browse"       class="fq-nav-link">Browsing &amp; Search</a>
+      <a href="#sec-wishlist"     class="fq-nav-link">Wishlist</a>
+      <a href="#sec-listings"     class="fq-nav-link">Managing Listings</a>
+      <a href="#sec-leads"        class="fq-nav-link">Leads &amp; Enquiries</a>
+      <a href="#sec-appointments" class="fq-nav-link">Appointments</a>
+      <a href="#sec-analytics"    class="fq-nav-link">Analytics</a>
+      <a href="#sec-company"      class="fq-nav-link">Company &amp; Team</a>
+      <a href="#sec-jobs"         class="fq-nav-link">Jobs &amp; Vacancies</a>
+      <a href="#sec-verified"     class="fq-nav-link">Verified Badge</a>
+      <a href="#sec-account"      class="fq-nav-link">Account &amp; Security</a>
+      <a href="#sec-limits"       class="fq-nav-link warn-link">What We Don't Do</a>
+      <a href="#sec-contact"      class="fq-nav-link">Contact Support</a>
+    </nav>
+  </aside>
+
+
+  <!-- CONTENT -->
+  <main class="fq-content">
+
+    <div class="fq-no-results" id="fqNoResults" style="display:none">
+      <i class="bi bi-search"></i>
+      <p>No topics match. Try different words or <a href="#sec-contact">contact support</a>.</p>
+    </div>
+
+
+    <!-- ── 1. ACCOUNT TYPES ── -->
+    <section class="fq-section" id="sec-roles" data-tags="account role customer agent company register signup">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-people-fill"></i></div>
+        <div><h2>Account Types &amp; Roles</h2><p>Three account types, each with different permissions.</p></div>
+      </div>
+
+      <div class="fq-role-cards">
+
+        <div class="fq-role-card customer">
+          <div class="fq-rc-top">
+            <div class="fq-rc-icon"><i class="bi bi-person-fill"></i></div>
+            <h3>Customer</h3>
+          </div>
+          <ul class="fq-list">
+            <li>Browse properties for sale and lease</li>
+            <li>Save properties to your wishlist</li>
+            <li>Send enquiries to agents and companies</li>
+            <li>Review agents and companies</li>
+            <li>Manage your profile and saved properties</li>
+          </ul>
+          <span class="fq-rc-note">Cannot post listings</span>
+        </div>
+
+        <div class="fq-role-card agent">
+          <div class="fq-rc-top">
+            <div class="fq-rc-icon"><i class="bi bi-award-fill"></i></div>
+            <h3>Agent</h3>
+          </div>
+          <ul class="fq-list">
+            <li>Post and manage sale &amp; rent listings</li>
+            <li>Receive and manage leads</li>
+            <li>Schedule and track appointments</li>
+            <li>View personal analytics and profile stats</li>
+            <li>Browse job listings from companies</li>
+            <li>Join a company via invite link</li>
+          </ul>
+          <span class="fq-rc-note">Can work independently or under a company</span>
+        </div>
+
+        <div class="fq-role-card company">
+          <div class="fq-rc-top">
+            <div class="fq-rc-icon"><i class="bi bi-building-fill"></i></div>
+            <h3>Company</h3>
+          </div>
+          <ul class="fq-list">
+            <li>Everything an Agent can do, plus:</li>
+            <li>Invite and manage a team of agents</li>
+            <li>Post job vacancies and review applications</li>
+            <li>View company-wide analytics and activity logs</li>
+            <li>Generate and revoke invite links</li>
+            <li>Edit company profile and legal details</li>
+          </ul>
+          <span class="fq-rc-note">Manages agents under one account</span>
+        </div>
+
+      </div>
+
+      <div class="fq-callout info">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>Your role is chosen at registration and <strong>cannot be changed</strong>. You would need to create a new account to switch roles.</p>
+      </div>
+    </section>
+
+
+    <!-- ── 2. GETTING STARTED ── -->
+    <section class="fq-section" id="sec-getting-started" data-tags="getting started register login sign in account new password">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-rocket-takeoff-fill"></i></div>
+        <div><h2>Getting Started</h2><p>New to Estate Web? Start here.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I create an account?</div>
+          <div class="fq-item-a">
+            <p>From the landing page, click <strong>Register</strong> and choose your account type. Each role has its own registration form:</p>
+            <ul class="fq-list">
+              <li><strong>Customer</strong> — fill in basic details and you're redirected to your profile immediately</li>
+              <li><strong>Agent</strong> — registration creates your account and an agent profile automatically. You're taken to your agent dashboard</li>
+              <li><strong>Company</strong> — registration creates your account and a company profile. You're taken to your company dashboard</li>
+            </ul>
+            <p style="margin-top:.5rem">All accounts are logged in automatically after registration — no second step needed.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I sign in and out?</div>
+          <div class="fq-item-a">
+            <p>Click <strong>Sign In</strong> on the landing page or navigation bar. After login you are redirected to the right dashboard for your role. To sign out, use the logout option in your navigation menu.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can I browse without an account?</div>
+          <div class="fq-item-a">
+            <p>Yes — property listings are publicly visible. You need an account to save properties, send enquiries, or post listings.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Where do I go after logging in?</div>
+          <div class="fq-item-a">
+            <ul class="fq-list">
+              <li><strong>Customer</strong> → your profile and property browsing pages</li>
+              <li><strong>Agent</strong> → agent dashboard with listings, leads, and schedule</li>
+              <li><strong>Company</strong> → company dashboard with team, leads, and analytics</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 3. BROWSING ── -->
+    <section class="fq-section" id="sec-browse" data-tags="browse search filter buy rent sale lease property find review news articles">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-house-heart-fill"></i></div>
+        <div><h2>Browsing &amp; Search</h2><p>Finding properties and exploring the platform.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What's the difference between Buy and Rent?</div>
+          <div class="fq-item-a">
+            <p><strong>Buy</strong> lists properties for outright purchase with a fixed price. <strong>Rent / Lease</strong> lists properties with a monthly price range. They are separate pages with separate listings.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do filters work?</div>
+          <div class="fq-item-a">
+            <p>Each listing page has a <strong>Filter Properties</strong> bar. On mobile tap <strong>Show Filters</strong>; on desktop it is always visible. Available filters:</p>
+            <ul class="fq-list">
+              <li><strong>Price range</strong> — minimum and maximum price</li>
+              <li><strong>Property category</strong> — Residential, Commercial, or Land</li>
+              <li><strong>State</strong> — filter by Nigerian state</li>
+            </ul>
+            <p style="margin-top:.5rem">Hit <strong>Apply Filters</strong> to see results or <strong>Reset</strong> to clear all.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What do the property categories mean?</div>
+          <div class="fq-item-a">
+            <ul class="fq-list">
+              <li><strong>Residential</strong> — houses, flats, duplexes, bungalows</li>
+              <li><strong>Commercial</strong> — offices, shops, warehouses, business spaces</li>
+              <li><strong>Land</strong> — bare plots and land for development or sale</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I contact an agent about a property?</div>
+          <div class="fq-item-a">
+            <p>Open a property's detail page. You can reach the agent via phone, WhatsApp, or by submitting the <strong>Enquiry Form</strong>. Submitting the form creates a lead in the agent's dashboard — they will contact you using the details you provide.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can I review an agent or company?</div>
+          <div class="fq-item-a">
+            <p>Yes — customers can leave a review on an agent's profile page or a company's profile page. Reviews help other users make informed decisions and contribute to the agent's platform rating.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Where can I find Nigerian property news?</div>
+          <div class="fq-item-a">
+            <p>Estate Web has a <strong>News &amp; Articles</strong> section that pulls the latest Nigerian housing market news. Access it from the main navigation under <strong>Articles</strong>.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 4. WISHLIST ── -->
+    <section class="fq-section" id="sec-wishlist" data-tags="wishlist favourite save heart like property saved">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-heart-fill"></i></div>
+        <div><h2>Wishlist &amp; Favourites</h2><p>Save and manage properties you're interested in.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I save a property?</div>
+          <div class="fq-item-a">
+            <p>Tap the <strong>heart icon</strong> on any property card. It fills red immediately — no page reload. The property is saved to your account right away.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Where do I view saved properties?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>My Wishlist</strong> from your profile. Properties are grouped into For Lease and For Sale, with counts at the top.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I remove a property?</div>
+          <div class="fq-item-a">
+            <p>Tap the red heart on any saved property. On the wishlist page, the card fades out and the counters update automatically — no page reload.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Do saved properties persist after logout?</div>
+          <div class="fq-item-a">
+            <p>Yes — wishlist items are saved to your account in the database and will be there next time you log in from any device.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can agents and companies use the wishlist?</div>
+          <div class="fq-item-a">
+            <p>No — the wishlist is a <strong>Customer</strong> feature only.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 5. MANAGING LISTINGS ── -->
+    <section class="fq-section" id="sec-listings" data-tags="listing post create sell lease rent property available agent company upload image score featured">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-house-add-fill"></i></div>
+        <div><h2>Managing Listings</h2><p>Posting, editing, and removing properties.</p></div>
+      </div>
+
+      <div class="fq-callout warn">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <p>Only <strong>Agent</strong> and <strong>Company</strong> accounts can post listings. Customer listing tools are coming in a future release.</p>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I post a listing?</div>
+          <div class="fq-item-a">
+            <p>From your dashboard use <strong>Sell Property</strong> (for sale) or <strong>Lease Property</strong> (for rent). Fill in all details and submit — your listing goes live <strong>immediately</strong>. There is no approval wait.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What information do I need?</div>
+          <div class="fq-item-a">
+            <ul class="fq-list">
+              <li>Property category (Residential, Commercial, or Land)</li>
+              <li>Property title and description</li>
+              <li>Location and state</li>
+              <li>Price (fixed for sale, monthly range for rent)</li>
+              <li>Phone number for enquiries</li>
+              <li>At least one property image</li>
+              <li>Bedrooms, bathrooms, parking, and size (where applicable)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I view and manage all my listings?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>My Listings</strong> from your dashboard. You can see all properties you have posted, their availability status, and options to edit or delete each one.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I remove a sold or rented property?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>My Listings</strong> and delete the property. You are required to do this within <strong>48 hours</strong> of a property being sold or rented. Leaving stale listings on the platform can lead to account suspension.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What is the Listing Score?</div>
+          <div class="fq-item-a">
+            <p>Every listing is automatically scored when created. The score reflects completeness — more details, better images, and accurate information results in a higher score. Higher-scoring listings tend to receive better visibility on the platform.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What are Featured Listings?</div>
+          <div class="fq-item-a">
+            <p>Featured listings appear with priority placement in search results and browsing pages. Contact <a href="mailto:support@estateweb.com" class="fq-link">support@estateweb.com</a> to enquire about featured placement for your listings.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 6. LEADS ── -->
+    <section class="fq-section" id="sec-leads" data-tags="lead enquiry contact inquiry message buyer tenant customer status stage">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-envelope-fill"></i></div>
+        <div><h2>Leads &amp; Enquiries</h2><p>How buyer interest reaches you and how to manage it.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What is a lead?</div>
+          <div class="fq-item-a">
+            <p>A lead is created when a user submits an enquiry about one of your properties. It records their <strong>name, phone number, and message</strong>, linked to the specific property they asked about. You manage all leads from your dashboard.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Where do I see my leads?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>Lead Management</strong> from your dashboard. Each lead shows the enquirer's contact details, the property they are interested in, and current status. You can contact them directly via phone or WhatsApp using their details.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can I track a lead's progress?</div>
+          <div class="fq-item-a">
+            <p>Yes. Each lead has a <strong>Status</strong> and a <strong>Stage</strong> you can update from Lead Management. Use these to track where a potential client is in your process — from first contact through to closing.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Is there in-app messaging?</div>
+          <div class="fq-item-a">
+            <p>No — Estate Web does not have in-app chat. All communication happens off-platform via the phone number or email in the lead. This keeps you in direct control of your client relationships.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I delete a lead?</div>
+          <div class="fq-item-a">
+            <p>From Lead Management, use the delete option on any lead. Deleted leads are permanently removed.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 7. APPOINTMENTS ── -->
+    <section class="fq-section" id="sec-appointments" data-tags="appointment schedule viewing tour meeting date client agent virtual business personal">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-calendar-check-fill"></i></div>
+        <div><h2>Appointments &amp; Scheduling</h2><p>Managing property viewings and client meetings.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I schedule an appointment?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>Add Schedule</strong> from your dashboard. Enter the client details, select the date, choose an appointment type, and link it to a property and lead. The appointment is saved immediately.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What appointment types are available?</div>
+          <div class="fq-item-a">
+            <ul class="fq-list">
+              <li><strong>Business</strong> — formal meetings with clients or prospects</li>
+              <li><strong>Personal</strong> — informal or personal viewings</li>
+              <li><strong>Virtual</strong> — remote property tours via video call</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can I edit an appointment?</div>
+          <div class="fq-item-a">
+            <p>Yes — open the appointment detail page and use the <strong>Edit Schedule</strong> option to update the date, type, notes, or linked property.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Who can create appointments?</div>
+          <div class="fq-item-a">
+            <p><strong>Agents</strong> and <strong>Company</strong> accounts only. Customers cannot book viewings through the platform — they must contact the agent who then arranges the appointment.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Where do I see my upcoming appointments?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>Lead Appointments</strong> from your dashboard. All scheduled appointments are listed with client details, dates, linked property, and notes.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 8. ANALYTICS ── -->
+    <section class="fq-section" id="sec-analytics" data-tags="analytics dashboard views clicks stats performance data agent company profile">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div><h2>Analytics &amp; Dashboard</h2><p>Understanding how your listings and profile perform.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What does my analytics page show?</div>
+          <div class="fq-item-a">
+            <ul class="fq-list">
+              <li><strong>Profile views</strong> — how many people have visited your profile</li>
+              <li><strong>Property views</strong> — views split across your sale and rent listings</li>
+              <li><strong>Average performance</strong> — your averages compared to others on the platform</li>
+              <li><strong>Competition score</strong> — how you rank against similar agents or companies</li>
+              <li><strong>Ratings</strong> — score from client reviews</li>
+              <li><strong>Total saves</strong> — how many times your properties have been wishlisted</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Do agents and companies see different analytics?</div>
+          <div class="fq-item-a">
+            <p><strong>Agents</strong> see their own personal analytics — their individual profile and listing performance. <strong>Companies</strong> have an additional company-wide analytics view covering the entire team's performance. You cannot see another user's private data.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What is the Company Activity Log?</div>
+          <div class="fq-item-a">
+            <p>Company accounts have an <strong>Activity Log</strong> that records team actions — listings posted or deleted, agents joining or leaving, and other key events. Use it to keep track of what's happening across your team.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 9. COMPANY & TEAM ── -->
+    <section class="fq-section" id="sec-company" data-tags="company team agent invite manage employee remove profile edit analytics">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-building-fill"></i></div>
+        <div><h2>Company &amp; Team Management</h2><p>For company accounts managing agents and team operations.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I add agents to my company?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>Manage Company</strong> and generate an <strong>Invite Link</strong>. Share it with the agent. When they click it while logged in with an Agent account they are added to your company automatically. Each link expires after <strong>24 hours</strong> and has a maximum of <strong>200 uses</strong>.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can I revoke an invite link?</div>
+          <div class="fq-item-a">
+            <p>Yes — from the Manage Company page you can see all active links and revoke any of them instantly. A revoked link cannot be used even if it hasn't expired.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I remove an agent from my company?</div>
+          <div class="fq-item-a">
+            <p>From <strong>Manage Company</strong>, find the agent in your team list and remove them. Their account stays active — they are simply unlinked from your company. Their existing listings remain attributed to their agent profile.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What happens to listings if an agent leaves?</div>
+          <div class="fq-item-a">
+            <p>Listings are not affected. Each property records the <strong>agent UUID</strong> and <strong>company UUID</strong> at the time it was posted. If an agent leaves, their listings remain live and unchanged until the agent removes them.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I update my company profile?</div>
+          <div class="fq-item-a">
+            <p>From your dashboard, go to <strong>Edit Profile</strong>. You can update your company name, contact information, legal certificate, and other profile details.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 10. JOBS & VACANCIES ── -->
+    <section class="fq-section" id="sec-jobs" data-tags="jobs vacancies apply application company agent hire recruitment listings">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-briefcase-fill"></i></div>
+        <div><h2>Jobs &amp; Vacancies</h2><p>How companies post jobs and agents find opportunities.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do companies post a job vacancy?</div>
+          <div class="fq-item-a">
+            <p>From your company dashboard, go to the <strong>Vacancy</strong> section and fill out the job post form. The vacancy is published on the platform for agents to see.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do agents find and apply for jobs?</div>
+          <div class="fq-item-a">
+            <p>Agents can browse all active job listings from the <strong>Job Listings</strong> section in their dashboard. Find a role that fits, read the details, and apply directly through the platform.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do companies manage applications?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>Application Management</strong> from your company dashboard to view and review all applications submitted for your posted vacancies.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 11. VERIFIED BADGE ── -->
+    <section class="fq-section" id="sec-verified" data-tags="verified badge verification trust identity check agent company">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-patch-check-fill"></i></div>
+        <div><h2>Verified Badge</h2><p>What it means and how to get it.</p></div>
+      </div>
+
+      <div class="fq-callout danger">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <p><strong>Important:</strong> A Verified badge only confirms we checked an ID document. It does <strong>not</strong> confirm property ownership, conduct title searches, or guarantee the legitimacy of any listing. Always do your own due diligence.</p>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What does Verified mean?</div>
+          <div class="fq-item-a">
+            <p>Verified agents and companies have submitted identification to the Estate Web team and we have confirmed those documents appear genuine. It is an <strong>identity check only</strong> — not a property ownership or transaction guarantee.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I get verified?</div>
+          <div class="fq-item-a">
+            <p>Verification is currently a manual process. Email <a href="mailto:support@estateweb.com" class="fq-link">support@estateweb.com</a> to start the process. You will be asked to submit valid government-issued ID and, for companies, a legal certificate.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> Can verification be revoked?</div>
+          <div class="fq-item-a">
+            <p>Yes — if an account violates our terms through fraud, misrepresentation, or misconduct, the Verified badge can be removed at any time without notice.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 12. ACCOUNT & SECURITY ── -->
+    <section class="fq-section" id="sec-account" data-tags="account password reset security delete profile settings feedback">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-shield-lock-fill"></i></div>
+        <div><h2>Account &amp; Security</h2><p>Managing your profile, password, and account settings.</p></div>
+      </div>
+
+      <div class="fq-items">
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I change my password?</div>
+          <div class="fq-item-a">
+            <p>Go to <strong>Account Settings</strong> → <strong>Change Password</strong>. Enter your current password and your new one. The change takes effect immediately.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> I forgot my password. What do I do?</div>
+          <div class="fq-item-a">
+            <p>On the login page click <strong>Forgot Password</strong>. Enter your email and follow the instructions. If you don't receive an email check your spam folder, or contact support.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I delete my account?</div>
+          <div class="fq-item-a">
+            <p><strong>Customers</strong> can delete their account from Account Settings. <strong>Agents and companies</strong> should contact <a href="mailto:support@estateweb.com" class="fq-link">support@estateweb.com</a> — we handle associated listings and team data before removing the account. Deletion is permanent and cannot be undone.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> What happens to listings when an account is deleted?</div>
+          <div class="fq-item-a">
+            <p>All listings, leads, and appointments associated with the deleted account are permanently removed from the platform.</p>
+          </div>
+        </div>
+
+        <div class="fq-item">
+          <div class="fq-item-q"><i class="bi bi-chevron-right"></i> How do I report a bug or request a feature?</div>
+          <div class="fq-item-a">
+            <p>Use the <strong>Feedback</strong> page (accessible from the main navigation). Rate your experience (1–5), choose a category — <em>Bug Report</em> or <em>Feature Request</em> — and add a description. You can also attach a screenshot. All feedback is reviewed by our team directly.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ── 13. WHAT WE DON'T DO ── -->
+    <section class="fq-section" id="sec-limits" data-tags="limitations not handle payment transaction escrow legal advice ownership title fraud scam">
+      <div class="fq-section-header">
+        <div class="fq-section-icon danger-icon"><i class="bi bi-slash-circle-fill"></i></div>
+        <div><h2>What Estate Web Does Not Do</h2><p>Important limitations every user must understand.</p></div>
+      </div>
+
+      <div class="fq-callout danger">
+        <i class="bi bi-exclamation-octagon-fill"></i>
+        <p><strong>Estate Web is a listing platform only.</strong> We connect property seekers with agents and companies. We are not involved in any actual transaction.</p>
+      </div>
+
+      <div class="fq-dont-grid">
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Handle Payments or Escrow</h4>
+            <p>All money moves directly between you and the seller or agent. Estate Web will never ask you to pay fees to view a property. If anyone claims to collect on our behalf — it is a scam.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Verify Property Ownership</h4>
+            <p>We do not confirm legal ownership or validate land titles. Always verify at the Land Registry (e.g. Alausa for Lagos) before any payment.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Provide Legal Advice</h4>
+            <p>Estate Web is not a law firm or licensed broker. Always hire a qualified lawyer to review documents before signing or paying.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Conduct Title Searches</h4>
+            <p>We do not validate C of O, check for government acquisition, or investigate 'Omo Onile' disputes. Do these checks independently at the relevant offices.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Guarantee Transactions</h4>
+            <p>All agreements are strictly between the buyer/tenant and the seller/agent. Estate Web is not a party to any deal.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>In-App Messaging or Notifications</h4>
+            <p>There is no in-app chat or push notification system. All communication happens off-platform via phone, WhatsApp, and email.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Process Payments or Subscriptions</h4>
+            <p>Estate Web has no payment gateway at this time. All features are currently free to use.</p>
+          </div>
+        </div>
+        <div class="fq-dont-item">
+          <i class="bi bi-x-circle-fill"></i>
+          <div>
+            <h4>Allow Customer Listings</h4>
+            <p>Customers cannot post properties for sale or rent at this time. Landlord tools are planned for a future release.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ── 14. CONTACT ── -->
+    <section class="fq-section" id="sec-contact" data-tags="contact support help email report problem issue">
+      <div class="fq-section-header">
+        <div class="fq-section-icon"><i class="bi bi-headset"></i></div>
+        <div><h2>Contact Support</h2><p>Can't find your answer? Get in touch.</p></div>
+      </div>
+
+      <div class="fq-contact-grid">
+        <a href="mailto:support@estateweb.com" class="fq-contact-card">
+          <div class="fq-contact-icon"><i class="bi bi-headset"></i></div>
+          <div>
+            <h4>General Support</h4>
+            <p>Platform issues, listing help, account questions</p>
+            <span>support@estateweb.com</span>
+          </div>
+        </a>
+        <a href="mailto:legal@estateweb.com" class="fq-contact-card">
+          <div class="fq-contact-icon"><i class="bi bi-briefcase-fill"></i></div>
+          <div>
+            <h4>Legal &amp; Partnerships</h4>
+            <p>Terms, disputes, partnership applications</p>
+            <span>legal@estateweb.com</span>
+          </div>
+        </a>
+        <a href="mailto:privacy@estateweb.com" class="fq-contact-card">
+          <div class="fq-contact-icon"><i class="bi bi-lock-fill"></i></div>
+          <div>
+            <h4>Privacy &amp; Data</h4>
+            <p>Data access, deletion, NDPR concerns</p>
+            <span>privacy@estateweb.com</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="fq-callout info" style="margin-top:1rem">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>We respond to all requests within <strong>3–5 business days</strong>. For urgent matters include "URGENT" in your subject line. You can also leave feedback via the <a href="{% url 'feedback' %}" class="fq-link">Feedback page</a>.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Accordion ── */
+  document.querySelectorAll('.fq-item-q').forEach(function (q) {
+    q.addEventListener('click', function () {
+      var item   = q.closest('.fq-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.fq-item.open').forEach(function (i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── Scroll spy ── */
+  var sections = document.querySelectorAll('.fq-section[id]');
+  var navLinks = document.querySelectorAll('.fq-nav-link');
+
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY + 130;
+    var cur = '';
+    sections.forEach(function (s) { if (s.offsetTop <= y) cur = s.id; });
+    navLinks.forEach(function (l) {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
+    });
+  }, { passive: true });
+
+  /* ── Smooth scroll ── */
+  document.querySelectorAll('.fq-nav-link, .fq-role-pill').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var t = document.querySelector(link.getAttribute('href'));
+      if (t) { e.preventDefault(); window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' }); }
+    });
+  });
+
+  /* ── Tab filter (mobile) ── */
+  window.switchFaqTab = function (role, btn) {
+    document.querySelectorAll('.fq-tab').forEach(function (t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+
+    var shared = ['sec-roles','sec-getting-started','sec-verified','sec-account','sec-limits','sec-contact'];
+
+    sections.forEach(function (s) {
+      if (role === 'all') { s.style.display = ''; return; }
+      var isShared = shared.indexOf(s.id) > -1;
+      if (isShared) { s.style.display = ''; return; }
+      var show = false;
+      if (role === 'customer') show = ['sec-browse','sec-wishlist'].indexOf(s.id) > -1;
+      if (role === 'agent')    show = ['sec-listings','sec-leads','sec-appointments','sec-analytics','sec-jobs'].indexOf(s.id) > -1;
+      if (role === 'company')  show = ['sec-listings','sec-leads','sec-appointments','sec-analytics','sec-company','sec-jobs'].indexOf(s.id) > -1;
+      s.style.display = show ? '' : 'none';
+    });
+  };
+
+  /* ── Live search ── */
+  var searchInput = document.getElementById('fqSearch');
+  var noResults   = document.getElementById('fqNoResults');
+
+  searchInput.addEventListener('input', function () {
+    var q = searchInput.value.toLowerCase().trim();
+    if (!q) { sections.forEach(function (s) { s.style.display = ''; }); noResults.style.display = 'none'; return; }
+    var any = false;
+    sections.forEach(function (s) {
+      var hit = (s.dataset.tags || '').includes(q) || s.textContent.toLowerCase().includes(q);
+      s.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    noResults.style.display = any ? 'none' : '';
+  });
+
+}());
+</script>
+
+{% endblock %}

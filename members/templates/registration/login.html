@@ -48,7 +48,6 @@
 <div class="login-wrapper">
   <div class="login-container">
 
-    {# ── Form Card ──────────────────────────────────────────────── #}
     <div class="login-card">
 
       {# Brand Header #}
@@ -61,18 +60,17 @@
         <p class="login-subtitle">Sign in to access your account</p>
       </div>
 
-      {# Quick Nav — Sign In active, Register links #}
       <div class="auth-nav">
         <span class="auth-nav-btn active">
           <i class="bi bi-box-arrow-in-right"></i> Sign In
         </span>
-        <a href="{% url 'register-customer' %}" class="auth-nav-btn">
+        <a href="{% url 'register-customer' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-nav-btn">
           <i class="bi bi-person"></i> Customer
         </a>
-        <a href="{% url 'register-agent' %}" class="auth-nav-btn">
+        <a href="{% url 'register-agent' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-nav-btn">
           <i class="bi bi-award"></i> Agent
         </a>
-        <a href="{% url 'register-company' %}" class="auth-nav-btn">
+        <a href="{% url 'register-company' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-nav-btn">
           <i class="bi bi-building"></i> Company
         </a>
       </div>
@@ -80,6 +78,10 @@
       {# Login Form #}
       <form method="post" action="" class="login-form">
         {% csrf_token %}
+
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
 
         <div class="form-group">
           <label for="id_username" class="form-label">
@@ -121,7 +123,7 @@
         </div>
       </form>
 
-      {# Register Section #}
+      {# Register Section — also carry next forward in the dropdown links #}
       <div class="register-section">
         <p class="register-text">Don't have an account?</p>
         <div class="dropdown">
@@ -134,7 +136,7 @@
           </button>
           <ul class="dropdown-menu" aria-labelledby="registerDropdown">
             <li>
-              <a class="dropdown-item" href="{% url 'register-customer' %}">
+              <a class="dropdown-item" href="{% url 'register-customer' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
                 <i class="bi bi-person"></i>
                 <div>
                   <strong>Customer</strong>
@@ -144,7 +146,7 @@
             </li>
             <li><hr class="dropdown-divider"></li>
             <li>
-              <a class="dropdown-item" href="{% url 'register-agent' %}">
+              <a class="dropdown-item" href="{% url 'register-agent' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
                 <i class="bi bi-award"></i>
                 <div>
                   <strong>Agent</strong>
@@ -154,7 +156,7 @@
             </li>
             <li><hr class="dropdown-divider"></li>
             <li>
-              <a class="dropdown-item" href="{% url 'register-company' %}">
+              <a class="dropdown-item" href="{% url 'register-company' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
                 <i class="bi bi-building"></i>
                 <div>
                   <strong>Company</strong>

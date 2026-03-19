@@ -18,7 +18,7 @@
 #
 # Or add to your hosting platform's task scheduler (Render, Railway, etc.)
 # ─────────────────────────────────────────────────────────────────────────────
-#TODO understand new added code
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
