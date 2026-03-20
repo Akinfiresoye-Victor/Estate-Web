@@ -1292,7 +1292,6 @@ def remove_agent(request, agent_uuid):
             company=company,
             action='Agent Deleted'
         )
-        #TODO make sure if agent put in link they are taken to the invite side after sign up and shii
         return redirect('company:manage-company')
     except ObjectDoesNotExist:
         messages.error(request, 'Agent data not Found')

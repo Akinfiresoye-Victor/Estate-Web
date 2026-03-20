@@ -1,5 +1,4 @@
 {% extends 'estate/base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
@@ -8,314 +7,369 @@
 
 {% block content %}
 
-
 {% if submitted %}
-  <!-- Success State -->
-  <div class="inquiry-success-wrapper">
-    <div class="success-card">
-      <div class="success-animation">
-        <div class="success-icon">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="success-confetti">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-      
-      <h2 class="success-title">Inquiry Sent Successfully!</h2>
-      <p class="success-message">
-        Thank you for your interest! The property owner has been notified and will contact you shortly through your preferred communication method.
-      </p>
-      
-      <div class="success-info">
-        <div class="info-item">
-          <i class="bi bi-clock-history"></i>
-          <div>
-            <strong>Response Time</strong>
-            <span>Usually within 24 hours</span>
-          </div>
-        </div>
-        <div class="info-item">
-          <i class="bi bi-shield-check"></i>
-          <div>
-            <strong>Your Information</strong>
-            <span>Safely shared with property owner</span>
-          </div>
-        </div>
-      </div>
 
-      <div class="success-actions">
-        <a href="{% url 'landing' %}" class="btn-primary">
-          <i class="bi bi-house-fill me-2"></i>
-          Back to Home
-        </a>
-        <a href="{% url 'customer:buy-property' %}" class="btn-secondary">
-          <i class="bi bi-search me-2"></i>
-          Browse More Properties on sale
-        </a>
-        <a href="{% url 'customer:rent-property' %}" class="btn-secondary">
-          <i class="bi bi-search me-2"></i>
-          Browse More Properties on Lease
-        </a>
+<!-- ── SUCCESS ────────────────────────────────── -->
+<div class="iq-success-wrap">
+  <div class="iq-success-card">
+
+    <div class="iq-success-icon">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+
+    <h2>Inquiry Sent!</h2>
+    <p>Thank you for your interest. The property owner has been notified and will reach out via your preferred contact method.</p>
+
+    <div class="iq-success-meta">
+      <div class="iq-meta-item">
+        <i class="bi bi-clock-history"></i>
+        <div>
+          <strong>Response Time</strong>
+          <span>Usually within 24 hours</span>
+        </div>
+      </div>
+      <div class="iq-meta-item">
+        <i class="bi bi-shield-check"></i>
+        <div>
+          <strong>Your Information</strong>
+          <span>Shared only with the property owner</span>
+        </div>
       </div>
     </div>
+
+    <div class="iq-success-actions">
+      <a href="{% url 'landing' %}" class="iq-btn-primary">
+        <i class="bi bi-house-fill"></i> Back to Home
+      </a>
+      <a href="{% url 'customer:buy-property' %}" class="iq-btn-outline">
+        <i class="bi bi-search"></i> Browse For Sale
+      </a>
+      <a href="{% url 'customer:rent-property' %}" class="iq-btn-outline">
+        <i class="bi bi-search"></i> Browse For Lease
+      </a>
+    </div>
+
   </div>
+</div>
 
 {% else %}
 
-  <!-- Inquiry Form -->
-  <div class="inquiry-form-wrapper">
-    <div class="container">
-      
-      <!-- Form Header -->
-      <div class="form-header">
-        <div class="header-icon">
-          <i class="bi bi-chat-dots-fill"></i>
+<!-- ── FORM PAGE ───────────────────────────────── -->
+
+<!-- HERO -->
+<div class="iq-hero">
+  <div class="iq-hero-inner">
+    <span class="iq-hero-pill"><i class="bi bi-chat-dots-fill"></i> Property Inquiry</span>
+    <h1>Express Your Interest</h1>
+    <p>Fill in the form below and the agent will get back to you directly.</p>
+  </div>
+</div>
+
+
+<!-- TRUST STRIP -->
+<div class="iq-trust-strip">
+  <div class="iq-trust-item">
+    <i class="bi bi-lightning-charge-fill"></i>
+    <span>Response within 24hrs</span>
+  </div>
+  <div class="iq-trust-sep"></div>
+  <div class="iq-trust-item">
+    <i class="bi bi-shield-lock-fill"></i>
+    <span>Your data is private</span>
+  </div>
+  <div class="iq-trust-sep"></div>
+  <div class="iq-trust-item">
+    <i class="bi bi-calendar-check-fill"></i>
+    <span>Schedule a viewing</span>
+  </div>
+</div>
+
+
+<!-- FORM -->
+<div class="iq-page">
+  <div class="iq-form-wrap">
+
+    <form method="POST" id="inquiryForm" novalidate class="iq-form">
+      {% csrf_token %}
+
+      <!-- Section 1 — Your Details -->
+      <div class="iq-section">
+        <div class="iq-section-title">
+          <div class="iq-section-num">1</div>
+          <div>
+            <h2>Your Details</h2>
+            <p>How should the agent reach you?</p>
+          </div>
         </div>
-        <h1 class="form-title">Property Inquiry</h1>
-        <p class="form-subtitle">
-          Fill out the form below to express your interest in this property. The owner will get back to you as soon as possible.
-        </p>
+
+        <!-- Name -->
+        <div class="iq-field">
+          <label for="{{ form.name.id_for_label }}">
+            Full Name <span class="iq-req">*</span>
+          </label>
+          <div class="iq-input-wrap">
+            <i class="bi bi-person-fill"></i>
+            <input type="text"
+                   name="{{ form.name.name }}"
+                   id="{{ form.name.id_for_label }}"
+                   placeholder="e.g. Chukwuemeka Obi"
+                   required>
+          </div>
+          {% if form.name.errors %}
+            <span class="iq-error"><i class="bi bi-exclamation-circle"></i> {{ form.name.errors.0 }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Two col: email + phone -->
+        <div class="iq-row-two">
+
+          <div class="iq-field">
+            <label for="{{ form.email.id_for_label }}">
+              Email <span class="iq-opt">Optional</span>
+            </label>
+            <div class="iq-input-wrap">
+              <i class="bi bi-envelope-fill"></i>
+              {{ form.email }}
+            </div>
+            {% if form.email.errors %}
+              <span class="iq-error"><i class="bi bi-exclamation-circle"></i> {{ form.email.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+          <div class="iq-field">
+            <label for="{{ form.phone_no.id_for_label }}">
+              WhatsApp / Phone <span class="iq-req">*</span>
+            </label>
+            <div class="iq-input-wrap">
+              <i class="bi bi-whatsapp"></i>
+              <input type="tel"
+                     name="{{ form.phone_no.name }}"
+                     id="{{ form.phone_no.id_for_label }}"
+                     placeholder="+234 800 123 4567"
+                     required>
+            </div>
+            {% if form.phone_no.errors %}
+              <span class="iq-error"><i class="bi bi-exclamation-circle"></i> {{ form.phone_no.errors.0 }}</span>
+            {% endif %}
+          </div>
+
+        </div>
       </div>
 
-      <!-- Benefits Section -->
-      <div class="benefits-section">
-        <div class="benefit-card">
-          <div class="benefit-icon">
-            <i class="bi bi-lightning-charge-fill"></i>
+
+      <!-- Section 2 — Your Message -->
+      <div class="iq-section">
+        <div class="iq-section-title">
+          <div class="iq-section-num">2</div>
+          <div>
+            <h2>Your Message</h2>
+            <p>Tell the agent what you need</p>
           </div>
-          <h3>Quick Response</h3>
-          <p>Get replies within 24 hours</p>
         </div>
-        <div class="benefit-card">
-          <div class="benefit-icon">
-            <i class="bi bi-calendar-check-fill"></i>
-          </div>
-          <h3>Schedule Tours</h3>
-          <p>Book property viewings instantly</p>
+
+        <!-- Message -->
+        <div class="iq-field">
+          <label for="{{ form.inquiry_message.id_for_label }}">
+            Message <span class="iq-req">*</span>
+          </label>
+          <textarea name="{{ form.inquiry_message.name }}"
+                    id="{{ form.inquiry_message.id_for_label }}"
+                    rows="4"
+                    placeholder="e.g. I'm interested in this property. Can we schedule a viewing? I'd also like to know about the service charge and nearest schools."
+                    required></textarea>
+          <span class="iq-hint">
+            <i class="bi bi-lightbulb"></i>
+            Mention your budget, timeline, or specific questions for a faster, more useful reply.
+          </span>
+          {% if form.inquiry_message.errors %}
+            <span class="iq-error"><i class="bi bi-exclamation-circle"></i> {{ form.inquiry_message.errors.0 }}</span>
+          {% endif %}
         </div>
-        <div class="benefit-card">
-          <div class="benefit-icon">
-            <i class="bi bi-lock-fill"></i>
+
+        <!-- Two col: contact type + schedule -->
+        <div class="iq-row-two">
+
+          <div class="iq-field">
+            <label for="{{ form.contact_type.id_for_label }}">
+              Preferred Contact <span class="iq-req">*</span>
+            </label>
+            <div class="iq-select-wrap">
+              <i class="bi bi-chat-dots-fill"></i>
+              <select name="{{ form.contact_type.name }}"
+                      id="{{ form.contact_type.id_for_label }}"
+                      required>
+                <option value="">Select method</option>
+                <option value="Whatsapp" selected>WhatsApp</option>
+                <option value="Email">Email</option>
+                <option value="Phone Call">Phone Call</option>
+              </select>
+              <i class="bi bi-chevron-down iq-arrow"></i>
+            </div>
+            <span class="iq-hint"><i class="bi bi-info-circle"></i> In-app chat coming soon</span>
+            {% if form.contact_type.errors %}
+              <span class="iq-error"><i class="bi bi-exclamation-circle"></i> {{ form.contact_type.errors.0 }}</span>
+            {% endif %}
           </div>
-          <h3>Secure & Private</h3>
-          <p>Your information is protected</p>
+
+          <div class="iq-field">
+            <label for="{{ form.schedule_tour.id_for_label }}">
+              Preferred Viewing Date <span class="iq-opt">Optional</span>
+            </label>
+            <div class="iq-input-wrap">
+              <i class="bi bi-calendar-event-fill"></i>
+              <input type="date"
+                     name="{{ form.schedule_tour.name }}"
+                     id="{{ form.schedule_tour.id_for_label }}"
+                     min="{{ today }}">
+            </div>
+            <span class="iq-hint"><i class="bi bi-info-circle"></i> Skip if you haven't decided yet</span>
+            {% if form.schedule_tour.errors %}
+              <span class="iq-error"><i class="bi bi-exclamation-circle"></i> {{ form.schedule_tour.errors.0 }}</span>
+            {% endif %}
+          </div>
+
         </div>
       </div>
 
-      <!-- Main Form Card -->
-      <div class="inquiry-form-card">
-        <form method="POST" id="inquiryForm" novalidate>
-          {% csrf_token %}
-          
-          <!-- Personal Information Section -->
-          <div class="form-section">
-            <div class="section-header">
-              <i class="bi bi-person-fill"></i>
-              <h2>Your Information</h2>
-            </div>
-            
-            <div class="row g-4">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="{{ form.name.id_for_label }}" class="form-label">
-                    <i class="bi bi-person-badge me-2"></i>
-                    {{ form.name.label }}
-                    <span class="required">*</span>
-                  </label>
-                  <input type="text" 
-                         name="{{ form.name.name }}" 
-                         id="{{ form.name.id_for_label }}"
-                         class="form-control"
-                         placeholder="e.g. John Doe"
-                         required>
-                  {% if form.name.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ form.name.errors }}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
 
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="{{ form.email.id_for_label }}" class="form-label">
-                    <i class="bi bi-envelope me-2"></i>
-                    {{ form.email.label }}
-                    <span class="optional-badge">Optional</span>
-                  </label>
-                  {{ form.email }}
-                  {% if form.email.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ form.email.errors }}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="col-12">
-                <div class="form-group">
-                  <label for="{{ form.phone_no.id_for_label }}" class="form-label">
-                    <i class="bi bi-whatsapp me-2"></i>
-                    {{ form.phone_no.label }}
-                    <span class="required">*</span>
-                  </label>
-                  <div class="input-with-icon">
-                    <i class="bi bi-telephone-fill"></i>
-                    <input type="tel" 
-                           name="{{ form.phone_no.name }}" 
-                           id="{{ form.phone_no.id_for_label }}"
-                           class="form-control"
-                           placeholder="e.g. +234 800 123 4567"
-                           required>
-                  </div>
-                  <small class="form-text">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Enter a valid WhatsApp number for quick communication
-                  </small>
-                  {% if form.phone_no.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ form.phone_no.errors }}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Inquiry Details Section -->
-          <div class="form-section">
-            <div class="section-header">
-              <i class="bi bi-chat-text-fill"></i>
-              <h2>Inquiry Details</h2>
-            </div>
-            
-            <div class="row g-4">
-              <div class="col-12">
-                <div class="form-group">
-                  <label for="{{ form.inquiry_message.id_for_label }}" class="form-label">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    {{ form.inquiry_message.label }}
-                    <span class="required">*</span>
-                  </label>
-                  <textarea name="{{ form.inquiry_message.name }}" 
-                            id="{{ form.inquiry_message.id_for_label }}"
-                            class="form-control"
-                            rows="5"
-                            placeholder="e.g. I'm interested in viewing this property. Could you provide more details about the amenities and neighborhood?"
-                            required></textarea>
-                  <small class="form-text">
-                    <i class="bi bi-lightbulb me-1"></i>
-                    Tip: Mention specific questions or requirements to get a better response
-                  </small>
-                  {% if form.inquiry_message.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ form.inquiry_message.errors }}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="{{ form.contact_type.id_for_label }}" class="form-label">
-                    <i class="bi bi-chat-dots me-2"></i>
-                    {{ form.contact_type.label }}
-                    <span class="required">*</span>
-                  </label>
-                  <select name="{{ form.contact_type.name }}" 
-                          id="{{ form.contact_type.id_for_label }}"
-                          class="form-control">
-                    <option value="">Select contact method</option>
-                    <option value="Whatsapp" selected>WhatsApp</option>
-                    <option value="Email">Email</option>
-                    <option value="Phone Call">Phone Call</option>
-                  </select>
-                  <small class="form-text">
-                    <i class="bi bi-info-circle me-1"></i>
-                    In-app chat coming soon!
-                  </small>
-                  {% if form.contact_type.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ form.contact_type.errors }}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="{{ form.schedule_tour.id_for_label }}" class="form-label">
-                    <i class="bi bi-calendar-event me-2"></i>
-                    {{ form.schedule_tour.label }}
-                    <span class="optional-badge">Optional</span>
-                  </label>
-                  <input type="date" 
-                         name="{{ form.schedule_tour.name }}" 
-                         id="{{ form.schedule_tour.id_for_label }}"
-                         class="form-control"
-                         min="{{ today }}">
-                  <small class="form-text">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Feel free to skip; your agent can schedule a viewing with you after you connect
-                  </small>
-                  {% if form.schedule_tour.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ form.schedule_tour.errors }}
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Privacy Notice -->
-          <div class="privacy-notice">
-            <i class="bi bi-shield-lock-fill"></i>
-            <div>
-              <strong>Privacy Notice:</strong>
-              <p>Your information will only be shared with the property owner/agent. We respect your privacy and will not share your details with third parties.</p>
-            </div>
-          </div>
-
-          <!-- Form Actions -->
-          <div class="form-actions">
-            <button type="button" class="btn-back" onclick="history.back()">
-              <i class="bi bi-arrow-left me-2"></i>
-              Go Back
-            </button>
-            <button type="submit" class="btn-submit">
-              <i class="bi bi-send-fill me-2"></i>
-              Send Inquiry
-            </button>
-          </div>
-
-        </form>
+      <!-- Privacy notice -->
+      <div class="iq-privacy">
+        <i class="bi bi-shield-lock-fill"></i>
+        <p>Your details are only shared with the property owner/agent and will not be passed to any third party.</p>
       </div>
 
-      <!-- Help Section -->
-      <div class="help-section">
-        <div class="help-card">
-          <i class="bi bi-question-circle-fill"></i>
-          <h4>Need Help?</h4>
-          <p>If you have any questions about the inquiry process, feel free to contact our support team.</p>
-          <a href="#" class="help-link">
-            Contact Support <i class="bi bi-arrow-right ms-2"></i>
-          </a>
+      <!-- Actions -->
+      <div class="iq-actions">
+        <button type="button" class="iq-btn-back" onclick="history.back()">
+          <i class="bi bi-arrow-left"></i> Go Back
+        </button>
+        <button type="submit" class="iq-btn-submit">
+          <i class="bi bi-send-fill"></i> Send Inquiry
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+
+  <!-- ── FAQ ──────────────────────────────────── -->
+  <aside class="iq-faq-wrap">
+
+    <div class="iq-faq-header">
+      <h3><i class="bi bi-question-circle-fill"></i> Common Questions</h3>
+      <p>Quick answers before you send</p>
+    </div>
+
+    <div class="iq-faq-list">
+
+      <div class="iq-faq-item open">
+        <div class="iq-faq-q">
+          <span>Will my contact details be made public?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>No. Your name, phone number, and email are only shared with the specific agent or company who listed the property. Estate Web does not publish your details or share them with other users.</p>
+        </div>
+      </div>
+
+      <div class="iq-faq-item">
+        <div class="iq-faq-q">
+          <span>How quickly will the agent reply?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>Most agents respond within 24 hours. If you haven't heard back in 2 days, try calling the phone number listed on the property detail page directly.</p>
+        </div>
+      </div>
+
+      <div class="iq-faq-item">
+        <div class="iq-faq-q">
+          <span>Do I need to pay anything to send an inquiry?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>No. Sending an inquiry is completely free. Estate Web does not charge buyers or renters for using the platform. Never pay anyone claiming to collect a fee on behalf of Estate Web.</p>
+        </div>
+      </div>
+
+      <div class="iq-faq-item">
+        <div class="iq-faq-q">
+          <span>What happens after I send the inquiry?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>Your message is saved as a lead in the agent's dashboard. The agent will see your name, phone number, and message, then contact you through your chosen method — WhatsApp, phone call, or email.</p>
+        </div>
+      </div>
+
+      <div class="iq-faq-item">
+        <div class="iq-faq-q">
+          <span>Can I schedule a viewing through this form?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>Yes — use the optional "Preferred Viewing Date" field to suggest a date. If you skip it, the agent will work out a suitable time with you directly after you connect.</p>
+        </div>
+      </div>
+
+      <div class="iq-faq-item">
+        <div class="iq-faq-q">
+          <span>Is the property still available?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>Listings marked as "Available" on Estate Web are expected to be active. Agents are required to remove or update sold/rented properties within 48 hours. If you suspect a listing is stale, send the inquiry and confirm availability with the agent directly.</p>
+        </div>
+      </div>
+
+      <div class="iq-faq-item">
+        <div class="iq-faq-q">
+          <span>Does Estate Web handle the transaction?</span>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="iq-faq-a">
+          <p>No. Estate Web is a listing platform only. All payments, agreements, and viewings happen directly between you and the agent or property owner. Always verify ownership and documents before making any payment.</p>
         </div>
       </div>
 
     </div>
-  </div>
+
+
+    <!-- Contact support -->
+    <div class="iq-support-card">
+      <div class="iq-support-icon"><i class="bi bi-headset"></i></div>
+      <div>
+        <h4>Still have questions?</h4>
+        <p>Our support team is happy to help.</p>
+        <a href="mailto:support@estateweb.com" class="iq-support-link">
+          support@estateweb.com <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- end .iq-page -->
 
 {% endif %}
 
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'estate/js/inq_form.js' %}"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* FAQ accordion */
+  document.querySelectorAll('.iq-faq-q').forEach(function (q) {
+    q.addEventListener('click', function () {
+      var item   = q.closest('.iq-faq-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.iq-faq-item.open').forEach(function (i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+}());
+</script>
 {% endblock %}

@@ -77,6 +77,7 @@
   <div class="tabs-content">
 
 
+
     <div class="tab-pane active" id="personal-info">
       <div class="content-grid">
 
@@ -143,6 +144,27 @@
                 <p class="info-value bio-text">{{ agent.bio }}</p>
               </div>
 
+              {# Agent UUID — masked by default, reveal on click #}
+              <div class="info-item full-width">
+                <label class="info-label">
+                  <i class="bi bi-fingerprint"></i> Agent UUID
+                  <span class="uuid-badge">Sensitive</span>
+                </label>
+                <div class="uuid-row">
+                  <span class="uuid-display" id="agentUuidDisplay" data-uuid="{{ agent.agent_uuid }}">
+                    ••••••••-••••-••••-••••-••••••••••••
+                  </span>
+                  <div class="uuid-actions">
+                    <button class="uuid-btn" id="uuidToggleBtn" onclick="toggleUuid()" title="Show / Hide">
+                      <i class="bi bi-eye-fill" id="uuidEyeIcon"></i>
+                    </button>
+                    <button class="uuid-btn" id="uuidCopyBtn" onclick="copyUuid()" title="Copy UUID">
+                      <i class="bi bi-clipboard" id="uuidCopyIcon"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -207,6 +229,8 @@
         </a>
       </div>
     </div>{# end personal-info #}
+
+
 
     <div class="tab-pane" id="professional">
       <div class="content-grid">
@@ -301,6 +325,7 @@
         </a>
       </div>
     </div>{# end professional #}
+
 
 
     <div class="tab-pane" id="security">
@@ -563,6 +588,7 @@
     </div>{# end preferences #}
 
 
+
     <div class="tab-pane" id="subscription">
       <div class="content-grid">
 
@@ -653,6 +679,7 @@
         </button>
       </div>
     </div>{# end subscription #}
+
 
     <div class="tab-pane" id="account-actions">
       <div class="content-grid">
@@ -869,6 +896,59 @@
   window.notifyMeLaunch     = function () { alert("We'll notify you when Preferences launch."); };
   window.notifyMeChannels   = function () { alert("We'll notify you when new notification channels are available."); };
   window.notifyMeSecurity   = function () { alert("We'll notify you when Advanced Security features roll out."); };
+
+  /* ── Agent UUID reveal / copy ────────────────────────────────────── */
+  var uuidRevealed = false;
+
+  window.toggleUuid = function () {
+    var display  = document.getElementById('agentUuidDisplay');
+    var eyeIcon  = document.getElementById('uuidEyeIcon');
+    var realUuid = display.getAttribute('data-uuid');
+    uuidRevealed = !uuidRevealed;
+    if (uuidRevealed) {
+      display.textContent = realUuid;
+      display.classList.add('uuid-visible');
+      eyeIcon.className = 'bi bi-eye-slash-fill';
+    } else {
+      display.textContent = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022-\u2022\u2022\u2022\u2022-\u2022\u2022\u2022\u2022-\u2022\u2022\u2022\u2022-\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+      display.classList.remove('uuid-visible');
+      eyeIcon.className = 'bi bi-eye-fill';
+    }
+  };
+
+  window.copyUuid = function () {
+    var display  = document.getElementById('agentUuidDisplay');
+    var copyBtn  = document.getElementById('uuidCopyBtn');
+    var copyIcon = document.getElementById('uuidCopyIcon');
+    var realUuid = display.getAttribute('data-uuid');
+
+    function markCopied() {
+      copyIcon.className = 'bi bi-clipboard-check-fill';
+      copyBtn.classList.add('uuid-btn--copied');
+      setTimeout(function () {
+        copyIcon.className = 'bi bi-clipboard';
+        copyBtn.classList.remove('uuid-btn--copied');
+      }, 2200);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(realUuid).then(markCopied).catch(function () {
+        fallbackCopy(realUuid); markCopied();
+      });
+    } else {
+      fallbackCopy(realUuid); markCopied();
+    }
+  };
+
+  function fallbackCopy(text) {
+    var tmp = document.createElement('textarea');
+    tmp.value = text;
+    tmp.style.position = 'fixed'; tmp.style.opacity = '0';
+    document.body.appendChild(tmp);
+    tmp.focus(); tmp.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(tmp);
+  }
 
 }());
 </script>

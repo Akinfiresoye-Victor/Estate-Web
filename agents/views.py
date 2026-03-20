@@ -824,7 +824,7 @@ def delete_agent(request, agent_uuid):
 
 
 
-# TODO Optimize all forms
+
 
 def join_via_invite(request):
     """

@@ -219,7 +219,7 @@ class JobPostForm(forms.ModelForm):
         return cleaned_data
 
 
-#TODO implement the manual onboarding agent form
+
 
 # and we convert it to actual hours before saving to expires_at
 

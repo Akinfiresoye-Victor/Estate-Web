@@ -378,7 +378,7 @@
         <input type="text" id="agentUuidInput"
                placeholder="e.g. 3f2a1c4d-8b7e-4a2f-9c1d-..."
                autocomplete="off" spellcheck="false">
-        <span class="form-hint">Paste the UUID exactly as provided by the agent.</span>
+        <span class="form-hint">Paste the UUID exactly as provided by the agent. agents uuid can be found in settings>basic information</span>
       </div>
     </div>
     <div class="modal-foot">
@@ -457,7 +457,7 @@
     if (!uuid) { showToast('Please enter an Agent UUID first.'); return; }
     var pat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!pat.test(uuid)) { showToast("Doesn't look like a valid UUID. Please check."); return; }
-    window.location.href = 'company/onboard/agent/' + uuid;
+    window.location.href = 'onboard_agent/' + uuid;
   };
 
   /* Toast */

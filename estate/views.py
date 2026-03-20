@@ -517,7 +517,6 @@ def update_profile(request, user_id):
         return render(request, 'estate/error_page.html', {'e': e})
 
 
-#TODO encrypt this 
 def change_password(request):
     """
     Change User Passwords with precise lines of code
@@ -727,7 +726,7 @@ def review_agent(request, agent_uuid):
 
 
 
-#TODO Answer inquiry questions 
+
 def inquiry_form(request, property_type, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')

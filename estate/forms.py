@@ -60,7 +60,7 @@ class InquiryForm(ModelForm):
             'email': 'Email',
             'phone_no': 'Whatsapp Phone Number',
             'inquiry_message': 'Book this property(send an inquiry message)',
-            'schedule_tour': 'Schedule a date to view property Physically(optional)',
+            'schedule_tour': 'Schedule a date to view property Physically',
             'contact_type': 'Contact Media(How Should we contact you)'
         }
         widgets={

@@ -5,7 +5,7 @@ from companies.models import *
 from agents.models import Experience, SocialLinks, AgentInformation, AgentAnalytics
 from agents.models import SessionId as agent_session
 from estate.models import LeadInfo
-#TODO Cross check all authentication side to affect loss of data 
+
 
 #registering all our models to our admin site
 admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedbacks, AgentInformation,
