@@ -1,198 +1,194 @@
-{% extends 'base.html' %}
+{% extends base_template %}
 {% load static %}
 {% load humanize %}
 
 {% block extra_css %}
+
 <link rel="stylesheet" href="{% static 'company/css/company_profile.css' %}">
 <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
 {% endblock %}
 
 {% block content %}
-<a href="javascript:history.back()" class="attractive-back-button">
-    &larr; Go back
-</a>
 
-<!-- Company Header -->
-<div class="company-header">
-  <div class="header-background">
-    <div class="header-overlay"></div>
-  </div>
+{# ── Back ───────────────────────────────────────────────────────── #}
+<div class="cp-back-wrap">
+  <a href="javascript:history.back()" class="cp-back-btn">
+    <i class="bi bi-arrow-left-circle-fill"></i> Go Back
+  </a>
+</div>
+
+
+{# ── HERO ────────────────────────────────────────────────────────── #}
+<div class="cp-hero">
+  <div class="cp-hero-bg" aria-hidden="true"></div>
+
   <div class="container">
-    <div class="company-header-content">
-      <div class="company-logo-section">
+    <div class="cp-hero-inner">
+
+      {# Logo #}
+      <div class="cp-logo-wrap">
         {% if company.company_logo %}
-          <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}" class="company-logo">
+          <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}" class="cp-logo-img">
         {% else %}
-          <div class="company-logo-placeholder">
+          <div class="cp-logo-placeholder">
             <i class="bi bi-building"></i>
           </div>
         {% endif %}
       </div>
-      <div class="company-main-info">
-        <div class="company-title-row">
-          <h1 class="company-name">{{ company.company_name }}</h1>
-          <span class="verified-badge">
-            <i class="bi bi-patch-check-fill"></i>Verified Company
+
+      {# Info #}
+      <div class="cp-hero-info">
+        <div class="cp-hero-top">
+          <h1 class="cp-company-name">{{ company.company_name }}</h1>
+          {% if company.verified %}
+          <span class="cp-verified-badge">
+            <i class="bi bi-patch-check-fill"></i> Verified
+          </span>
+          {% endif %}
+        </div>
+
+        <div class="cp-hero-meta">
+          <span class="cp-meta-item">
+            <i class="bi bi-geo-alt-fill"></i>{{ company.service_areas }}
+          </span>
+          <span class="cp-meta-item">
+            <i class="bi bi-calendar-check"></i>Est. {{ company.year_established }}
+          </span>
+          <span class="cp-meta-item">
+            <i class="bi bi-houses-fill"></i>{{ total_properties }} Properties
           </span>
         </div>
-        <div class="company-meta">
-          <div class="meta-item">
-            <i class="bi bi-geo-alt-fill"></i>
-            <span>{{ company.service_areas }}</span>
-          </div>
-          <div class="meta-item">
-            <i class="bi bi-calendar-check"></i>
-            <span>Established {{ company.year_established }}</span>
-          </div>
-          <div class="meta-item">
-            <i class="bi bi-briefcase"></i>
-            <span>{{ total_properties }} Properties</span>
-          </div>
+
+        <div class="cp-hero-actions">
+          <button class="cp-btn-contact" data-bs-toggle="modal" data-bs-target="#contactModal">
+            <i class="bi bi-envelope-fill"></i> Contact Company
+          </button>
+          <button class="cp-btn-share" onclick="shareCompany()" title="Share">
+            <i class="bi bi-share-fill"></i>
+          </button>
         </div>
       </div>
-      <div class="company-actions">
-        <button class="btn-contact" data-bs-toggle="modal" data-bs-target="#contactModal">
-          <i class="bi bi-envelope-fill me-2"></i>Contact Company
-        </button>
-        <button class="btn-share" onclick="shareCompany()">
-          <i class="bi bi-share-fill"></i>
-        </button>
-      </div>
+
     </div>
   </div>
 </div>
 
-<!-- Company Stats Bar -->
-<div class="stats-bar">
+
+{# ── STATS STRIP ──────────────────────────────────────────────────── #}
+<div class="cp-stats-strip">
   <div class="container">
-    <div class="stats-row">
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-house-fill"></i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ total_properties }}</h3>
-          <p>Total Listings</p>
-        </div>
+    <div class="cp-stats-row">
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ total_properties }}</span>
+        <span class="cp-stat-label">Total Listings</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-tag-fill"></i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ properties_for_sale }}</h3>
-          <p>For Sale</p>
-        </div>
+
+      <div class="cp-stat-divider" aria-hidden="true"></div>
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ properties_for_sale }}</span>
+        <span class="cp-stat-label">For Sale</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-key-fill"></i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ properties_for_rent }}</h3>
-          <p>For Rent</p>
-        </div>
+
+      <div class="cp-stat-divider" aria-hidden="true"></div>
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ properties_for_rent }}</span>
+        <span class="cp-stat-label">For Rent</span>
       </div>
-      <div class="stat-item">
-        <div class="stat-icon">
-          <i class="bi bi-star-fill"></i>
-        </div>
-        <div class="stat-info">
-          <h3>{{ average_rating|floatformat:1 }}</h3>
-          <p>Average Rating</p>
-        </div>
+
+      <div class="cp-stat-divider" aria-hidden="true"></div>
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ average_rating|floatformat:1 }}</span>
+        <span class="cp-stat-label">
+          <i class="bi bi-star-fill" style="color:#f59e0b;font-size:.65rem;"></i> Rating
+        </span>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- Main Content -->
-<div class="company-content">
-  <div class="container">
-    <div class="row g-4">
 
-      <!-- Left Sidebar -->
-      <div class="col-lg-4">
-        
-        <!-- About Section -->
-        <div class="profile-card">
-          <div class="card-header">
+{# ── BODY ─────────────────────────────────────────────────────────── #}
+<div class="cp-body">
+  <div class="container">
+    <div class="cp-layout">
+
+
+      {# ── SIDEBAR ── #}
+      <aside class="cp-sidebar">
+
+        {# About #}
+        <div class="cp-card">
+          <div class="cp-card-hd">
             <i class="bi bi-info-circle-fill"></i>
-            <h3>About Company</h3>
+            <h3>About</h3>
           </div>
-          <div class="card-body">
-            <p class="company-description">{{ company.company_bio }}</p>
-            
-            <div class="info-grid">
-              <div class="info-item">
-                <div class="info-icon">
-                  <i class="bi bi-person-badge"></i>
-                </div>
-                <div class="info-content">
-                  <span class="info-label">Principal Broker</span>
-                  <span class="info-value">{{ company.principal_broker }}</span>
-                </div>
+          <div class="cp-card-bd">
+            <p class="cp-about-text">{{ company.company_bio }}</p>
+            <div class="cp-info-row">
+              <div class="cp-info-icon"><i class="bi bi-person-badge-fill"></i></div>
+              <div>
+                <span class="cp-info-label">Principal Broker</span>
+                <span class="cp-info-val">{{ company.principal_broker }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Contact Card -->
-        <div class="profile-card">
-          <div class="card-header">
+        {# Contact #}
+        <div class="cp-card">
+          <div class="cp-card-hd">
             <i class="bi bi-telephone-fill"></i>
-            <h3>Contact Information</h3>
+            <h3>Contact</h3>
           </div>
-          <div class="card-body">
-            <div class="contact-list">
-              <a href="tel:{{ company.phone_number }}" class="contact-link">
-                <div class="contact-icon">
-                  <i class="bi bi-phone"></i>
-                </div>
-                <div class="contact-info">
-                  <span class="contact-label">Phone</span>
-                  <span class="contact-value">{{ company.phone_number }}</span>
-                </div>
-              </a>
-              
-              <a href="mailto:{{ company.email }}" class="contact-link">
-                <div class="contact-icon">
-                  <i class="bi bi-envelope"></i>
-                </div>
-                <div class="contact-info">
-                  <span class="contact-label">Email</span>
-                  <span class="contact-value">{{ company.email }}</span>
-                </div>
-              </a>
-              
-              <div class="contact-link">
-                <div class="contact-icon">
-                  <i class="bi bi-geo-alt"></i>
-                </div>
-                <div class="contact-info">
-                  <span class="contact-label">Office Address</span>
-                  <span class="contact-value">{{ company.address }}</span>
-                </div>
+          <div class="cp-card-bd">
+
+            <a href="tel:{{ company.phone_number }}" class="cp-contact-row">
+              <div class="cp-contact-icon"><i class="bi bi-phone"></i></div>
+              <div>
+                <span class="cp-info-label">Phone</span>
+                <span class="cp-info-val">{{ company.phone_number }}</span>
+              </div>
+            </a>
+
+            <a href="mailto:{{ company.email }}" class="cp-contact-row">
+              <div class="cp-contact-icon"><i class="bi bi-envelope"></i></div>
+              <div>
+                <span class="cp-info-label">Email</span>
+                <span class="cp-info-val">{{ company.email }}</span>
+              </div>
+            </a>
+
+            <div class="cp-contact-row no-link">
+              <div class="cp-contact-icon"><i class="bi bi-geo-alt"></i></div>
+              <div>
+                <span class="cp-info-label">Address</span>
+                <span class="cp-info-val">{{ company.address }}</span>
               </div>
             </div>
-            
-            <button class="btn-contact-full" data-bs-toggle="modal" data-bs-target="#contactModal">
-              <i class="bi bi-send-fill me-2"></i>Send Message
+
+            <button class="cp-btn-msg" data-bs-toggle="modal" data-bs-target="#contactModal">
+              <i class="bi bi-send-fill"></i> Send Message
             </button>
+
           </div>
         </div>
 
-        <!-- Social Media -->
+        {# Social #}
         {% if social_links %}
-        <div class="profile-card">
-          <div class="card-header">
+        <div class="cp-card">
+          <div class="cp-card-hd">
             <i class="bi bi-share-fill"></i>
             <h3>Follow Us</h3>
           </div>
-          <div class="card-body">
-            <div class="social-grid">
+          <div class="cp-card-bd">
+            <div class="cp-social-grid">
               {% for link in social_links %}
-                <a href="{{ link.link_to_social }}" target="_blank" class="social-btn" title="{{ link.social_platform }}">
+                <a href="{{ link.link_to_social }}" target="_blank" class="cp-social-btn" title="{{ link.social_platform }}">
                   <i class="bi bi-{{ link.social_platform|lower }}"></i>
                   <span>{{ link.social_platform }}</span>
                 </a>
@@ -202,206 +198,159 @@
         </div>
         {% endif %}
 
-      </div>
+      </aside>
 
-      <!-- Right Content -->
-      <div class="col-lg-8">
 
-        <!-- Properties Section -->
-        <div class="properties-section">
-          <div class="section-header">
-            <h2 class="section-title">
-              <i class="bi bi-houses-fill me-2"></i>Recent Listings by {{company.company_name}}
+      {# ── MAIN ── #}
+      <main class="cp-main">
+
+        {# Properties #}
+        <section class="cp-section">
+          <div class="cp-section-hd">
+            <h2 class="cp-section-title">
+              <i class="bi bi-houses-fill"></i> Recent Listings
             </h2>
+            {% if on_sale or on_lease %}
+              <a href="{% url 'company:company-properties' company_uuid=company.unique_company_id %}"
+                 class="cp-view-all-link">
+                View All <i class="bi bi-arrow-right"></i>
+              </a>
+            {% endif %}
           </div>
 
-          {% if on_lease or on_sale %}
-          <div class="properties-grid">
-            
-            <!-- Properties for Sale -->
-            {% for property in on_sale %}
-            <div class="property-card" data-type="sale">
-              <div class="property-image">
-                {% if property.base_image %}
-                  <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
-                {% else %}
-                  <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
-                {% endif %}
-                <div class="property-badge sale-badge">For Sale</div>
-              </div>
-              
-              <div class="property-details">
-                {%if property.property_category == 'Residential' %}
-                  <h3 class="property-title">{{ property.residential }}</h3>
-                {%elif property.property_category == 'Commercial' %}
-                  <h3 class="property-title">{{ property.commercial }}</h3>
-                {%elif property.property_category == 'Land' %}
-                  <h3 class="property-title">{{ property.lands }}</h3>
-                {%endif%}
-                <p class="property-location">
-                  <i class="bi bi-geo-alt"></i>{{ property.location }}
-                </p>
-                
-                <div class="property-features">
-                  <span class="feature">
-                    {%if property.property_category == 'Residential' %}
-                      <i class="bi bi-house"></i>{{ property.residential }}
-                    {%elif property.property_category == 'Commercial' %}
-                      <i class="bi bi-house"></i>{{ property.commercial }}
-                    {%elif property.property_category == 'Land' %}
-                      <i class="bi bi-house"></i>{{ property.lands }}
-                    {%endif%}
-                  </span>
-                  <span class="feature">
-                    <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
-                  </span>
-                  <span class="feature">
-                    <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
-                  </span>
+          {% if on_sale or on_lease %}
+            <div class="cp-props-grid">
+
+              {% for property in on_sale %}
+              <article class="cp-prop-card">
+                <div class="cp-prop-img-wrap">
+                  {% if property.base_image %}
+                    <img src="{{ property.base_image.url }}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% endif %}
+                  <span class="cp-prop-badge cp-badge-sale">For Sale</span>
                 </div>
-                
-                <div class="property-footer">
-                  <div class="property-price">
-                    <span class="price">₦{{ property.price|floatformat:2|intcomma }}</span>
+                <div class="cp-prop-body">
+                  <h3 class="cp-prop-title">
+                    {% if property.property_category == 'Residential' %}{{ property.residential }}
+                    {% elif property.property_category == 'Commercial' %}{{ property.commercial }}
+                    {% else %}{{ property.lands }}{% endif %}
+                  </h3>
+                  <p class="cp-prop-loc"><i class="bi bi-geo-alt"></i>{{ property.location }}</p>
+                  <div class="cp-prop-features">
+                    {% if property.bedrooms %}<span class="cp-feat"><i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds</span>{% endif %}
+                    {% if property.bathrooms %}<span class="cp-feat"><i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths</span>{% endif %}
                   </div>
-                  <a href="{% url 'customer:view-property-s' property.id %}" class="btn-view-property">
-                    View Details <i class="bi bi-arrow-right"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-            {% endfor %}
-
-            <!-- Properties for Rent -->
-            {% for property in on_lease %}
-            <div class="property-card" data-type="rent">
-              <div class="property-image">
-                {% if property.base_image %}
-                  <img src="{{ property.base_image.url }}" alt="{{ property.title }}">
-                {% else %}
-                  <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property">
-                {% endif %}
-                <div class="property-badge rent-badge">For Rent</div>
-              </div>
-              
-              <div class="property-details">
-                {%if property.property_category == 'Residential' %}
-                  <h3 class="property-title">{{ property.residential }}</h3>
-                {%elif property.property_category == 'Commercial' %}
-                  <h3 class="property-title">{{ property.commercial }}</h3>
-                {%elif property.property_category == 'Land' %}
-                  <h3 class="property-title">{{ property.lands }}</h3>
-                {%endif%}
-                <p class="property-location">
-                  <i class="bi bi-geo-alt"></i>{{ property.location }}
-                </p>
-                
-                <div class="property-features">
-                  <span class="feature">
-                    {%if property.property_category == 'Residential' %}
-                      <i class="bi bi-house"></i>{{ property.residential }}
-                    {%elif property.property_category == 'Commercial' %}
-                      <i class="bi bi-house"></i>{{ property.commercial }}
-                    {%elif property.property_category == 'Land' %}
-                      <i class="bi bi-house"></i>{{ property.lands }}
-                    {%endif%}
-                  </span>
-                  <span class="feature">
-                    <i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds
-                  </span>
-                  <span class="feature">
-                    <i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths
-                  </span>
-                </div>
-                
-                <div class="property-footer">
-                  <div class="property-price">
-                    <span class="price">₦{{ property.price_range|floatformat:2|intcomma }}</span>
-                    <span class="price-period">/month</span>
+                  <div class="cp-prop-footer">
+                    <div class="cp-prop-price">
+                      <span class="cp-price">₦{{ property.price|floatformat:2|intcomma }}</span>
+                    </div>
+                    <a href="{% url 'customer:view-property-s' property.id %}" class="cp-btn-view">
+                      View <i class="bi bi-arrow-right"></i>
+                    </a>
                   </div>
-                  <a href="{% url 'customer:view-property-r' property.id %}" class="btn-view-property">
-                    View Details <i class="bi bi-arrow-right"></i>
-                  </a>
                 </div>
-              </div>
+              </article>
+              {% endfor %}
+
+              {% for property in on_lease %}
+              <article class="cp-prop-card">
+                <div class="cp-prop-img-wrap">
+                  {% if property.base_image %}
+                    <img src="{{ property.base_image.url }}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% endif %}
+                  <span class="cp-prop-badge cp-badge-rent">For Rent</span>
+                </div>
+                <div class="cp-prop-body">
+                  <h3 class="cp-prop-title">
+                    {% if property.property_category == 'Residential' %}{{ property.residential }}
+                    {% elif property.property_category == 'Commercial' %}{{ property.commercial }}
+                    {% else %}{{ property.lands }}{% endif %}
+                  </h3>
+                  <p class="cp-prop-loc"><i class="bi bi-geo-alt"></i>{{ property.location }}</p>
+                  <div class="cp-prop-features">
+                    {% if property.bedrooms %}<span class="cp-feat"><i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds</span>{% endif %}
+                    {% if property.bathrooms %}<span class="cp-feat"><i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths</span>{% endif %}
+                  </div>
+                  <div class="cp-prop-footer">
+                    <div class="cp-prop-price">
+                      <span class="cp-price">₦{{ property.price_range|floatformat:2|intcomma }}</span>
+                      <span class="cp-price-period">/mo</span>
+                    </div>
+                    <a href="{% url 'customer:view-property-r' property.id %}" class="cp-btn-view">
+                      View <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </article>
+              {% endfor %}
+
             </div>
-            {% endfor %}
-
-            <a href="{% url 'company:company-properties' company_uuid=company.unique_company_id %}" class="btn-view-property">
-              View All <i class="bi bi-arrow-right"></i>
-            </a>
-
-          </div>
-
           {% else %}
-          <div class="no-properties">
-            <i class="bi bi-house-x"></i>
-            <h4>No Properties Available</h4>
-            <p>This company hasn't listed any properties yet</p>
-          </div>
+            <div class="cp-empty">
+              <i class="bi bi-house-x"></i>
+              <h4>No Properties Yet</h4>
+              <p>{{ company.company_name }} hasn't listed any properties yet.</p>
+            </div>
           {% endif %}
-        </div>
+        </section>
 
-        <!-- Reviews Section -->
-        <div class="reviews-section">
-          <div class="section-header">
-            <h2 class="section-title">
-              <i class="bi bi-chat-quote-fill me-2"></i>Client Reviews
+
+        {# Reviews #}
+        <section class="cp-section">
+          <div class="cp-section-hd">
+            <h2 class="cp-section-title">
+              <i class="bi bi-chat-quote-fill"></i> Reviews
               {% if total_reviews > 0 %}
-                <span class="review-count">({{ total_reviews }})</span>
+                <span class="cp-review-count">{{ total_reviews }}</span>
               {% endif %}
             </h2>
-            
+
             {% if user.is_authenticated and not user_has_reviewed %}
-              <button class="btn-write-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
-                <i class="bi bi-pencil-square me-2"></i>Write a Review
+              <button class="cp-btn-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <i class="bi bi-pencil-square"></i> Write Review
               </button>
             {% elif user_has_reviewed %}
-              <button class="btn-write-review" disabled style="opacity: 0.6; cursor: not-allowed;">
-                <i class="bi bi-check-circle me-2"></i>Already Reviewed
-              </button>
+              <span class="cp-reviewed-tag">
+                <i class="bi bi-check-circle-fill"></i> Reviewed
+              </span>
             {% else %}
-              <a href="{% url 'login' %}?next={{ request.path }}" class="btn-write-review">
-                <i class="bi bi-pencil-square me-2"></i>Login to Review
+              <a href="{% url 'login' %}?next={{ request.path }}" class="cp-btn-review">
+                <i class="bi bi-pencil-square"></i> Login to Review
               </a>
             {% endif %}
           </div>
 
           {% if reviews %}
-            <!-- Average Rating Display -->
-            <div class="average-rating-display mb-4">
-              <div class="rating-summary">
-                <div class="rating-number">{{ average_rating|floatformat:1 }}</div>
-                <div class="rating-stars">
+            <div class="cp-rating-summary">
+              <span class="cp-rating-big">{{ average_rating|floatformat:1 }}</span>
+              <div class="cp-rating-right">
+                <div class="cp-stars">
                   {% for i in "12345" %}
-                    {% if forloop.counter <= average_rating|floatformat:2 %}
+                    {% if forloop.counter <= average_rating|floatformat:0 %}
                       <i class="bi bi-star-fill"></i>
-                    {% elif forloop.counter <= average_rating|add:"0.5"|floatformat:2 %}
-                      <i class="bi bi-star-half"></i>
                     {% else %}
                       <i class="bi bi-star"></i>
                     {% endif %}
                   {% endfor %}
                 </div>
-                <div class="rating-count">Based on {{ total_reviews }} review{{ total_reviews|pluralize }}</div>
+                <span class="cp-rating-label">{{ total_reviews }} review{{ total_reviews|pluralize }}</span>
               </div>
             </div>
 
-            <!-- Reviews List -->
-            <div class="reviews-list">
+            <div class="cp-reviews-list">
               {% for review in reviews %}
-              <div class="review-card">
-                <div class="review-header">
-                  <div class="reviewer-info">
-                    <div class="reviewer-avatar">
-                      {{ review.user.username.0|upper }}
-                    </div>
-                    <div>
-                      <h4 class="reviewer-name">{{ review.user.username }}</h4>
-                      <p class="review-date">{{ review.created_at|date:"M d, Y" }}</p>
-                    </div>
+              <div class="cp-review-item">
+                <div class="cp-review-hd">
+                  <div class="cp-reviewer-avatar">{{ review.user.username.0|upper }}</div>
+                  <div class="cp-reviewer-meta">
+                    <strong>{{ review.user.username }}</strong>
+                    <span>{{ review.created_at|date:"M d, Y" }}</span>
                   </div>
-                  <div class="review-rating">
+                  <div class="cp-review-stars">
                     {% for i in "12345" %}
                       {% if forloop.counter <= review.rating %}
                         <i class="bi bi-star-fill"></i>
@@ -411,55 +360,67 @@
                     {% endfor %}
                   </div>
                 </div>
-                <p class="review-text">{{ review.comment }}</p>
+                <p class="cp-review-text">{{ review.comment }}</p>
               </div>
               {% endfor %}
             </div>
+
           {% else %}
-            <div class="no-reviews">
+            <div class="cp-empty">
               <i class="bi bi-chat-left-text"></i>
-              <p>No reviews yet. Be the first to review {{ company.company_name }}!</p>
+              <h4>No Reviews Yet</h4>
+              <p>Be the first to review {{ company.company_name }}!</p>
             </div>
           {% endif %}
-        </div>
+        </section>
 
-      </div>
+      </main>
 
     </div>
   </div>
 </div>
 
-<!-- Contact Modal -->
+
+{# ── Mobile Sticky CTA ────────────────────────────────────────────── #}
+<div class="cp-sticky-cta" id="cpStickyCta">
+  <button class="cp-sticky-btn" data-bs-toggle="modal" data-bs-target="#contactModal">
+    <i class="bi bi-envelope-fill"></i> Contact {{ company.company_name }}
+  </button>
+</div>
+
+
+{# ── CONTACT MODAL ───────────────────────────────────────────────── #}
 <div class="modal fade" id="contactModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
+    <div class="modal-content cp-modal-content">
+      <div class="modal-header cp-modal-hd">
         <h5 class="modal-title">
-          <i class="bi bi-envelope-fill me-2"></i>Contact {{ company.company_name }}
+          <i class="bi bi-envelope-fill"></i> Contact {{ company.company_name }}
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body cp-modal-bd">
         <form id="contactForm" method="post" action="#">
           {% csrf_token %}
-          <div class="mb-3">
-            <label class="form-label">Your Name</label>
-            <input type="text" name="name" class="form-control" required>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Your Name</label>
+            <input type="text" name="name" class="cp-form-input" placeholder="Full name" required>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Your Email</label>
-            <input type="email" name="email" class="form-control" required>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Email Address</label>
+            <input type="email" name="email" class="cp-form-input" placeholder="your@email.com" required>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Phone Number</label>
-            <input type="tel" name="phone" class="form-control" required>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Phone Number</label>
+            <input type="tel" name="phone" class="cp-form-input" placeholder="08XX XXX XXXX" required>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Message</label>
-            <textarea name="message" class="form-control" rows="4" required></textarea>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Message</label>
+            <textarea name="message" class="cp-form-input cp-form-textarea" rows="4"
+                      placeholder="Tell us what you're looking for..." required></textarea>
           </div>
-          <button type="submit" class="btn-submit-contact">
-            <i class="bi bi-send-fill me-2"></i>Send Message
+          <button type="submit" class="cp-form-submit">
+            <i class="bi bi-send-fill"></i> Send Message
           </button>
         </form>
       </div>
@@ -467,66 +428,62 @@
   </div>
 </div>
 
-<!-- Review Modal -->
+
+{# ── REVIEW MODAL ─────────────────────────────────────────────────── #}
 <div class="modal fade" id="reviewModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
+    <div class="modal-content cp-modal-content">
+      <div class="modal-header cp-modal-hd">
         <h5 class="modal-title">
-          <i class="bi bi-star-fill me-2"></i>Write a Review for {{ company.company_name }}
+          <i class="bi bi-star-fill"></i> Review {{ company.company_name }}
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body cp-modal-bd">
         {% if user.is_authenticated %}
           {% if user_has_reviewed %}
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle me-2"></i>
+            <div class="cp-alert-info">
+              <i class="bi bi-info-circle-fill"></i>
               You have already submitted a review for this company.
             </div>
           {% else %}
-            <form id="reviewForm" method="post" action="{% url 'customer:review-company' company.unique_company_id %}">
+            <form id="reviewForm" method="post"
+                  action="{% url 'customer:review-company' company.unique_company_id %}">
               {% csrf_token %}
-              
-              <div class="mb-4">
-                <label class="form-label">Your Rating *</label>
-                <div class="star-rating-input">
+
+              <div class="cp-form-group">
+                <label class="cp-form-label">Your Rating <span style="color:#dc2626">*</span></label>
+                <div class="cp-star-input" id="starInput">
                   <input type="radio" name="rating" value="5" id="star5" required>
-                  <label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star5"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="4" id="star4">
-                  <label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star4"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="3" id="star3">
-                  <label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star3"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="2" id="star2">
-                  <label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star2"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="1" id="star1">
-                  <label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                  <label for="star1"><i class="bi bi-star-fill"></i></label>
                 </div>
-                <div class="rating-text text-center mt-2">
-                  <span id="ratingText" class="text-muted">Select a rating</span>
-                </div>
+                <div class="cp-rating-text" id="ratingText">Select a rating</div>
               </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Your Review *</label>
-                <textarea name="comment" class="form-control" rows="5" required 
-                          placeholder="Share your experience with {{ company.company_name }}..."></textarea>
-                <small class="text-muted">Minimum 10 characters</small>
+
+              <div class="cp-form-group">
+                <label class="cp-form-label">Your Review <span style="color:#dc2626">*</span></label>
+                <textarea name="comment" class="cp-form-input cp-form-textarea" rows="5" required
+                  placeholder="Share your experience with {{ company.company_name }}..."></textarea>
+                <span class="cp-form-hint">Minimum 10 characters</span>
               </div>
-              
-              <button type="submit" class="btn-submit-review">
-                <i class="bi bi-check-circle-fill me-2"></i>Submit Review
+
+              <button type="submit" class="cp-form-submit">
+                <i class="bi bi-check-circle-fill"></i> Submit Review
               </button>
             </form>
           {% endif %}
         {% else %}
-          <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to write a review.
+          <div class="cp-alert-warn">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a> to write a review.
           </div>
         {% endif %}
       </div>
@@ -536,97 +493,62 @@
 
 {% endblock %}
 
+
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Star rating interaction
-    const starInputs = document.querySelectorAll('.star-rating-input input[type="radio"]');
-    const starLabels = document.querySelectorAll('.star-rating-input label');
-    const ratingText = document.getElementById('ratingText');
-    
-    const ratingDescriptions = {
-        '5': '⭐ Excellent - 5 stars',
-        '4': '⭐ Very Good - 4 stars',
-        '3': '⭐ Good - 3 stars',
-        '2': '⭐ Fair - 2 stars',
-        '1': '⭐ Poor - 1 star'
-    };
-    
-    // Handle star selection
-    starInputs.forEach((input) => {
-        input.addEventListener('change', function() {
-            const rating = this.value;
-            if (ratingText) {
-                ratingText.textContent = ratingDescriptions[rating];
-                ratingText.style.color = '#ffc107';
-                ratingText.style.fontWeight = '600';
-            }
-        });
-    });
-    
-    // Hover effects for star rating
-    starLabels.forEach((label, index) => {
-        label.addEventListener('mouseenter', function() {
-            const value = this.previousElementSibling.value;
-            if (!document.querySelector('.star-rating-input input:checked') && ratingText) {
-                ratingText.textContent = ratingDescriptions[value];
-                ratingText.style.color = '#6c757d';
-            }
-        });
-    });
-    
-    // Reset text on mouse leave if no selection
-    const starRatingContainer = document.querySelector('.star-rating-input');
-    if (starRatingContainer) {
-        starRatingContainer.addEventListener('mouseleave', function() {
-            const checkedInput = document.querySelector('.star-rating-input input:checked');
-            if (!checkedInput && ratingText) {
-                ratingText.textContent = 'Select a rating';
-                ratingText.style.color = '';
-                ratingText.style.fontWeight = '';
-            }
-        });
-    }
-    
-    // Form validation
-    const reviewForm = document.getElementById('reviewForm');
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', function(e) {
-            const ratingChecked = document.querySelector('.star-rating-input input:checked');
-            const commentField = document.querySelector('textarea[name="comment"]');
-            
-            if (!ratingChecked) {
-                e.preventDefault();
-                alert('Please select a star rating');
-                return false;
-            }
-            
-            if (commentField && commentField.value.trim().length < 10) {
-                e.preventDefault();
-                alert('Please write at least 10 characters in your review');
-                commentField.focus();
-                return false;
-            }
-            
-            return true;
-        });
-    }
-});
+(function () {
+  'use strict';
 
-// Share company function
-function shareCompany() {
+  /* ── Star rating ── */
+  var ratings = {
+    '5': 'Excellent — 5 stars',
+    '4': 'Very Good — 4 stars',
+    '3': 'Good — 3 stars',
+    '2': 'Fair — 2 stars',
+    '1': 'Poor — 1 star'
+  };
+  document.querySelectorAll('.cp-star-input input[type="radio"]').forEach(function (inp) {
+    inp.addEventListener('change', function () {
+      var txt = document.getElementById('ratingText');
+      if (txt) { txt.textContent = ratings[this.value]; txt.classList.add('active'); }
+    });
+  });
+
+  /* ── Review form validation ── */
+  var reviewForm = document.getElementById('reviewForm');
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', function (e) {
+      var checked = document.querySelector('.cp-star-input input:checked');
+      var comment = document.querySelector('textarea[name="comment"]');
+      if (!checked) { e.preventDefault(); alert('Please select a star rating.'); return; }
+      if (comment && comment.value.trim().length < 10) {
+        e.preventDefault(); alert('Please write at least 10 characters.'); comment.focus();
+      }
+    });
+  }
+
+  /* ── Share ── */
+  window.shareCompany = function () {
     if (navigator.share) {
-        navigator.share({
-            title: '{{ company.company_name }}',
-            text: 'Check out {{ company.company_name }} on our platform',
-            url: window.location.href
-        }).catch(err => console.log('Error sharing:', err));
+      navigator.share({ title: '{{ company.company_name }}', url: window.location.href })
+        .catch(function () {});
     } else {
-        // Fallback: copy URL to clipboard
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            alert('Link copied to clipboard!');
-        });
+      navigator.clipboard.writeText(window.location.href)
+        .then(function () { alert('Link copied to clipboard!'); })
+        .catch(function () {});
     }
-}
+  };
+
+  /* ── Sticky CTA: hide when hero contact btn is visible ── */
+  var stickyCta = document.getElementById('cpStickyCta');
+  var heroBtn   = document.querySelector('.cp-btn-contact');
+  if (stickyCta && heroBtn) {
+    var obs = new IntersectionObserver(function (entries) {
+      stickyCta.classList.toggle('cp-sticky-cta--hidden', entries[0].isIntersecting);
+    }, { threshold: 0.5 });
+    obs.observe(heroBtn);
+  }
+
+}());
 </script>
 {% endblock %}

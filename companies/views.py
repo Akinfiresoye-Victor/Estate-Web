@@ -730,6 +730,13 @@ def company_profile(request, company_uuid):
     if request.user.role == 'company':
         messages.info(request, 'Access Denied')
         return redirect('landing')
+    role=request.user.role
+    if role=='company':
+        base_template='company/base.html'
+    elif role == 'agent':
+        base_template='agent/base.html'
+    else:
+        base_template='estate/base.html'
     try:
         company = get_object_or_404(CompanyInformation, unique_company_id=company_uuid)
         
@@ -801,6 +808,7 @@ def company_profile(request, company_uuid):
             'average_rating': average_rating,
             'total_reviews': total_reviews,
             'user_has_reviewed': user_has_reviewed,
+            'base_template':base_template
         }
         
         return render(request, 'company/company_profile.html', context)

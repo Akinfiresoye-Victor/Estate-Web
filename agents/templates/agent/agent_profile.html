@@ -2,420 +2,378 @@
 {% load static %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'estate/css/agent_profile.css' %}">
+  <link rel="stylesheet" href="{% static 'agent/css/agent_profile.css' %}">
 {% endblock %}
 
 {% block content %}
 
-<!-- Go Back Button -->
-<div class="back-button-container">
-  <button class="back-btn" onclick="history.back()" aria-label="Go back">
-    <i class="bi bi-chevron-left"></i>
-    <span>Back</span>
-  </button>
-</div>
+<!-- ── HERO ─────────────────────────────────── -->
+<div class="ap-hero">
+  <div class="ap-hero-cover"></div>
 
-<!-- Agent Profile Hero -->
-<div class="agent-hero">
-  <div class="hero-background"></div>
-  <div class="container"> 
-    <div class="hero-wrapper">
-      
-      <div class="agent-profile-card">
-        <div class="profile-avatar-section">
-          {% if agent.profile_picture %}
-            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}" class="profile-avatar">
-          {% else %}
-            <div class="avatar-placeholder">
-              <i class="bi bi-person"></i>
-            </div>
-          {% endif %}
-          
-          {% if agent.verified %}
-          <div class="verified-badge">
-            <i class="bi bi-patch-check-fill"></i>
-          </div>
-          {% endif %}
+  <div class="ap-hero-body">
+
+    <!-- Avatar -->
+    <div class="ap-avatar-wrap">
+      {% if agent.profile_picture %}
+        <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}" class="ap-avatar">
+      {% else %}
+        <div class="ap-avatar-placeholder">
+          {{ agent.first_name|slice:":1"|upper }}
         </div>
+      {% endif %}
+      {% if agent.verified %}
+        <span class="ap-verified-dot" title="Verified Agent">
+          <i class="bi bi-patch-check-fill"></i>
+        </span>
+      {% endif %}
+    </div>
 
-        <div class="profile-info-section">
-          <h1 class="agent-name">{{ agent.first_name }} {{ agent.last_name }}</h1>
-          <p class="agent-work-type">{{ agent.work_type }}</p>
-          
-          <div class="agent-rating-display">
-            <div class="stars">
-              {% if total_reviews > 0 %}
-                {% for i in "12345" %}
-                  {% if forloop.counter <= average_rating|floatformat:0 %}
-                    <i class="bi bi-star-fill"></i>
-                  {% elif forloop.counter <= average_rating|add:"0.5"|floatformat:0 %}
-                    <i class="bi bi-star-half"></i>
-                  {% else %}
-                    <i class="bi bi-star"></i>
-                  {% endif %}
-                {% endfor %}
+    <!-- Name / role / rating -->
+    <div class="ap-hero-info">
+      <div class="ap-name-row">
+        <h1>{{ agent.first_name }} {{ agent.last_name }}</h1>
+        {% if agent.verified %}
+          <span class="ap-verified-badge">
+            <i class="bi bi-patch-check-fill"></i> Verified
+          </span>
+        {% endif %}
+      </div>
+
+      <p class="ap-work-type">{{ agent.work_type }}</p>
+
+      <div class="ap-rating-row">
+        <div class="ap-stars">
+          {% if total_reviews > 0 %}
+            {% for i in "12345" %}
+              {% if forloop.counter <= average_rating|floatformat:0 %}
+                <i class="bi bi-star-fill"></i>
               {% else %}
                 <i class="bi bi-star"></i>
-                <i class="bi bi-star"></i>
-                <i class="bi bi-star"></i>
-                <i class="bi bi-star"></i>
-                <i class="bi bi-star"></i>
               {% endif %}
-            </div>
-            <span class="rating-number">{{ average_rating|floatformat:1 }}</span>
-            <span class="rating-count">({{ total_reviews }} review{{ total_reviews|pluralize }})</span>
-          </div>
-
-          <div class="agent-meta-info">
-            <div class="meta-item">
-              <i class="bi bi-geo-alt-fill"></i>
-              <span>{{ agent.location }}</span>
-            </div>
-            <div class="meta-item">
-              <i class="bi bi-translate"></i>
-              <span>{{ agent.language }}</span>
-            </div>
-            {% if agent.universal_agent %}
-            <div class="meta-item">
-              <i class="bi bi-briefcase-fill"></i>
-              <span>{{ universal_info.years_experience }} Years Experience</span>
-            </div>
-            {% endif %}
-          </div>
-
-          <div class="agent-contact-actions">
-            <a href="tel:{{ agent.phone_number }}" class="btn-contact primary">
-              <i class="bi bi-telephone-fill"></i>
-              Call Agent
-            </a>
-            <a href="mailto:{{ agent.email }}" class="btn-contact secondary">
-              <i class="bi bi-envelope-fill"></i>
-              Email
-            </a>
-            {% if agent.phone_number %}
-            <a href="https://wa.me/{{ agent.phone_number }}" target="_blank" class="btn-contact whatsapp">
-              <i class="bi bi-whatsapp"></i>
-              WhatsApp
-            </a>
-            {% endif %}
-          </div>
+            {% endfor %}
+          {% else %}
+            <i class="bi bi-star"></i><i class="bi bi-star"></i>
+            <i class="bi bi-star"></i><i class="bi bi-star"></i>
+            <i class="bi bi-star"></i>
+          {% endif %}
         </div>
+        <span class="ap-rating-num">{{ average_rating|floatformat:1 }}</span>
+        <span class="ap-rating-count">({{ total_reviews }} review{{ total_reviews|pluralize }})</span>
       </div>
 
+      <div class="ap-meta-row">
+        <span class="ap-meta-chip">
+          <i class="bi bi-geo-alt-fill"></i> {{ agent.location }}
+        </span>
+        {% if agent.language %}
+          <span class="ap-meta-chip">
+            <i class="bi bi-translate"></i> {{ agent.language }}
+          </span>
+        {% endif %}
+        {% if agent.universal_agent and universal_info %}
+          <span class="ap-meta-chip">
+            <i class="bi bi-briefcase-fill"></i> {{ universal_info.years_experience }} yrs exp
+          </span>
+        {% endif %}
+      </div>
     </div>
+
+    <!-- Contact actions -->
+    <div class="ap-hero-actions">
+      <a href="tel:{{ agent.phone_number }}" class="ap-btn primary">
+        <i class="bi bi-telephone-fill"></i> Call
+      </a>
+      <a href="mailto:{{ agent.email }}" class="ap-btn secondary">
+        <i class="bi bi-envelope-fill"></i> Email
+      </a>
+      {% if agent.phone_number %}
+      <a href="https://wa.me/{{ agent.phone_number }}" target="_blank" class="ap-btn whatsapp">
+        <i class="bi bi-whatsapp"></i> WhatsApp
+      </a>
+      {% endif %}
+      <button class="ap-back-btn" onclick="history.back()">
+        <i class="bi bi-arrow-left"></i> Back
+      </button>
+    </div>
+
   </div>
 </div>
 
-<!-- Main Content -->
-<div class="container profile-container">
-  
-  <div class="profile-grid">
-    
-    <!-- Main Column -->
-    <main class="main-content">
-      
-      <!-- About Section -->
-      <section class="content-card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <i class="bi bi-person-badge"></i>
-            About {{ agent.first_name }} {{ agent.last_name }}
-          </h2>
-        </div>
-        <div class="card-body">
-          <p class="bio-text">{{ agent.bio }}</p>
-        </div>
-      </section>
 
-      <!-- Experience Section -->
-      {% if experiences %}
-      <section class="content-card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <i class="bi bi-briefcase"></i>
-            Professional Experience
-          </h2>
-        </div>
-        <div class="card-body">
-          <div class="experience-timeline">
-            
-            {% for exp in experiences %}
-            <div class="experience-item">
-              <div class="exp-date-badge">
-                <span class="year-start">{{ exp.start_date|date:"Y" }}</span>
-                {% if exp.end_date %}
-                <span class="year-separator">-</span>
-                <span class="year-end">{{ exp.end_date|date:"Y" }}</span>
-                {% else %}
-                <span class="year-separator">-</span>
-                <span class="year-end current">Present</span>
-                {% endif %}
-              </div>
-              <div class="exp-details">
-                <h3 class="exp-title">{{ exp.title }}</h3>
-                <p class="exp-company">
-                  <i class="bi bi-building"></i>
-                  {{ exp.company }}
-                </p>
-                <p class="exp-description">{{ exp.past_experence }}</p>
-              </div>
+<!-- ── PAGE LAYOUT ───────────────────────────── -->
+<div class="ap-page">
+
+  <!-- ── LEFT / MAIN ── -->
+  <main class="ap-main">
+
+    <!-- About -->
+    <section class="ap-card">
+      <div class="ap-card-hd">
+        <i class="bi bi-person-badge-fill"></i>
+        <h2>About {{ agent.first_name }}</h2>
+      </div>
+      <div class="ap-card-bd">
+        <p class="ap-bio">{{ agent.bio|default:"No bio provided yet." }}</p>
+      </div>
+    </section>
+
+
+    <!-- Experience -->
+    {% if experiences %}
+    <section class="ap-card">
+      <div class="ap-card-hd">
+        <i class="bi bi-briefcase-fill"></i>
+        <h2>Professional Experience</h2>
+      </div>
+      <div class="ap-card-bd">
+        <div class="ap-timeline">
+          {% for exp in experiences %}
+          <div class="ap-timeline-item">
+            <div class="ap-tl-date">
+              {{ exp.start_date|date:"Y" }} —
+              {% if exp.end_date %}{{ exp.end_date|date:"Y" }}{% else %}<span class="ap-tl-now">Present</span>{% endif %}
             </div>
-            {% endfor %}
-
+            <div class="ap-tl-body">
+              <h3>{{ exp.title }}</h3>
+              <p class="ap-tl-company"><i class="bi bi-building"></i> {{ exp.company }}</p>
+              <p class="ap-tl-desc">{{ exp.past_experence }}</p>
+            </div>
           </div>
+          {% endfor %}
         </div>
-      </section>
-      {% endif %}
+      </div>
+    </section>
+    {% endif %}
 
-      <!-- Ratings & Reviews Section -->
-      <section class="content-card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <i class="bi bi-star"></i>
-            Ratings & Reviews
-          </h2>
-          
+
+    <!-- Reviews -->
+    <section class="ap-card" id="ap-reviews">
+      <div class="ap-card-hd">
+        <i class="bi bi-star-fill"></i>
+        <h2>Ratings &amp; Reviews</h2>
+        <div class="ap-card-hd-action">
           {% if user.is_authenticated and not user_has_reviewed %}
-            <button class="btn-write-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
-              <i class="bi bi-pencil-square"></i>
-              Write a Review
+            <button class="ap-review-btn" data-bs-toggle="modal" data-bs-target="#reviewModal">
+              <i class="bi bi-pencil-square"></i> Write Review
             </button>
           {% elif user_has_reviewed %}
-            <button class="btn-write-review" disabled style="opacity: 0.6; cursor: not-allowed;">
-              <i class="bi bi-check-circle"></i>
-              Already Reviewed
-            </button>
+            <span class="ap-reviewed-tag">
+              <i class="bi bi-check-circle-fill"></i> Reviewed
+            </span>
           {% else %}
-            <a href="{% url 'login' %}?next={{ request.path }}" class="btn-write-review">
-              <i class="bi bi-pencil-square"></i>
-              Login to Review
+            <a href="{% url 'login' %}?next={{ request.path }}" class="ap-review-btn">
+              <i class="bi bi-pencil-square"></i> Login to Review
             </a>
           {% endif %}
         </div>
-        <div class="card-body">
-          
-          <!-- Rating Summary -->
-          {% if total_reviews > 0 %}
-          <div class="rating-summary">
-            <div class="rating-score">
-              <div class="score-number">{{ average_rating|floatformat:1 }}</div>
-              <div class="score-stars">
-                {% for i in "12345" %}
-                  {% if forloop.counter <= average_rating|floatformat:0 %}
-                    <i class="bi bi-star-fill"></i>
-                  {% elif forloop.counter <= average_rating|add:"0.5"|floatformat:0 %}
-                    <i class="bi bi-star-half"></i>
-                  {% else %}
-                    <i class="bi bi-star"></i>
-                  {% endif %}
-                {% endfor %}
-              </div>
-              <p class="score-text">Based on {{ total_reviews }} review{{ total_reviews|pluralize }}</p>
-            </div>
+      </div>
+      <div class="ap-card-bd">
 
-          </div>
-          {% endif %}
-
-          <!-- Reviews List -->
-          <div class="reviews-list">
-            {% if reviews %}
-              {% for review in reviews %}
-              <div class="review-item">
-                <div class="review-header">
-                  <div class="reviewer-avatar">
-                    <i class="bi bi-person-circle"></i>
-                  </div>
-                  <div class="reviewer-info">
-                    <h4 class="reviewer-name">{{ review.user.username }}</h4>
-                    <div class="review-stars">
-                      {% for i in "12345" %}
-                        {% if forloop.counter <= review.rating %}
-                          <i class="bi bi-star-fill"></i>
-                        {% else %}
-                          <i class="bi bi-star"></i>
-                        {% endif %}
-                      {% endfor %}
-                    </div>
-                  </div>
-                  <span class="review-date">{{ review.created_at|timesince }} ago</span>
-                </div>
-                <div class="review-body">
-                  <p class="review-text">{{ review.comment }}</p>
-                </div>
-              </div>
+        {% if total_reviews > 0 %}
+        <div class="ap-rating-summary">
+          <div class="ap-rs-score">
+            <span class="ap-rs-num">{{ average_rating|floatformat:1 }}</span>
+            <div class="ap-rs-stars">
+              {% for i in "12345" %}
+                {% if forloop.counter <= average_rating|floatformat:0 %}
+                  <i class="bi bi-star-fill"></i>
+                {% else %}
+                  <i class="bi bi-star"></i>
+                {% endif %}
               {% endfor %}
-            {% else %}
-              <div class="no-reviews-message">
-                <i class="bi bi-chat-left-text"></i>
-                <p>No reviews yet. Be the first to review {{ agent.first_name }}!</p>
+            </div>
+            <span class="ap-rs-count">{{ total_reviews }} review{{ total_reviews|pluralize }}</span>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="ap-reviews-list">
+          {% if reviews %}
+            {% for review in reviews %}
+            <div class="ap-review-item">
+              <div class="ap-review-top">
+                <div class="ap-reviewer-avatar">{{ review.user.username|slice:":1"|upper }}</div>
+                <div class="ap-reviewer-info">
+                  <strong>{{ review.user.username }}</strong>
+                  <div class="ap-review-stars">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= review.rating %}
+                        <i class="bi bi-star-fill"></i>
+                      {% else %}
+                        <i class="bi bi-star"></i>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <span class="ap-review-date">{{ review.created_at|timesince }} ago</span>
               </div>
-            {% endif %}
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-
-    <!-- Sidebar -->
-    <aside class="sidebar-content">
-      
-      <!-- Contact Card -->
-      <div class="sidebar-card">
-        <div class="sidebar-card-header">
-          <h3 class="sidebar-title">
-            <i class="bi bi-telephone"></i>
-            Contact Information
-          </h3>
-        </div>
-        <div class="sidebar-card-body">
-          
-          <div class="contact-info-item">
-            <i class="bi bi-telephone-fill"></i>
-            <div class="contact-details">
-              <span class="contact-label">Phone</span>
-              <a href="tel:{{ agent.phone_number }}" class="contact-value">{{ agent.phone_number }}</a>
+              <p class="ap-review-text">{{ review.comment }}</p>
             </div>
-          </div>
-
-          <div class="contact-info-item">
-            <i class="bi bi-envelope-fill"></i>
-            <div class="contact-details">
-              <span class="contact-label">Email</span>
-              <a href="mailto:{{ agent.email }}" class="contact-value">{{ agent.email }}</a>
-            </div>
-          </div>
-
-          <div class="contact-info-item">
-            <i class="bi bi-geo-alt-fill"></i>
-            <div class="contact-details">
-              <span class="contact-label">Location</span>
-              <span class="contact-value">{{ agent.location }}, Nigeria</span>
-            </div>
-          </div>
-
-          {% if universal_info and universal_info.agency %}
-          <div class="contact-info-item">
-            <i class="bi bi-building"></i>
-            <div class="contact-details">
-              <span class="contact-label">Agency</span>
-              <span class="contact-value">{{ universal_info.agency_name }}</span>
-            </div>
-          </div>
-          {% endif %}
-
-        </div>
-      </div>
-
-      <!-- Social Links -->
-      {% if social_links %}
-      <div class="sidebar-card">
-        <div class="sidebar-card-header">
-          <h3 class="sidebar-title">
-            <i class="bi bi-share"></i>
-            Connect
-          </h3>
-        </div>
-        <div class="sidebar-card-body">
-          <div class="social-links">
-            {% for link in social_links %}
-            <a href="{{ link.link_to_social }}" target="_blank" class="social-link" rel="noopener noreferrer">
-              <i class="bi bi-{{ link.social_platform|lower }}"></i>
-              <span>{{ link.social_platform }}</span>
-            </a>
             {% endfor %}
+          {% else %}
+            <div class="ap-no-reviews">
+              <i class="bi bi-chat-left-text"></i>
+              <p>No reviews yet. Be the first to review {{ agent.first_name }}!</p>
+            </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="ap-sidebar">
+
+    <!-- Contact -->
+    <div class="ap-sidebar-card">
+      <div class="ap-sc-hd">
+        <i class="bi bi-telephone-fill"></i> Contact Information
+      </div>
+      <div class="ap-sc-bd">
+
+        <div class="ap-contact-row">
+          <div class="ap-contact-icon"><i class="bi bi-telephone-fill"></i></div>
+          <div class="ap-contact-info">
+            <span class="ap-contact-label">Phone</span>
+            <a href="tel:{{ agent.phone_number }}" class="ap-contact-val">{{ agent.phone_number }}</a>
           </div>
         </div>
-      </div>
-      {% endif %}
 
-
-      <!-- Quick Inquiry -->
-      <div class="sidebar-card inquiry-card">
-        <div class="sidebar-card-header">
-          <h3 class="sidebar-title">
-            <i class="bi bi-chat-dots"></i>
-            Quick Inquiry
-          </h3>
+        <div class="ap-contact-row">
+          <div class="ap-contact-icon"><i class="bi bi-envelope-fill"></i></div>
+          <div class="ap-contact-info">
+            <span class="ap-contact-label">Email</span>
+            <a href="mailto:{{ agent.email }}" class="ap-contact-val">{{ agent.email }}</a>
+          </div>
         </div>
-        <div class="sidebar-card-body">
-          <p class="inquiry-text">Interested in working with {{ agent.first_name }}?</p>
-          <a href="mailto:{{ agent.email }}" class="btn-inquiry" target='_blank'>
-            <i class="bi bi-send"></i>
-            Send an Email
+
+        <div class="ap-contact-row">
+          <div class="ap-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+          <div class="ap-contact-info">
+            <span class="ap-contact-label">Location</span>
+            <span class="ap-contact-val">{{ agent.location }}, Nigeria</span>
+          </div>
+        </div>
+
+        {% if universal_info and universal_info.agency %}
+        <div class="ap-contact-row">
+          <div class="ap-contact-icon"><i class="bi bi-building-fill"></i></div>
+          <div class="ap-contact-info">
+            <span class="ap-contact-label">Agency</span>
+            <span class="ap-contact-val">{{ universal_info.agency_name }}</span>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+
+    <!-- Social links -->
+    {% if social_links %}
+    <div class="ap-sidebar-card">
+      <div class="ap-sc-hd">
+        <i class="bi bi-share-fill"></i> Connect
+      </div>
+      <div class="ap-sc-bd">
+        <div class="ap-social-grid">
+          {% for link in social_links %}
+          <a href="{{ link.link_to_social }}" target="_blank" rel="noopener noreferrer" class="ap-social-btn">
+            <i class="bi bi-{{ link.social_platform|lower }}"></i>
+            <span>{{ link.social_platform }}</span>
           </a>
+          {% endfor %}
         </div>
       </div>
+    </div>
+    {% endif %}
 
-    </aside>
 
-  </div>
-
-</div>
-
-<!-- Review Modal -->
-<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reviewModalLabel">
-          <i class="bi bi-star-fill me-2"></i>Write a Review for {{ agent.first_name }}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Quick inquiry -->
+    <div class="ap-sidebar-card ap-inquiry-card">
+      <div class="ap-sc-hd">
+        <i class="bi bi-chat-dots-fill"></i> Quick Inquiry
       </div>
-      <div class="modal-body">
+      <div class="ap-sc-bd">
+        <p>Interested in working with {{ agent.first_name }}?</p>
+        <a href="mailto:{{ agent.email }}" class="ap-btn primary" style="width:100%;justify-content:center">
+          <i class="bi bi-send-fill"></i> Send an Email
+        </a>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- end .ap-page -->
+
+
+<!-- ── REVIEW MODAL ──────────────────────────── -->
+<div class="modal fade" id="reviewModal" tabindex="-1"
+     aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content ap-modal">
+
+      <div class="ap-modal-header">
+        <h5 id="reviewModalLabel">
+          <i class="bi bi-star-fill"></i> Review {{ agent.first_name }}
+        </h5>
+        <button type="button" class="ap-modal-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="ap-modal-body">
         {% if user.is_authenticated %}
           {% if user_has_reviewed %}
-            <div class="alert alert-info">
-              <i class="bi bi-info-circle me-2"></i>
-              You have already submitted a review for this agent.
+            <div class="ap-alert info">
+              <i class="bi bi-info-circle-fill"></i>
+              You have already reviewed this agent.
             </div>
           {% else %}
             <form id="reviewForm" method="post" action="{% url 'customer:review-agent' agent.agent_uuid %}">
               {% csrf_token %}
-              
-              <div class="mb-4">
-                <label class="form-label">Your Rating *</label>
-                <div class="star-rating-input">
+
+              <div class="ap-form-group">
+                <label>Your Rating <span class="ap-req">*</span></label>
+                <div class="ap-star-input">
                   <input type="radio" name="rating" value="5" id="star5" required>
-                  <label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star5"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="4" id="star4">
-                  <label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star4"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="3" id="star3">
-                  <label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star3"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="2" id="star2">
-                  <label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
-                  
+                  <label for="star2"><i class="bi bi-star-fill"></i></label>
                   <input type="radio" name="rating" value="1" id="star1">
-                  <label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                  <label for="star1"><i class="bi bi-star-fill"></i></label>
                 </div>
-                <div class="rating-text text-center mt-2">
-                  <span id="ratingText" class="text-muted">Select a rating</span>
-                </div>
+                <p class="ap-rating-text" id="ratingText">Select a rating</p>
               </div>
-              
-              <div class="mb-3">
-                <label class="form-label">Your Review *</label>
-                <textarea name="comment" class="form-control" rows="5" required 
-                          placeholder="Share your experience working with {{ agent.first_name }}..."></textarea>
-                <small class="text-muted">Minimum 10 characters</small>
+
+              <div class="ap-form-group">
+                <label>Your Review <span class="ap-req">*</span></label>
+                <textarea name="comment" rows="5" required
+                  placeholder="Share your experience with {{ agent.first_name }}..."></textarea>
+                <span class="ap-field-hint">Minimum 10 characters</span>
               </div>
-              
-              <button type="submit" class="btn-submit-review">
-                <i class="bi bi-check-circle-fill me-2"></i>Submit Review
+
+              <button type="submit" class="ap-submit-btn">
+                <i class="bi bi-check-circle-fill"></i> Submit Review
               </button>
             </form>
           {% endif %}
         {% else %}
-          <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to write a review.
+          <div class="ap-alert warn">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Please <a href="{% url 'login' %}?next={{ request.path }}">sign in</a> to write a review.
           </div>
         {% endif %}
       </div>
+
     </div>
   </div>
 </div>
@@ -423,214 +381,40 @@
 {% endblock %}
 
 {% block extra_js %}
-<style>
-/* Back Button Styles */
-.back-button-container {
-  position: sticky;
-  top: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 50px;
-  padding: 0.75rem 1.5rem;
-  font-weight: 600;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  font-size: 0.95rem;
-}
-
-.back-btn:hover {
-  background: #f8f9fa;
-  border-color: #333;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-}
-
-.back-btn i {
-  font-size: 1.1rem;
-}
-
-@media (max-width: 768px) {
-  .back-button-container {
-    padding: 0.75rem 1rem;
-  }
-  
-  .back-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
-}
-</style>
-
 <script>
-(function() {
+(function () {
   'use strict';
 
-  // Star rating interaction in modal
-  const starInputs = document.querySelectorAll('.star-rating-input input[type="radio"]');
-  const starLabels = document.querySelectorAll('.star-rating-input label');
-  const ratingText = document.getElementById('ratingText');
-  
-  const ratingDescriptions = {
-    '5': '⭐ Excellent - 5 stars',
-    '4': '⭐ Very Good - 4 stars',
-    '3': '⭐ Good - 3 stars',
-    '2': '⭐ Fair - 2 stars',
-    '1': '⭐ Poor - 1 star'
-  };
-  
-  // Handle star selection
-  starInputs.forEach((input) => {
-    input.addEventListener('change', function() {
-      const rating = this.value;
-      if (ratingText) {
-        ratingText.textContent = ratingDescriptions[rating];
-        ratingText.style.color = '#ffc107';
-        ratingText.style.fontWeight = '600';
+  var ratings = { '5':'Excellent', '4':'Very Good', '3':'Good', '2':'Fair', '1':'Poor' };
+  var inputs  = document.querySelectorAll('.ap-star-input input');
+  var text    = document.getElementById('ratingText');
+
+  inputs.forEach(function (inp) {
+    inp.addEventListener('change', function () {
+      if (text) {
+        text.textContent = ratings[inp.value] + ' — ' + inp.value + ' star' + (inp.value > 1 ? 's' : '');
+        text.className = 'ap-rating-text filled';
       }
     });
   });
-  
-  // Hover effects for star rating
-  starLabels.forEach((label) => {
-    label.addEventListener('mouseenter', function() {
-      const value = this.previousElementSibling.value;
-      if (!document.querySelector('.star-rating-input input:checked') && ratingText) {
-        ratingText.textContent = ratingDescriptions[value];
-        ratingText.style.color = '#6c757d';
+
+  var form = document.getElementById('reviewForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      var checked  = document.querySelector('.ap-star-input input:checked');
+      var textarea = form.querySelector('textarea[name="comment"]');
+      if (!checked) {
+        e.preventDefault();
+        alert('Please select a star rating.');
+        return;
       }
-    });
-  });
-  
-  // Reset text on mouse leave if no selection
-  const starRatingContainer = document.querySelector('.star-rating-input');
-  if (starRatingContainer) {
-    starRatingContainer.addEventListener('mouseleave', function() {
-      const checkedInput = document.querySelector('.star-rating-input input:checked');
-      if (!checkedInput && ratingText) {
-        ratingText.textContent = 'Select a rating';
-        ratingText.style.color = '';
-        ratingText.style.fontWeight = '';
+      if (textarea && textarea.value.trim().length < 10) {
+        e.preventDefault();
+        alert('Please write at least 10 characters.');
+        textarea.focus();
       }
     });
   }
-  
-  // Form validation
-  const reviewForm = document.getElementById('reviewForm');
-  if (reviewForm) {
-    reviewForm.addEventListener('submit', function(e) {
-      const ratingChecked = document.querySelector('.star-rating-input input:checked');
-      const commentField = document.querySelector('textarea[name="comment"]');
-      
-      if (!ratingChecked) {
-        e.preventDefault();
-        alert('Please select a star rating');
-        return false;
-      }
-      
-      if (commentField && commentField.value.trim().length < 10) {
-        e.preventDefault();
-        alert('Please write at least 10 characters in your review');
-        commentField.focus();
-        return false;
-      }
-      
-      return true;
-    });
-  }
-})();
+}());
 </script>
-
-<style>
-/* Additional styles for review modal */
-.star-rating-input {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-.star-rating-input input[type="radio"] {
-  display: none;
-}
-
-.star-rating-input label {
-  cursor: pointer;
-  font-size: 2.5rem;
-  color: #e0e0e0;
-  transition: all 0.2s ease;
-}
-
-.star-rating-input label:hover,
-.star-rating-input label:hover ~ label,
-.star-rating-input input[type="radio"]:checked ~ label {
-  color: #ffc107;
-  transform: scale(1.1);
-}
-
-.rating-text {
-  min-height: 24px;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.btn-submit-review {
-  width: 100%;
-  padding: 0.875rem;
-  background: linear-gradient(135deg, #1a3c4e 0%, #2d5a73 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 1.5rem;
-}
-
-.btn-submit-review:hover {
-  background: linear-gradient(135deg, #2d5a73 0%, #1a3c4e 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 60, 78, 0.3);
-}
-
-.no-reviews-message {
-  text-align: center;
-  padding: 3rem 1.5rem;
-  background: #f8f9fa;
-  border-radius: 12px;
-  margin-top: 2rem;
-}
-
-.no-reviews-message i {
-  font-size: 4rem;
-  color: #cbd5e0;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.no-reviews-message p {
-  color: #6c757d;
-  font-size: 1rem;
-  margin: 0;
-}
-</style>
 {% endblock %}

@@ -795,15 +795,19 @@ button { font-family: inherit; font-size: inherit; }
   }
 
   /* Accordion cards: sidebar (right column).
-     nth-child(6) = Company News
-     nth-child(7) = Your Information */
+    nth-child(6) = Company News
+    nth-child(7) = Your Information */
   .main-content > .accordion-card:nth-child(6) {
     grid-column: 2;
-    grid-row: 2;       /* aligns with listings section */
+    grid-row: 2 / span 3;   /* spans rows 2-4 so it doesn't force gap in left column */
   }
   .main-content > .accordion-card:nth-child(7) {
     grid-column: 2;
-    grid-row: 3;       /* stacks below news */
+    grid-row: 5;
+  }
+  .main-content > .accordion-card:nth-child(6),
+  .main-content > .accordion-card:nth-child(7) {
+    align-self: start;
   }
 
   /* Auto-expand accordions on desktop — no need to tap */
@@ -880,4 +884,45 @@ button { font-family: inherit; font-size: inherit; }
   .main-content { grid-template-columns: 1fr 350px; }
   .stat-card { padding: 1.25rem; }
   .stat-data h3 { font-size: 2.1rem; }
+}
+
+
+@media (min-width: 900px) {
+
+  /* ... all your other desktop rules stay the same ... */
+
+  .main-content {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    column-gap: 1.75rem;
+    row-gap: 1.4rem;
+    align-items: start;   /* <-- THIS is the key line */
+  }
+
+  /* Tip banner still spans both columns */
+  .tip-banner {
+    grid-column: 1 / -1;
+  }
+
+  /* All section blocks stay in left column */
+  .section-block {
+    grid-column: 1;
+    padding: 1.5rem;
+    align-self: start;   /* prevents stretching to match sidebar height */
+  }
+
+  /* Sidebar accordion cards */
+  .main-content > .accordion-card:nth-child(6) {
+    grid-column: 2;
+    grid-row: 2 / span 2;   /* spans 2 rows — won't create gaps */
+    align-self: start;
+  }
+  .main-content > .accordion-card:nth-child(7) {
+    grid-column: 2;
+    grid-row: 4;
+    align-self: start;
+  }
 }
