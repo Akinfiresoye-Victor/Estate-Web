@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import *
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.db import transaction
 from companies.models import CompanyInformation, CompanyActivityLog
 from . import news_scrape as ns
@@ -11,7 +11,8 @@ from estate.models import LeadInfo
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
-from core.utils import score_new_listing
+from core.utils import *
+
 
 # Create your views here.
 def landing_page(request):
@@ -138,7 +139,25 @@ def sell_property(request):
             base_template = 'agent/base.html'
         else:
             base_template = 'estate/base.html'
- 
+            
+        if request.user.role == 'agent':
+            agent=AgentInformation.objects.get(user_id=request.user.id)
+            company=get_agent_company(agent)
+            
+            allowed, reason= can_add_to_inventory(agent, company)
+            if not allowed:
+                messages.error(request, reason)
+                return redirect('listings')
+        elif request.user.role == 'company':
+            """
+            Company listed themselves
+            """
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+            agent=None
+            allowed, reason= can_add_to_inventory(agent, company)
+            if not allowed:
+                messages.error(request, reason)
+                return redirect('listings')
         submitted = False
  
         if request.method == 'POST':
@@ -166,6 +185,7 @@ def sell_property(request):
                         landlord.company_uuid  = company.unique_company_id
                         landlord.user_id       = request.user.id
                         landlord.time_stamp    = timezone.now()
+                        landlord.is_listed=False
                         landlord.save()
  
                         image_form.instance = landlord
@@ -184,8 +204,9 @@ def sell_property(request):
                         landlord.agent_uuid   = str(agent.agent_uuid)
                         if agent.company_uuid:
                             landlord.company_uuid = agent.company_uuid
-                        landlord.user_id      = request.user.id
-                        landlord.time_stamp   = timezone.now()
+                        landlord.user_id= request.user.id
+                        landlord.time_stamp= timezone.now()
+                        landlord.is_listed=False
                         landlord.save()
  
                         image_form.instance = landlord
@@ -240,7 +261,25 @@ def lease_property(request):
             base_template = 'agent/base.html'
         else:
             base_template = 'estate/base.html'
- 
+        if request.user.role == 'agent':
+            agent=AgentInformation.objects.get(user_id=request.user.id)
+            company=get_agent_company(agent)
+            
+            allowed, reason= can_add_to_inventory(agent, company)
+            if not allowed:
+                messages.error(request, reason)
+                return redirect('listings')
+        elif request.user.role == 'company':
+            """
+            Company listed themselves
+            """
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+            agent=None
+            allowed, reason= can_add_to_inventory(agent, company)
+            if not allowed:
+                messages.error(request, reason)
+                return redirect('listings')
+        submitted=False
         if request.method == 'POST':
             prop_form  = LeaseForm(request.POST or None, request.FILES or None)
             image_form = RentImageFormSet(request.POST or None, request.FILES or None)
@@ -266,6 +305,7 @@ def lease_property(request):
                         landlord.company_uuid  = company.unique_company_id
                         landlord.user_id       = request.user.id
                         landlord.time_stamp    = timezone.now()
+                        landlord.is_listed=False
                         landlord.save()
  
                         image_form.instance = landlord
@@ -286,6 +326,7 @@ def lease_property(request):
                             landlord.company_uuid = agent.company_uuid
                         landlord.user_id      = request.user.id
                         landlord.time_stamp   = timezone.now()
+                        landlord.is_listed=False
                         landlord.save()
  
                         image_form.instance = landlord
@@ -316,6 +357,54 @@ def lease_property(request):
     except Exception as e:
         messages.error(request, 'Tell us the Error')
         return render(request, 'estate/error_page.html', {'e': e})        
+
+
+def toggle_listing(request, property_id, property_type):
+    """
+    Toggles a property between inventory (private) and listed(public).
+    Supports AJAX
+    """
+    is_ajax=request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    Model=PropertyManagementSale if property_type == 'sale' else PropertyManagementRent
+    
+    try:
+        prop=Model.objects.get(pk=property_id, user_id=request.user.id)
+    except:
+        if is_ajax:
+            return JsonResponse({'error':'Not found'}, status=404)
+        messages.error(request, 'Property not found')
+        return redirect('listings')
+
+    if prop.is_listed:
+        prop.is_listed=False
+        prop.save(update_fields=['is_listed'])
+        msg='Property moved back to inventory.'
+        if is_ajax:
+            return JsonResponse({'is_lited': False, 'message':msg})
+        messages.success(request, msg)
+    else:
+        if request.user.role == 'agent':
+            agent=AgentInformation.objects.get(user_id=request.user.id)
+            company=get_agent_company(agent)
+        elif request.user.role == 'company':
+            agent=None
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+        
+        allowed,reason= can_go_live(agent, company)
+        if not allowed:
+            if is_ajax:
+                return JsonResponse({'error': reason}, status=403)
+            messages.error(request, reason)
+            return redirect('listings')
+        prop.is_listed=True
+        prop.save(update_fields=['is_listed'])
+        msg= 'Property is now live on the platform.'
+        if is_ajax:
+            return JsonResponse({'is_listed':True, 'message': msg})
+        messages.success(request, msg)
+    return redirect('listings')
+
 
 
 '''News Blog Automation'''
@@ -744,22 +833,44 @@ def manage_listings(request):
         else:
             base_template='estate/base.html'
         if request.user.role == 'company':
-            user_type=CompanyInformation.objects.get(user_id=request.user.id)
-            user_id=user_type.unique_company_id
-            property_on_lease=PropertyManagementRent.objects.filter(company_uuid=user_id)
-            property_on_sale=PropertyManagementSale.objects.filter(company_uuid=user_id)
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+            agent=None
+            property_on_lease=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
+            property_on_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
             role='company'
         elif request.user.role == 'agent':
-            user_type=AgentInformation.objects.get(user_id=request.user.id)
-            user_id=user_type.agent_uuid
-            property_on_lease=PropertyManagementRent.objects.filter(agent_uuid=user_id)
-            property_on_sale=PropertyManagementSale.objects.filter(agent_uuid=user_id)
+            agent=AgentInformation.objects.get(user_id=request.user.id)
+            company=None
+            if agent.company_uuid:
+                company=CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
+            property_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid)
+            property_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid)
             role='agent'
         else:
             messages.error(request, 'An error occured')
             return redirect('landing')
-        return render(request, 'core/listings.html', {'on_lease':property_on_lease,'role':role,
-                                                        'on_sale':property_on_sale, 'base_template':base_template})
+        inv_used=get_inventory_count(agent, company)
+        live_used= get_listing_count(agent,company)
+        if company and company.company_tier == 'enterprise':
+            inv_limit='∞'
+            live_limit='∞'
+        elif company:
+            inv_limit=company.inventory_slots
+            live_limit=company.listing_slots
+        else:
+            inv_limit=agent.inventory_slot
+            live_limit=agent.listing_slots
+        context={
+            'on_lease':property_on_lease,
+            'role':role,
+            'on_sale':property_on_sale,
+            'base_template':base_template,
+            'inv_used':inv_used,
+            'inv_limit':inv_limit,
+            'live_used':live_used,
+            'live_limit': live_limit
+        }
+        return render(request, 'core/listings.html', context)
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
 

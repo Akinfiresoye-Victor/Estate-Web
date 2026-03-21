@@ -33,6 +33,8 @@ class AgentInformation(models.Model):
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=agent_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
     certificate = models.FileField('Professional Certificate', blank=True, null=True)
+    inventory_slot=models.IntegerField('Inventory Slots', default=10)
+    listing_slots=models.IntegerField('Listing Slots', default=6)
     verified = models.BooleanField('Verified agent', default=False)
     date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):

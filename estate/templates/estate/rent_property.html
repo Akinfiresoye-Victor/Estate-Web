@@ -79,7 +79,7 @@
   <!-- PROPERTY GRID -->
   <div class="rent-grid">
     {% for lease, wishlist in on_lease %}
-      {% if lease.available %}
+      {% if lease.is_listed %}
       <article class="rent-card">
 
         <div class="rent-card-image">

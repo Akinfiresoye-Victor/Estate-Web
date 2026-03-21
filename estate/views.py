@@ -99,7 +99,7 @@ def buy_property(request):
     Unauthenticated users see all listings but hearts show as empty.
     """
     try:
-        sale_qs = PropertyManagementSale.objects.all().order_by(
+        sale_qs = PropertyManagementSale.objects.filter(is_listed=True).order_by(
             '-listing_score', '-listed_date'
         )
  
@@ -135,7 +135,7 @@ def rent_property(request):
     Works for both authenticated and unauthenticated users.
     """
     try:
-        rent_qs = PropertyManagementRent.objects.all().order_by(
+        rent_qs = PropertyManagementRent.objects.filter(is_listed=True).order_by(
             '-listing_score', '-listed_date'
         )
  

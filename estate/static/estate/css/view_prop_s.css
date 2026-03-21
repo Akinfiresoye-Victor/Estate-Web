@@ -586,3 +586,8 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+.description-text {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}

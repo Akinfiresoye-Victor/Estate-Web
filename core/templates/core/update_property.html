@@ -125,7 +125,7 @@
                                     {{ field.label }}
                                 </label>
 
-                                {% if field.name == 'is_featured' or field.name == 'available' or field.name == 'furnished' %}
+                                {% if field.name == 'is_featured' or field.name == 'is_listed' or field.name == 'furnished' %}
                                     <div class="form-check-wrapper">
                                         {% render_field field class="form-check-input" %}
                                         <label class="form-check-label" for="{{ field.id_for_label }}">

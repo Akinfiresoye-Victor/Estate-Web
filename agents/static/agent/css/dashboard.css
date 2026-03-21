@@ -772,7 +772,7 @@ button { font-family: inherit; font-size: inherit; }
     display: grid;
     grid-template-columns: 1fr 320px;
     column-gap: 1.75rem;
-    row-gap: 0.75rem;
+    row-gap: 1.4rem;
     align-items: start;
   }
 
@@ -784,10 +784,14 @@ button { font-family: inherit; font-size: inherit; }
   }
   .tip-text { font-size: 1rem; }
 
-  /* Section blocks: always in left column */
+  /* Section blocks: always in left column.
+     align-self: start stops the grid stretching a section to match
+     a taller sidebar card in the same row — fixes the empty gap
+     between People Interested and Quick Actions. */
   .section-block {
     grid-column: 1;
     padding: 1.5rem;
+    align-self: start;
   }
 
   /* Accordion cards: sidebar (right column).

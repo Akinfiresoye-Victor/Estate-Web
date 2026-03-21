@@ -611,3 +611,9 @@ body {
 
 .price-card { display: none; }
 @media (min-width: 900px) { .price-card { display: block; } }
+
+.description-text {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}

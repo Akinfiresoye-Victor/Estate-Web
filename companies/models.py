@@ -1,5 +1,5 @@
 from django.db import models
-from core.choices import STATES, SOCIAL_LINKS,AGENT_STATUS
+from core.choices import STATES, SOCIAL_LINKS,AGENT_STATUS, COMPANY_TIER
 from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
@@ -32,6 +32,9 @@ class CompanyInformation(models.Model):
     company_logo=models.ImageField('Company Logo', blank=True, upload_to=company_logo_path, validators=[validate_image], null=True)
     principal_broker= models.CharField('Registered Owner of Company', max_length=100)
     time_created=models.DateTimeField(default=timezone.now, blank=False)
+    company_tier= models.CharField(choices=COMPANY_TIER, default='starter')
+    inventory_slots=models.IntegerField('Inventory Slots', default=50)
+    listing_slots=models.IntegerField('Listing Slots', default=30)
     verified=models.BooleanField('Verified Company',default=False)
     date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):

@@ -79,7 +79,7 @@
   <!-- PROPERTY GRID -->
   <div class="buy-grid">
     {% for bought, wishlist in buy %}
-      {% if bought.available %}
+      {% if bought.is_listed %}
       <article class="buy-card">
 
         <div class="buy-card-image">

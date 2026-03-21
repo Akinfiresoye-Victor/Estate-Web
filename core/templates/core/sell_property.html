@@ -22,23 +22,23 @@
 <div class="wizard-wrapper">
 
   {% if submitted %}
-  {# ══ SUCCESS ══════════════════════════════════════════════════════════ #}
-  <div class="success-card">
-    <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
-    <h2 class="success-title">Property Listed Successfully!</h2>
-    <p class="success-message">
-      Your property has been submitted for sale and will be reviewed shortly.
-    </p>
-    <div class="success-actions">
-      <a href="{% url 'listings' %}" class="btn-dashboard">
-        <i class="bi bi-card-list"></i> My Listings
-      </a>
-      <a href="{% url 'sell-property' %}" class="btn-dashboard-outline">
-        <i class="bi bi-plus-circle"></i> Sell Another
-      </a>
-    </div>
+{# ══ SUCCESS ══════════════════════════════════════════════════════════ #}
+<div class="success-card">
+  <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+  <h2 class="success-title">Property Saved to Inventory!</h2>
+  <p class="success-message">
+    Your property has been added to your inventory. It is <strong>not publicly visible yet</strong> — 
+    go to My Listings and toggle it <strong>Live</strong> whenever you're ready to publish it.
+  </p>
+  <div class="success-actions">
+    <a href="{% url 'listings' %}" class="btn-dashboard">
+      <i class="bi bi-toggles"></i> Go Live Now
+    </a>
+    <a href="{% url 'sell-property' %}" class="btn-dashboard-outline">
+      <i class="bi bi-plus-circle"></i> Add Another
+    </a>
   </div>
-
+</div>
   {% else %}
   {# ══ STEP INDICATOR ═══════════════════════════════════════════════════ #}
   <div class="step-indicator" id="stepIndicator">

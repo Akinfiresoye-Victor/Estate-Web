@@ -2,120 +2,254 @@
 
 <link rel="stylesheet" href="{% static 'estate/css/navbar.css' %}">
 
-<nav class="navbar navbar-custom fixed-top" data-bs-theme="dark">
-  <div class="container-fluid">
-    <a class="navbar-brand d-flex align-items-center" href="{% url 'landing' %}">
-      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" height="40" class="me-2">
-      <strong>Estate Web</strong>
+<nav class="nb-nav">
+  <div class="nb-inner">
+
+    <!-- Brand -->
+    <a class="nb-brand" href="{% url 'landing' %}">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web" height="36">
+      <span>Estate Web</span>
     </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+
+    <!-- Desktop centre links -->
+    <div class="nb-desktop-links">
+      <a href="{% url 'customer:buy-property' %}" class="nb-link">
+        <i class="bi bi-house-fill"></i> Buy
+      </a>
+      <a href="{% url 'customer:rent-property' %}" class="nb-link">
+        <i class="bi bi-key-fill"></i> Rent
+      </a>
+      <a href="{% url 'customer:wishlist' %}" class="nb-link">
+        <i class="bi bi-heart-fill"></i> Wishlist
+      </a>
+      <a href="{% url 'faq' %}" class="nb-link">
+        <i class="bi bi-question-circle-fill"></i> Help
+      </a>
+    </div>
+
+    <!-- Desktop right actions -->
+    <div class="nb-desktop-actions">
+      <!-- Desktop More dropdown -->
+    <div class="nb-more-wrap">
+      <button class="nb-more-btn" id="nbMoreBtn" onclick="toggleNbMore()" type="button">
+        More <i class="bi bi-chevron-down"></i>
       </button>
-    </div>
-
-    <div class="offcanvas offcanvas-end offcanvas-custom" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-          <i class="bi bi-compass me-2"></i>Explore
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-
-      <div class="offcanvas-body">
-        <ul class="navbar-nav flex-grow-1 pe-3">
-          
-          <!-- Latest News -->
-          <li class="nav-item">
-            <a class="nav-link" href="{%url 'articles'%}">
-              <i class="bi bi-newspaper me-2"></i>Blog
-            </a>
-          </li>
-            {% comment %} Main Customer Section {% endcomment %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'customer:rent-property' %}">
-                <i class="bi bi-key me-2"></i>Rent Home
-              </a></li>
-              <li class="nav-item"><a class="nav-link" href="{% url 'customer:buy-property' %}">
-                <i class="bi bi-cart-check me-2"></i>Buy Home
-              </a></li>
-              <li class="nav-item"><a class="nav-link" href="{% url 'customer:wishlist' %}">
-                <i class="bi bi-heart me-2"></i>Wishlist
-              </a></li>
-            </ul>
-          </li>
-
-
-
-
-
-
-
-          <li class="nav-divider"></li>
-
-          <!-- User Profile -->
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'customer:user-profile' %}">
-              <i class="bi bi-person-circle me-2"></i>User Profile
-            </a>
-          </li>
-
-
-          <li class="nav-divider"></li>
-
-          <!-- Coming Soon Section -->
-          <li class="nav-item">
-            <span class="nav-link text-muted coming-soon">
-              <i class="bi bi-geo-alt me-2"></i>Property Near You
-              <span class="badge bg-secondary ms-2">Soon</span>
-            </span>
-          </li>
-          <li class="nav-item">
-            <span class="nav-link text-muted coming-soon">
-              <i class="bi bi-moon-stars me-2"></i>Dark Theme
-              <span class="badge bg-secondary ms-2">Soon</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Footer -->
-      <div class="offcanvas-footer border-top border-secondary">
-        <div class="footer-content">
-          <h6 class="fw-bold mb-3">
-            <i class="bi bi-headset me-2"></i>Customer Support
-          </h6>
-          <ul class="list-unstyled mb-3">
-            <li class="mb-2">
-              <a href="mailto:estateweb101@gmail.com" class="footer-link">
-                <i class="bi bi-envelope me-2"></i>Contact Us
-              </a>
-            </li>
-            </li>
-            <li class="mb-2">
-              <a href="{%url 'faq'%}" class="footer-link">
-                <i class="bi bi-question-circle me-2"></i>Help Section  
-              </a>
-            </li>
-            <li class="mb-3">
-              <a href="{%url 'terms-agreement'%}" target="_blank"class="footer-link">
-                <i class="bi bi-shield-lock me-2"></i>Terms & Privacy
-              </a>
-            </li>
-            <li class="mb-3">
-              <a href="{%url 'partner-with-us'%}" target="_blank"class="footer-link">
-                <i class="fas fa-handshake me-2"></i>Partner With Us
-              </a>
-            </li>
-          </ul>
-          
-          <div class="text-center">
-            <a class="btn btn-logout w-100" href="{% url 'logout' %}">
-              <i class="bi bi-box-arrow-right me-2"></i>Logout
-            </a>
-          </div>
-          
-          <p class="text-center small text-muted mb-0 mt-3">&copy; 2026 Estate Web. All rights reserved.</p>
-        </div>
+      <div class="nb-more-menu" id="nbMoreMenu">
+        <a href="{% url 'faq' %}" class="nb-more-item">
+          <i class="bi bi-question-circle-fill"></i> Help Centre
+        </a>
+        <a href="{% url 'feedback' %}" class="nb-more-item">
+          <i class="bi bi-chat-heart-fill"></i> Send Feedback
+        </a>
+        <div class="nb-more-divider"></div>
+        <a href="{% url 'partner-with-us' %}" class="nb-more-item" target="_blank">
+          <i class="bi bi-people-fill"></i> Partner With Us
+        </a>
+        <a href="{% url 'terms-agreement' %}" class="nb-more-item" target="_blank">
+          <i class="bi bi-shield-lock-fill"></i> Terms &amp; Privacy
+        </a>
       </div>
     </div>
+
+        <a href="{% url 'customer:user-profile' %}" class="nb-profile-btn">
+        <i class="bi bi-person-circle"></i>
+        <span>Profile</span>
+      </a>
+      <a href="{% url 'logout' %}" class="nb-logout-btn">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Mobile hamburger -->
+    <button class="nb-toggle" type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#nbOffcanvas"
+            aria-controls="nbOffcanvas"
+            aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
   </div>
 </nav>
+
+
+<!-- ── OFFCANVAS (mobile + tablet) ──────────── -->
+<div class="offcanvas offcanvas-end nb-canvas"
+     tabindex="-1"
+     id="nbOffcanvas"
+     aria-labelledby="nbOffcanvasLabel">
+
+  <div class="nb-canvas-header">
+    <div class="nb-canvas-brand">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web" height="30">
+      <span id="nbOffcanvasLabel">Estate Web</span>
+    </div>
+    <button type="button" class="nb-canvas-close"
+            data-bs-dismiss="offcanvas" aria-label="Close">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="nb-canvas-body">
+
+    <!-- Main actions — big tap targets -->
+    <div class="nb-canvas-section">
+      <p class="nb-canvas-label">Browse Properties</p>
+
+      <a href="{% url 'customer:buy-property' %}" class="nb-canvas-link primary-link">
+        <div class="nb-canvas-icon sale"><i class="bi bi-house-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Buy Property</strong>
+          <span>Browse homes for sale</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:rent-property' %}" class="nb-canvas-link primary-link">
+        <div class="nb-canvas-icon lease"><i class="bi bi-key-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Rent / Lease</strong>
+          <span>Find rental properties</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:wishlist' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon heart"><i class="bi bi-heart-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>My Wishlist</strong>
+          <span>Your saved properties</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+    </div>
+
+    <div class="nb-canvas-divider"></div>
+
+    <!-- Account -->
+    <div class="nb-canvas-section">
+      <p class="nb-canvas-label">My Account</p>
+
+      <a href="{% url 'customer:user-profile' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon profile"><i class="bi bi-person-circle"></i></div>
+        <div class="nb-canvas-text">
+          <strong>My Profile</strong>
+          <span>View and edit your details</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="#" class="nb-canvas-link coming">
+        <div class="nb-canvas-icon notif"><i class="bi bi-bell-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Notifications</strong>
+          <span>Activity and alerts</span>
+        </div>
+        <span class="nb-soon">Soon</span>
+      </a>
+    </div>
+
+    <div class="nb-canvas-divider"></div>
+
+    <!-- Discover -->
+    <div class="nb-canvas-section">
+      <p class="nb-canvas-label">Discover</p>
+
+      <a href="#" class="nb-canvas-link coming">
+        <div class="nb-canvas-icon map"><i class="bi bi-geo-alt-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Properties Near You</strong>
+          <span>Location-based search</span>
+        </div>
+        <span class="nb-soon">Soon</span>
+      </a>
+
+      <a href="#" class="nb-canvas-link coming">
+        <div class="nb-canvas-icon news"><i class="bi bi-newspaper"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Property News</strong>
+          <span>Nigerian market insights</span>
+        </div>
+        <span class="nb-soon">Soon</span>
+      </a>
+
+    </div>
+
+    <div class="nb-canvas-divider"></div>
+
+    <!-- Support -->
+    <div class="nb-canvas-section">
+      <p class="nb-canvas-label">Support</p>
+
+      <a href="{% url 'faq' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon help"><i class="bi bi-question-circle-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Help Centre</strong>
+          <span>FAQs and guides</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'feedback' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon feedback"><i class="bi bi-chat-heart-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Send Feedback</strong>
+          <span>Help us improve</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'terms-agreement' %}" class="nb-canvas-link" target="_blank">
+        <div class="nb-canvas-icon terms"><i class="bi bi-shield-lock-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Terms &amp; Privacy</strong>
+          <span>Legal information</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'partner-with-us' %}" class="nb-canvas-link" target="_blank">
+        <div class="nb-canvas-icon partner"><i class="bi bi-people-fill"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Partner With Us</strong>
+          <span>Agents and companies</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- Canvas footer — logout -->
+  <div class="nb-canvas-footer">
+    <a href="mailto:support@estateweb.com" class="nb-footer-contact">
+      <i class="bi bi-envelope-fill"></i> support@estateweb.com
+    </a>
+    <a href="{% url 'logout' %}" class="nb-logout">
+      <i class="bi bi-box-arrow-right"></i> Sign Out
+    </a>
+    <p class="nb-footer-copy">&copy; 2026 Estate Web. All rights reserved.</p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  window.toggleNbMore = function () {
+    var btn  = document.getElementById('nbMoreBtn');
+    var menu = document.getElementById('nbMoreMenu');
+    btn.classList.toggle('open');
+    menu.classList.toggle('open');
+  };
+  document.addEventListener('click', function (e) {
+    var wrap = document.querySelector('.nb-more-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      document.getElementById('nbMoreBtn').classList.remove('open');
+      document.getElementById('nbMoreMenu').classList.remove('open');
+    }
+  });
+}());
+</script>

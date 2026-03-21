@@ -11,7 +11,7 @@ from core.models import PropertyManagementRent, PropertyManagementSale,PropertyV
 from estate.models import LeadInfo
 from agents.models import AgentInformation
 from companies.models import CompanyInformation
-
+from django.shortcuts import render
 
 def monthly_change(current_value, average_value):
     """Calculate percentage change from average"""
@@ -447,3 +447,77 @@ def refresh_activity_score(property_obj, property_type):
     property_obj.save(update_fields=['listing_score', 'last_reset_date'])
 
     return points
+
+
+
+
+def get_inventory_count(agent, company=None):
+    """
+    Getting how many properties an agent have stored
+    either listed/unlisted
+    """
+    if company:
+        return(PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).count()+
+                PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).count())
+    elif agent:
+        #Solo agent - only their own properties
+        return(PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count()+
+                PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count()
+                )
+
+def get_listing_count(agent, company=None):
+    """
+    How many properties are Currently LIVE
+    """
+    if company:
+        return(
+            PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id, is_listed=True).count()+
+            PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id, is_listed=True).count()
+        )
+    elif agent:
+        return(
+            PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count() + 
+            PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count()
+            
+        )
+
+def can_add_to_inventory(agent, company=None):
+    """
+    Can this agent/company store one more property?
+    """
+    
+    if company and company.company_tier =='enterprise':
+        return True, 'ok'
+    
+    limit=company.inventory_slots if company else agent.inventory_slots
+    used=get_inventory_count(agent,company)
+    
+    if used >= limit:
+        return False, f'Inventory full {used}/{limit} slots used. Upgrade to add more'
+    return True,'ok'
+
+def can_go_live(agent, company=None):
+    """
+    Can this agent/company make one more property live?
+    """
+    if company and company.company_tier == 'enterprise':
+        return True, 'ok'
+    
+    limit= company.listing_slots if company else agent.listing_slots
+    used= get_listing_count(agent, company)
+    
+    if used >= limit:
+        return False, f'Listing limit reached ({used}/{limit} live) Unlist another property first or upgrade'
+    return True, 'ok'
+
+
+def get_agent_company(agent):
+    """
+    Returns CompanyInformation object if aent is in a company, else None
+    """
+    if not agent.company_uuid:
+        return None
+    try:
+        return CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
+    except CompanyInformation.DoesNotExist:
+        return None

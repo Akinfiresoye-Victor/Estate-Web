@@ -258,3 +258,9 @@ ESTIMATED_ANNUAL_REVENUE=[
     ('₦100M - ₦500M', '₦100M - ₦500M'),
     ('₦500M+', '₦500M+')
 ]
+
+COMPANY_TIER=[
+    ('starter', 'Starter'), #50 inventory/ 30 live
+    ('growth', 'Growth'), # 200 inventory / 120 live
+    ('enterprise', 'Enterprise') # unlimited
+]

@@ -84,7 +84,6 @@ class LeaseForm(ModelForm):
                 'price_range': 'Price',
                 'phone_number': 'Phone Number',
                 'state': 'State',
-                'available': 'Visible To Public',
                 'base_image': 'Add Overview image Of Property ',
 }
         widgets= {
@@ -92,7 +91,6 @@ class LeaseForm(ModelForm):
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Oda Road, Kagola, Plot2,3'}),
                     'price_range': forms.TextInput(attrs={'class': 'form-control'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-                    'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
                     'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
@@ -106,7 +104,7 @@ class SellForm(ModelForm):
     class Meta:
         model=PropertyManagementSale
         fields=('property_category','residential','commercial','lands','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
-                'phone_number','size', 'price','available', 'base_image')
+                'phone_number','size', 'price', 'base_image')
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             
@@ -135,7 +133,6 @@ class SellForm(ModelForm):
                 'phone_number': 'Phone.No',
                 'price': 'Price',
                 'state': 'State',
-                'available': 'Visible To Public',
                 'base_image': 'Add Overview image Of Property ',
 }
         widgets= {
@@ -143,8 +140,8 @@ class SellForm(ModelForm):
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Akure,Oda road'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
                     'price': forms.TextInput(attrs={'class': 'form-control'}),
-                    # 'state': forms.ChoiceField(attrs={'class': 'form-control'}),
-                    'available': forms.Select(choices=YES_NO_CHOICES,attrs={'class': 'form-control'}),
+                    'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+                    'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
 }
