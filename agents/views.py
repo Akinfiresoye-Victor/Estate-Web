@@ -744,24 +744,20 @@ def job_listings(request):
         return redirect('login')
     if request.user.role != 'agent':
         messages.info(request, 'Agents Only')
-        return redirect('lnding')
+        return redirect('landing')
     
     try:
-        jobs=JobPost.objects.all()
-        companies_name=[]
-        market_days=[]
-        for names in jobs:
-            companies_id= names.company_uuid
-            company=CompanyInformation.objects.get(unique_company_id=companies_id)
-            companies_name.append(company.company_name)
-        # Calculate days on market for each job post
-        for job in jobs:
-            job_posted_date = job.date_posted
-            days_on_market = (datetime.now().date() - job_posted_date).days
-            market_days.append(days_on_market)
-        return render(request, 'agent/job_listings.html',{'jobs':zip(jobs,companies_name,market_days)})
+        jobs = JobPost.objects.all()
+        today = datetime.now().date()
+
+        # No set here — we need one result per job, duplicates included
+        market_days = [(today - job.date_posted).days for job in jobs]
+
+        return render(request, 'agent/job_listings.html', {
+            'jobs': zip(jobs, market_days)
+        })
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 def job_detail(request, job_id):

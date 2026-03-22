@@ -358,6 +358,8 @@ body {
 .menu-item:hover { background: var(--bg); color: var(--primary); }
 .menu-item.danger:hover { background: rgba(220,38,38,.07); color: var(--danger); }
 .menu-item i { font-size: 14px; }
+.menu-item.danger { color: var(--danger); }
+.menu-item.danger:hover { background: rgba(220,38,38,.07); color: var(--danger); }
 
 .emp-info { text-align: center; margin-bottom: 12px; }
 .emp-name { font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin-bottom: 2px; }
@@ -681,4 +683,17 @@ body {
 
 .revoke-warning-text p {
   font-size: 0.84rem; color: var(--text-mid); line-height: 1.6; margin: 0;
+}
+
+
+/* Reset button defaults so it looks identical to the <a> menu items */
+button.menu-item {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
 }

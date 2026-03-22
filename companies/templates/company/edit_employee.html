@@ -1,0 +1,319 @@
+{% extends base_template %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/edit_employee.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ee-page">
+
+  <!-- BREADCRUMB -->
+  <div class="ee-breadcrumb">
+    <a href="{% url 'company:manage-company' %}" class="bc-link">
+      <i class="bi bi-people-fill"></i> Team Management
+    </a>
+    <i class="bi bi-chevron-right bc-sep"></i>
+    <span class="bc-current">Edit Agent</span>
+  </div>
+
+
+  <!-- PAGE HEADER -->
+  <div class="ee-header">
+    <div class="ee-agent-preview">
+      <div class="ee-avatar">
+        {% if employee.agent_headshot %}
+          <img src="{{ employee.agent_headshot.url }}" alt="{{ employee.agent_name }}" id="avatarPreview">
+        {% else %}
+          <img src="https://ui-avatars.com/api/?name={{ employee.agent_name|urlencode }}&size=80&background=1a3c4e&color=fff&bold=true"
+               alt="{{ employee.agent_name }}" id="avatarPreview">
+        {% endif %}
+        <label class="avatar-upload-btn" for="id_agent_headshot" title="Change photo">
+          <i class="bi bi-camera-fill"></i>
+        </label>
+      </div>
+      <div class="ee-agent-info">
+        <h1 class="ee-agent-name">{{ employee.agent_name }}</h1>
+        <p class="ee-agent-role">{{ employee.company_role }} &mdash; {{ employee.company_department|default:"Unassigned" }}</p>
+        <span class="ee-status-badge {% if employee.agent_status == 'Active' %}active{% elif employee.agent_status == 'On Leave' %}on-leave{% else %}inactive{% endif %}">
+          <i class="bi bi-circle-fill"></i>
+          {{ employee.agent_status }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- DJANGO MESSAGES -->
+  {% if messages %}
+  <div class="ee-messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}x-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+
+  <!-- FORM -->
+  <form method="POST" enctype="multipart/form-data" class="ee-form" id="editForm">
+    {% csrf_token %}
+
+    <!-- Hidden file input for avatar -->
+    {{ form.agent_headshot }}
+
+    <!-- ── SECTION 1: Personal Information ── -->
+    <div class="ee-card">
+      <div class="ee-card-header">
+        <i class="bi bi-person-fill"></i>
+        <h2>Personal Information</h2>
+      </div>
+      <div class="ee-card-body">
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="id_agent_name">Full Name <span class="req">*</span></label>
+            {{ form.agent_name }}
+            {% if form.agent_name.errors %}
+              <span class="field-error">{{ form.agent_name.errors.0 }}</span>
+            {% endif %}
+          </div>
+          <div class="form-field">
+            <label for="id_agent_email">Email Address</label>
+            {{ form.agent_email }}
+            {% if form.agent_email.errors %}
+              <span class="field-error">{{ form.agent_email.errors.0 }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="id_agent_phone_no">Phone Number <span class="req">*</span></label>
+            {{ form.agent_phone_no }}
+            {% if form.agent_phone_no.errors %}
+              <span class="field-error">{{ form.agent_phone_no.errors.0 }}</span>
+            {% endif %}
+          </div>
+          <div class="form-field">
+            <label for="id_agent_status">Status <span class="req">*</span></label>
+            {{ form.agent_status }}
+            {% if form.agent_status.errors %}
+              <span class="field-error">{{ form.agent_status.errors.0 }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ── SECTION 2: Company Details ── -->
+    <div class="ee-card">
+      <div class="ee-card-header">
+        <i class="bi bi-briefcase-fill"></i>
+        <h2>Company Details</h2>
+      </div>
+      <div class="ee-card-body">
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="id_company_role">Role / Job Title <span class="req">*</span></label>
+            {{ form.company_role }}
+            {% if form.company_role.errors %}
+              <span class="field-error">{{ form.company_role.errors.0 }}</span>
+            {% endif %}
+          </div>
+          <div class="form-field">
+            <label for="id_company_department">Department</label>
+            {{ form.company_department }}
+            {% if form.company_department.errors %}
+              <span class="field-error">{{ form.company_department.errors.0 }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+
+    <!-- ── FORM ACTIONS ── -->
+    <div class="ee-actions">
+      <a href="{% url 'company:manage-company' %}" class="btn btn-ghost">
+        <i class="bi bi-x-lg"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary" id="saveBtn">
+        <i class="bi bi-check-lg"></i> Save Changes
+      </button>
+    </div>
+
+  </form>
+
+
+  <!-- DANGER ZONE -->
+<div class="ee-danger-zone">
+    <div class="danger-header">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <h3>Danger Zone</h3>
+    </div>
+    <div class="danger-body">
+      <div class="danger-item">
+        <div>
+          <strong>Remove from Company</strong>
+          <p>This agent will be removed from your team. Their properties and leads will remain attributed to your company.</p>
+        </div>
+        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">
+          <i class="bi bi-person-dash-fill"></i> Remove Agent
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .ee-page -->
+<!-- DANGER ZONE -->
+  
+
+  <!-- MODAL: Delete / Remove Agent Confirmation -->
+  <div class="ew-modal" id="deleteModal">
+    <div class="modal-box delete-modal-box">
+
+      <div class="modal-head">
+        <h3><i class="bi bi-person-dash-fill"></i> Remove Agent</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Warning block -->
+        <div class="delete-warning">
+          <div class="delete-warning-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+          </div>
+          <div class="delete-warning-text">
+            <strong>This action cannot be undone.</strong>
+            <p>
+              You are about to remove <strong>{{ employee.agent_name }}</strong> from your company.
+              Their listings and leads will remain with your company but they will lose access to your team.
+            </p>
+          </div>
+        </div>
+
+        <!-- Type-to-confirm input -->
+        <div class="form-field">
+          <label for="deleteConfirmInput">
+            Type <strong class="confirm-word">REMOVE</strong> to confirm
+          </label>
+          <input
+            type="text"
+            id="deleteConfirmInput"
+            placeholder="Type REMOVE here..."
+            autocomplete="off"
+            spellcheck="false"
+            oninput="checkDeleteConfirm(this)"
+          >
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" onclick="closeDeleteModal()">
+          Cancel
+        </button>
+        <a
+          id="deleteConfirmBtn"
+          href="{% url 'company:remove-agent' employee.agent_uuid %}"
+          class="btn btn-danger"
+          style="pointer-events: none; opacity: 0.45;"
+        >
+          <i class="bi bi-person-dash-fill"></i> Yes, Remove Agent
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* Avatar preview — when user picks a new photo, show it immediately */
+  var headshotInput = document.getElementById('id_agent_headshot');
+  if (headshotInput) {
+    headshotInput.addEventListener('change', function () {
+      var file = this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById('avatarPreview').src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* Copy UUID to clipboard */
+  window.copyUUID = function () {
+    var uuid = document.getElementById('uuidText').textContent.trim();
+    navigator.clipboard.writeText(uuid).then(function () {
+      var btn = document.querySelector('.uuid-copy-btn');
+      btn.innerHTML = '<i class="bi bi-clipboard-check"></i>';
+      btn.style.color = 'var(--success)';
+      setTimeout(function () {
+        btn.innerHTML = '<i class="bi bi-clipboard"></i>';
+        btn.style.color = '';
+      }, 2000);
+    });
+  };
+
+  /* Save button loading state — prevents double submit */
+  var form    = document.getElementById('editForm');
+  var saveBtn = document.getElementById('saveBtn');
+  if (form && saveBtn) {
+    form.addEventListener('submit', function () {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+    });
+  }
+
+}());
+  (function () {
+    'use strict';
+
+    window.openDeleteModal = function () {
+      /* Reset the input and lock the button every time modal opens */
+      var input   = document.getElementById('deleteConfirmInput');
+      var btn     = document.getElementById('deleteConfirmBtn');
+      input.value = '';
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity       = '0.45';
+      document.getElementById('deleteModal').classList.add('active');
+    };
+
+    window.closeDeleteModal = function () {
+      document.getElementById('deleteModal').classList.remove('active');
+    };
+
+    /* Close if user clicks the dark backdrop behind the modal */
+    document.getElementById('deleteModal').addEventListener('click', function (e) {
+      if (e.target === this) closeDeleteModal();
+    });
+
+    /* Only unlock the confirm button when the user types exactly "REMOVE" */
+    window.checkDeleteConfirm = function (input) {
+      var btn     = document.getElementById('deleteConfirmBtn');
+      var correct = input.value.trim() === 'REMOVE';
+      btn.style.pointerEvents = correct ? 'auto'  : 'none';
+      btn.style.opacity       = correct ? '1'     : '0.45';
+    };
+
+  }());
+</script>
+
+{% endblock %}

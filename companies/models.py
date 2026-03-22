@@ -110,8 +110,10 @@ class CompanyRating(models.Model):
 
 class JobPost(models.Model):
     # Existing fields (unchanged)
+    company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE,related_name='company_jobs')
     user_id = models.IntegerField('Company ID', default=1, blank=False, null=False)
     company_uuid = models.CharField('Company UUID', default=uuid.uuid4, blank=False, null=False, max_length=36)  # Fixed: removed () from uuid.uuid4
+    company_name=models.CharField('Company Name', default='Estate Web', blank=False, null=False)
     job_title = models.CharField('Job Title', default='', blank=False, null=True, max_length=100)
     job_type = models.CharField('Full/Part time', default='', blank=False, null=False, max_length=20)
     job_location = models.CharField('Location', default='', blank=False, null=False, max_length=100)  # Increased from 11 to 100

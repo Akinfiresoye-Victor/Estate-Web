@@ -28,7 +28,7 @@
   <div class="wl-content">
 
     <!-- ── STATS ── -->
-    {% if wishlist_rent or wishlist_sale %}
+    {% if rent_list or sale_list %}
     <div class="wl-stats" id="wlStats">
 
       <div class="wl-stat lease">
@@ -85,7 +85,7 @@
 
 
     <!-- ── FOR LEASE ── -->
-    {% if wishlist_rent %}
+    {% if rent_list %}
     <section class="wl-section" id="leaseSection">
       <div class="wl-section-header">
         <div class="wl-section-title">
@@ -98,16 +98,15 @@
       </div>
 
       <div class="wl-grid" id="leaseGrid">
-        {% for wishlist_item, property in wishlist_rent %}
-        <article class="wl-card" id="rent-card-{{ wishlist_item.property_id }}">
+        {% for property in rent_list %}
+        <article class="wl-card" id="rent-card-{{ property.id }}">
 
           <div class="wl-card-image">
             <span class="wl-badge lease"><i class="bi bi-geo-alt-fill"></i> Lease</span>
 
-            {# Button — no href, driven by AJAX #}
             <button class="wl-heart active wl-remove"
-                    data-url="{% url 'customer:toggle-wishlist-rent' wishlist_item.property_id %}"
-                    data-card-id="rent-card-{{ wishlist_item.property_id }}"
+                    data-url="{% url 'customer:toggle-wishlist-rent' property.id %}"
+                    data-card-id="rent-card-{{ property.id }}"
                     data-type="lease"
                     aria-label="Remove from wishlist">
               <i class="bi bi-heart-fill"></i>
@@ -150,7 +149,7 @@
 
             <p class="wl-desc">{{ property.description|truncatewords:18 }}</p>
 
-            <a href="{% url 'customer:view-property-r' property_id=wishlist_item.property_id %}"
+            <a href="{% url 'customer:view-property-r' property_id=property.id %}"
                class="wl-btn lease">
               View Details <i class="bi bi-arrow-right-short"></i>
             </a>
@@ -176,7 +175,7 @@
 
 
     <!-- ── FOR SALE ── -->
-    {% if wishlist_sale %}
+    {% if sale_list %}
     <section class="wl-section" id="saleSection">
       <div class="wl-section-header">
         <div class="wl-section-title">
@@ -189,15 +188,15 @@
       </div>
 
       <div class="wl-grid" id="saleGrid">
-        {% for wishlist_item, property in wishlist_sale %}
-        <article class="wl-card" id="sale-card-{{ wishlist_item.property_id }}">
+        {% for property in sale_list %}
+        <article class="wl-card" id="sale-card-{{ property.id }}">
 
           <div class="wl-card-image">
             <span class="wl-badge sale"><i class="bi bi-tag-fill"></i> Sale</span>
 
             <button class="wl-heart active wl-remove"
-                    data-url="{% url 'customer:toggle-wishlist-buy' wishlist_item.property_id %}"
-                    data-card-id="sale-card-{{ wishlist_item.property_id }}"
+                    data-url="{% url 'customer:toggle-wishlist-buy' property.id %}"
+                    data-card-id="sale-card-{{ property.id }}"
                     data-type="sale"
                     aria-label="Remove from wishlist">
               <i class="bi bi-heart-fill"></i>
@@ -239,7 +238,7 @@
 
             <p class="wl-desc">{{ property.property_description|truncatewords:18 }}</p>
 
-            <a href="{% url 'customer:view-property-s' property_id=wishlist_item.property_id %}"
+            <a href="{% url 'customer:view-property-s' property_id=property.id %}"
                class="wl-btn sale">
               View Details <i class="bi bi-arrow-right-short"></i>
             </a>
@@ -264,7 +263,7 @@
 
 
     <!-- ── EMPTY STATE ── -->
-    <div class="wl-empty" id="wlEmpty" {% if wishlist_rent or wishlist_sale %}style="display:none"{% endif %}>
+    <div class="wl-empty" id="wlEmpty" {% if rent_list or sale_list %}style="display:none"{% endif %}>
       <div class="wl-empty-icon">
         <i class="bi bi-heart"></i>
       </div>
@@ -311,7 +310,7 @@
       btn.querySelector('i').style.transform = 'scale(0.7)';
 
       fetch(url, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRFToken': CSRF,

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import SocialLinksFormset, CompanyForm,JobPostForm, InviteLinkForm
+from .forms import SocialLinksFormset, CompanyForm,JobPostForm, InviteLinkForm, EditEmployeeForm
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -995,6 +995,8 @@ def vacancy_form(request):
                     job = job_form.save(commit=False)
                     job.user_id = request.user.id
                     job.company_uuid = company.unique_company_id
+                    job.company=company
+                    job.company_name=company.company_name
                     job.save()
                     CompanyActivityLog.objects.create(
                         company=company,
@@ -1292,6 +1294,11 @@ def remove_agent(request, agent_uuid):
             messages.warning(request, 'Unauthorized Action')
             return redirect('landing')
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        #handing every property and lead data back to the company
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
+        LeadInfo.objects.filter(agent_id=agent.agent_uuid).update(agent_id=None)
+        Appointments.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
         agent.company_uuid = None
         agent.save()
         employee.delete()
@@ -1306,3 +1313,44 @@ def remove_agent(request, agent_uuid):
         return redirect('company:manage-company')
     except Exception as e:
         return render(request, 'estate/error_page.html', {'e':e})
+    
+
+
+
+
+def edit_employee(request, agent_uuid):
+
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('landing')
+    if request.user.role != 'company':
+        messages.warning(request, 'Company Access Only')
+        return redirect('landing')
+    company = get_object_or_404(CompanyInformation, user_id=request.user.id)
+
+    employee = get_object_or_404(Employees,agent_uuid=agent_uuid,company=company)
+
+    # ── 3. Handle form submission (POST) ───────────────────────────────────
+    if request.method == 'POST':
+        form = EditEmployeeForm(request.POST,instance=employee)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request,f"{employee.agent_name}'s details have been updated successfully.")
+            return redirect('company:edit-employee', agent_uuid=agent_uuid)
+
+        else:
+            messages.error(request,'Please fix the errors below and try again.')
+
+    # ── 4. Handle page load (GET) ──────────────────────────────────────────
+    else:
+        # Pre-fill the form with the employee's current data
+        form = EditEmployeeForm(instance=employee)
+
+    return render(request, 'company/edit_employee.html', {
+        'form':          form,
+        'employee':      employee,
+        'company':       company,
+        'base_template': 'company/base.html',  # matches your extends pattern
+    })
+

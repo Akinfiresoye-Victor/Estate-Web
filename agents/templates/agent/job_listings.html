@@ -160,7 +160,7 @@
 
   <!-- Job Listings -->
   <div class="job-listings" id="jobListings">
-    {% for job, company_name, market_days in jobs %}
+    {% for job,market_days in jobs %}
     <div class="job-card" 
          data-job-type="{{ job.job_type|lower }}" 
          data-location="{{ job.job_location|lower }}" 
@@ -168,7 +168,7 @@
          data-min-pay="{{ job.min_pay|default:0 }}"
          data-max-pay="{{ job.max_pay|default:0 }}"
          data-job-title="{{ job.job_title|lower }}"
-         data-company="{{ company_name|lower }}"
+         data-company="{{ job.company_name|lower }}"
          data-experience="{{ job.experience_required|default:''|lower }}"
          data-skills="{{ job.skills_required|default:''|lower }}"
          data-full-description="{{ job.full_description|default:''|lower }}"
@@ -182,7 +182,7 @@
           <div class="company-logo">{{ company_name|truncatewords:1|slice:":2"|upper }}</div>
           <div class="company-details">
             <h2 class="job-title">{{ job.job_title }}</h2>
-            <p class="company-name">{{ company_name }}</p>
+            <p class="company-name">{{ job.company_name }}</p>
           </div>
         </div>
         

@@ -24,37 +24,21 @@ from django.urls import reverse
 '''Algorithms Start👇'''
 
 def wishlist_generator(properties_list, user_id):
-    
     """
-    Takes in a list of indexes and returns the boolean output based on 
-    favourited properties of each users
+    Takes a list of property objects and returns a list of booleans
+    indicating whether each property is in the user's wishlist.
     """
-    if properties_list:
-        if properties_list[0].property_type == 'Rent':
-            user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id, property_type='Rent')
-        elif properties_list[0].property_type == 'Sale':
-            user_wishlists=WishlistStorageUnit.objects.filter(user_id=user_id, property_type='Sale')
-        else:
-            return redirect('landing')
-        properties_id=[]
-        user_wishlist_list=[]
-        boolean_results=[]
-        
-        for prop in properties_list:
-            properties_id.append(prop.id)
-            
-        for raw_wishlist in user_wishlists:
-            user_wishlist_list.append(raw_wishlist.property_id)
-            
-        for k in properties_id:
-            if k in user_wishlist_list:
-                boolean_results.append(True)
-            else:
-                boolean_results.append(False)
-        return boolean_results
-    else:
-        boolean_results =[]
-        return boolean_results
+    if not properties_list:
+        return []
+
+    property_type = properties_list[0].property_type
+
+    if property_type not in ('Rent', 'Sale'):
+        return []
+
+    wishlisted_ids = set(WishlistStorageUnit.objects.filter(user_id=user_id,property_type=property_type).values_list('property_id', flat=True))
+
+    return [prop.id in wishlisted_ids for prop in properties_list]
 
 
 
@@ -62,19 +46,15 @@ def property_view_count(property_id, property_type, users_id, users_uuid):
     """
     Tracks Property Views
     """
-    all_views=PropertyViews.objects.filter(property_type=property_type, property_id=property_id)
-    viewers_id=[]
-    for users in all_views:
-        all_viewers_id=users.user_id
-        viewers_id.append(all_viewers_id)
-    if not users_id in viewers_id:
-        new_object=PropertyViews.objects.create(
+    all_views=set(PropertyViews.objects.filter(property_type=property_type, property_id=property_id).values_list('user_id', flat=True))
+    viewers_id=[users_id in all_views]
+    if users_id not in all_views:
+        new_object = PropertyViews.objects.create(
             user_id=users_id,
             property_type=property_type,
             property_id=property_id,
             uuid=users_uuid
-        )
-        new_object.save()
+        )   
 
 
 def _wishlist_for_user(properties_list, user):
@@ -438,44 +418,41 @@ def toggle_wishlist_buy(request, property_id):
         return render(request, 'estate/error_page.html', {'e': e})
 
 def wishlist(request):
-    """
-    Lists each user's favourited properties.
-    Unauthenticated users are redirected to login with ?next= so they
-    come straight back here after signing in.
-    """
     if not request.user.is_authenticated:
         return redirect(f"{reverse('login')}?next={request.get_full_path()}")
     if not request.user.role == 'customer':
         messages.error(request, 'Customer Access Only')
         return redirect('landing')
     try:
-        wishlist_rent = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Rent")
-        wishlist_sale = WishlistStorageUnit.objects.filter(user_id=request.user.id, property_type="Sale")
- 
-        rent_list = []
-        sale_list = []
- 
-        for rent in wishlist_rent:
-            on_lease = PropertyManagementRent.objects.get(pk=rent.property_id)
-            rent_list.append(on_lease)
- 
-        for sale in wishlist_sale:
-            on_sale = PropertyManagementSale.objects.get(pk=sale.property_id)
-            sale_list.append(on_sale)
- 
-        total_saved = wishlist_rent.count() + wishlist_sale.count()
+        # Get the wishlisted property IDs for this user
+        wishlist_rent_ids = WishlistStorageUnit.objects.filter(
+            user_id=request.user.id,
+            property_type="Rent"
+        ).values_list('property_id', flat=True)
+
+        wishlist_sale_ids = WishlistStorageUnit.objects.filter(
+            user_id=request.user.id,
+            property_type="Sale"
+        ).values_list('property_id', flat=True)
+
+        # Fetch all matching properties in one query each — no loop, no N+1
+        rent_list = PropertyManagementRent.objects.filter(pk__in=wishlist_rent_ids)
+        sale_list = PropertyManagementSale.objects.filter(pk__in=wishlist_sale_ids)
+
+        lease_count = wishlist_rent_ids.count()
+        sale_count = wishlist_sale_ids.count()
+
         context = {
-            'wishlist_rent': zip(wishlist_rent, rent_list),
-            'wishlist_sale': zip(wishlist_sale, sale_list),
-            'lease_count':   wishlist_rent.count(),
-            'sale_count':    wishlist_sale.count(),
-            'total_saved':   total_saved,
+            'rent_list':   rent_list,
+            'sale_list':   sale_list,
+            'lease_count': lease_count,
+            'sale_count':  sale_count,
+            'total_saved': lease_count + sale_count,
         }
         return render(request, 'estate/wishlist.html', context)
- 
+
     except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
- 
+        return render(request, 'estate/error_page.html', {'e': e}) 
 
 
 def update_profile(request, user_id):

@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import CompanyInformation, CompanySocialLinks,JobPost, InviteLink
+from .models import CompanyInformation, CompanySocialLinks,JobPost, Employees
 from core.choices import STATES, EXPIRY_CHOICES
 from django.forms import formset_factory, inlineformset_factory
 from django.core.exceptions import ValidationError
@@ -238,3 +238,94 @@ class InviteLinkForm(forms.Form):
             'placeholder': 'Leave blank for a default of 200'
         })
     )
+
+
+
+
+
+class EditEmployeeForm(forms.ModelForm):
+    """
+    Form for editing an existing Employees record.
+
+    Only exposes the fields that make sense to edit.
+    agent_uuid and date_joined are NOT included — they
+    are set once at creation and should never change.
+    company is also excluded — an agent belongs to one
+    company and that doesn't change through this form.
+    """
+
+    class Meta:
+        model  = Employees
+        fields = [
+            'agent_name',
+            'agent_email',
+            'agent_phone_no',
+            'company_role',
+            'company_department',
+            'agent_status',
+        ]
+
+        widgets = {
+            'agent_name': forms.TextInput(attrs={
+                'placeholder': 'e.g. Chukwuemeka Okonkwo',
+                'autocomplete': 'off',
+            }),
+            'agent_email': forms.EmailInput(attrs={
+                'placeholder': 'e.g. agent@example.com',
+                'autocomplete': 'off',
+            }),
+            'agent_phone_no': forms.TextInput(attrs={
+                'placeholder': 'e.g. 08012345678',
+                'autocomplete': 'off',
+            }),
+            'company_role': forms.TextInput(attrs={
+                'placeholder': 'e.g. Senior Sales Agent',
+                'autocomplete': 'off',
+            }),
+            'company_department': forms.Select(choices=[
+                ('',            'Select Department'),
+                ('Sales',       'Sales'),
+                ('Management',  'Property Management'),
+                ('Marketing',   'Marketing'),
+                ('Finance',     'Finance'),
+                ('Administration', 'Administration'),
+                ('Unassigned',  'Unassigned'),
+            ]),
+            'agent_status': forms.Select(),
+            # agent_headshot uses Django's default ClearableFileInput
+            # which is hidden in the template — triggered by the camera button
+        }
+
+        labels = {
+            'agent_name':         'Full Name',
+            'agent_email':        'Email Address',
+            'agent_phone_no':     'Phone Number',
+            'company_role':       'Role / Job Title',
+            'company_department': 'Department',
+            'agent_status':       'Status',
+        }
+
+    def clean_agent_phone_no(self):
+        """
+        Basic Nigerian phone number validation.
+        Accepts formats: 08012345678, +2348012345678, 2348012345678
+        Strips everything that isn't a digit or leading +.
+        """
+        phone = self.cleaned_data.get('agent_phone_no', '').strip()
+        # Remove spaces and dashes
+        phone = phone.replace(' ', '').replace('-', '')
+        if not phone:
+            raise forms.ValidationError('Phone number is required.')
+        # Must be between 10 and 14 characters (digits / + prefix)
+        digits_only = phone.lstrip('+')
+        if not digits_only.isdigit():
+            raise forms.ValidationError('Phone number should contain only digits.')
+        if len(digits_only) < 10 or len(digits_only) > 14:
+            raise forms.ValidationError('Enter a valid phone number (10–14 digits).')
+        return phone
+
+    def clean_agent_name(self):
+        name = self.cleaned_data.get('agent_name', '').strip()
+        if len(name) < 2:
+            raise forms.ValidationError('Name must be at least 2 characters.')
+        return name

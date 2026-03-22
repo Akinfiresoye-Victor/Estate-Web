@@ -367,7 +367,7 @@ def toggle_listing(request, property_id, property_type):
     is_ajax=request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     Model=PropertyManagementSale if property_type == 'sale' else PropertyManagementRent
-    
+    #FIXME you can only toggle listings the company account listed  
     try:
         prop=Model.objects.get(pk=property_id, user_id=request.user.id)
     except:
