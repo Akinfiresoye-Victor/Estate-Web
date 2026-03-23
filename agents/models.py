@@ -74,6 +74,10 @@ class AgentAnalytics(models.Model):
     competition = models.FloatField('Engagement Score', default=0.0, blank=True, null=True)
     ratings = models.FloatField('Agent Rating', default=0.0, blank=True, null=True)
     reviews = models.IntegerField('Number Of Reviews', default=0, blank=True, null=True)
+    monthly_leads    = models.IntegerField(default=0)
+    monthly_reviews  = models.IntegerField(default=0)
+    average_leads    = models.IntegerField(default=0)
+    average_reviews  = models.IntegerField(default=0)
     
     def __str__(self):
         return(f'{self.agent.first_name} {self.agent.last_name} - Analytics')

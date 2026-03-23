@@ -23,94 +23,129 @@ from django.urls import reverse
 
 
 # Create your views here.
+def calculate_agent_profile_strength(has_picture, has_listing, has_phone):
+    """
+    Lives outside the view — defined once, not recreated on every request.
+    """
+    score = 0
+    if has_picture: score += 25
+    if has_listing: score += 25
+    if has_phone:   score += 50
+    return score
+
+
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('landing')
-    if not request.user.role == 'agent':
+    if request.user.role != 'agent':
         return redirect('landing')
+
     try:
-        agent_data= AgentInformation.objects.get(user_id=request.user.id)
-        agent_name=agent_data.first_name + ' ' + agent_data.last_name
-        agent_profession=agent_data.work_type
-        agent_email=agent_data.email
-        agent_phone=agent_data.phone_number
-        agent_location=agent_data.location
-        first_name=agent_name.split()
-        first_name=first_name[0]
-        raw_time=timezone.localtime(timezone.now())
-        current_hour=raw_time.hour
-        if current_hour >= 0 and current_hour < 12:
-            greeting='Good Morning'
-        elif current_hour >= 12 and current_hour < 16:
-            greeting='Good Afternoon'
+        agent_data = AgentInformation.objects.get(user_id=request.user.id)
+
+        # ── Name and greeting ─────────────────────────────────────────────────
+        agent_name = f"{agent_data.first_name} {agent_data.last_name}"
+        first_name = agent_data.first_name
+
+        raw_time     = timezone.localtime(timezone.now())
+        current_hour = raw_time.hour
+
+        if current_hour < 12:
+            greeting = 'Good Morning'
+        elif current_hour < 16:
+            greeting = 'Good Afternoon'
         else:
-            greeting='Good Evening'
-            
+            greeting = 'Good Evening'
+
         quote = get_random_quote()
-        tips = quote['tips']
-        by = quote['by']
-        agent_prop_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid)
-        agent_prop_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid)
-        
-        
-        leads=LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
-        new_leads= leads.filter(date_created=datetime.today())
-        
-        
-        '''Today's Appointment'''
-        
-        today_appointments=Appointments.objects.filter(agent_uuid=agent_data.agent_uuid).filter(appointment=datetime.today())
+
+        # ── Property IDs — fetched once, reused for counts ───────────────────
+        # Using .exists() and .count() on the same queryset hits DB twice.
+        # Fetching IDs once lets us do both with no extra queries.
+        rent_ids = set(
+            PropertyManagementRent.objects.filter(
+                agent_uuid=agent_data.agent_uuid
+            ).values_list('pk', flat=True)
+        )
+        sale_ids = set(
+            PropertyManagementSale.objects.filter(
+                agent_uuid=agent_data.agent_uuid
+            ).values_list('pk', flat=True)
+        )
+        house_count = len(rent_ids) + len(sale_ids)
+        has_listing = house_count > 0
+
+        # ── Leads ─────────────────────────────────────────────────────────────
+        # Fetch once, reuse for count, new_lead_count, and recent_inquiries.
+        # date_created is a DateField so compare with date() not datetime.
+        leads         = LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
+        lead_count    = leads.count()
+        new_leads     = leads.filter(date_created=timezone.now().date())
+        new_lead_count = new_leads.count()
+
+        # ── Appointments ──────────────────────────────────────────────────────
+        today_appointments = Appointments.objects.filter(
+            agent_uuid=agent_data.agent_uuid,
+            appointment=timezone.now().date()
+        )
+
+        # ── Rating ────────────────────────────────────────────────────────────
         rating_data = AgentRating.objects.filter(
             agent_uuid=agent_data.agent_uuid
-        ).aggregate(
-            avg_rating=Avg('rating'),
-            total_reviews=Count('id')
-        )
+        ).aggregate(avg_rating=Avg('rating'), total_reviews=Count('id'))
+
         average_rating = rating_data['avg_rating'] or 0.0
-        total_reviews = rating_data['total_reviews']
-        
-        def calculate_profile_strength():
-            score=0
-            if agent_data.profile_picture: score+=25
-            if agent_prop_on_lease.exists() or agent_prop_on_sale.exists(): score+=25
-            if agent_data.phone_number: score+=50
-            return score
+        total_reviews  = rating_data['total_reviews']
+
+        # ── Company name — only query if agent belongs to a company ──────────
+        # Avoids the query entirely for solo agents
+        company_name = None
         if agent_data.company_uuid:
-            company_name=CompanyInformation.objects.get(unique_company_id=agent_data.company_uuid)
-        else:
-            company_name=None
+            try:
+                company      = CompanyInformation.objects.get(
+                    unique_company_id=agent_data.company_uuid
+                )
+                company_name = company.company_name
+            except CompanyInformation.DoesNotExist:
+                company_name = None
 
-# company_announcements — queryset with .title, .message, .created_at, .company.company_name TODO do this once companies and agents have been linked
+        # ── Profile strength ──────────────────────────────────────────────────
+        has_picture = bool(agent_data.profile_picture)
+        has_phone   = bool(agent_data.phone_number)
+
         return render(request, 'agent/dashboard.html', {
-            'agent_info':agent_data,
-            'has_headshot':bool(agent_data.profile_picture),
-            'has_whatsapp': bool(agent_data.phone_number),
-            'has_listing': bool(agent_prop_on_lease.exists() or agent_prop_on_sale.exists()),
-            'agent_profile_strength': calculate_profile_strength(),
-            'name':agent_name,
-            'work_type': agent_profession,
-            'recent_inquiries':leads,
-            'email': agent_email,
-            'phone': agent_phone,
-            'location': agent_location,
-            'first_name': first_name,
-            'greeting': greeting,
-            'tips': tips,
-            'by': by,
-            'house_count': agent_prop_on_lease.count() + agent_prop_on_sale.count(),
-            'lead_count': leads.count(),
-            'new_lead_count': new_leads.count(),
-            'todays_appointment':today_appointments,
-            'avg_rating': average_rating,
-            'total_reviews': total_reviews,
-            'company_name':company_name
-            })
-    except AgentInformation.DoesNotExist:
-        messages.error(request, 'Set up your Profile to access other pages')
-        return redirect('agent:agent-form')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+            'agent_info':            agent_data,
+            'name':                  agent_name,
+            'first_name':            first_name,
+            'work_type':             agent_data.work_type,
+            'email':                 agent_data.email,
+            'phone':                 agent_data.phone_number,
+            'location':              agent_data.location,
+            'greeting':              greeting,
+            'tips':                  quote['tips'],
+            'by':                    quote['by'],
+            'house_count':           house_count,
+            'lead_count':            lead_count,
+            'new_lead_count':        new_lead_count,
+            'recent_inquiries':      leads.order_by('-date_created')[:5],
+            'todays_appointment':    today_appointments,
+            'avg_rating':            average_rating,
+            'total_reviews':         total_reviews,
+            'company_name':          company_name,
+            'has_headshot':          has_picture,
+            'has_whatsapp':          has_phone,
+            'has_listing':           has_listing,
+            'agent_profile_strength': calculate_agent_profile_strength(
+                                          has_picture, has_listing, has_phone
+                                      ),
+        })
 
+    except AgentInformation.DoesNotExist:
+        messages.error(request, 'Set up your profile to access other pages')
+        return redirect('agent:agent-form')
+
+    except Exception as e:
+        return render(request, 'estate/error_page.html', {'e': e})
 
 
 
@@ -434,102 +469,148 @@ def analytics(request):
     if request.user.role != 'agent':
         messages.error(request, "Agent's Only")
         return redirect('landing')
-    
+
     try:
         current_agent = AgentInformation.objects.get(user_id=request.user.id)
-        
-        analytics_data, created = AgentAnalytics.objects.get_or_create(
+
+        analytics_data, _ = AgentAnalytics.objects.get_or_create(
             agent=current_agent,
             defaults={
-                'profile_views': 0,
-                'property_views_l': 0,
-                'property_views_s': 0,
+                'profile_views':         0,
+                'property_views_l':      0,
+                'property_views_s':      0,
                 'average_profile_views': 0,
-                'average_lease_views': 0,
-                'average_sale_views': 0,
-                'ratings': 0.0,
-                'reviews': 0,
-                'competition': 0.0
+                'average_lease_views':   0,
+                'average_sale_views':    0,
+                'monthly_leads':         0,
+                'monthly_reviews':       0,
+                'average_leads':         0,
+                'average_reviews':       0,
+                'ratings':               0.0,
+                'reviews':               0,
+                'competition':           0.0,
             }
         )
-        
-        # Calculate property views for CURRENT agent only
+
+        # ── 30-day window start ──────────────────────────────────────────────
+        # The cron job moves this forward every 30 days.
+        # Every date-filtered query below uses this as its starting point.
+        window_start = analytics_data.last_reset_date
+
+        # ── Property IDs — fetched once, reused below ────────────────────────
+        rent_ids = set(
+            PropertyManagementRent.objects.filter(
+                agent_uuid=current_agent.agent_uuid
+            ).values_list('pk', flat=True)
+        )
+        sale_ids = set(
+            PropertyManagementSale.objects.filter(
+                agent_uuid=current_agent.agent_uuid
+            ).values_list('pk', flat=True)
+        )
+
+        # ── Property views — PropertyViews gets wiped by cron, no date filter
         lease_views = PropertyViews.objects.filter(
             property_type='Rent',
-            property_id__in=PropertyManagementRent.objects.filter(
-                agent_uuid=current_agent.agent_uuid
-            ).values_list('pk', flat=True)
+            property_id__in=rent_ids
         ).count()
-        
+
         sale_views = PropertyViews.objects.filter(
             property_type='Sale',
-            property_id__in=PropertyManagementSale.objects.filter(
-                agent_uuid=current_agent.agent_uuid
-            ).values_list('pk', flat=True)
+            property_id__in=sale_ids
         ).count()
-        
-        # Save the new counts for CURRENT agent
+
+        # ── Leads — filtered to current 30-day window ────────────────────────
+        monthly_leads = LeadInfo.objects.filter(
+            agent_id=current_agent.agent_uuid,
+            date_created__gte=window_start
+        ).count()
+
+        # ── Ratings — all-time for display, monthly count for tracking ───────
+        all_time_rating = AgentRating.objects.filter(
+            agent_uuid=current_agent.agent_uuid
+        ).aggregate(avg_rating=Avg('rating'), total_reviews=Count('id'))
+
+        monthly_reviews = AgentRating.objects.filter(
+            agent_uuid=current_agent.agent_uuid,
+            created_at__gte=window_start
+        ).count()
+
+        average_rating = all_time_rating['avg_rating'] or 0.0
+        total_reviews  = all_time_rating['total_reviews']
+
+        # ── Appointments — filtered to current 30-day window ─────────────────
+        monthly_appointments = Appointments.objects.filter(
+            agent_uuid=current_agent.agent_uuid,
+            appointment__gte=window_start
+        ).count()
+
+        # ── Update analytics — views read from DB each load, cron resets ─────
         analytics_data.property_views_l = lease_views
         analytics_data.property_views_s = sale_views
-        analytics_data.save()
-        
-        # Reset monthly tracking if needed
-        reset_button(analytics_data, current_agent.agent_uuid, lease_views, sale_views)
-        
-        # Calculate percentage changes
-        lease_views_change = monthly_change(analytics_data.property_views_l, analytics_data.average_lease_views)
-        sale_views_change = monthly_change(analytics_data.property_views_s, analytics_data.average_sale_views)
+        analytics_data.monthly_leads    = monthly_leads
+        analytics_data.monthly_reviews  = monthly_reviews
+        analytics_data.ratings          = average_rating
+        analytics_data.reviews          = total_reviews
+
+        # ── Percentage changes vs last month's rolling average ────────────────
+        lease_views_change   = monthly_change(lease_views, analytics_data.average_lease_views)
+        sale_views_change    = monthly_change(sale_views, analytics_data.average_sale_views)
         profile_views_change = monthly_change(analytics_data.profile_views, analytics_data.average_profile_views)
+        leads_change         = monthly_change(monthly_leads, analytics_data.average_leads)
+        reviews_change       = monthly_change(monthly_reviews, analytics_data.average_reviews)
         total_prop_incr_perc = (sale_views_change + lease_views_change) / 2
-        
-        # ========================================
-        # 2. CALCULATE COMPETITION (READ-ONLY)
-        # ========================================
-        
-        # Get ALL agents' analytics in one query (READ ONLY - don't modify!)
+
+        # ── Competition loop — bulk queries, zero per-agent DB hits ──────────
         all_analytics = AgentAnalytics.objects.select_related('agent').all()
-        
-        total_agents_eng = []
-        
+
+        # One query: total likes per agent_uuid across all rent properties
+        rent_likes_by_agent = {
+            item['agent_uuid']: item['total']
+            for item in PropertyManagementRent.objects.values('agent_uuid')
+            .annotate(total=Sum('total_likes'))
+        }
+        sale_likes_by_agent = {
+            item['agent_uuid']: item['total']
+            for item in PropertyManagementSale.objects.values('agent_uuid')
+            .annotate(total=Sum('total_likes'))
+        }
+
+        total_agents_eng      = []
+        current_agent_score   = 0.0
+
         for record in all_analytics:
-            # Calculate engagement for each agent using EXISTING data
-            ag_rent_likes = PropertyManagementRent.objects.filter(
-                agent_uuid=record.agent.agent_uuid
-            ).aggregate(total=Sum('total_likes'))['total'] or 0
-            
-            ag_sale_likes = PropertyManagementSale.objects.filter(
-                agent_uuid=record.agent.agent_uuid
-            ).aggregate(total=Sum('total_likes'))['total'] or 0
-            
-            ag_total_likes = ag_rent_likes + ag_sale_likes
-            ag_rating_score = (record.ratings or 0) * (record.reviews or 0)
+            uid = record.agent.agent_uuid
+
+            ag_total_likes = (
+                (rent_likes_by_agent.get(uid) or 0) +
+                (sale_likes_by_agent.get(uid) or 0)
+            )
+            ag_rating_score   = (record.ratings or 0) * (record.reviews or 0)
             ag_avg_prop_views = record.average_sale_views + record.average_lease_views
-            
-            # Calculate engagement score
+
             ag_eng_rate = engagement_rate(
                 ag_total_likes,
                 ag_avg_prop_views,
                 record.average_profile_views,
                 ag_rating_score
             )
-            
             total_agents_eng.append(ag_eng_rate)
-            
-            # If this is the current agent, save their score
+
+            # Capture current agent score without an extra save inside the loop
             if record.agent.id == current_agent.id:
-                analytics_data.competition = ag_eng_rate
-                analytics_data.save()
-        
-        # ========================================
-        # 3. CALCULATE MARKET POSITION
-        # ========================================
-        current_agent_score = analytics_data.competition
-        
+                current_agent_score = ag_eng_rate
+
+        # Save all updated fields in one single DB write
+        analytics_data.competition = current_agent_score
+        analytics_data.save()
+
+        # ── Market position ───────────────────────────────────────────────────
         if total_agents_eng and len(total_agents_eng) > 1:
-            sorted_eng = sorted(total_agents_eng, reverse=True)
+            sorted_eng   = sorted(total_agents_eng, reverse=True)
             agents_above = sum(1 for score in sorted_eng if score > current_agent_score)
             market_position = (agents_above / len(sorted_eng)) * 100
-            
+
             if market_position <= 1:
                 top_performer = "Top 1%"
             elif market_position <= 5:
@@ -541,70 +622,92 @@ def analytics(request):
             else:
                 top_performer = f"Top {int(market_position)}%"
         else:
-            top_performer = "New Agent"
+            top_performer   = "New Agent"
             market_position = 100
-        
-        # Calculate competition metrics
-        total_eng_sum = sum(total_agents_eng)
+
         avg_prop_views = analytics_data.average_lease_views + analytics_data.average_sale_views
-        
+        total_eng_sum  = sum(total_agents_eng)
+
         calculated_engagement = total_agents_engagement_calculator(
             total_eng_sum,
             current_agent_score,
             current_agent.agent_uuid,
             avg_prop_views
         )
-        
+
         competition_pct = calculated_engagement[0]
-        inq_conv_rate = calculated_engagement[1]
-        
-        # ========================================
-        # 4. GET TOP PROPERTIES
-        # ========================================
-        agent_props_rent = PropertyManagementRent.objects.filter(agent_uuid=current_agent.agent_uuid)
-        agent_props_sale = PropertyManagementSale.objects.filter(agent_uuid=current_agent.agent_uuid)
-        
-        all_properties = list(agent_props_rent) + list(agent_props_sale)
+        inq_conv_rate   = calculated_engagement[1]
+
+        # ── Top 4 properties — two queries instead of one per property ────────
+        agent_props_rent = list(PropertyManagementRent.objects.filter(
+            agent_uuid=current_agent.agent_uuid
+        ))
+        agent_props_sale = list(PropertyManagementSale.objects.filter(
+            agent_uuid=current_agent.agent_uuid
+        ))
+
+        all_properties = agent_props_rent + agent_props_sale
         all_properties.sort(key=lambda x: x.total_likes, reverse=True)
         top_properties = all_properties[:4]
-        
-        # Get views for top 4 properties
+
+        top_rent_ids = [p.pk for p in top_properties if p in agent_props_rent]
+        top_sale_ids = [p.pk for p in top_properties if p in agent_props_sale]
+
+        rent_view_counts = {
+            item['property_id']: item['cnt']
+            for item in PropertyViews.objects.filter(
+                property_type='Rent',
+                property_id__in=top_rent_ids
+            ).values('property_id').annotate(cnt=Count('id'))
+        }
+        sale_view_counts = {
+            item['property_id']: item['cnt']
+            for item in PropertyViews.objects.filter(
+                property_type='Sale',
+                property_id__in=top_sale_ids
+            ).values('property_id').annotate(cnt=Count('id'))
+        }
+
         view_list = []
         for prop in top_properties:
-            cnt = PropertyViews.objects.filter(
-                property_id=prop.pk,
-                property_type=prop.property_type
-            ).count()
-            view_list.append(cnt)
-        
+            if prop in agent_props_rent:
+                view_list.append(rent_view_counts.get(prop.pk, 0))
+            else:
+                view_list.append(sale_view_counts.get(prop.pk, 0))
+
         likes_views = zip(top_properties, view_list)
-        
-        # ========================================
-        # 5. RETURN CONTEXT
-        # ========================================
-        context = {
-            'profile_views': analytics_data.profile_views,
-            'listing_views': analytics_data.property_views_l + analytics_data.property_views_s,
-            'lease_views': analytics_data.property_views_l,
-            'sale_views': analytics_data.property_views_s,
-            'profile_incr_perc': profile_views_change,
-            'lease_incr_perc': lease_views_change,
-            'sale_incr_perc': sale_views_change,
+
+        return render(request, 'agent/agent_analytics.html', {
+            'profile_views':        analytics_data.profile_views,
+            'listing_views':        analytics_data.property_views_l + analytics_data.property_views_s,
+            'lease_views':          analytics_data.property_views_l,
+            'sale_views':           analytics_data.property_views_s,
+            'profile_incr_perc':    profile_views_change,
+            'lease_incr_perc':      lease_views_change,
+            'sale_incr_perc':       sale_views_change,
             'total_prop_incr_perc': total_prop_incr_perc,
-            'competition': market_position,
-            'inq_rate': inq_conv_rate,
-            'ranking': likes_views
-        }
-        
-        return render(request, 'agent/agent_analytics.html', context)
-        
+            'monthly_leads':        monthly_leads,
+            'leads_change':         leads_change,
+            'monthly_reviews':      monthly_reviews,
+            'reviews_change':       reviews_change,
+            'monthly_appointments': monthly_appointments,
+            'average_rating':       average_rating,
+            'total_reviews':        total_reviews,
+            'competition':          top_performer,
+            'market_position':      round(market_position, 1),
+            'inq_rate':             inq_conv_rate,
+            'ranking':              likes_views,
+            'window_start':         window_start,
+        })
+
     except AgentInformation.DoesNotExist:
         messages.error(request, 'Agent profile not found.')
         return redirect('landing')
-        
+
     except Exception as e:
-        print(f"Error in analytics view: {e}")  # Debug logging
+        print(f"Error in analytics view: {e}")
         return render(request, 'estate/error_page.html', {'e': str(e)})
+
 
 def lead_detail(request, lead_id):
     if not request.user.is_authenticated:

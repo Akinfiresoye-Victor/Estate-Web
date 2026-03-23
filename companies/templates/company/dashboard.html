@@ -182,6 +182,9 @@
       <!-- STATS -->
       <section class="stats-section">
         <h2 class="section-title">Overview</h2>
+        <p style="font-size:0.78rem; color:var(--text-light); margin:-0.5rem 0 0.85rem;">
+          Since {{ window_start|date:"M d, Y" }}
+        </p>
 
         {% if total_properties == 0 %}
         <div class="hero-card">
@@ -226,6 +229,16 @@
             </div>
 
             <div class="stat-card">
+              <div class="stat-icon" style="background: linear-gradient(135deg,#43e97b,#38f9d7);">
+                <i class="bi bi-eye"></i>
+              </div>
+              <div class="stat-data">
+                <h3>{{ total_views|default:"0" }}</h3>
+                <p>Avg. Profile Views</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
               <div class="stat-icon views {% if market_position <= 10 %}top-performer{% elif market_position <= 25 %}above-average{% endif %}">
                 <i class="bi bi-{% if market_position <= 1 %}trophy-fill{% elif market_position <= 5 %}award-fill{% elif market_position <= 25 %}star-fill{% else %}graph-up{% endif %}"></i>
               </div>
@@ -233,14 +246,17 @@
                 <h3>{{ competition }}</h3>
                 <p>Market Rank</p>
                 {% if market_position <= 25 %}
-                  <small class="ranking-badge">Top {{ market_position|floatformat:"0" }}%</small>
+                <small class="ranking-badge">Top {{ market_position|floatformat:"0" }}%</small>
                 {% endif %}
+                <small style="font-size:0.7rem; color:var(--text-light); display:block; margin-top:3px;">
+                Score: {{ engagement_rate|floatformat:"1" }}
+                </small>
               </div>
             </div>
 
             <div class="stat-card">
               <div class="stat-icon inquiries"><i class="bi bi-chat-dots"></i></div>
-              <div class="stat-data"><h3>{{ total_inquiries|default:"0" }}</h3><p>Inquiries</p></div>
+              <div class="stat-data"><h3>{{ total_inquiries|default:"0" }}</h3><p>Monthly Inquiries</p></div>
             </div>
 
             <div class="stat-card">
@@ -251,6 +267,7 @@
           </div>
           <div class="scroll-dots" id="scrollDots">
             <span class="scroll-dot active"></span>
+            <span class="scroll-dot"></span>
             <span class="scroll-dot"></span>
             <span class="scroll-dot"></span>
             <span class="scroll-dot"></span>

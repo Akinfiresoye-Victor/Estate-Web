@@ -94,6 +94,7 @@ def dashboard(request):
         sale_views = PropertyViews.objects.filter(property_type='Sale',property_id__in=sale_ids).count()
 
         # ── Likes ────────────────────────────────────────────────────────────
+        #instead of looping through to get each i\objects we just get a particular row and do math on it
         rent_likes = PropertyManagementRent.objects.filter(pk__in=rent_ids).aggregate(total=Sum('total_likes'))['total'] or 0
 
         sale_likes = PropertyManagementSale.objects.filter(pk__in=sale_ids).aggregate(total=Sum('total_likes'))['total'] or 0
@@ -251,6 +252,8 @@ def dashboard(request):
     except Exception as e:
         print(f"Error in company dashboard: {e}")
         return render(request, 'estate/error_page.html', {'e': e})
+
+
 #form all companies must fill before they access the dashboard
 def company_form(request):
     if not request.user.is_authenticated:
