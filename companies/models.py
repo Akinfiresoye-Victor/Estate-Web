@@ -79,6 +79,10 @@ class CompanyAnalytics(models.Model):
     average_lease_views=models.IntegerField('last month lease views',default=1)
     average_sale_views=models.IntegerField('last month sale views',default=1)
     competition= models.IntegerField('competition', default=0)
+    monthly_leads   = models.IntegerField(default=0)
+    monthly_reviews = models.IntegerField(default=0)
+    average_leads   = models.IntegerField(default=0)
+    average_reviews = models.IntegerField(default=0)
     def __str__(self):
         return(self.company.company_name)
     
@@ -98,6 +102,11 @@ class CompanyRating(models.Model):
     comment = models.TextField('Review Comment', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    period_start = models.DateTimeField(default=timezone.now)  
+    average_inquiries = models.IntegerField(default=0)
+    average_ratings = models.IntegerField(default=0)
+    last_month_inquiries = models.IntegerField(default=0)
+    last_month_ratings = models.IntegerField(default=0)
     
     class Meta:
         unique_together = ('company_uuid', 'user')  # Prevents duplicate reviews from same user

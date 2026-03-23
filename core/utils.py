@@ -186,45 +186,61 @@ def total_companies_engagement_calculator(total_eng_sum, current_engagement, com
     
     return [round(competition, 2), round(inquiry_rate, 2)]
 
-
-def reset_button(analytics, company_uuid, lease_views, sale_views):
+def reset_button(analytics, company_uuid, lease_views, sale_views, current_inquiries, current_ratings):
     """
-    Reset monthly tracking every 30 days
+    Soft reset every 30 days.
     
-    Plain English:
-    Every 30 days:
-    1. Calculate new averages: (old_average + this_month) ÷ 2
-    2. Reset current counters to 0
-    3. Start tracking next month
-    
-    Example:
-    - Month 1: 150 views → Average = 150
-    - Month 2: 200 views → New Average = (150 + 200) ÷ 2 = 175
-    - Month 3: Counter resets, starts from 0 again
+    - Calculates rolling averages for views, inquiries, ratings
+    - Stores last month's values so percentage change can be calculated
+    - Resets view counters to 0
+    - Does NOT delete any records — queries use date filters instead
+    - Updates period_start so the 30-day window restarts cleanly
     """
-
-    
     current_time = timezone.now()
     time_difference = current_time - analytics.last_reset_date
-    
+
     if time_difference >= timedelta(days=30):
-        # Calculate rolling averages
-        analytics.average_profile_views = (analytics.profile_views + analytics.average_profile_views) // 2
-        analytics.average_lease_views = (lease_views + analytics.average_lease_views) // 2
-        analytics.average_sale_views = (sale_views + analytics.average_sale_views) // 2
-        
-        # Reset current month counters
-        analytics.profile_views = 0
+
+        # ── Rolling averages (views) ────────────────────────────────────────
+        analytics.average_profile_views = (
+            analytics.profile_views + analytics.average_profile_views
+        ) // 2
+        analytics.average_lease_views = (
+            lease_views + analytics.average_lease_views
+        ) // 2
+        analytics.average_sale_views = (
+            sale_views + analytics.average_sale_views
+        ) // 2
+
+        # ── Rolling averages (inquiries + ratings) ──────────────────────────
+        analytics.average_inquiries = (
+            current_inquiries + analytics.average_inquiries
+        ) // 2
+        analytics.average_ratings = (
+            current_ratings + analytics.average_ratings
+        ) // 2
+
+        # ── Store last month's values for percentage change display ─────────
+        analytics.last_month_inquiries = current_inquiries
+        analytics.last_month_ratings   = current_ratings
+
+        # ── Reset view counters — inquiries/ratings don't need resetting ────
+        # because they are always calculated with a date filter, not stored counts
+        analytics.profile_views    = 0
         analytics.property_views_l = 0
         analytics.property_views_s = 0
+
+        # ── Move the 30-day window forward ──────────────────────────────────
         analytics.last_reset_date = current_time
-        
+        analytics.period_start    = current_time
+
         analytics.save()
-        
-        # Clean up old tracking data
+
+        # ── Clean up view tracking (these are the only hard deletes) ────────
+        # PropertyViews are deleted because they are already aggregated
+        # into the rolling averages above — keeping them would double-count
         PropertyViews.objects.filter(uuid=company_uuid).delete()
         SessionId.objects.filter(company_uuid=company_uuid).delete()
-
 
 def property_views_count(property_type, property_id):
     """
