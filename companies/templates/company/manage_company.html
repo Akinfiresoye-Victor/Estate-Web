@@ -43,7 +43,7 @@
   </div>
 
 
-  <!-- STATS — horizontal scroll on mobile, grid on desktop -->
+  <!-- STATS -->
   <div class="stats-scroll-wrap">
     <div class="ew-stats">
 
@@ -83,7 +83,7 @@
   </div>
 
 
-  <!-- INVITE LINKS — stacked cards on mobile, row on desktop -->
+  <!-- INVITE LINKS -->
   <div class="invite-panel">
     <div class="invite-panel-header">
       <div class="invite-panel-title">
@@ -114,18 +114,18 @@
               onclick="copyInviteLink(this, '{{ request.scheme }}://{{ request.get_host }}{% url 'agent:join_via_invite' %}?token={{ link.invite_token }}')">
               <i class="bi bi-clipboard"></i> Copy
             </button>
-            {%if link.is_active%}
+            {% if link.is_active %}
             <a href="#"
                class="btn btn-sm btn-warning"
                onclick="openRevokeModal('{{ link.invite_token }}'); return false;">
               <i class="bi bi-slash-circle"></i> Revoke
             </a>
-            {%else%}
-            <a class="btn btn-sm btn-warning disabled" 
+            {% else %}
+            <a class="btn btn-sm btn-warning disabled"
               aria-disabled="true">
               <i class="bi bi-slash-circle"></i> Revoked
             </a>
-            {%endif%}
+            {% endif %}
           </div>
         </div>
 
@@ -160,7 +160,12 @@
         <option value="">All Status</option>
         <option value="active">Active</option>
         <option value="on-leave">On Leave</option>
-        <option value="inactive">Inactive</option>
+        <option value="home-sick">Home Sick</option>
+        <option value="paternity-leave">Paternity Leave</option>
+        <option value="emergency">Emergency</option>
+        <option value="resigned">Resigned</option>
+        <option value="on-probation">On Probation</option>
+        <option value="fired">Fired</option>
       </select>
     </div>
     <div class="filter-group">
@@ -173,7 +178,7 @@
   </div>
 
 
-  <!-- VIEW CONTROLS — list toggle hidden on mobile -->
+  <!-- VIEW CONTROLS -->
   <div class="ew-view-controls">
     <div class="view-toggle">
       <button class="toggle-btn active" data-view="grid">
@@ -195,10 +200,14 @@
   <!-- EMPLOYEE GRID -->
   <div class="employees-grid active" id="gridView">
     {% for employee in employees %}
+
+    {# ── Derive a slug from the status for CSS class & filter matching ── #}
+    {% with status_slug=employee.agent_status|lower|slugify %}
+
     <div class="emp-card"
          data-name="{{ employee.agent_name|lower }}"
          data-dept="{{ employee.company_department }}"
-         data-status="active">
+         data-status="{{ status_slug }}">
 
       <div class="emp-card-top">
         <div class="emp-avatar">
@@ -207,20 +216,19 @@
           {% else %}
             <img src="https://ui-avatars.com/api/?name={{ employee.agent_name|urlencode }}&size=80&background=1a3c4e&color=fff&bold=true" alt="{{ employee.agent_name }}">
           {% endif %}
-          <span class="status-dot active"></span>
+          <span class="status-dot {{ status_slug }}"></span>
         </div>
         <div class="emp-menu">
           <button class="menu-btn" aria-label="Options"><i class="bi bi-three-dots-vertical"></i></button>
           <div class="dropdown-menu">
-            <a href="{%url 'agent:agent-profile' employee.agent_uuid%}" class="menu-item"><i class="bi bi-eye"></i> View Profile</a>
-            <a href="{%url 'company:edit-employee' employee.agent_uuid%}" class="menu-item"><i class="bi bi-pencil"></i> Edit Details</a>
+            <a href="{% url 'agent:agent-profile' employee.agent_uuid %}" class="menu-item"><i class="bi bi-eye"></i> View Profile</a>
+            <a href="{% url 'company:edit-employee' employee.agent_uuid %}" class="menu-item"><i class="bi bi-pencil"></i> Edit Details</a>
             <button
               type="button"
               class="menu-item danger"
               onclick="openRemoveModal('{{ employee.agent_uuid }}', '{{ employee.agent_name }}')">
               <i class="bi bi-person-dash"></i> Remove Agent
             </button>
-            
           </div>
         </div>
       </div>
@@ -238,11 +246,25 @@
       </div>
 
       <div class="emp-footer">
-        <span class="status-badge active"><i class="bi bi-check-circle"></i> Active</span>
+        <span class="status-badge {{ status_slug }}">
+          {% if employee.agent_status == 'Active' %}<i class="bi bi-check-circle"></i>
+          {% elif employee.agent_status == 'On Leave' %}<i class="bi bi-clock"></i>
+          {% elif employee.agent_status == 'Home Sick' %}<i class="bi bi-thermometer-half"></i>
+          {% elif employee.agent_status == 'Parternity Leave' %}<i class="bi bi-heart"></i>
+          {% elif employee.agent_status == 'Emergency' %}<i class="bi bi-exclamation-triangle"></i>
+          {% elif employee.agent_status == 'Resigned' %}<i class="bi bi-door-open"></i>
+          {% elif employee.agent_status == 'On Probation' %}<i class="bi bi-shield-exclamation"></i>
+          {% elif employee.agent_status == 'Fired' %}<i class="bi bi-x-circle"></i>
+          {% else %}<i class="bi bi-dash-circle"></i>
+          {% endif %}
+          {{ employee.agent_status }}
+        </span>
         <span class="onboard-source"><i class="bi bi-link-45deg"></i> Via Invite</span>
       </div>
 
     </div>
+    {% endwith %}
+
     {% empty %}
     <div class="empty-state">
       <i class="bi bi-people"></i>
@@ -260,10 +282,11 @@
         <div>Contact</div><div>Status</div><div>Actions</div>
       </div>
       {% for employee in employees %}
+      {% with status_slug=employee.agent_status|lower|slugify %}
       <div class="table-row"
            data-name="{{ employee.agent_name|lower }}"
            data-dept="{{ employee.company_department }}"
-           data-status="active">
+           data-status="{{ status_slug }}">
         <div class="td">
           <div class="emp-cell">
             {% if employee.agent_headshot %}
@@ -283,11 +306,23 @@
         </div>
         <div class="td">{{ employee.agent_phone_no }}</div>
         <div class="td">
-          <span class="status-badge active"><i class="bi bi-check-circle"></i> Active</span>
+          <span class="status-badge {{ status_slug }}">
+            {% if employee.agent_status == 'Active' %}<i class="bi bi-check-circle"></i>
+            {% elif employee.agent_status == 'On Leave' %}<i class="bi bi-clock"></i>
+            {% elif employee.agent_status == 'Home Sick' %}<i class="bi bi-thermometer-half"></i>
+            {% elif employee.agent_status == 'Parternity Leave' %}<i class="bi bi-heart"></i>
+            {% elif employee.agent_status == 'Emergency' %}<i class="bi bi-exclamation-triangle"></i>
+            {% elif employee.agent_status == 'Resigned' %}<i class="bi bi-door-open"></i>
+            {% elif employee.agent_status == 'On Probation' %}<i class="bi bi-shield-exclamation"></i>
+            {% elif employee.agent_status == 'Fired' %}<i class="bi bi-x-circle"></i>
+            {% else %}<i class="bi bi-dash-circle"></i>
+            {% endif %}
+            {{ employee.agent_status }}
+          </span>
         </div>
         <div class="td td-actions">
-          <a href="{%url 'agent:agent-profile' employee.agent_uuid%}" class="action-btn" title="View"><i class="bi bi-eye"></i></a>
-          <a href="{%url 'company:edit-employee' employee.agent_uuid%}" class="action-btn" title="Edit"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'agent:agent-profile' employee.agent_uuid %}" class="action-btn" title="View"><i class="bi bi-eye"></i></a>
+          <a href="{% url 'company:edit-employee' employee.agent_uuid %}" class="action-btn" title="Edit"><i class="bi bi-pencil"></i></a>
           <button
             type="button"
             class="action-btn danger"
@@ -297,6 +332,7 @@
           </button>
         </div>
       </div>
+      {% endwith %}
       {% empty %}
       <div style="padding:40px;text-align:center;color:var(--text-light);">No agents found.</div>
       {% endfor %}
@@ -304,7 +340,7 @@
   </div>
 
 
-  <!-- AUDIT LOG — card list on mobile, no table -->
+  <!-- AUDIT LOG -->
   <div class="audit-section">
     <h2 class="section-title"><i class="bi bi-clipboard2-check"></i> Onboarding Activity</h2>
 
@@ -384,7 +420,7 @@
         <input type="text" id="agentUuidInput"
                placeholder="e.g. 3f2a1c4d-8b7e-4a2f-9c1d-..."
                autocomplete="off" spellcheck="false">
-        <span class="form-hint">Paste the UUID exactly as provided by the agent. agents uuid can be found in settings>basic information</span>
+        <span class="form-hint">Paste the UUID exactly as provided by the agent. Agents UUID can be found in Settings > Basic Information</span>
       </div>
     </div>
     <div class="modal-foot">
@@ -443,7 +479,6 @@
   function openModal(id)  { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-  /* Expose to window so onclick="" attributes in HTML can reach them */
   window.openModal  = openModal;
   window.closeModal = closeModal;
 
@@ -479,11 +514,11 @@
     navigator.clipboard.writeText(url).then(function () { showToast('Invite link copied!'); });
   };
 
-  /* Filter */
+  /* Filter — matches slugified data-status values */
   function filterCards() {
     var s  = document.getElementById('searchInput').value.toLowerCase();
     var d  = document.getElementById('deptFilter').value;
-    var st = document.getElementById('statusFilter').value;
+    var st = document.getElementById('statusFilter').value; /* already slugified e.g. "on-leave" */
     document.querySelectorAll('.emp-card, .table-row[data-name]').forEach(function (c) {
       var show = (c.dataset.name || '').includes(s)
               && (d  === '' || c.dataset.dept   === d)
@@ -532,17 +567,16 @@
   </div>
 </div>
 
+
 <!-- MODAL: Remove Agent Confirmation -->
 <div class="ew-modal" id="removeAgentModal">
   <div class="modal-box revoke-modal-box">
- 
     <div class="modal-head">
       <h3><i class="bi bi-person-dash-fill"></i> Remove Agent</h3>
       <button class="modal-close" onclick="closeModal('removeAgentModal')">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
- 
     <div class="modal-body">
       <div class="revoke-warning">
         <div class="revoke-warning-icon">
@@ -556,7 +590,7 @@
           </p>
         </div>
       </div>
- <div class="form-field" style="margin-top: 4px;">
+      <div class="form-field" style="margin-top: 4px;">
         <label for="removeConfirmInput">
           Type <strong style="color:#dc2626; font-family:'Courier New',monospace;">REMOVE</strong> to confirm
         </label>
@@ -570,7 +604,6 @@
         >
       </div>
     </div>
- 
     <div class="modal-foot">
       <button type="button" class="btn btn-ghost" onclick="closeModal('removeAgentModal')">
         Cancel
@@ -582,36 +615,28 @@
         <i class="bi bi-person-dash-fill"></i> Yes, Remove
       </a>
     </div>
- 
   </div>
 </div>
+
 <script>
   /* Remove agent modal */
   window.openRemoveModal = function (uuid, name) {
-    /* Update modal text with this specific agent's name */
     document.getElementById('removeAgentTitle').textContent = 'Remove ' + name + '?';
     document.getElementById('removeAgentDesc').innerHTML =
       '<strong>' + name + '</strong> will be removed from your company. ' +
       'Their listings and leads will remain attributed to your company.';
- 
-    /* Point the confirm button at the correct remove URL for this agent */
     document.getElementById('removeConfirmBtn').href = '/company/team/remove/' + uuid + '/';
- 
-    /* Reset input and lock button */
     document.getElementById('removeConfirmInput').value = '';
     var btn = document.getElementById('removeConfirmBtn');
     btn.style.pointerEvents = 'none';
     btn.style.opacity       = '0.45';
- 
     openModal('removeAgentModal');
   };
- 
-  /* Close on backdrop click */
+
   document.getElementById('removeAgentModal').addEventListener('click', function (e) {
     if (e.target === this) closeModal('removeAgentModal');
   });
- 
-  /* Unlock button only when user types exactly REMOVE */
+
   window.checkRemoveConfirm = function (input) {
     var btn     = document.getElementById('removeConfirmBtn');
     var correct = input.value.trim() === 'REMOVE';
@@ -619,5 +644,5 @@
     btn.style.opacity       = correct ? '1'     : '0.45';
   };
 </script>
- 
+
 {% endblock %}

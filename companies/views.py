@@ -1402,8 +1402,8 @@ def remove_agent(request, agent_uuid):
             return redirect('landing')
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
         #handing every property and lead data back to the company
-        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
-        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None,user_id=request.user.id)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None, user_id=request.user.id)
         LeadInfo.objects.filter(agent_id=agent.agent_uuid).update(agent_id=None)
         Appointments.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
         agent.company_uuid = None
