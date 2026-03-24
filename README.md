@@ -204,6 +204,7 @@ Over 50 migrations across apps, handling:
 - Allowed hosts via env
 - Production: HTTPS enforced via CSRF_TRUSTED_ORIGINS
 
+if pip-audit is not working use $env:PYTHONIOENCODING='utf-8', chcp 65001 on the terminal before you run pip-audit
 ## Troubleshooting
 
 | Issue | Solution |
@@ -221,3 +222,4 @@ MIT License - see LICENSE file for details.
 ## Contact
 
 For support: Contact project maintainer via GitHub Issues.
+

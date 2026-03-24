@@ -145,14 +145,15 @@
     window.confirmDelete = function() {
         if (!deleteUrl) return;
 
-        const csrftoken = getCookie('csrftoken');
+        const CSRF = getCookie('csrftoken');
 
         fetch(deleteUrl, {
             method: 'POST',
             headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': CSRF,
             },
+            credentials: 'same-origin',
         })
         .then(response => {
             // If response is ok (status 200-299), consider it successful

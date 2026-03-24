@@ -1,0 +1,8 @@
+# Development and security tools
+# Install with: pip install -r requirements-dev.txt
+
+pip-audit
+black
+flake8
+isort
+django-debug-toolbar

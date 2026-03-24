@@ -13,24 +13,36 @@ from django.views.decorators.http import require_POST
 from core.utils import *
 from .models import ErrorLog
 import traceback
-
+from django.utils.http import url_has_allowed_host_and_scheme
 
 # Create your views here.
+
 def landing_page(request):
     if not request.user.is_authenticated:
         return render(request, 'core/landing.html')
+    
+    # 1. Grab the potential redirect URL
+    next_url = request.GET.get('next') or request.POST.get('next')
+    
+    # 2. Run the security check ONCE
+    is_safe = url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ) if next_url else False
+
+    # 3. Handle role-based redirects
+    if request.user.role == 'company':
+        return redirect(next_url if is_safe else 'company:dashboard')
+        
+    elif request.user.role == 'agent':
+        return redirect(next_url if is_safe else 'agent:dashboard')
+        
+    elif request.user.role == 'customer':
+        return redirect(next_url if is_safe else 'customer:user-profile')
+        
     else:
-        if request.user.role == 'company':
-            next_url = request.GET.get('next') or request.POST.get('next')
-            return redirect(next_url if next_url else 'company:dashboard')
-        elif request.user.role == 'agent':
-            next_url = request.GET.get('next') or request.POST.get('next')
-            return redirect(next_url if next_url else 'agent:dashboard')
-        elif request.user.role == 'customer':
-            next_url = request.GET.get('next') or request.POST.get('next')
-            return redirect(next_url if next_url else 'customer:user-profile')
-        else:
-            return render(request, 'core/landing.html')
+        return render(request, 'core/landing.html')
 
 def about_page(request):
     return render(request, 'core/about.html')
@@ -800,14 +812,37 @@ def add_schedule(request):
                 property_type = request.POST.get('property_type')
                 
                 if property_id:
-                    appointment.property_id = property_id
+                    try:
+                        property_id = int(property_id)
+                        if property_id <= 0:
+                            raise ValueError
+                        appointment.property_id = property_id
+                    except (ValueError, TypeError):
+                        messages.error(request, 'Invalid property ID.')
+                        return render(request, 'core/add_schedule.html', {'form': form, 'base_template': base_template})
+                
                 if property_type:
+                    if property_type not in ['Sale', 'Rent']:
+                        messages.error(request, 'Invalid property type.')
+                        return render(request, 'core/add_schedule.html', {'form': form, 'base_template': base_template})
                     appointment.property_type = property_type
                 
                 # Handle lead/customer selection if provided
                 lead_uuid = request.POST.get('lead_uuid')
                 if lead_uuid:
-                    appointment.lead_uuid = lead_uuid
+                    try:
+                        lead = LeadInfo.objects.get(lead_id=lead_uuid)
+                        # Check if lead belongs to the user
+                        if request.user.role == 'company':
+                            if lead.company_uuid != str(company.unique_company_id):
+                                raise PermissionError
+                        elif request.user.role == 'agent':
+                            if lead.agent_id != str(agent.agent_uuid):
+                                raise PermissionError
+                        appointment.lead_uuid = lead_uuid
+                    except (LeadInfo.DoesNotExist, PermissionError):
+                        messages.error(request, 'Invalid lead selection.')
+                        return render(request, 'core/add_schedule.html', {'form': form, 'base_template': base_template})
                 
                 appointment.save()
                 
@@ -990,18 +1025,45 @@ def edit_appointment(request, appointment_uuid):
         # Handle POST request (form submission)
         if request.method == 'POST':
             try:
-                # Update appointment fields
-                appointment.appointment = request.POST.get('appointment_date')
+                # Validate and update appointment fields
+                appointment_date = request.POST.get('appointment_date')
+                if not appointment_date:
+                    messages.error(request, 'Appointment date is required.')
+                    return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
+                
+                try:
+                    from datetime import datetime
+                    datetime.strptime(appointment_date, '%Y-%m-%d')
+                    appointment.appointment = appointment_date
+                except ValueError:
+                    messages.error(request, 'Invalid appointment date format.')
+                    return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
+                
                 appointment.note = request.POST.get('note', 'No Note Provided')
-                appointment.appointment_type = request.POST.get('appointment_type')
+                
+                appointment_type = request.POST.get('appointment_type')
+                if appointment_type not in dict(APPOINTMENT_TYPE):
+                    messages.error(request, 'Invalid appointment type.')
+                    return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
+                appointment.appointment_type = appointment_type
                 
                 # Update property fields if provided
                 property_id = request.POST.get('property_id')
                 if property_id:
-                    appointment.property_id = int(property_id)
+                    try:
+                        property_id = int(property_id)
+                        if property_id <= 0:
+                            raise ValueError
+                        appointment.property_id = property_id
+                    except (ValueError, TypeError):
+                        messages.error(request, 'Invalid property ID.')
+                        return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                 
                 property_type = request.POST.get('property_type')
                 if property_type:
+                    if property_type not in ['Sale', 'Rent']:
+                        messages.error(request, 'Invalid property type.')
+                        return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                     appointment.property_type = property_type
                 
                 appointment.save()

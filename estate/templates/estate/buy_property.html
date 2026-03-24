@@ -202,7 +202,7 @@ function toggleFilters() {
       btn.disabled = true;
 
       fetch(url, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRFToken': CSRF,

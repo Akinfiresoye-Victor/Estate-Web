@@ -351,15 +351,17 @@
     if (!el) { alert('Error: Lead ID not found'); return; }
 
     const url       = el.getAttribute('data-update-url');
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
     if (!url) { alert('Error: Update URL not configured'); return; }
 
     fetch(url, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      credentials: 'same-origin',
       body: `new_status=${encodeURIComponent(newStatus)}`
     })
     .then(function () { window.location.reload(); })
@@ -376,15 +378,17 @@
     if (!el) return;
 
     const leadId    = el.getAttribute('data-lead-id');
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
     const url       = `/company/lead/update_stage/${leadId}`;
 
     fetch(url, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      credentials: 'same-origin',
       body: `new_stage=${encodeURIComponent(newStage)}`
     })
     .then(function (response) { if (response.ok) window.location.reload(); })

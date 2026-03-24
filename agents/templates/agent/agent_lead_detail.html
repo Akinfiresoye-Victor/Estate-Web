@@ -373,15 +373,17 @@
     if (!leadData) { alert('Error: Lead ID not found'); return; }
 
     var leadId    = leadData.getAttribute('data-lead-id');
-    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    var CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
     var url       = '/agent/lead/update_status/' + leadId + '/';
 
     fetch(url, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      credentials: 'same-origin',
       body: 'new_status=' + encodeURIComponent(newStatus)
     })
     .then(function () { window.location.reload(); })
@@ -398,15 +400,17 @@
     if (!leadData) return;
 
     var leadId    = leadData.getAttribute('data-lead-id');
-    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    var CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
     var url       = '/agent/lead/update_stage/' + leadId + '/';
 
     fetch(url, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': csrftoken,
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
+      credentials: 'same-origin',
       body: 'new_stage=' + encodeURIComponent(newStage)
     })
     .then(function (res) { if (res.ok) window.location.reload(); })

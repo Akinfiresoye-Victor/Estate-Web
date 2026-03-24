@@ -746,6 +746,12 @@ def update_lead_status(request, lead_id):
             if not new_status:
                 messages.error(request, 'Status Missing')
                 return redirect('company:lead-management')
+            
+            from core.choices import LEAD_STATUS
+            if new_status not in [choice[0] for choice in LEAD_STATUS]:
+                messages.error(request, 'Invalid status value')
+                return redirect('company:lead-management')
+            
             lead.status=new_status
             lead.date_updated=timezone.now()
             lead.save()
@@ -783,6 +789,12 @@ def update_lead_stage(request, lead_id):
             if not new_stage:
                 messages.error(request, 'Stage Missing')
                 return redirect('company:lead-management')
+            
+            from core.choices import LEAD_STAGES
+            if new_stage not in [choice[0] for choice in LEAD_STAGES]:
+                messages.error(request, 'Invalid stage value')
+                return redirect('company:lead-management')
+            
             lead.stages = new_stage
             lead.date_updated=timezone.now()
             lead.save()

@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'django_filters',
     'cloudinary',
     'cloudinary_storage',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+    'axes'
 ]
 
 # Middleware
@@ -116,11 +117,20 @@ else:
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    'OPTIONS': {'min_length': 8}},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+#TODO set up password warning and forget password functinality
+AXES_FAILURE_LIMIT = 5        # lock after 5 failed attempts
+AXES_COOLOFF_TIME  = 1        # lock for 1 hour
+AXES_LOCKOUT_PARAMETERS = ['ip_address', 'username']  # lock by IP and username
+PASSWORD_RESET_TIMEOUT = 3600
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Lagos'
@@ -177,3 +187,23 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+SESSION_COOKIE_HTTPONLY = True   # JS cannot read the cookie
+SESSION_COOKIE_SECURE   = True   # cookie only sent over HTTPS (Render uses HTTPS)
+SESSION_COOKIE_SAMESITE = 'Lax'  # blocks cross-site request cookie leaks
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 1209600     # 2 weeks in seconds
+
+# Clickjacking protection
+X_FRAME_OPTIONS = 'DENY'
+
+# HTTPS enforcement
+SECURE_SSL_REDIRECT          = True   # redirect all HTTP to HTTPS
+SECURE_HSTS_SECONDS          = 31536000  # tell browsers to always use HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD          = True
+SECURE_PROXY_SSL_HEADER      = ('HTTP_X_FORWARDED_PROTO', 'https')  # needed on Render
+
+# Cookie security
+CSRF_COOKIE_SECURE      = True
+CSRF_COOKIE_HTTPONLY    = True
