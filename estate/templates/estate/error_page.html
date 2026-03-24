@@ -1,10 +1,9 @@
-{% extends request.user.role|default:"estate"|stringformat:"%s/base.html" %}
+{% extends request.user.role|lower|add:"/base.html"|default:"estate/base.html" %}
 {% load static %}
 
 {% block title %}Something went wrong — Estate Web{% endblock %}
 
 {% block extra_css %}
-...
 <link rel="stylesheet" href="{% static 'estate/css/error_page.css' %}">
 {% endblock %}
 

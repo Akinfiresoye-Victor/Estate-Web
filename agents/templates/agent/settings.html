@@ -818,7 +818,7 @@
   });
 
   /* ── Delete modal ───────────────────────────────────────────────── */
-  var deleteUrl = "{% url 'agent:delete-agent' agent.agent_uuid %}";
+  var deleteUrl = "{% url 'agent:delete-agent' %}";
 
   window.openDeleteModal = function () {
     var modal   = document.getElementById('deleteModalOverlay');

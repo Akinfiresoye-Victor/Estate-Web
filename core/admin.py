@@ -12,6 +12,6 @@ admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedbacks, 
                     Experience, SocialLinks, PropertyRentImage, PropertySaleImage, User, CompanyInformation,
                     CompanyAnalytics, LeadInfo,WishlistStorageUnit, SessionId, PropertyViews,Appointments, 
                     AgentAnalytics, agent_session, CompanyRating,JobPost, CompanyActivityLog,Employees, InviteLink,
-                    Partnership,PartnershipGoal
+                    Partnership,PartnershipGoal,ErrorLog
                     ])
 

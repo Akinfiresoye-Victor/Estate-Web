@@ -4,7 +4,6 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .models import *
-from members.views import logout_user
 from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments, ErrorLog
 from estate.models import LeadInfo
 from members.models import User
@@ -14,10 +13,8 @@ from datetime import date, timedelta
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg, Count, Sum,Q
+from django.db.models import Avg, Count, Sum
 from core.utils import *
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 from agents.models import AgentInformation
 from django.urls import reverse
 import traceback
@@ -874,7 +871,21 @@ def company_profile(request, company_uuid):
             avg_rating=Avg('rating'),
             total_reviews=Count('id')
         )
-        
+        analytics_data, _ = CompanyAnalytics.objects.get_or_create(
+            company=company,
+            defaults={
+                'profile_views':         0,
+                'property_views_l':      0,
+                'property_views_s':      0,
+                'average_profile_views': 0,
+                'average_lease_views':   0,
+                'average_sale_views':    0,
+                'monthly_leads':         0,
+                'monthly_reviews':       0,
+                'average_leads':         0,
+                'average_reviews':       0,
+            }
+        )
         average_rating = rating_data['avg_rating'] or 0.0
         total_reviews = rating_data['total_reviews']
         
@@ -892,9 +903,8 @@ def company_profile(request, company_uuid):
                     session_id=request.user.id,
                     inquires_check=0
                 )
-                profile = company.analytics.get()
-                profile.profile_views += 1
-                profile.save()
+                analytics_data.profile_views += 1
+                analytics_data.save()
         
         # Generate page numbers for pagination
         nums_sale = "x" * properties_on_sale.paginator.num_pages

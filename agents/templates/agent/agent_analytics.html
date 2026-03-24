@@ -4,6 +4,134 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'agent/css/agent_analytics.css' %}">
+<style>
+/* ── Period Banner ── */
+.ag-period-banner {
+  background: rgba(26,60,78,.04);
+  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.76rem;
+  color: var(--text-mid);
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+.ag-period-banner i { color: var(--secondary); font-size: 0.82rem; }
+.ag-period-banner strong { color: var(--primary); font-weight: 700; }
+.ag-period-sep {
+  display: inline-block;
+  width: 28px; height: 1.5px;
+  background: var(--secondary);
+  border-radius: 2px;
+  vertical-align: middle;
+  margin: 0 4px;
+}
+
+/* ── Activity Row ── */
+.ag-activity-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+@media (min-width: 580px) {
+  .ag-activity-row { grid-template-columns: repeat(3, 1fr); }
+}
+
+.ag-act-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-left: 3px solid transparent;
+  transition: var(--ease);
+}
+.ag-act-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.ag-act-card.leads       { border-left-color: #0284c7; }
+.ag-act-card.appts       { border-left-color: var(--secondary); }
+.ag-act-card.reviews-act { border-left-color: var(--lease); }
+
+.ag-act-left { display: flex; align-items: center; gap: 0.75rem; }
+
+.ag-act-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: var(--white);
+}
+.ag-act-card.leads       .ag-act-icon { background: linear-gradient(135deg,#0284c7,#38bdf8); }
+.ag-act-card.appts       .ag-act-icon { background: linear-gradient(135deg,var(--secondary),var(--accent)); }
+.ag-act-card.reviews-act .ag-act-icon { background: linear-gradient(135deg,var(--lease),#4ade80); }
+
+.ag-act-body {}
+.ag-act-val  { font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1.1; }
+.ag-act-lbl  { font-size: 0.72rem; color: var(--text-light); font-weight: 500; }
+
+/* ── Ratings Card ── */
+.ag-stars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 1.15rem;
+}
+.ag-star-filled  { color: #f59e0b; }
+.ag-star-half    { color: #f59e0b; opacity: 0.6; }
+.ag-star-empty   { color: var(--border); }
+
+.ag-rating-big {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.ag-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ag-rating-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ag-market-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(26,60,78,.08), rgba(193,155,118,.12));
+  color: var(--primary);
+  border: 1px solid rgba(193,155,118,.25);
+}
+.ag-market-pill i { color: var(--secondary); }
+
+.ag-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.5rem 0;
+}
+
+.ag-review-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+.ag-review-stat span:first-child { color: var(--text-mid); font-weight: 500; }
+.ag-review-stat span:last-child  { color: var(--primary); font-weight: 700; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -25,6 +153,19 @@
       </button>
     </div>
   </div>
+</div>
+
+
+<!-- ── ANALYTICS PERIOD BANNER ───────────────────── -->
+<div class="ag-period-banner">
+  <i class="bi bi-calendar-range"></i>
+  <span>Analytics window:</span>
+  <strong>{{ window_start|date:"M d, Y" }}</strong>
+  <span class="ag-period-sep"></span>
+  <strong>Today</strong>
+  <span style="margin-left:auto; color:var(--text-light);">
+    All metrics below reflect activity within this 30-day rolling window
+  </span>
 </div>
 
 
@@ -63,12 +204,12 @@
     <div class="ag-kpi-left">
       <div class="ag-kpi-icon market"><i class="bi bi-graph-up"></i></div>
       <div class="ag-kpi-body">
-        <span class="ag-kpi-val">{{ competition|floatformat:1 }}%</span>
+        <span class="ag-kpi-val">{{ competition }}</span>
         <span class="ag-kpi-lbl">Market Position</span>
       </div>
     </div>
-    <span class="ag-kpi-badge {% if competition > 0 %}positive{% else %}neutral{% endif %}">
-      {% if competition > 0 %}Leading{% else %}Growing{% endif %}
+    <span class="ag-kpi-badge {% if market_position <= 25 %}positive{% else %}neutral{% endif %}">
+      {{ market_position }}% rank
     </span>
   </div>
 
@@ -90,6 +231,51 @@
 
 <!-- ── MAIN CONTENT ──────────────────────────────── -->
 <div class="ag-page">
+
+  <!-- Activity Row — Leads, Appointments, Reviews -->
+  <div class="ag-activity-row">
+
+    <div class="ag-act-card leads">
+      <div class="ag-act-left">
+        <div class="ag-act-icon"><i class="bi bi-person-lines-fill"></i></div>
+        <div class="ag-act-body">
+          <div class="ag-act-val">{{ monthly_leads|intcomma }}</div>
+          <div class="ag-act-lbl">Monthly Leads</div>
+        </div>
+      </div>
+      <span class="ag-kpi-trend {% if leads_change > 0 %}up{% else %}down{% endif %}">
+        <i class="bi bi-arrow-{% if leads_change > 0 %}up{% else %}down{% endif %}-short"></i>
+        {{ leads_change|floatformat:1 }}%
+      </span>
+    </div>
+
+    <div class="ag-act-card appts">
+      <div class="ag-act-left">
+        <div class="ag-act-icon"><i class="bi bi-calendar-check-fill"></i></div>
+        <div class="ag-act-body">
+          <div class="ag-act-val">{{ monthly_appointments|intcomma }}</div>
+          <div class="ag-act-lbl">Monthly Appointments</div>
+        </div>
+      </div>
+      <span class="ag-kpi-badge neutral">This window</span>
+    </div>
+
+    <div class="ag-act-card reviews-act">
+      <div class="ag-act-left">
+        <div class="ag-act-icon"><i class="bi bi-star-fill"></i></div>
+        <div class="ag-act-body">
+          <div class="ag-act-val">{{ monthly_reviews|intcomma }}</div>
+          <div class="ag-act-lbl">New Reviews</div>
+        </div>
+      </div>
+      <span class="ag-kpi-trend {% if reviews_change > 0 %}up{% else %}down{% endif %}">
+        <i class="bi bi-arrow-{% if reviews_change > 0 %}up{% else %}down{% endif %}-short"></i>
+        {{ reviews_change|floatformat:1 }}%
+      </span>
+    </div>
+
+  </div>
+
 
   <!-- Two-card grid -->
   <div class="ag-two-col">
@@ -198,6 +384,91 @@
   </div>
 
 
+  <!-- Ratings & Reviews Card — full width -->
+  <div class="ag-card">
+    <div class="ag-card-hd">
+      <div class="ag-card-icon" style="background: linear-gradient(135deg,#d97706,#f59e0b);">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <div>
+        <h3>Ratings & Reviews</h3>
+        <p>All-time client feedback summary</p>
+      </div>
+      <span class="ag-market-pill" style="margin-left:auto;">
+        <i class="bi bi-trophy-fill"></i> {{ competition }}
+      </span>
+    </div>
+    <div class="ag-card-bd">
+
+      <div class="ag-rating-row">
+        <div class="ag-rating-big">{{ average_rating|floatformat:1 }}</div>
+        <div class="ag-rating-meta">
+          <!-- Star display — filled, half, empty based on average_rating -->
+          <div class="ag-stars">
+            {% for i in "12345" %}
+              {% with i_int=forloop.counter %}
+                {% if average_rating >= i_int %}
+                  <i class="bi bi-star-fill ag-star-filled"></i>
+                {% elif average_rating >= i_int|add:"-0.5" %}
+                  <i class="bi bi-star-half ag-star-half"></i>
+                {% else %}
+                  <i class="bi bi-star ag-star-empty"></i>
+                {% endif %}
+              {% endwith %}
+            {% endfor %}
+          </div>
+          <span style="font-size:0.78rem; color:var(--text-light);">Based on {{ total_reviews|intcomma }} review{{ total_reviews|pluralize }}</span>
+        </div>
+      </div>
+
+      <div class="ag-divider"></div>
+
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <div class="ag-review-stat">
+          <span>Total Reviews (All Time)</span>
+          <span>{{ total_reviews|intcomma }}</span>
+        </div>
+        <div class="ag-review-stat">
+          <span>New Reviews This Window</span>
+          <span>
+            {{ monthly_reviews }}
+            <span class="ag-kpi-trend {% if reviews_change > 0 %}up{% else %}down{% endif %}" style="margin-left:6px;">
+              <i class="bi bi-arrow-{% if reviews_change > 0 %}up{% else %}down{% endif %}-short"></i>
+              {{ reviews_change|floatformat:1 }}%
+            </span>
+          </span>
+        </div>
+        <div class="ag-review-stat">
+          <span>Average Star Rating</span>
+          <span>{{ average_rating|floatformat:2 }} / 5.00</span>
+        </div>
+        <div class="ag-review-stat">
+          <span>Market Rank</span>
+          <span>{{ competition }} &mdash; top {{ market_position }}% of agents</span>
+        </div>
+      </div>
+
+      {% if average_rating >= 4.5 %}
+        <div class="ag-quick-insight">
+          <i class="bi bi-patch-check-fill" style="color:var(--success);"></i>
+          <div><strong>Outstanding Reputation:</strong> A {{ average_rating|floatformat:1 }}-star rating puts you among the most trusted agents on the platform. Keep delivering great experiences.</div>
+        </div>
+      {% elif average_rating >= 3.5 %}
+        <div class="ag-quick-insight">
+          <i class="bi bi-info-circle-fill"></i>
+          <div><strong>Good Standing:</strong> Your {{ average_rating|floatformat:1 }}-star average is solid. Focus on follow-ups and responsiveness to push it higher.</div>
+        </div>
+      {% else %}
+        <div class="ag-quick-insight" style="border-left-color:var(--warning);">
+          <i class="bi bi-exclamation-triangle-fill" style="color:var(--warning);"></i>
+          <div><strong>Needs Improvement:</strong> A {{ average_rating|floatformat:1 }}-star rating suggests room to grow. Request feedback from satisfied clients and act on concerns.</div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+
   <!-- ── INSIGHTS ─────────────────────────────────── -->
   <div class="ag-insights">
     <div class="ag-insights-hd">
@@ -272,13 +543,32 @@
         </div>
       {% endif %}
 
+      <!-- Leads -->
+      {% if leads_change > 0 %}
+        <div class="ag-insight success">
+          <div class="ag-insight-icon"><i class="bi bi-person-plus-fill"></i></div>
+          <div>
+            <h4>Lead Growth</h4>
+            <p>Leads are up <strong>{{ leads_change|floatformat:1 }}%</strong> this window with <strong>{{ monthly_leads }}</strong> new leads. Great momentum — follow up fast.</p>
+          </div>
+        </div>
+      {% elif leads_change < 0 %}
+        <div class="ag-insight warn">
+          <div class="ag-insight-icon"><i class="bi bi-person-dash-fill"></i></div>
+          <div>
+            <h4>Fewer Leads</h4>
+            <p>Leads dropped <strong>{{ leads_change|floatformat:1|cut:"-" }}%</strong>. Try promoting listings more actively or refreshing your profile.</p>
+          </div>
+        </div>
+      {% endif %}
+
       <!-- Competition -->
-      {% if competition > 0 %}
+      {% if market_position <= 25 %}
         <div class="ag-insight success">
           <div class="ag-insight-icon"><i class="bi bi-trophy-fill"></i></div>
           <div>
-            <h4>Top Performer</h4>
-            <p>Outperforming competitors by <strong>{{ competition|floatformat:1 }}%</strong>! Maintain momentum with excellent service.</p>
+            <h4>{{ competition }}</h4>
+            <p>You're ranking in the top <strong>{{ market_position }}%</strong> of all agents. Maintain momentum with excellent service and active listings.</p>
           </div>
         </div>
       {% else %}
@@ -286,7 +576,7 @@
           <div class="ag-insight-icon"><i class="bi bi-bullseye"></i></div>
           <div>
             <h4>Growth Opportunity</h4>
-            <p>Room to grow. Focus on quality listings, responsive communication, and regular profile updates to gain an edge.</p>
+            <p>Currently at top <strong>{{ market_position }}%</strong>. Focus on quality listings, responsive communication, and regular profile updates to climb the rankings.</p>
           </div>
         </div>
       {% endif %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import AgentInformation, AgentAnalytics, AgentRating
+from .models import AgentInformation, AgentAnalytics, AgentRating,SessionId
 from django.contrib import messages
 from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
 from django.db import transaction
@@ -45,7 +45,6 @@ def dashboard(request):
 
     try:
         agent_data = AgentInformation.objects.get(user_id=request.user.id)
-        
         #Name and greeting
         agent_name = f"{agent_data.first_name} {agent_data.last_name}"
         first_name = agent_data.first_name
@@ -341,10 +340,14 @@ def update_agent_profile(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
         
 
-    
+
 
 
 def lead_management(request):
+    """
+    Querying Through to get all leads and their respective status
+    """
+    
     if not request.user.is_authenticated:
         messages.info(request, "Login Required")
         return redirect('login')
@@ -389,12 +392,10 @@ def agent_profile(request, agent_uuid):
             base_template = 'agent/base.html'
         else:
             base_template='estate/base.html'
-        agent = get_object_or_404(AgentInformation, agent_uuid=agent_uuid)
+        agent = AgentInformation.objects.get(agent_uuid=agent_uuid)
         
         # Get reviews
-        reviews = AgentRating.objects.filter(
-            agent_uuid=agent_uuid
-        ).select_related('user').order_by('-created_at')[:10]  # Latest 10 reviews
+        reviews = AgentRating.objects.filter(agent_uuid=agent_uuid).select_related('user').order_by('-created_at')[:10]  # Latest 10 reviews
         
         # Calculate rating statistics
         rating_data = AgentRating.objects.filter(
@@ -404,16 +405,46 @@ def agent_profile(request, agent_uuid):
             total=Count('id')
         )
         
+        # get analytics for the profile views incrementations
+        analytics_data, _ = AgentAnalytics.objects.get_or_create(
+            agent=agent,
+            defaults={
+                'profile_views':         0,
+                'property_views_l':      0,
+                'property_views_s':      0,
+                'average_profile_views': 0,
+                'average_lease_views':   0,
+                'average_sale_views':    0,
+                'monthly_leads':         0,
+                'monthly_reviews':       0,
+                'average_leads':         0,
+                'average_reviews':       0,
+                'ratings':               0.0,
+                'reviews':               0,
+                'competition':           0.0,
+            }
+        )
+        
+        
         average_rating = rating_data['average'] or 0.0
         total_reviews = rating_data['total'] or 0
         
         # Check if current user has reviewed
         user_has_reviewed = False
         if request.user.is_authenticated:
-            user_has_reviewed = AgentRating.objects.filter(
-                agent_uuid=agent_uuid,
-                user=request.user
-            ).exists()
+            user_has_reviewed = AgentRating.objects.filter(agent_uuid=agent_uuid,user=request.user).exists()
+            
+            #Ensuring the user doesnt view the profile more than one
+            try:
+                prop_analytics=agent.session_id.get(session_id=request.user.id)
+            except ObjectDoesNotExist:
+                prop_analytics=SessionId.objects.create(
+                    agent=agent,
+                    session_id=request.user.id,
+                    inquires_check=0
+                )
+                analytics_data.profile_views += 1
+                analytics_data.save()
         
         # Get agent's other data (adjust based on your models)
         house_count = agent.properties.count() if hasattr(agent, 'properties') else 0
@@ -450,11 +481,12 @@ def agent_profile(request, agent_uuid):
 
 
 
-
-
-
-
 def analytics(request):
+    """
+    All of the Users data analyzed step by step within a 30-day window
+    cron job runs all updates after 30 days on Estate Web
+    """
+    
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -484,58 +516,32 @@ def analytics(request):
             }
         )
 
-        # ── 30-day window start ──────────────────────────────────────────────
-        # The cron job moves this forward every 30 days.
-        # Every date-filtered query below uses this as its starting point.
+        #checking if the last reset date was 30 days ago
         window_start = analytics_data.last_reset_date
 
         # ── Property IDs — fetched once, reused below ────────────────────────
         rent_ids = set(
-            PropertyManagementRent.objects.filter(
-                agent_uuid=current_agent.agent_uuid
-            ).values_list('pk', flat=True)
-        )
-        sale_ids = set(
-            PropertyManagementSale.objects.filter(
-                agent_uuid=current_agent.agent_uuid
-            ).values_list('pk', flat=True)
-        )
+            PropertyManagementRent.objects.filter(agent_uuid=current_agent.agent_uuid).values_list('pk', flat=True))
+        sale_ids = set(PropertyManagementSale.objects.filter(agent_uuid=current_agent.agent_uuid).values_list('pk', flat=True))
 
         # ── Property views — PropertyViews gets wiped by cron, no date filter
-        lease_views = PropertyViews.objects.filter(
-            property_type='Rent',
-            property_id__in=rent_ids
-        ).count()
+        lease_views = PropertyViews.objects.filter(property_type='Rent',property_id__in=rent_ids).count()
 
-        sale_views = PropertyViews.objects.filter(
-            property_type='Sale',
-            property_id__in=sale_ids
-        ).count()
+        sale_views = PropertyViews.objects.filter(property_type='Sale',property_id__in=sale_ids).count()
 
-        # ── Leads — filtered to current 30-day window ────────────────────────
-        monthly_leads = LeadInfo.objects.filter(
-            agent_id=current_agent.agent_uuid,
-            date_created__gte=window_start
-        ).count()
+        # ── Leads — filtered to current 30-day window 
+        monthly_leads = LeadInfo.objects.filter(agent_id=current_agent.agent_uuid,date_created__gte=window_start).count()
 
         # ── Ratings — all-time for display, monthly count for tracking ───────
-        all_time_rating = AgentRating.objects.filter(
-            agent_uuid=current_agent.agent_uuid
-        ).aggregate(avg_rating=Avg('rating'), total_reviews=Count('id'))
+        all_time_rating = AgentRating.objects.filter(agent_uuid=current_agent.agent_uuid).aggregate(avg_rating=Avg('rating'), total_reviews=Count('id'))
 
-        monthly_reviews = AgentRating.objects.filter(
-            agent_uuid=current_agent.agent_uuid,
-            created_at__gte=window_start
-        ).count()
+        monthly_reviews = AgentRating.objects.filter(agent_uuid=current_agent.agent_uuid,created_at__gte=window_start).count()
 
         average_rating = all_time_rating['avg_rating'] or 0.0
         total_reviews  = all_time_rating['total_reviews']
 
         # ── Appointments — filtered to current 30-day window ─────────────────
-        monthly_appointments = Appointments.objects.filter(
-            agent_uuid=current_agent.agent_uuid,
-            appointment__gte=window_start
-        ).count()
+        monthly_appointments = Appointments.objects.filter(agent_uuid=current_agent.agent_uuid,appointment__gte=window_start).count()
 
         # ── Update analytics — views read from DB each load, cron resets ─────
         analytics_data.property_views_l = lease_views
@@ -701,7 +707,12 @@ def analytics(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
+
 def lead_detail(request, lead_id):
+    """
+    Specific Lead/Client Details based on the informtion the client provided
+    """
+    #TODO enable view passowrd side during login and signup
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return render('login')
@@ -709,8 +720,13 @@ def lead_detail(request, lead_id):
         messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
-        agent=AgentInformation.objects.get(user_id=request.user.id)
+        agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
         lead=LeadInfo.objects.get(lead_id=lead_id)
+        
+        #preventing other agents from stealing another agents lead/data
+        if not lead.agent_id in agent_uuid:
+            messages.warning(request, 'Access Denied')
+            return redirect('landing')
         if lead.property_type == 'Sale':
             property_intrested=PropertyManagementSale.objects.get(pk=lead.property_intrested)
         else:
@@ -723,6 +739,10 @@ def lead_detail(request, lead_id):
 
 @require_POST
 def agent_update_lead_status(request, lead_id):
+    """
+    View to update Agents Lead status With proper security measures
+    """
+    
     if not request.user.is_authenticated:
         messages.info(request, 'log in to access this page')
         return redirect('landing')
@@ -731,9 +751,11 @@ def agent_update_lead_status(request, lead_id):
         return redirect('landing')
     try:
         try:
-            agent = AgentInformation.objects.get(user_id=request.user.id)
+            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
             lead = LeadInfo.objects.get(pk=lead_id)
-            
+            if not lead.agent_id in agent_uuid:
+                messages.warning(request, 'Action Prohibited')
+                return redirect('landing')
             new_status = request.POST.get('new_status')
             if not new_status:
                 messages.error(request, 'Status Missing')
@@ -755,6 +777,10 @@ def agent_update_lead_status(request, lead_id):
 
 @require_POST
 def agent_update_lead_stage(request, lead_id):
+    """
+    View to update Agents Lead stage With proper security measures
+    """
+    
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to gain access')
         return redirect('landing')
@@ -763,9 +789,11 @@ def agent_update_lead_stage(request, lead_id):
         return redirect('landing')
     try:
         try:
-            agent = AgentInformation.objects.get(user_id=request.user.id)
+            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
             lead = LeadInfo.objects.get(pk=lead_id)
-            
+            if not lead.agent_id in agent_uuid:
+                messages.warning(request, 'Action Prohibited')
+                return redirect('landing')
             new_stage = request.POST.get('new_stage')
             if not new_stage:
                 messages.error(request, 'Stage Missing')
@@ -795,6 +823,9 @@ def settings(request):
         return redirect('landing')
     try:
         agent= AgentInformation.objects.get(user_id=request.user.id)
+        if agent.user_id != request.user.id:
+            messages.error(request, 'Restricted Access')
+            return redirect('landing')
         context={
             'agent':agent
         }
@@ -806,6 +837,7 @@ def settings(request):
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
+
 def delete_lead(request, lead_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
@@ -814,27 +846,17 @@ def delete_lead(request, lead_id):
         messages.error(request, 'Access Denied')
         return redirect('landing')
     try:
-        agent= AgentInformation.objects.get(user_id=request.user.id)
+        agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
         lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
-        if agent.agent_uuid == lead_to_delete.agent_id:
-            lead_to_delete.delete()
-            messages.success(request, "Lead Deleted")
-            return redirect('agent:leads')
-        else:
+        if not lead_to_delete.agent_id in agent_uuid:
             messages.error(request, "Access Denied")
             return redirect('landing')
+        lead_to_delete.delete()
+        messages.success(request, "Lead Deleted")
+        return redirect('agent:leads')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
-
-
-
-
-
-
-
-
-
 
 
 
@@ -876,7 +898,7 @@ def job_detail(request, job_id):
 
 
 
-def delete_agent(request, agent_uuid):
+def delete_agent(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -885,7 +907,7 @@ def delete_agent(request, agent_uuid):
         return redirect('landing')
     
     try:
-        agent_data=AgentInformation.objects.get(agent_uuid=agent_uuid)
+        agent_data=AgentInformation.objects.get(user_id=request.user.id)
         if agent_data.user_id != request.user.id:
             messages.warning(request, 'Unauthorized Access')
             return redirect('landing')
@@ -907,19 +929,13 @@ def delete_agent(request, agent_uuid):
         except:
             messages.error(request, 'An error Occured.....')
             return redirect('landing')
-        messages.success(request, 'User Deleted Successfully')
+        messages.success(request, 'If you encoutered any inconvinence please let us know')
         return redirect('landing')
     except ObjectDoesNotExist:
-        messages.error(request, 'Tell Us the error')
-        return render(request, 'estate/error_page.html', {'e':'Object Doesnt Exist'})
+        return render(request, 'estate/error_page.html', {'e':'Agent Doesnt Exist'})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
-
-
-
-
-
 
 
 
@@ -951,8 +967,7 @@ def join_via_invite(request):
             request,
             'Please complete your agent profile first before joining a company.'
         )
-        return redirect('agent:setup-profile')
-
+        return redirect('agent:agent-form')
     try:
         invite_link = InviteLink.objects.get(invite_token=token)
     except ObjectDoesNotExist:
@@ -1020,4 +1035,3 @@ def join_via_invite(request):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
-

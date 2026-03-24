@@ -5,7 +5,6 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.db import transaction
 from companies.models import CompanyInformation, CompanyActivityLog
 from . import news_scrape as ns
-from admin_panel.views import admin
 from agents.models import AgentInformation
 from estate.models import LeadInfo
 from django.core.exceptions import ObjectDoesNotExist
