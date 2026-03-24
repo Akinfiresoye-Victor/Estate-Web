@@ -46,6 +46,10 @@ def calculate_profile_strength(has_logo, has_agent, is_verified):
 
 
 def dashboard(request):
+    """
+    HomePage for companies
+    """
+    
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to access page')
         return redirect('landing')
@@ -57,7 +61,9 @@ def dashboard(request):
     try:
         company      = CompanyInformation.objects.get(user_id=request.user.id)
         social_links = company.social.all()
-
+        if company.user_id != request.user.id:
+            messages.error(request, 'Error Redirecting To Dashboard....')
+            return redirect('landing')
         analytics, _ = CompanyAnalytics.objects.get_or_create(
             company=company,
             defaults={
@@ -74,32 +80,25 @@ def dashboard(request):
             }
         )
 
-        # ── 30-day window start ──────────────────────────────────────────────
-        # Set by the cron job (reset_analytics command) every 30 days.
-        # All date-filtered queries below use this as their starting point.
-        # The view never moves this date — only the cron does.
+        #shwing data based on the last 30 days
         window_start = analytics.last_reset_date
 
-        # ── Property IDs — fetched once, reused for views and likes ─────────
+        #Properties ID 
         rent_ids = set(PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).values_list('pk', flat=True))
         sale_ids = set(PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).values_list('pk', flat=True))
 
-        # ── Property views ───────────────────────────────────────────────────
-        # PropertyViews is wiped by the cron on reset so no date filter needed —
-        # whatever is in the table already belongs to the current window.
+        # ── Property views based on the last 30 days
         lease_views = PropertyViews.objects.filter(property_type='Rent',property_id__in=rent_ids).count()
-
         sale_views = PropertyViews.objects.filter(property_type='Sale',property_id__in=sale_ids).count()
 
-        # ── Likes ────────────────────────────────────────────────────────────
-        #instead of looping through to get each i\objects we just get a particular row and do math on it
+        # ── Likes
         rent_likes = PropertyManagementRent.objects.filter(pk__in=rent_ids).aggregate(total=Sum('total_likes'))['total'] or 0
 
         sale_likes = PropertyManagementSale.objects.filter(pk__in=sale_ids).aggregate(total=Sum('total_likes'))['total'] or 0
 
         total_liked_prop = rent_likes + sale_likes
 
-        # ── Counts ───────────────────────────────────────────────────────────
+        # ── Counts
         total_prop     = len(rent_ids) + len(sale_ids)  # free — sets already in memory
         employee_count = Employees.objects.filter(company=company).count()
 
@@ -109,7 +108,6 @@ def dashboard(request):
             date_created__gte=window_start
         ).count()
 
-        # ── Rating ───────────────────────────────────────────────────────────
         # All-time rating — users expect to see full history, not just this month
         rating_data = CompanyRating.objects.filter(
             company_uuid=company.unique_company_id
@@ -119,14 +117,11 @@ def dashboard(request):
         total_reviews  = rating_data['total_reviews']
         rating_score   = average_rating * total_reviews
 
-        # ── Update analytics — views only, no reset logic here ──────────────
-        # The cron job (reset_analytics) handles all resets.
-        # This view only updates the running view counters and saves once.
         analytics.property_views_l = lease_views
         analytics.property_views_s = sale_views
 
         avg_property_view = analytics.average_lease_views + analytics.average_sale_views
-
+        #Calculating ranking based on specific analytics
         eng_rate              = engagement_rate(
             total_liked_prop,
             avg_property_view,
@@ -136,9 +131,10 @@ def dashboard(request):
         analytics.competition = eng_rate
         analytics.save()
 
-        # ── Competition loop — bulk queries, zero per-company DB hits ────────
+        # Getting other companies scores to make ranking efficient
         all_analytics = CompanyAnalytics.objects.select_related('company').all()
 
+        #calculating saved properties count of each and every company:The company UUID is the key and the total is the value
         rent_likes_by_company = {
             item['company_uuid']: item['total']
             for item in PropertyManagementRent.objects.values('company_uuid')
@@ -158,21 +154,15 @@ def dashboard(request):
             .annotate(avg_rating=Avg('rating'), total_reviews=Count('id'))
         }
 
+        #final calculation of all companies analytics
         total_eng = []
-#TODO Understand Code
         for comp_analytics in all_analytics:
             uid = comp_analytics.company.unique_company_id
 
-            comp_total_likes = (
-                (rent_likes_by_company.get(uid) or 0) +
-                (sale_likes_by_company.get(uid) or 0)
-            )
+            comp_total_likes = ((rent_likes_by_company.get(uid) or 0) +(sale_likes_by_company.get(uid) or 0))
             comp_rating       = ratings_by_company.get(uid, {'avg': 0.0, 'count': 0})
             comp_rating_score = comp_rating['avg'] * comp_rating['count']
-            comp_avg_prop_views = (
-                comp_analytics.average_sale_views +
-                comp_analytics.average_lease_views
-            )
+            comp_avg_prop_views = (comp_analytics.average_sale_views +comp_analytics.average_lease_views)
             comp_eng_rate = engagement_rate(
                 comp_total_likes,
                 comp_avg_prop_views,
@@ -181,7 +171,7 @@ def dashboard(request):
             )
             total_eng.append(comp_eng_rate)
 
-        # ── Market position ──────────────────────────────────────────────────
+        # ── Market position
         total_eng_sum         = sum(total_eng)
         calculated_engagement = total_companies_engagement_calculator(
             total_eng_sum,
@@ -190,6 +180,7 @@ def dashboard(request):
             avg_property_view
         )
 
+        #ordering them based on their engagement scores
         if total_eng and len(total_eng) > 1:
             sorted_eng      = sorted(total_eng, reverse=True)
             companies_above = sum(1 for eng in sorted_eng if eng > analytics.competition)
@@ -211,12 +202,12 @@ def dashboard(request):
             top_performer   = "New Listing"
             market_position = 100
 
-        # ── Profile strength ─────────────────────────────────────────────────
+        #  Profile strength
         has_logo    = bool(company.company_logo)
         has_agent   = employee_count > 0
         is_verified = company.verified
 
-        # ── Recent activity — filtered to current 30-day window ─────────────
+        # ── Recent activity — filtered to current 30-day window
         recent_activities = CompanyActivityLog.objects.filter(
             company=company,
             timestamp__gte=window_start
@@ -281,7 +272,7 @@ def company_form(request):
                         return HttpResponseRedirect('?submitted=True')
                 CompanyActivityLog.objects.create(
                 company=CompanyInformation.objects.get(user_id=request.user.id),
-                action='Account created'
+                action='Joined Estate Web'
         )
         else:
             comp_form= CompanyForm()
@@ -289,18 +280,17 @@ def company_form(request):
             if 'submitted' in request.GET:
                 submitted=True
         return render(request, 'company/company_form.html', {
-                                                                'form': comp_form,
-                                                                'social': link_form,
-                                                                'submitted': submitted
+                                                            'form': comp_form,
+                                                            'social': link_form,
+                                                            'submitted': submitted
                     })
-        
         
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-def update_company_profile(request, company_id):
+def update_company_profile(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -308,33 +298,32 @@ def update_company_profile(request, company_id):
         messages.info(request, 'Company account only')
         return redirect('landing')
     try:
-        company_information=CompanyInformation.objects.get(unique_company_id=company_id)
-        if request.user.id == company_information.user_id:
-            if request.method == 'POST':
-                comp_form = CompanyForm(request.POST, request.FILES, instance=company_information)
-                link_form = SocialLinksFormset(request.POST, request.FILES, instance=company_information)
-                if comp_form.is_valid() and link_form.is_valid():
-                    with transaction.atomic():
-                        company = comp_form.save(commit=False)
-                        company.user_id = request.user.id
-                        company.save()
-                        link_form.save()
-                        messages.success(request, 'Profile Updated Successfully')
-                        return redirect('company:company-settings')
-            else:
-                comp_form = CompanyForm(instance=company_information)
-                link_form = SocialLinksFormset(instance=company_information)
-                CompanyActivityLog.objects.create(
-                    company=company_information,
-                    action='Company Details Updated'
-                )
-            return render(request, 'company/update_company_profile.html', {
-                'form':comp_form,
-                'social': link_form
-            })
-        else:
-            messages.warning(request, 'Access Denied')
+        company_information=CompanyInformation.objects.get(user_id=request.user.id)
+        if request.user.id != company_information.user_id:
+            messages.error(request, 'Unauthorized Access')
             return redirect('landing')
+        if request.method == 'POST':
+            comp_form = CompanyForm(request.POST, request.FILES, instance=company_information)
+            link_form = SocialLinksFormset(request.POST, request.FILES, instance=company_information)
+            if comp_form.is_valid() and link_form.is_valid():
+                with transaction.atomic():
+                    company = comp_form.save(commit=False)
+                    company.user_id = request.user.id
+                    company.save()
+                    link_form.save()
+                    messages.success(request, 'Profile Updated Successfully')
+                    return redirect('company:company-settings')
+        else:
+            comp_form = CompanyForm(instance=company_information)
+            link_form = SocialLinksFormset(instance=company_information)
+            CompanyActivityLog.objects.create(
+                company=company_information,
+                action='Company Details Updated'
+            )
+        return render(request, 'company/update_company_profile.html', {
+            'form':comp_form,
+            'social': link_form
+        })
     except ObjectDoesNotExist:
         messages.info(request, 'Company data missing')
         return redirect('landing')
@@ -356,7 +345,9 @@ def company_analytics(request):
         messages.info(request, 'Numbers might seem low since we just launched')
 
         company = CompanyInformation.objects.get(user_id=request.user.id)
-
+        if company.user_id != request.user.id:
+            messages.error(request, 'Unauthorized access')
+            return redirect('landing')
         analytics, _ = CompanyAnalytics.objects.get_or_create(
             company=company,
             defaults={
@@ -373,26 +364,14 @@ def company_analytics(request):
             }
         )
 
-        # ── 30-day window start ──────────────────────────────────────────────
-        # The cron job (reset_analytics command) moves this forward every 30 days.
-        # This view never touches last_reset_date — it only reads it.
-        # Every __gte filter below uses this as its starting point so all
-        # counts automatically reflect only the current 30-day window.
+        #30 days window for company analytics
         window_start = analytics.last_reset_date
 
-        # ── Property IDs — fetched once, reused below ────────────────────────
-        rent_ids = set(
-            PropertyManagementRent.objects.filter(
-                company_uuid=company.unique_company_id
-            ).values_list('pk', flat=True)
-        )
-        sale_ids = set(
-            PropertyManagementSale.objects.filter(
-                company_uuid=company.unique_company_id
-            ).values_list('pk', flat=True)
-        )
+        # ── Property IDs — fetched once, reused below
+        rent_ids = set(PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id).values_list('pk', flat=True))
+        sale_ids = set(PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id).values_list('pk', flat=True))
 
-        # ── Property views ───────────────────────────────────────────────────
+        # ── Property views
         # PropertyViews is wiped by the cron on reset so no date filter needed.
         # Everything in the table already belongs to the current window.
         lease_views = PropertyViews.objects.filter(
@@ -631,6 +610,9 @@ def company_settings(request):
     
     try:
         company=CompanyInformation.objects.get(user_id=request.user.id)
+        if company.user_id != request.user.id:
+            messages.error(request, 'Something happned on our end')
+            return redirect('landing')
         context={
             'company':company,
         }
@@ -651,7 +633,7 @@ def lead_management(request):
         if request.user.role != 'company':
             messages.error(request, 'Company account only')
             return redirect('landing')
-        company_uuid=CompanyInformation.objects.get(user_id=request.user.id).unique_company_id
+        company_uuid=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
         general_leads=LeadInfo.objects.filter(company_uuid=company_uuid)
         p=Paginator(general_leads.order_by('-date_created'), 10)
         page=request.GET.get('page')
@@ -701,10 +683,8 @@ def lead_detail(request, lead_id):
         return redirect('landing')
     try:
         company=CompanyInformation.objects.get(user_id=request.user.id)
-        data=LeadInfo.objects.get(lead_id=lead_id)
-        if data.company_uuid == company.unique_company_id:
-            client=data
-        else:
+        client=LeadInfo.objects.get(lead_id=lead_id)
+        if client.company_uuid != company.unique_company_id:
             messages.warning(request, 'Access Denied')
             return redirect('landing')
         try:
@@ -731,17 +711,16 @@ def delete_lead(request, lead_id):
     try:
         company= CompanyInformation.objects.get(user_id=request.user.id)
         lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
-        if company.unique_company_id == lead_to_delete.company_uuid:
-            lead_to_delete.delete()
-            messages.success(request, "Lead Deleted")
-            CompanyActivityLog.objects.create(
-                company=company,
-                action='Lead Deleted'
-            )
-            return redirect('company:lead-management')
-        else:
+        if company.unique_company_id != lead_to_delete.company_uuid:
             messages.error(request, "Access Denied")
             return redirect('landing')
+        lead_to_delete.delete()
+        messages.success(request, "Lead Deleted")
+        CompanyActivityLog.objects.create(
+            company=company,
+            action='Lead Deleted'
+        )
+        return redirect('company:lead-management')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -759,10 +738,8 @@ def update_lead_status(request, lead_id):
     try:
         try:
             company= CompanyInformation.objects.get(user_id= request.user.id)
-            lead_data=LeadInfo.objects.get(pk=lead_id)
-            if lead_data.company_uuid == company.unique_company_id:
-                lead=lead_data
-            else:
+            lead=LeadInfo.objects.get(pk=lead_id)
+            if lead.company_uuid != company.unique_company_id:
                 messages.error(request, 'Access Denied')
                 return redirect('landing')
             new_status= request.POST.get('new_status')
@@ -798,10 +775,8 @@ def update_lead_stage(request, lead_id):
     try:
         try:
             company= CompanyInformation.objects.get(user_id= request.user.id)
-            lead_data=LeadInfo.objects.get(pk=lead_id)
-            if lead_data.company_uuid == company.unique_company_id:
-                lead=lead_data
-            else:
+            lead=LeadInfo.objects.get(pk=lead_id)
+            if lead.company_uuid != company.unique_company_id:
                 messages.error(request, 'Access Denied')
                 return redirect('landing')
             new_stage = request.POST.get('new_stage')
@@ -841,7 +816,7 @@ def company_profile(request, company_uuid):
     else:
         base_template='estate/base.html'
     try:
-        company = get_object_or_404(CompanyInformation, unique_company_id=company_uuid)
+        company = CompanyInformation.objects.get(unique_company_id=company_uuid)
         
         # Count properties
         total_property_on_lease = PropertyManagementRent.objects.filter(company_uuid=company_uuid).count()
@@ -928,7 +903,12 @@ def company_profile(request, company_uuid):
         }
         
         return render(request, 'company/company_profile.html', context)
-        
+    except ObjectDoesNotExist:
+        messages.error(request, 'Company Not Found')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -942,7 +922,7 @@ def properties_by_company(request, company_uuid):
         messages.info(request, 'Customers Only')
         return redirect('landing')
     try:
-        company=CompanyInformation.objects.get(unique_company_id=company_uuid)
+        company=CompanyInformation.objects.filter(unique_company_id=company_uuid).values_list('user_id', flat=True).first()
         on_lease=PropertyManagementRent.objects.filter(company_uuid=company_uuid)
         on_sale=PropertyManagementSale.objects.filter(company_uuid=company_uuid)
         return render(request, 'company/company_properties.html', {
@@ -1055,7 +1035,7 @@ def manage_company(request):
 
 
 
-def delete_company(request, company_uuid):
+def delete_company(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -1064,7 +1044,7 @@ def delete_company(request, company_uuid):
         return redirect('landing')
     
     try:
-        company_data= CompanyInformation.objects.get(unique_company_id=company_uuid)
+        company_data= CompanyInformation.objects.get(user_id=request.user.id)
         if company_data.user_id != request.user.id:
             messages.warning(request, 'Unauthorized Access')
             return redirect('landing')
@@ -1089,7 +1069,7 @@ def delete_company(request, company_uuid):
         messages.success(request, 'User deleted successfully')
         return redirect('landing')
     except ObjectDoesNotExist:
-        messages.error(request, 'Tell Us the error')
+        messages.error(request, 'Company not found')
         return render(request, 'estate/error_page.html', {'e':'Object Does Not Exist'})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1281,6 +1261,9 @@ def onboard_agent(request, agent_uuid):
     try:
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
         company=CompanyInformation.objects.get(user_id=request.user.id)
+        if company.user_id != request.user.id:
+            messages.error(request, 'Action Denied')
+            return redirect('landing')
         try:
             #checking if employee is present
             Employees.objects.get(agent_uuid=agent_uuid)
@@ -1324,6 +1307,9 @@ def generate_invite_link(request):
 
     try:
         company = CompanyInformation.objects.get(user_id=request.user.id)
+        if company.user_id != request.user.id:
+            messages.warning(request, 'Action Denied')
+            return redirect('landing')
 
         if request.method == 'POST':
             form = InviteLinkForm(request.POST)
@@ -1383,7 +1369,7 @@ def revoke_invite_link(request, token):
         invite_link=InviteLink.objects.get(invite_token=token)
         company=CompanyInformation.objects.get(user_id=request.user.id)
         
-        if not invite_link.company==company:
+        if invite_link.company!=company:
             messages.error(request, 'RESTRICTED ACCESS')
             return redirect('landing')
         invite_link.is_active=False

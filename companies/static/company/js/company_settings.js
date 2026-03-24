@@ -326,7 +326,7 @@ function initializeDeleteModal() {
                 // Create form and submit
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = `/company/delete/company/${companyUuid}`;
+                form.action = `/company/delete/company`;
                 
                 // Try to get CSRF token from various sources
                 let csrfToken = null;

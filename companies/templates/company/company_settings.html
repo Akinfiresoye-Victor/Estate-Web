@@ -212,7 +212,7 @@
             <a href="{% url 'company:dashboard' %}" class="btn-cancel">
               <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
             </a>
-            <a href="{% url 'company:edit-profile' company.unique_company_id %}" class="btn-save">
+            <a href="{% url 'company:edit-profile'%}" class="btn-save">
               <i class="bi bi-pencil-square"></i> Update Profile
             </a>
           </div>
@@ -501,7 +501,6 @@
       <button
         class="btn-modal-delete"
         id="confirmDeleteBtn"
-        data-company-uuid="{{ company.unique_company_id }}"
         disabled
       >
         <i class="bi bi-trash"></i> Delete Company Forever

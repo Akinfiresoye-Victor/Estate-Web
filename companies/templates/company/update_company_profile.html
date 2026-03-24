@@ -1,216 +1,185 @@
-
 {% extends 'company/base.html' %}
-
 {% load static %}
 
+{% block title %}Update Company Profile — Estate Web{% endblock %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'company/css/company_form.css' %}">
+<link rel="stylesheet" href="{% static 'company/css/company_update_profile.css' %}">
 {% endblock %}
 
 {% block content %}
-<a href="{%url 'company:company-settings'%}" class="attractive-back-button">
-    &larr; Go back
-</a>
 
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
+<div class="company-update-wrapper">
+  <div class="company-update-inner">
 
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
+    <!-- Back Button -->
+    <a href="{% url 'company:company-settings' %}" class="page-back-btn">
+      <i class="bi bi-arrow-left"></i>
+      Back to Settings
+    </a>
 
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
-
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
-
-  <!-- Form Container -->
-  <div class="form-wrapper">
-    <div class="container">
-      
-      <!-- Page Header -->
-      <div class="page-header">
-        <div class="header-icon">
+    <!-- Page Heading -->
+    <div class="page-heading">
+      <div class="page-heading-inner">
+        <div class="page-heading-icon">
           <i class="bi bi-pencil-square"></i>
         </div>
-        <h1 class="page-title">Update Company Profile</h1>
-        <p class="page-subtitle">Keep your company information up to date to maintain trust with your clients</p>
-      </div>
-
-      <!-- Progress Steps -->
-      <div class="progress-steps">
-        <div class="step active">
-          <div class="step-number">1</div>
-          <div class="step-label">Company Info</div>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-label">Contact Details</div>
-        </div>
-        <div class="step-line"></div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-label">Social Links</div>
+        <div class="page-heading-text">
+          <h1>Update Company Profile</h1>
+          <p>Keep your information current to build trust with clients</p>
         </div>
       </div>
+    </div>
 
-      <!-- Main Form -->
-      <form method="post" enctype="multipart/form-data" class="company-form" id="companyForm">
-        {% csrf_token %}
-        
-        <!-- Company Information Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-building-fill"></i>
-            <h2>Company Information</h2>
-          </div>
-          
-          <div class="row g-4">
-            <div class="col-md-6">
+    <!-- Main Form -->
+    <form method="POST" enctype="multipart/form-data" id="companyUpdateForm" novalidate>
+      {% csrf_token %}
+
+      <!-- =============================================
+           SECTION 1 — COMPANY INFORMATION
+           ============================================= -->
+      <div class="form-section" data-section-index="0">
+        <button type="button"
+                class="section-toggle"
+                aria-expanded="true"
+                aria-controls="section-company-info">
+          <span class="section-icon"><i class="bi bi-building-fill"></i></span>
+          <span class="section-toggle-text">
+            <h3>Company Information</h3>
+            <p>Name, bio, service areas &amp; logo</p>
+          </span>
+          <span class="section-badge required">Required</span>
+          <i class="bi bi-chevron-down section-chevron"></i>
+        </button>
+
+        <div class="section-body open" id="section-company-info">
+          <div class="section-body-inner">
+            <div class="form-grid">
+
+              <!-- Company Name -->
               <div class="form-group">
-                <label for="{{ form.company_name.id_for_label }}" class="form-label">
+                <label for="{{ form.company_name.id_for_label }}">
                   {{ form.company_name.label }}
                 </label>
                 {{ form.company_name }}
                 {% if form.company_name.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.company_name.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.company_name.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-            <div class="col-md-6">
+              <!-- Year Established -->
               <div class="form-group">
-                <label for="{{ form.year_established.id_for_label }}" class="form-label">
+                <label for="{{ form.year_established.id_for_label }}">
                   {{ form.year_established.label }}
                 </label>
                 {{ form.year_established }}
                 {% if form.year_established.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.year_established.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.year_established.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-            <div class="col-12">
-              <div class="form-group">
-                <label for="{{ form.company_bio.id_for_label }}" class="form-label">
+              <!-- Company Bio -->
+              <div class="form-group full-width">
+                <label for="{{ form.company_bio.id_for_label }}">
                   {{ form.company_bio.label }}
                 </label>
                 {{ form.company_bio }}
                 {% if form.company_bio.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.company_bio.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.company_bio.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-
-            <div class="col-md-6">
+              <!-- Service Areas -->
               <div class="form-group">
-                <label for="{{ form.service_areas.id_for_label }}" class="form-label">
+                <label for="{{ form.service_areas.id_for_label }}">
                   {{ form.service_areas.label }}
                 </label>
                 {{ form.service_areas }}
                 {% if form.service_areas.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.service_areas.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.service_areas.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-            <div class="col-md-6">
+              <!-- Principal Broker -->
               <div class="form-group">
-                <label for="{{ form.principal_broker.id_for_label }}" class="form-label">
+                <label for="{{ form.principal_broker.id_for_label }}">
                   {{ form.principal_broker.label }}
                 </label>
                 {{ form.principal_broker }}
                 {% if form.principal_broker.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.principal_broker.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.principal_broker.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="{{ form.company_logo.id_for_label }}" class="form-label">
+              <!-- Company Logo -->
+              <div class="form-group full-width">
+                <label for="{{ form.company_logo.id_for_label }}">
                   {{ form.company_logo.label }}
                   <span class="optional-badge">Optional</span>
                 </label>
-                
-                <!-- Show current logo if exists -->
+
                 {% if form.instance.company_logo %}
-                  <div class="current-file-info mb-2">
-                    <div class="alert alert-info d-flex align-items-center">
-                      <i class="bi bi-image me-2"></i>
-                      <span>Current logo: <strong>{{ form.instance.company_logo.name|slice:"18:" }}</strong></span>
-                    </div>
-                    <img src="{{ form.instance.company_logo.url }}" alt="Current Logo" style="max-width: 150px; max-height: 150px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <div class="current-upload">
+                  <img src="{{ form.instance.company_logo.url }}" alt="Current company logo">
+                  <div class="current-upload-info">
+                    <strong>Current Logo</strong>
+                    <span>Upload a new file to replace</span>
                   </div>
+                </div>
                 {% endif %}
-                
+
                 <div class="file-upload-wrapper">
-                  <input type="file" 
-                         name="{{ form.company_logo.name }}" 
+                  <input type="file"
+                         name="{{ form.company_logo.name }}"
                          id="{{ form.company_logo.id_for_label }}"
                          class="file-input"
                          accept="image/*">
                   <label for="{{ form.company_logo.id_for_label }}" class="file-label">
-                    <i class="bi bi-cloud-upload me-2"></i>
-                    <span class="file-text">{% if form.instance.company_logo %}Change company logo{% else %}Choose company logo{% endif %}</span>
+                    <i class="bi bi-image"></i>
+                    <div class="file-label-text">
+                      <strong>{% if form.instance.company_logo %}Change company logo{% else %}Upload company logo{% endif %}</strong>
+                      <span>JPG, PNG — max 5MB</span>
+                    </div>
                   </label>
-                  <div class="file-preview" id="logoPreview"></div>
+                  <div class="file-name-display" id="name-company_logo">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span></span>
+                  </div>
                 </div>
                 {% if form.company_logo.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.company_logo.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.company_logo.errors.0 }}</span>
                 {% endif %}
               </div>
+
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Contact Information Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-telephone-fill"></i>
-            <h2>Contact Information</h2>
-          </div>
-          
-          <div class="row g-4">
-            <div class="col-md-6">
+      <!-- =============================================
+           SECTION 2 — CONTACT INFORMATION
+           ============================================= -->
+      <div class="form-section" data-section-index="1">
+        <button type="button"
+                class="section-toggle"
+                aria-expanded="false"
+                aria-controls="section-contact">
+          <span class="section-icon"><i class="bi bi-telephone-fill"></i></span>
+          <span class="section-toggle-text">
+            <h3>Contact Information</h3>
+            <p>Phone, email &amp; address</p>
+          </span>
+          <span class="section-badge required">Required</span>
+          <i class="bi bi-chevron-down section-chevron"></i>
+        </button>
+
+        <div class="section-body" id="section-contact">
+          <div class="section-body-inner">
+            <div class="form-grid">
+
+              <!-- Phone -->
               <div class="form-group">
-                <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                <label for="{{ form.phone_number.id_for_label }}">
                   {{ form.phone_number.label }}
                 </label>
                 <div class="input-with-icon">
@@ -218,16 +187,13 @@
                   {{ form.phone_number }}
                 </div>
                 {% if form.phone_number.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.phone_number.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.phone_number.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-            <div class="col-md-6">
+              <!-- Email -->
               <div class="form-group">
-                <label for="{{ form.email.id_for_label }}" class="form-label">
+                <label for="{{ form.email.id_for_label }}">
                   {{ form.email.label }}
                 </label>
                 <div class="input-with-icon">
@@ -235,16 +201,13 @@
                   {{ form.email }}
                 </div>
                 {% if form.email.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.email.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.email.errors.0 }}</span>
                 {% endif %}
               </div>
-            </div>
 
-            <div class="col-12">
-              <div class="form-group">
-                <label for="{{ form.address.id_for_label }}" class="form-label">
+              <!-- Address -->
+              <div class="form-group full-width">
+                <label for="{{ form.address.id_for_label }}">
                   {{ form.address.label }}
                 </label>
                 <div class="input-with-icon">
@@ -252,141 +215,309 @@
                   {{ form.address }}
                 </div>
                 {% if form.address.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.address.errors }}
-                  </div>
+                  <span class="invalid-feedback">{{ form.address.errors.0 }}</span>
                 {% endif %}
               </div>
+
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Legal Documentation Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-file-earmark-text-fill"></i>
-            <h2>Legal Documentation</h2>
-          </div>
-          
-          <div class="row g-4">
-            <div class="col-12">
-              <div class="form-group">
-                <label for="{{ form.legal_certificate.id_for_label }}" class="form-label">
-                  {{ form.legal_certificate.label }}
-                  <span class="optional-badge">Optional</span>
+      <!-- =============================================
+           SECTION 3 — LEGAL DOCUMENTATION
+           ============================================= -->
+      <div class="form-section" data-section-index="2">
+        <button type="button"
+                class="section-toggle"
+                aria-expanded="false"
+                aria-controls="section-legal">
+          <span class="section-icon"><i class="bi bi-file-earmark-text-fill"></i></span>
+          <span class="section-toggle-text">
+            <h3>Legal Documentation</h3>
+            <p>Registration certificate</p>
+          </span>
+          <span class="section-badge">Optional</span>
+          <i class="bi bi-chevron-down section-chevron"></i>
+        </button>
+
+        <div class="section-body" id="section-legal">
+          <div class="section-body-inner">
+
+            <div class="form-group">
+              <label for="{{ form.legal_certificate.id_for_label }}">
+                {{ form.legal_certificate.label }}
+                <span class="optional-badge">Optional</span>
+              </label>
+
+              {% if form.instance.legal_certificate %}
+              <div class="current-upload">
+                <div class="current-upload-icon">
+                  <i class="bi bi-file-earmark-check"></i>
+                </div>
+                <div class="current-upload-info">
+                  <strong>Certificate Uploaded</strong>
+                  <span>Upload a new file to replace</span>
+                </div>
+                <div class="current-upload-actions">
+                  <a href="{{ form.instance.legal_certificate.url }}"
+                     target="_blank"
+                     class="btn-view-file">
+                    <i class="bi bi-download"></i> View
+                  </a>
+                </div>
+              </div>
+              {% endif %}
+
+              <div class="file-upload-wrapper">
+                <input type="file"
+                       name="{{ form.legal_certificate.name }}"
+                       id="{{ form.legal_certificate.id_for_label }}"
+                       class="file-input"
+                       accept=".pdf,.doc,.docx,image/*">
+                <label for="{{ form.legal_certificate.id_for_label }}" class="file-label">
+                  <i class="bi bi-file-earmark-arrow-up"></i>
+                  <div class="file-label-text">
+                    <strong>{% if form.instance.legal_certificate %}Replace certificate{% else %}Upload legal certificate{% endif %}</strong>
+                    <span>PDF, JPG, PNG accepted</span>
+                  </div>
                 </label>
-                
-                <!-- Debug: Check if file exists -->
-                <p>Debug: {{ form.instance.legal_certificate }}</p>
-                <p>Has file: {{ form.instance.legal_certificate|yesno:"YES,NO" }}</p>
-
-                {% if form.instance.legal_certificate %}
-                  <div class="current-file-info mb-2">
-                    <div class="alert alert-success d-flex align-items-center" data-permanent="true">
-                      <i class="bi bi-file-earmark-check me-2"></i>
-                      <span>Current certificate: <strong>{{ form.instance.legal_certificate.name|slice:"18:" }}</strong></span>
-                      <a href="{{ form.instance.legal_certificate.url }}" target="_blank" class="ms-auto btn btn-sm btn-outline-primary">
-                        <i class="bi bi-download me-1"></i>View/Download
-                      </a>
-                    </div>
-                  </div>
-                {% else %}
-                  <p class="text-muted">No certificate uploaded yet</p>
-                {% endif %}
-                
-                <div class="file-upload-wrapper">
-                  <input type="file" 
-                         name="{{ form.legal_certificate.name }}" 
-                         id="{{ form.legal_certificate.id_for_label }}"
-                         class="file-input"
-                         accept=".pdf,.doc,.docx,image/*">
-                  <label for="{{ form.legal_certificate.id_for_label }}" class="file-label">
-                    <i class="bi bi-cloud-upload me-2"></i>
-                    <span class="file-text">{% if form.instance.legal_certificate %}Replace legal certificate{% else %}Upload legal certificate{% endif %} (PDF, JPG and PNG)</span>
-                  </label>
-                  <div class="file-preview" id="certPreview"></div>
+                <div class="file-name-display" id="name-legal_certificate">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span></span>
                 </div>
-                <small class="form-text">Upload your company's legal registration certificate for verification purposes</small>
-                {% if form.legal_certificate.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.legal_certificate.errors }}
+              </div>
+              <span class="form-hint">Upload your company's legal registration certificate for verification</span>
+              {% if form.legal_certificate.errors %}
+                <span class="invalid-feedback">{{ form.legal_certificate.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================================
+           SECTION 4 — SOCIAL LINKS
+           ============================================= -->
+      <div class="form-section" data-section-index="3">
+        <button type="button"
+                class="section-toggle"
+                aria-expanded="false"
+                aria-controls="section-social">
+          <span class="section-icon"><i class="bi bi-share-fill"></i></span>
+          <span class="section-toggle-text">
+            <h3>Social Links</h3>
+            <p>Company social media profiles</p>
+          </span>
+          <span class="section-badge">Optional</span>
+          <i class="bi bi-chevron-down section-chevron"></i>
+        </button>
+
+        <div class="section-body" id="section-social">
+          <div class="section-body-inner">
+
+            <div id="socialLinksContainer">
+              {{ social.management_form }}
+
+              <div class="social-forms">
+                {% for soc in social %}
+                  <div class="social-item">
+                    <div class="social-item-header">
+                      <h4>Link #<span class="social-number">{{ forloop.counter }}</span></h4>
+                      {% if not forloop.first %}
+                        <button type="button" class="btn-remove-social">
+                          <i class="bi bi-trash"></i> Remove
+                        </button>
+                      {% endif %}
+                    </div>
+                    <div class="form-grid">
+                      <div class="form-group">
+                        <label class="field-label">Platform</label>
+                        {{ soc.social_platform }}
+                        {% if soc.social_platform.errors %}
+                          <span class="invalid-feedback">{{ soc.social_platform.errors.0 }}</span>
+                        {% endif %}
+                      </div>
+                      <div class="form-group">
+                        <label class="field-label">Profile URL</label>
+                        {{ soc.link_to_social }}
+                        {% if soc.link_to_social.errors %}
+                          <span class="invalid-feedback">{{ soc.link_to_social.errors.0 }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    {{ soc.id }}
+                    {{ soc.DELETE }}
                   </div>
-                {% endif %}
+                {% endfor %}
               </div>
             </div>
+
+            <button type="button" class="btn-add-social" id="addSocialLink">
+              <i class="bi bi-plus-circle"></i>
+              Add Another Social Link
+            </button>
+
           </div>
         </div>
+      </div>
 
-        <!-- Social Links Section -->
-        <div class="form-section">
-          <div class="section-header">
-            <i class="bi bi-share-fill"></i>
-            <h2>Company Social Links</h2>
-          </div>
-          <p class="section-subtitle">Update your company's social media profiles (optional)</p>
-          
-          <div id="socialLinksContainer">
-            {{ social.management_form }}
-            
-            {% for form in social %}
-              <div class="social-link-item">
-                <div class="row g-3 align-items-end">
-                  <div class="col-md-5">
-                    <div class="form-group">
-                      <label class="form-label">Platform</label>
-                      {{ form.social_platform }}
-                      {% if form.social_platform.errors %}
-                        <div class="invalid-feedback d-block">
-                          {{ form.social_platform.errors }}
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label class="form-label">Profile URL</label>
-                      {{ form.link_to_social }}
-                      {% if form.link_to_social.errors %}
-                        <div class="invalid-feedback d-block">
-                          {{ form.link_to_social.errors }}
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
-                  <div class="col-md-1">
-                    <button type="button" class="btn-remove-social">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                    {{ form.DELETE }}
-                    {{ form.id }}
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-          
-          <button type="button" class="btn-add-social">
-            <i class="bi bi-plus-circle me-2"></i>Add Another Social Link
-          </button>
-        </div>
-
-        <!-- Form Actions -->
-        <div class="form-actions">
-          <a href="{% url 'company:dashboard' %}" class="btn-secondary">
-            <i class="bi bi-x-circle me-2"></i>Cancel
-          </a>
-          <button type="submit" class="btn-primary">
-            <i class="bi bi-save me-2"></i>Update Profile
-          </button>
-        </div>
-
-      </form>
-
-    </div>
+    </form>
   </div>
+</div>
+
+<!-- =============================================
+     STICKY BOTTOM ACTION BAR
+     ============================================= -->
+<div class="sticky-actions">
+  <div class="sticky-actions-inner">
+    <a href="{% url 'company:dashboard' %}" class="btn-cancel">
+      <i class="bi bi-x"></i> Cancel
+    </a>
+    <button type="submit" form="companyUpdateForm" class="btn-submit">
+      <i class="bi bi-check-lg"></i>
+      Save Changes
+    </button>
+  </div>
+</div>
+
+<!-- =============================================
+     JAVASCRIPT
+     ============================================= -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ==========================================
+  // 1. ACCORDION — mobile collapsible sections
+  // ==========================================
+  var toggles = document.querySelectorAll('.section-toggle');
+
+  toggles.forEach(function (toggle) {
+    toggle.addEventListener('click', function () {
+      var bodyId = this.getAttribute('aria-controls');
+      var body   = document.getElementById(bodyId);
+      var isOpen = this.getAttribute('aria-expanded') === 'true';
+
+      // On mobile: close all others first
+      if (window.innerWidth < 900) {
+        toggles.forEach(function (t) {
+          if (t !== toggle) {
+            t.setAttribute('aria-expanded', 'false');
+            var otherId = t.getAttribute('aria-controls');
+            var other   = document.getElementById(otherId);
+            if (other) other.classList.remove('open');
+          }
+        });
+      }
+
+      var willOpen = !isOpen;
+      this.setAttribute('aria-expanded', String(willOpen));
+      if (body) body.classList.toggle('open', willOpen);
+    });
+  });
 
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'company/js/company_form.js' %}"></script>
+  // ==========================================
+  // 2. FILE INPUT — show filename after pick
+  // ==========================================
+  document.querySelectorAll('.file-input').forEach(function (input) {
+    input.addEventListener('change', function () {
+      var file    = this.files[0];
+      var display = this.parentElement.querySelector('.file-name-display');
+      if (display) {
+        if (file) {
+          display.querySelector('span').textContent = file.name;
+          display.classList.add('visible');
+        } else {
+          display.classList.remove('visible');
+        }
+      }
+    });
+  });
 
-{%endblock%}
+
+  // ==========================================
+  // 3. SOCIAL LINKS FORMSET
+  // ==========================================
+  var socialContainer  = document.querySelector('#socialLinksContainer .social-forms');
+  var addSocialBtn     = document.getElementById('addSocialLink');
+  var totalFormsSocial = document.querySelector('#socialLinksContainer input[name$="-TOTAL_FORMS"]');
+
+  if (socialContainer && addSocialBtn && totalFormsSocial) {
+
+    // Add
+    addSocialBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var formCount     = socialContainer.querySelectorAll('.social-item').length;
+      var firstForm     = socialContainer.querySelector('.social-item');
+      if (!firstForm) return;
+
+      var newForm       = firstForm.cloneNode(true);
+      var formsetPrefix = totalFormsSocial.name.replace('-TOTAL_FORMS', '');
+
+      newForm.querySelectorAll('input, select, textarea').forEach(function (field) {
+        if (field.name) {
+          field.name = field.name.replace(formsetPrefix + '-0-', formsetPrefix + '-' + formCount + '-');
+          field.id   = field.id.replace(formsetPrefix + '-0-', formsetPrefix + '-' + formCount + '-');
+          if (field.type === 'checkbox') {
+            field.checked = false;
+          } else if (field.type === 'hidden' && field.name.includes('-id')) {
+            field.value = '';
+          } else if (field.type !== 'hidden') {
+            field.value = '';
+          }
+        }
+      });
+
+      var num = newForm.querySelector('.social-number');
+      if (num) num.textContent = formCount + 1;
+
+      // Ensure remove button exists
+      var removeBtn = newForm.querySelector('.btn-remove-social');
+      if (removeBtn) {
+        removeBtn.style.display = 'flex';
+      } else {
+        var header = newForm.querySelector('.social-item-header');
+        if (header) {
+          var newBtn = document.createElement('button');
+          newBtn.type = 'button';
+          newBtn.className = 'btn-remove-social';
+          newBtn.innerHTML = '<i class="bi bi-trash"></i> Remove';
+          header.appendChild(newBtn);
+        }
+      }
+
+      socialContainer.appendChild(newForm);
+      totalFormsSocial.value = parseInt(totalFormsSocial.value) + 1;
+    });
+
+    // Remove (delegated)
+    socialContainer.addEventListener('click', function (e) {
+      var btn = e.target.closest('.btn-remove-social');
+      if (!btn) return;
+      e.preventDefault();
+
+      var item           = btn.closest('.social-item');
+      var deleteCheckbox = item.querySelector('input[name$="-DELETE"]');
+
+      if (deleteCheckbox) {
+        deleteCheckbox.checked = true;
+        item.style.display = 'none';
+      } else {
+        item.remove();
+        totalFormsSocial.value = parseInt(totalFormsSocial.value) - 1;
+      }
+
+      // Renumber visible
+      socialContainer.querySelectorAll('.social-item:not([style*="display: none"])').forEach(function (it, i) {
+        var n = it.querySelector('.social-number');
+        if (n) n.textContent = i + 1;
+      });
+    });
+  }
+
+});
+</script>
+
+{% endblock %}
