@@ -331,7 +331,7 @@ def toggle_wishlist_rent(request, property_id):
     if not request.user.role == 'customer':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': 'forbidden'}, status=403)
-        messages.error(request, 'Customer Access Only')
+        messages.error(request, 'Only Customers can Save Properties')
         return redirect('landing')
  
     try:
@@ -459,7 +459,7 @@ def wishlist(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id}) 
 
 
-def update_profile(request, user_id):
+def update_profile(request):
     """
     Update User Profile View
     Only The User can edit his/her own profile
@@ -471,13 +471,9 @@ def update_profile(request, user_id):
         messages.error(request, 'Customers account only')
         return redirect('landing')
     try:
-        formatted_user_id= int(user_id)
         
-        if not formatted_user_id == request.user.id:
-            messages.warning(request, 'Access Denied')
-            return redirect('landing')
     
-        profile= User.objects.get(pk=user_id)
+        profile= User.objects.get(pk=request.user.id)
         if request.method == 'POST':
             
             form= UpdateUserForm(request.POST or None, request.FILES or None, instance=profile)
