@@ -27,3 +27,4 @@ class Migration(migrations.Migration):
             field=models.TextField(blank=True, help_text='Detailed description of the property (Max 3,000 characters).', max_length=3000, verbose_name='Description'),
         ),
     ]
+

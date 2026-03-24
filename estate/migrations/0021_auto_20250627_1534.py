@@ -46,3 +46,4 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(clean_price_data, reverse_code=migrations.RunPython.noop),
     ]
+

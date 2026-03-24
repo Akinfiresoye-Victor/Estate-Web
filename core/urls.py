@@ -30,3 +30,4 @@ urlpatterns = [
     path('faq', views.estate_web_guide, name='faq'),
     path('toggle_listing/<str:property_type>/<int:property_id>/', views.toggle_listing, name='toggle-listing'),
 ]
+

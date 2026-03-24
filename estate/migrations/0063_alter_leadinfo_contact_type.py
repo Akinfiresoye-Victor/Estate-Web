@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('Whatsapp', 'Whatsapp'), ('Email', 'Email'), ('Phone Call', 'Phone Call')], default='Whatsapp', verbose_name='Media to get in touch'),
         ),
     ]
+

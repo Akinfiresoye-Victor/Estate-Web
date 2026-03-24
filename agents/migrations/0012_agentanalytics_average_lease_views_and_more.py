@@ -63,3 +63,4 @@ class Migration(migrations.Migration):
             field=models.FloatField(blank=True, default=0.0, null=True, verbose_name='Agent Rating'),
         ),
     ]
+

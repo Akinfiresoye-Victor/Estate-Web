@@ -12,6 +12,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from core.utils import *
+from .models import ErrorLog
+import traceback
 
 
 # Create your views here.
@@ -59,9 +61,9 @@ def feedbacks(request):
             if 'submitted' in request.GET:
                 submitted = True
         return render(request, 'core/feedback.html', {'form': form, 'submitted': submitted, 'base_template':base_template})
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 '''New Multi-Channel Feedback System — receives AJAX POST from the feedback modal'''
@@ -116,8 +118,8 @@ def submit_feedback(request):
             messages.error(request, 'Error Redirecting')
             return redirect('landing')
 
-    except Exception as e:
-        print(f'[Feedback Error] {e}')
+    except Exception:
+        print('[Feedback Error]')
         messages.error(request, 'Something went wrong. Please try again.')
         return HttpResponse(status=500)
 '''Property Management'''
@@ -234,9 +236,9 @@ def sell_property(request):
         }
         return render(request, 'core/sell_property.html', context)
  
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
  
  
 # ─────────────────────────────────────────────────────────────────────────────
@@ -354,9 +356,9 @@ def lease_property(request):
         }
         return render(request, 'core/lease_property.html', context)
  
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})        
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})        
 
 
 def toggle_listing(request, property_id, property_type):
@@ -431,10 +433,9 @@ def articles(request):
                                                     'article':article,
                                                     "full_article":full_article,
                                                     'base_template':base_template})
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        e=f'News:{e}-- {ns.error}'
-        return render(request, 'estate/error_page.html',{'e': e} )
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -477,9 +478,9 @@ def update_property_rent(request, property_id):
         return render(request, 'core/update_property.html', {'property': property, 'form': prop_form, 'images': image_form, 'base_template':base_template})
         
         
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 #view to update listed property on rent
@@ -518,9 +519,9 @@ def update_property_sale(request, property_id):
             return redirect('listings')
         return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
         
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 #view to delete listings
@@ -562,11 +563,11 @@ def delete_property_on_lease(request, property_id):
                 action= 'Property Listing Deleted'
             )
             return redirect('listings')
-        except Exception as e:
+        except Exception:
             messages.error(request, 'An error occured.....')
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 #view to delete listings
 def delete_property_on_sale(request, property_id):
@@ -604,9 +605,9 @@ def delete_property_on_sale(request, property_id):
             action= 'Property Listing Deleted'
         )
         return redirect('listings')
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -691,9 +692,9 @@ def appointment_detail(request,appt_uuid):
         except ObjectDoesNotExist:
             return render(request, 'core/appointment_detail.html', {'appointment': appointment, 'base_template':base_template})
         
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 def add_schedule(request):
     if not request.user.is_authenticated:
@@ -762,9 +763,9 @@ def add_schedule(request):
         
         return render(request, 'core/add_schedule.html', context)
         
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def appointment(request):
@@ -793,9 +794,9 @@ def appointment(request):
             agent= AgentInformation.objects.get(user_id=request.user.id)
             total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
             return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':f'{agent.first_name} {agent.last_name}'})
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -812,9 +813,9 @@ def estate_blog(request):
         else:
             base_template='estate/base.html'
         return render(request, 'core/estate_blog.html', {'base_template': base_template})
-    except Exception as e:
-        messages.error(request, 'Tell us the Error')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def manage_listings(request):
@@ -871,8 +872,9 @@ def manage_listings(request):
             'live_limit': live_limit
         }
         return render(request, 'core/listings.html', context)
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def edit_appointment(request, appointment_uuid):
@@ -946,8 +948,8 @@ def edit_appointment(request, appointment_uuid):
                 messages.success(request, 'Appointment updated successfully!')
                 return redirect('view-schedule', lead_id=appointment_uuid)
                 
-            except Exception as e:
-                messages.error(request, f'Error updating appointment: {str(e)}')
+            except Exception:
+                messages.error(request, 'Error updating appointment')
         
         # Get appointment types for the dropdown
         appointment_types = dict(APPOINTMENT_TYPE)
@@ -964,8 +966,9 @@ def edit_appointment(request, appointment_uuid):
     except Appointments.DoesNotExist:
         messages.error(request, 'Appointment not found')
         return redirect('appointment')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -1001,8 +1004,9 @@ def view_client(request, appointment_uuid):
                 messages.warning(request, 'Access Denied')
                 return redirect('landing')
         return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_uuid})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def add_client(request, lead_uuid, appointment_uuid):
@@ -1040,8 +1044,9 @@ def add_client(request, lead_uuid, appointment_uuid):
         appointment_data.save()
         messages.success(request, 'Client Added')
         return redirect('view-schedule', raw_data.appointment_uuid)
-    except Exception as e:
-        return render(request, 'estate/error_page', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
     
 def delete_appointment(request, appointment_uuid):
     if not request.user.is_authenticated:
@@ -1085,8 +1090,9 @@ def delete_appointment(request, appointment_uuid):
         else:
             messages.error(request, 'Access Denied')
             return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def delete_client(request, appointment_uuid):
@@ -1133,8 +1139,9 @@ def delete_client(request, appointment_uuid):
         else:
             messages.error(request, 'Access Denied')
             return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -1147,3 +1154,4 @@ def partnership_terms(request):
 
 def estate_web_guide(request):
     return render(request, 'core/faq.html')
+

@@ -9,3 +9,4 @@ urlpatterns = [
     path('delete/<feedback_id>', views.delete_feedback, name='delete-feedback'),
     path('listed_prop/', views.all_properties, name='all-listings')
 ]
+

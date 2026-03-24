@@ -122,3 +122,4 @@ SocialLinksFormSet = inlineformset_factory(
         }),
     }
 )
+

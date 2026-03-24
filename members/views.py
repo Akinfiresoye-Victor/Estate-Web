@@ -38,7 +38,7 @@ def login_user(request):
                 return redirect('login')
         else:
             return render(request, 'registration/login.html', {})
-    except Exception as e:
+    except Exception:
         print(e)
 
 
@@ -79,7 +79,7 @@ def register_customer(request):
         else:
             form = CustomerSignUpForm()
             return render(request, 'registration/register_customer.html', {'form': form, 'role': 'Customer'})
-    except Exception as e:
+    except Exception:
         print(e)
 
 
@@ -108,7 +108,7 @@ def register_agent(request):
         else:
             form = AgentSignUpForm()
             return render(request, 'registration/register_agent.html', {'form': form, 'role': 'Agent'})
-    except Exception as e:
+    except Exception:
         print(e)
 
 
@@ -137,5 +137,6 @@ def register_company(request):
         else:
             form = CompanySignUpForm()
             return render(request, 'registration/register_company.html', {'form': form, 'role': 'Company'})
-    except Exception as e:
+    except Exception:
         print(e)
+

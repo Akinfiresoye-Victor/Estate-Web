@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('customer', 'Customer'), ('agent', 'Agent'), ('company', 'Company')], default='customer', max_length=10),
         ),
     ]
+

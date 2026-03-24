@@ -21,3 +21,4 @@ def validate_file(file):
     ]
     if hasattr(file, 'content_type') and file.content_type not in allowed_types:
         raise ValidationError('Unsupported file type. Only PDF, JPG, and PNG files are allowed.')
+

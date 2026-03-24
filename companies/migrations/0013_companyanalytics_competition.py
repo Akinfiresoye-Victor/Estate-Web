@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=0, verbose_name='competition'),
         ),
     ]
+

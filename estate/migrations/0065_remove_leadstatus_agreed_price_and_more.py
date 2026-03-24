@@ -62,3 +62,4 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('Apartment', 'Apartment'), ('Bungalow', 'Bungalow'), ('Block of flats', 'Block of Flats'), ('Bungalow Design', 'Bungalow Design'), ('Conclusion', 'Conclusion'), ('Detached bungalow', 'Detached Bungalow'), ('Detached duplex', 'Detached Duplex'), ('Duplex', 'Duplex'), ('Detached houses', 'Detached Houses'), ('Duplex Design', 'Duplex Design'), ('Detached', 'Detached'), ('Detached House', 'Detached House'), ('Massionette', 'Masionette'), ('Mansion', 'Mansion'), ('Penthouse', 'Penthouse'), ('Semi detached duplex', 'Semi Detached Duplex'), ('Semi detached bungalow', 'Semi Detached Bungalow'), ('Terraced bungalow', 'Terraced Bungalow'), ('Terraced duplex', 'Terraced Duplexes'), ('Townhouse', 'Townhouse'), ('Terraced houses', 'Terraced houses'), ('Traditional houses', 'Traditional Houses'), ('Terrace', 'Terrace')], default='Bungalow', max_length=30),
         ),
     ]
+

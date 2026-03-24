@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from .models import *
 from members.views import logout_user
-from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments, ErrorLog
 from estate.models import LeadInfo
 from members.models import User
 from django.utils import timezone
@@ -20,6 +20,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from agents.models import AgentInformation
 from django.urls import reverse
+import traceback
 
 
 
@@ -249,9 +250,9 @@ def dashboard(request):
         messages.warning(request, 'Set company profile')
         return redirect('company:company_form')
 
-    except Exception as e:
-        print(f"Error in company dashboard: {e}")
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 #form all companies must fill before they access the dashboard
@@ -297,8 +298,9 @@ def company_form(request):
                     })
         
         
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def update_company_profile(request, company_id):
@@ -339,8 +341,9 @@ def update_company_profile(request, company_id):
     except ObjectDoesNotExist:
         messages.info(request, 'Company data missing')
         return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def company_analytics(request):
@@ -611,9 +614,9 @@ def company_analytics(request):
         messages.error(request, "Company profile not found.")
         return redirect('landing')
 
-    except Exception as e:
-        print(f"Error in company_analytics: {e}")
-        return render(request, 'estate/error_page.html', {'e': str(e)})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 def documents(request):
     return render(request, 'company/documents.html', {})
 
@@ -638,8 +641,9 @@ def company_settings(request):
     except ObjectDoesNotExist:
         messages.error(request, 'Error Company Info Missing')
         return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def lead_management(request):
@@ -686,8 +690,9 @@ def lead_management(request):
                     'attempt':attempt_contact, 'cold_lead':cold_lead, 'warm_lead':warm_lead, 'hot_lead':hot_lead,
                     'qulified':qualified, 'unqualified':unqualified, 'nums': nums, 'new_stage':new_lead_stage.count()}
         return render(request, 'company/lead_management.html', context)
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def lead_detail(request, lead_id):
@@ -713,8 +718,9 @@ def lead_detail(request, lead_id):
         except ObjectDoesNotExist:
             property=None
         return render(request, 'company/lead_detail_page.html', {'lead':client, 'property':property})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -739,8 +745,9 @@ def delete_lead(request, lead_id):
         else:
             messages.error(request, "Access Denied")
             return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -777,8 +784,9 @@ def update_lead_status(request, lead_id):
         except ObjectDoesNotExist:
             messages.error(request, 'Lead Not found')
             return redirect('company:lead-management')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -815,8 +823,9 @@ def update_lead_stage(request, lead_id):
         except ObjectDoesNotExist:
             messages.error(request, 'Lead Not found')
             return redirect('company:lead-management')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -910,8 +919,9 @@ def company_profile(request, company_uuid):
         
         return render(request, 'company/company_profile.html', context)
         
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def properties_by_company(request, company_uuid):
@@ -930,8 +940,9 @@ def properties_by_company(request, company_uuid):
             'on_sale': on_sale,
             'company':company
         })
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -946,8 +957,9 @@ def find_talents(request):
     try:
         agents = AgentInformation.objects.all()
         return render(request, 'company/find_talents.html',{'agents':agents})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def manage_applications(request):
@@ -979,8 +991,9 @@ def manage_applications(request):
     except CompanyInformation.DoesNotExist:
         messages.error(request, 'Company Data missing')
         return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def manage_company(request):
@@ -1026,8 +1039,9 @@ def manage_company(request):
             'form': InviteLinkForm(),
             'invite_url': None,  # None by default, set to the URL string after generation
         })
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -1067,9 +1081,9 @@ def delete_company(request, company_uuid):
     except ObjectDoesNotExist:
         messages.error(request, 'Tell Us the error')
         return render(request, 'estate/error_page.html', {'e':'Object Does Not Exist'})
-    except Exception as e:
-        messages.error(request, 'Tell Us the error')
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def vacancy_form(request):
@@ -1119,9 +1133,9 @@ def vacancy_form(request):
         messages.error(request, 'Company Profile Not Found. Please complete your company profile first.')
         return redirect('landing')
         
-    except Exception as e:
-        messages.error(request, f'An error occurred: {str(e)}')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def update_vacancy(request, job_id):
@@ -1169,9 +1183,9 @@ def update_vacancy(request, job_id):
         messages.error(request, 'Job posting not found or you do not have permission to edit it.')
         return redirect('company:application-management')
         
-    except Exception as e:
-        messages.error(request, f'An error occurred: {str(e)}')
-        return render(request, 'estate/error_page.html', {'error': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def delete_vacancy(request, job_id):
@@ -1203,8 +1217,8 @@ def delete_vacancy(request, job_id):
         messages.error(request, 'Job posting not found or you do not have permission to delete it.')
         return redirect('company:application-management')
         
-    except Exception as e:
-        messages.error(request, f'An error occurred while deleting: {str(e)}')
+    except Exception:
+        messages.error(request, 'An error occurred while deleting job post')
         return redirect('company:application-management')
 
 
@@ -1239,8 +1253,8 @@ def toggle_job_status(request, job_id):
         messages.error(request, 'Job posting not found.')
         return redirect('company:application-management')
         
-    except Exception as e:
-        messages.error(request, f'An error occurred: {str(e)}')
+    except Exception:
+        messages.error(request, 'An error occurred:')
         return redirect('company:application-management')
 
 
@@ -1285,9 +1299,9 @@ def onboard_agent(request, agent_uuid):
             else:
                 messages.error(request, 'Error Redirecting')
                 return redirect('landing')
-    except Exception as e:
-        messages.error(request, 'An error Occured')
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def generate_invite_link(request):
@@ -1340,9 +1354,9 @@ def generate_invite_link(request):
 
         return render(request, 'estate/generate_invite.html', {'form': form})
 
-    except Exception as e:
-        # Log e server-side in production instead of exposing it to the template
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -1371,9 +1385,9 @@ def revoke_invite_link(request, token):
         
         messages.success(request, 'Invite Link Revoked')
         return redirect('company:manage-company')
-    except Exception as e:
-        messages.error(request,'An error occured')
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def remove_agent(request, agent_uuid):
@@ -1408,8 +1422,9 @@ def remove_agent(request, agent_uuid):
     except ObjectDoesNotExist:
         messages.error(request, 'Agent data not Found')
         return redirect('company:manage-company')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
     
 
 
@@ -1450,4 +1465,5 @@ def edit_employee(request, agent_uuid):
         'company':       company,
         'base_template': 'company/base.html',  # matches your extends pattern
     })
+
 

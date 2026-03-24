@@ -22,3 +22,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(blank=True, default=200, null=True, verbose_name='Usage Possibility'),
         ),
     ]
+

@@ -48,3 +48,4 @@ class Migration(migrations.Migration):
             name='Wishlist_for_sale',
         ),
     ]
+

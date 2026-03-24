@@ -326,3 +326,4 @@ class PartnershipForm(forms.ModelForm):
         if len(text) < 30:
             raise forms.ValidationError('Please give us a bit more detail — at least 30 characters.')
         return text
+

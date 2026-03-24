@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(verbose_name='Year Established'),
         ),
     ]
+

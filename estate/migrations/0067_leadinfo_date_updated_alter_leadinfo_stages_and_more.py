@@ -27,3 +27,4 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('Contacted', 'Contacted'), ('Not Contacted', 'Not Contacted'), ('Contact Attempt', 'Contact Attempt'), ('Cold Lead', 'Cold Lead'), ('Warm Lead', 'Warm Lead'), ('Hot Lead', 'Hot Lead'), ('Qualified', 'Qualified'), ('Unqualified', 'Unqualified')], default='Not Contacted', verbose_name='Lead Status'),
         ),
     ]
+

@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, default=None, null=True, verbose_name='Lead UUID'),
         ),
     ]
+

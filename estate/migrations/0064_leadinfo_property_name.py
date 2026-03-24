@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='Bungalow', verbose_name='Property Name'),
         ),
     ]
+

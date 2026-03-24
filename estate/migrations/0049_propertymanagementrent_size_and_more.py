@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(blank=True, default='300', verbose_name='size'),
         ),
     ]
+

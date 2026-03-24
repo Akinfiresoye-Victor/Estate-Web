@@ -25,3 +25,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='Akinfiresoye', max_length=50, verbose_name='Last Name'),
         ),
     ]
+

@@ -16,3 +16,4 @@ def get_images(prop):
                 image_list.append(related_image.more_images)
     
     return image_list
+

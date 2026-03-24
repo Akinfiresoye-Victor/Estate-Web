@@ -23,3 +23,4 @@ class Migration(migrations.Migration):
             field=models.FileField(blank=True, null=True, upload_to=companies.models.company_file_path, validators=[core.validators.validate_file], verbose_name='Certificate of Incoperation'),
         ),
     ]
+

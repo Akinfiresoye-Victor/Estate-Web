@@ -26,3 +26,4 @@ class Migration(migrations.Migration):
             new_name='average_sale_views',
         ),
     ]
+

@@ -31,7 +31,7 @@ try:
     #     req= Request(url,headers=headers)
     # html=urlopen(req)
     # bs=BeautifulSoup(html, 'lxml')
-except Exception as e:
-    print(e)
+except Exception:
     article_headline= 'hello'
+
 

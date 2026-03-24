@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(max_length=4, verbose_name='Year Established'),
         ),
     ]
+

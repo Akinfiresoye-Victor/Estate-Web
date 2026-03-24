@@ -17,3 +17,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default=uuid.UUID('6e66119e-8ba8-45f7-bcf2-371ed13fac41'), unique=True, verbose_name='UUID'),
         ),
     ]
+

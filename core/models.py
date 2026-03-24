@@ -248,4 +248,15 @@ class Partnership(models.Model):
     partnership_benefits = models.ManyToManyField(PartnershipGoal, blank=True)
     def __str__(self):
         return(f'{self.company_name}- {self.company_type}')
-    
+
+
+class ErrorLog(models.Model):
+    ref_id = models.CharField(max_length=8, unique=True, editable=False)
+    traceback = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.ref_id:
+            self.ref_id = str(uuid.uuid4())[:8].upper()
+        super().save(*args, **kwargs)
+

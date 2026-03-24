@@ -222,3 +222,4 @@ class CompanyAnnouncements(models.Model):
     company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='company_announcements')
     announcements=models.CharField('Announcemt', max_length=100, default=None, null=False, blank=False)
     time_created=models.DateTimeField(auto_now_add=True)
+

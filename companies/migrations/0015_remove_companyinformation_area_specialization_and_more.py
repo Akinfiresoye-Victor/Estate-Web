@@ -43,3 +43,4 @@ class Migration(migrations.Migration):
             field=models.EmailField(max_length=40, unique=True, verbose_name='Company Email'),
         ),
     ]
+

@@ -17,3 +17,4 @@ class Migration(migrations.Migration):
             field=models.DateField(default=datetime.datetime(2025, 9, 26, 13, 21, 54, 244340, tzinfo=datetime.timezone.utc)),
         ),
     ]
+

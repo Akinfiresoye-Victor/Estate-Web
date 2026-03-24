@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='Akinfiresoye', max_length=120, verbose_name='Listed By'),
         ),
     ]
+

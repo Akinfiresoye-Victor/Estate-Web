@@ -17,3 +17,4 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(default=datetime.datetime(2026, 3, 19, 23, 13, 41, 75931, tzinfo=datetime.timezone.utc), verbose_name='Date To expire'),
         ),
     ]
+

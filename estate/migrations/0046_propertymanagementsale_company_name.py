@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, default='No Compay Tied', verbose_name='Company'),
         ),
     ]
+

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'agent/base.html' %}
 {% load static %}
 
 {% block title %}Update Agent Profile - Estate Web{% endblock %}
@@ -9,32 +9,34 @@
 
 {% block content %}
 
-<!-- Messages Container -->
-<div class="messages-container">
+<!-- ============================================
+     TOAST ALERTS
+     ============================================ -->
+<div class="messages-container" aria-live="polite">
   {% if messages %}
     {% for message in messages %}
       {% if message.tags == 'error' or message.tags == 'danger' %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          {{ message }}
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ message }}</span>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% elif message.tags == 'warning' %}
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <i class="bi bi-exclamation-circle-fill me-2"></i>
-          {{ message }}
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>{{ message }}</span>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% elif message.tags == 'info' %}
         <div class="alert alert-info alert-dismissible fade show" role="alert">
-          <i class="bi bi-info-circle-fill me-2"></i>
-          {{ message }}
+          <i class="bi bi-info-circle-fill"></i>
+          <span>{{ message }}</span>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% else %}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <i class="bi bi-check-circle-fill me-2"></i>
-          {{ message }}
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ message }}</span>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       {% endif %}
@@ -42,571 +44,686 @@
   {% endif %}
 </div>
 
-<!-- Header Section -->
-<div class="update-header">
-  <div class="container">
-    <a href="{% url 'agent:settings' %}" class="back-link">
+<!-- ============================================
+     STICKY HEADER
+     ============================================ -->
+<header class="update-header">
+  <div class="header-inner">
+    <a href="{% url 'agent:settings' %}" class="back-link" aria-label="Back to settings">
       <i class="bi bi-arrow-left"></i>
-      Back to Settings
     </a>
-    <h1>Update Agent Profile</h1>
-    <p>Keep your agent information up to date</p>
+    <div class="header-text">
+      <h1>Update Profile</h1>
+      <p>Keep your agent information current</p>
+    </div>
+    <!-- Visual section progress — updated by JS -->
+    <div class="header-progress" aria-hidden="true">
+      <span class="progress-dot" data-section="0"></span>
+      <span class="progress-dot" data-section="1"></span>
+      <span class="progress-dot" data-section="2"></span>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================
+     MAIN FORM
+     ============================================ -->
+<div class="form-container">
+  <form method="POST" enctype="multipart/form-data" id="agentUpdateForm" novalidate>
+    {% csrf_token %}
+
+    <!-- ==========================================
+         SECTION 1 — BASIC INFORMATION
+         ========================================== -->
+    <div class="form-section" data-section-index="0">
+      <button type="button"
+              class="section-toggle"
+              aria-expanded="true"
+              aria-controls="section-basic">
+        <span class="section-icon">
+          <i class="bi bi-person-badge"></i>
+        </span>
+        <span class="section-toggle-text">
+          <h3>Basic Information</h3>
+          <p>Personal &amp; professional details</p>
+        </span>
+        <span class="section-badge" data-badge="0">Required</span>
+        <i class="bi bi-chevron-down section-chevron"></i>
+      </button>
+
+      <div class="section-body open" id="section-basic">
+        <div class="section-body-inner">
+
+          <div class="form-grid">
+
+            <!-- First Name -->
+            <div class="form-group">
+              <label for="{{ form.first_name.id_for_label }}">
+                {{ form.first_name.label }}
+                {% if form.first_name.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.first_name.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group">
+              <label for="{{ form.last_name.id_for_label }}">
+                {{ form.last_name.label }}
+                {% if form.last_name.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.last_name.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+              <label for="{{ form.phone_number.id_for_label }}">
+                {{ form.phone_number.label }}
+                {% if form.phone_number.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.phone_number }}
+              {% if form.phone_number.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.phone_number.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="{{ form.email.id_for_label }}">
+                {{ form.email.label }}
+                {% if form.email.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.email.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+              <label for="{{ form.location.id_for_label }}">
+                {{ form.location.label }}
+                {% if form.location.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.location }}
+              {% if form.location.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.location.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Language -->
+            <div class="form-group">
+              <label for="{{ form.language.id_for_label }}">
+                {{ form.language.label }}
+                {% if form.language.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.language }}
+              {% if form.language.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.language.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Work Type (full width) -->
+            <div class="form-group full-width">
+              <label for="{{ form.work_type.id_for_label }}">
+                {{ form.work_type.label }}
+                {% if form.work_type.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.work_type }}
+              {% if form.work_type.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.work_type.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Bio (full width) -->
+            <div class="form-group full-width">
+              <label for="{{ form.bio.id_for_label }}">
+                {{ form.bio.label }}
+                {% if form.bio.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              {{ form.bio }}
+              {% if form.bio.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.bio.errors.0 }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Profile Picture (full width) -->
+            {% if form.profile_picture %}
+            <div class="form-group full-width">
+              <label>Profile Picture</label>
+              <div class="file-upload-wrapper">
+                <input type="file"
+                       id="{{ form.profile_picture.id_for_label }}"
+                       name="{{ form.profile_picture.name }}"
+                       accept="image/*"
+                       class="file-input">
+                <label for="{{ form.profile_picture.id_for_label }}" class="file-label">
+                  <i class="bi bi-camera"></i>
+                  <div class="file-label-text">
+                    <strong>Choose profile picture</strong>
+                    <span>JPG, PNG — max 5MB</span>
+                  </div>
+                </label>
+                <div class="file-name-display" id="name-profile_picture">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span></span>
+                </div>
+              </div>
+              {% if form.profile_picture.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.profile_picture.errors.0 }}</span>
+              {% endif %}
+              {% if form.instance.profile_picture %}
+              <div class="current-upload">
+                <img src="{{ form.instance.profile_picture.url }}" alt="Current profile picture">
+                <div class="current-upload-info">
+                  <strong>Current photo</strong>
+                  <span>Upload a new file to replace</span>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Government ID (full width) -->
+            {% if form.government_id %}
+            <div class="form-group full-width">
+              <label>
+                {{ form.government_id.label }}
+                {% if form.government_id.field.required %}<span class="required">*</span>{% endif %}
+              </label>
+              <div class="file-upload-wrapper">
+                <input type="file"
+                       id="{{ form.government_id.id_for_label }}"
+                       name="{{ form.government_id.name }}"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       class="file-input">
+                <label for="{{ form.government_id.id_for_label }}" class="file-label">
+                  <i class="bi bi-file-earmark-text"></i>
+                  <div class="file-label-text">
+                    <strong>Upload Government ID</strong>
+                    <span>PDF, JPG, or PNG accepted</span>
+                  </div>
+                </label>
+                <div class="file-name-display" id="name-government_id">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span></span>
+                </div>
+              </div>
+              {% if form.government_id.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.government_id.errors.0 }}</span>
+              {% endif %}
+              {% if form.instance.government_id %}
+              <div class="current-upload">
+                <div class="current-upload-icon"><i class="bi bi-file-earmark-check"></i></div>
+                <div class="current-upload-info">
+                  <strong>Government ID uploaded</strong>
+                  <span>Upload a new file to replace</span>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Certificate (full width) -->
+            {% if form.certificate %}
+            <div class="form-group full-width">
+              <label>{{ form.certificate.label }}</label>
+              <div class="file-upload-wrapper">
+                <input type="file"
+                       id="{{ form.certificate.id_for_label }}"
+                       name="{{ form.certificate.name }}"
+                       accept=".pdf,.jpg,.jpeg,.png"
+                       class="file-input">
+                <label for="{{ form.certificate.id_for_label }}" class="file-label">
+                  <i class="bi bi-award"></i>
+                  <div class="file-label-text">
+                    <strong>Upload Certificate</strong>
+                    <span>PDF, JPG, or PNG accepted</span>
+                  </div>
+                </label>
+                <div class="file-name-display" id="name-certificate">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span></span>
+                </div>
+              </div>
+              {% if form.certificate.errors %}
+                <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.certificate.errors.0 }}</span>
+              {% endif %}
+              {% if form.instance.certificate %}
+              <div class="current-upload">
+                <div class="current-upload-icon"><i class="bi bi-award"></i></div>
+                <div class="current-upload-info">
+                  <strong>Certificate uploaded</strong>
+                  <span>Upload a new file to replace</span>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            {% endif %}
+
+          </div><!-- /.form-grid -->
+        </div><!-- /.section-body-inner -->
+      </div><!-- /.section-body -->
+    </div><!-- /.form-section -->
+
+
+    <!-- ==========================================
+         SECTION 2 — EXPERIENCE
+         ========================================== -->
+    {% if exp_form %}
+    <div class="form-section" data-section-index="1">
+      <button type="button"
+              class="section-toggle"
+              aria-expanded="false"
+              aria-controls="section-experience">
+        <span class="section-icon">
+          <i class="bi bi-briefcase"></i>
+        </span>
+        <span class="section-toggle-text">
+          <h3>Experience</h3>
+          <p>Work history &amp; roles</p>
+        </span>
+        <span class="section-badge" data-badge="1">Optional</span>
+        <i class="bi bi-chevron-down section-chevron"></i>
+      </button>
+
+      <div class="section-body" id="section-experience">
+        <div class="section-body-inner">
+
+          <div id="experienceSection">
+            {{ exp_form.management_form }}
+            <div class="experience-forms">
+              {% for exp in exp_form %}
+                <div class="sub-item experience-item">
+                  <div class="sub-item-header">
+                    <h4>Experience #<span class="exp-number">{{ forloop.counter }}</span></h4>
+                    {% if not forloop.first %}
+                      <button type="button" class="btn-remove btn-remove-exp">
+                        <i class="bi bi-trash"></i> Remove
+                      </button>
+                    {% endif %}
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="field-label">Company Name</label>
+                      {{ exp.company }}
+                    </div>
+                    <div class="form-group">
+                      <label class="field-label">Position / Title</label>
+                      {{ exp.title }}
+                    </div>
+                    <div class="form-group">
+                      <label class="field-label">Start Date</label>
+                      {{ exp.start_date }}
+                    </div>
+                    <div class="form-group">
+                      <label class="field-label">End Date</label>
+                      {{ exp.end_date }}
+                    </div>
+                  </div>
+                  {{ exp.id }}
+                  {{ exp.DELETE }}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button type="button" class="btn-add-more" id="addExperience">
+            <i class="bi bi-plus-circle"></i>
+            Add Another Experience
+          </button>
+
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
+    <!-- ==========================================
+         SECTION 3 — SOCIAL LINKS
+         ========================================== -->
+    {% if social_form %}
+    <div class="form-section" data-section-index="2">
+      <button type="button"
+              class="section-toggle"
+              aria-expanded="false"
+              aria-controls="section-social">
+        <span class="section-icon">
+          <i class="bi bi-share"></i>
+        </span>
+        <span class="section-toggle-text">
+          <h3>Social Links</h3>
+          <p>Professional online profiles</p>
+        </span>
+        <span class="section-badge" data-badge="2">Optional</span>
+        <i class="bi bi-chevron-down section-chevron"></i>
+      </button>
+
+      <div class="section-body" id="section-social">
+        <div class="section-body-inner">
+
+          <div id="socialSection">
+            {{ social_form.management_form }}
+            <div class="social-forms">
+              {% for soc in social_form %}
+                <div class="sub-item social-item">
+                  <div class="sub-item-header">
+                    <h4>Link #<span class="social-number">{{ forloop.counter }}</span></h4>
+                    {% if not forloop.first %}
+                      <button type="button" class="btn-remove btn-remove-social">
+                        <i class="bi bi-trash"></i> Remove
+                      </button>
+                    {% endif %}
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="field-label">Platform</label>
+                      {{ soc.social_platform }}
+                    </div>
+                    <div class="form-group">
+                      <label class="field-label">Profile URL</label>
+                      {{ soc.link_to_social }}
+                    </div>
+                  </div>
+                  {{ soc.id }}
+                  {{ soc.DELETE }}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button type="button" class="btn-add-more" id="addSocial">
+            <i class="bi bi-plus-circle"></i>
+            Add Another Social Link
+          </button>
+
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </form>
+</div><!-- /.form-container -->
+
+
+<!-- ============================================
+     STICKY BOTTOM ACTION BAR
+     Always accessible — no need to scroll.
+     ============================================ -->
+<div class="sticky-actions" role="region" aria-label="Form actions">
+  <div class="sticky-actions-inner">
+    <a href="{% url 'agent:settings' %}" class="btn-cancel">
+      <i class="bi bi-x"></i> Cancel
+    </a>
+    <button type="submit" form="agentUpdateForm" class="btn-submit">
+      <i class="bi bi-check-lg"></i>
+      Save Changes
+    </button>
   </div>
 </div>
 
-<!-- Main Form Container -->
-<div class="form-container">
-  <form method="POST" enctype="multipart/form-data" id="agentUpdateForm">
-    {% csrf_token %}
 
-    <!-- Basic Information Section -->
-    <div class="form-card">
-      <h3 class="section-title">
-        <i class="bi bi-person-badge"></i>
-        Basic Information
-      </h3>
-      <p class="section-description">Update your personal and professional details</p>
-
-      <div class="form-grid">
-        <div class="form-group full-width">
-          <label for="{{ form.first_name.id_for_label }}">
-            {{ form.first_name.label }}
-            {% if form.first_name.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.first_name }}
-          {% if form.first_name.errors %}
-            <span class="error-text">{{ form.first_name.errors }}</span>
-          {% endif %}
-        </div>
-      <div class="form-grid">
-        <div class="form-group full-width">
-          <label for="{{ form.last_name.id_for_label }}">
-            {{ form.last_name.label }}
-            {% if form.last_name.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.last_name }}
-          {% if form.last_name.errors %}
-            <span class="error-text">{{ form.last_name.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.phone_number.id_for_label }}">
-            {{ form.phone_number.label }}
-            {% if form.phone_number.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.phone_number }}
-          {% if form.phone_number.errors %}
-            <span class="error-text">{{ form.phone_number.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.email.id_for_label }}">
-            {{ form.email.label }}
-            {% if form.email.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.email }}
-          {% if form.email.errors %}
-            <span class="error-text">{{ form.email.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.location.id_for_label }}">
-            {{ form.location.label }}
-            {% if form.location.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.location }}
-          {% if form.location.errors %}
-            <span class="error-text">{{ form.location.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.language.id_for_label }}">
-            {{ form.language.label }}
-            {% if form.language.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.language }}
-          {% if form.language.errors %}
-            <span class="error-text">{{ form.language.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group full-width">
-          <label for="{{ form.work_type.id_for_label }}">
-            {{ form.work_type.label }}
-            {% if form.work_type.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.work_type }}
-          {% if form.work_type.errors %}
-            <span class="error-text">{{ form.work_type.errors }}</span>
-          {% endif %}
-        </div>
-
-        <div class="form-group full-width">
-          <label for="{{ form.bio.id_for_label }}">
-            {{ form.bio.label }}
-            {% if form.bio.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          {{ form.bio }}
-          {% if form.bio.errors %}
-            <span class="error-text">{{ form.bio.errors }}</span>
-          {% endif %}
-        </div>
-
-        <!-- Profile Picture Upload -->
-        {% if form.profile_picture %}
-        <div class="form-group full-width">
-          <label for="{{ form.profile_picture.id_for_label }}">
-            Profile Picture
-          </label>
-          <div class="file-upload-wrapper">
-            <input type="file" id="{{ form.profile_picture.id_for_label }}" 
-                   name="{{ form.profile_picture.name }}" 
-                   accept="image/*" class="file-input">
-            <label for="{{ form.profile_picture.id_for_label }}" class="file-label">
-              <i class="bi bi-camera"></i>
-              <span>Choose profile picture</span>
-            </label>
-            <span class="file-name"></span>
-          </div>
-          {% if form.profile_picture.errors %}
-            <span class="error-text">{{ form.profile_picture.errors }}</span>
-          {% endif %}
-          
-          {% if form.instance.profile_picture %}
-          <div class="current-image">
-            <img src="{{ form.instance.profile_picture.url }}" alt="Current Profile Picture">
-            <div class="current-image-info">
-              <strong>Current Profile Picture</strong>
-              <span>Upload a new file to replace</span>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-        {% endif %}
-
-        <!-- Government ID Upload -->
-        {% if form.government_id %}
-        <div class="form-group full-width">
-          <label for="{{ form.government_id.id_for_label }}">
-            {{ form.government_id.label }}
-            {% if form.government_id.field.required %}
-              <span class="required">*</span>
-            {% endif %}
-          </label>
-          <div class="file-upload-wrapper">
-            <input type="file" id="{{ form.government_id.id_for_label }}" 
-                   name="{{ form.government_id.name }}" 
-                   accept=".pdf,.jpg,.jpeg,.png" class="file-input">
-            <label for="{{ form.government_id.id_for_label }}" class="file-label">
-              <i class="bi bi-file-earmark-text"></i>
-              <span>Upload government ID (PDF, JPG, PNG)</span>
-            </label>
-            <span class="file-name"></span>
-          </div>
-          {% if form.government_id.errors %}
-            <span class="error-text">{{ form.government_id.errors }}</span>
-          {% endif %}
-          
-          {% if form.instance.government_id %}
-          <div class="current-image">
-            <i class="bi bi-file-earmark-check" style="font-size: 3rem; color: var(--success-color);"></i>
-            <div class="current-image-info">
-              <strong>Government ID Uploaded</strong>
-              <span>Upload a new file to replace</span>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-        {% endif %}
-
-        <!-- Certificate Upload -->
-        {% if form.certificate %}
-        <div class="form-group full-width">
-          <label for="{{ form.certificate.id_for_label }}">
-            {{ form.certificate.label }}
-          </label>
-          <div class="file-upload-wrapper">
-            <input type="file" id="{{ form.certificate.id_for_label }}" 
-                   name="{{ form.certificate.name }}" 
-                   accept=".pdf,.jpg,.jpeg,.png" class="file-input">
-            <label for="{{ form.certificate.id_for_label }}" class="file-label">
-              <i class="bi bi-award"></i>
-              <span>Upload certificate (PDF, JPG, PNG)</span>
-            </label>
-            <span class="file-name"></span>
-          </div>
-          {% if form.certificate.errors %}
-            <span class="error-text">{{ form.certificate.errors }}</span>
-          {% endif %}
-          
-          {% if form.instance.certificate %}
-          <div class="current-image">
-            <i class="bi bi-file-earmark-check" style="font-size: 3rem; color: var(--success-color);"></i>
-            <div class="current-image-info">
-              <strong>Certificate Uploaded</strong>
-              <span>Upload a new file to replace</span>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Experience Section -->
-    {% if exp_form %}
-    <div class="form-card">
-      <h3 class="section-title">
-        <i class="bi bi-briefcase"></i>
-        Professional Experience
-      </h3>
-      <p class="section-description">Add or update your work history and experience</p>
-
-      <div id="experienceSection">
-        {{ exp_form.management_form }}
-        <div class="experience-forms">
-          {% for form in exp_form %}
-            <div class="experience-item">
-              <div class="experience-header">
-                <h4>Experience #<span class="exp-number">{{ forloop.counter }}</span></h4>
-                {% if not forloop.first %}
-                  <button type="button" class="btn-remove-exp">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                {% endif %}
-              </div>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Company Name</label>
-                  {{ form.company }}
-                </div>
-                <div class="form-group">
-                  <label>Position/Title</label>
-                  {{ form.title }}
-                </div>
-                <div class="form-group">
-                  <label>Start Date</label>
-                  {{ form.start_date }}
-                </div>
-                <div class="form-group">
-                  <label>End Date</label>
-                  {{ form.end_date }}
-                </div>
-              </div>
-              {{ form.id }}
-              {{ form.DELETE }}
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <button type="button" class="btn-add-more" id="addExperience">
-        <i class="bi bi-plus-circle"></i>
-        Add Another Experience
-      </button>
-    </div>
-    {% endif %}
-
-    <!-- Social Links Section -->
-    {% if social_form %}
-    <div class="form-card">
-      <h3 class="section-title">
-        <i class="bi bi-share"></i>
-        Social Media Links
-      </h3>
-      <p class="section-description">Connect your professional social media profiles</p>
-
-      <div id="socialSection">
-        {{ social_form.management_form }}
-        <div class="social-forms">
-          {% for form in social_form %}
-            <div class="social-item">
-              <div class="social-header">
-                <h4>Social Link #<span class="social-number">{{ forloop.counter }}</span></h4>
-                {% if not forloop.first %}
-                  <button type="button" class="btn-remove-social">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                {% endif %}
-              </div>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Platform</label>
-                  {{ form.social_platform }}
-                </div>
-                <div class="form-group">
-                  <label>Profile URL</label>
-                  {{ form.link_to_social }}
-                </div>
-              </div>
-              {{ form.id }}
-              {{ form.DELETE }}
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <button type="button" class="btn-add-more" id="addSocial">
-        <i class="bi bi-plus-circle"></i>
-        Add Another Social Link
-      </button>
-    </div>
-    {% endif %}
-
-    <!-- Form Actions -->
-    <div class="form-actions">
-      <a href="{% url 'agent:settings' %}" class="btn-cancel">
-        <i class="bi bi-x-circle"></i>
-        Cancel
-      </a>
-      <button type="submit" class="btn-submit">
-        <i class="bi bi-check-circle"></i>
-        Save Changes
-      </button>
-    </div>
-
-  </form>
-</div>
-
-<!-- Inline JavaScript - Same pattern as working agent form -->
+<!-- ============================================
+     JAVASCRIPT
+     Accordion + Formset + File inputs + Alerts
+     ============================================ -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  
-  // ===================================
-  // AUTO-DISMISS ALERTS
-  // ===================================
-  const alerts = document.querySelectorAll('.alert');
-  alerts.forEach(function(alert) {
-    setTimeout(function() {
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ==========================================
+  // 1. AUTO-DISMISS ALERTS (5 seconds)
+  // ==========================================
+  document.querySelectorAll('.alert').forEach(function (alert) {
+    setTimeout(function () {
       alert.classList.remove('show');
-      setTimeout(function() {
-        alert.remove();
-      }, 500);
+      setTimeout(function () { alert.remove(); }, 400);
     }, 5000);
   });
 
-  // ===================================
-  // FILE INPUT DISPLAY
-  // ===================================
-  const fileInputs = document.querySelectorAll('.file-input');
-  fileInputs.forEach(input => {
-    input.addEventListener('change', function() {
-      const fileName = this.files[0]?.name || 'No file chosen';
-      const fileNameDisplay = this.parentElement.querySelector('.file-name');
-      if (fileNameDisplay) {
-        fileNameDisplay.textContent = fileName;
+
+  // ==========================================
+  // 2. ACCORDION — mobile collapsible sections
+  //    On desktop (≥900px) all sections stay
+  //    open and toggles are pointer-events:none
+  //    via CSS, so this JS only matters on mobile.
+  // ==========================================
+  var toggles = document.querySelectorAll('.section-toggle');
+
+  toggles.forEach(function (toggle) {
+    toggle.addEventListener('click', function () {
+      var bodyId = this.getAttribute('aria-controls');
+      var body   = document.getElementById(bodyId);
+      var isOpen = this.getAttribute('aria-expanded') === 'true';
+
+      // Close all other sections first (one open at a time on mobile)
+      if (window.innerWidth < 900) {
+        toggles.forEach(function (t) {
+          if (t !== toggle) {
+            t.setAttribute('aria-expanded', 'false');
+            var otherBodyId = t.getAttribute('aria-controls');
+            var otherBody   = document.getElementById(otherBodyId);
+            if (otherBody) otherBody.classList.remove('open');
+          }
+        });
+      }
+
+      // Toggle this section
+      var willOpen = !isOpen;
+      this.setAttribute('aria-expanded', String(willOpen));
+      if (body) {
+        body.classList.toggle('open', willOpen);
+      }
+
+      // Update progress dots
+      updateProgressDots();
+    });
+  });
+
+  function updateProgressDots() {
+    document.querySelectorAll('.progress-dot').forEach(function (dot) {
+      var idx    = parseInt(dot.dataset.section);
+      var toggle = document.querySelector('[data-section-index="' + idx + '"] .section-toggle');
+      if (!toggle) return;
+      var isOpen = toggle.getAttribute('aria-expanded') === 'true';
+      dot.classList.toggle('active', isOpen);
+    });
+  }
+
+  // Set initial dot state
+  updateProgressDots();
+
+
+  // ==========================================
+  // 3. FILE INPUT — show filename after pick
+  // ==========================================
+  document.querySelectorAll('.file-input').forEach(function (input) {
+    input.addEventListener('change', function () {
+      var file    = this.files[0];
+      // Find the sibling .file-name-display element
+      var display = this.parentElement.querySelector('.file-name-display');
+      if (display) {
+        if (file) {
+          display.querySelector('span').textContent = file.name;
+          display.classList.add('visible');
+        } else {
+          display.classList.remove('visible');
+        }
       }
     });
   });
 
-  // ===================================
-  // EXPERIENCE FORMSET - EXACT SAME PATTERN AS REGISTRATION
-  // ===================================
-  const experienceSection = document.getElementById('experienceSection');
-  const addExperienceBtn = document.getElementById('addExperience');
-  
-  if (experienceSection && addExperienceBtn) {
-    const experienceContainer = experienceSection.querySelector('.experience-forms');
-    const totalFormsExp = experienceSection.querySelector('input[name$="-TOTAL_FORMS"]');
-    
-    if (totalFormsExp && experienceContainer) {
-      // Add Experience
-      addExperienceBtn.addEventListener('click', function(e) {
+
+  // ==========================================
+  // 4. EXPERIENCE FORMSET
+  //    Exact same logic as before — untouched.
+  // ==========================================
+  var expSection    = document.getElementById('experienceSection');
+  var addExpBtn     = document.getElementById('addExperience');
+
+  if (expSection && addExpBtn) {
+    var expContainer  = expSection.querySelector('.experience-forms');
+    var totalFormsExp = expSection.querySelector('input[name$="-TOTAL_FORMS"]');
+
+    if (expContainer && totalFormsExp) {
+
+      // Add
+      addExpBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        
-        const formCount = experienceContainer.querySelectorAll('.experience-item').length;
-        const firstForm = experienceContainer.querySelector('.experience-item');
-        
+        var formCount = expContainer.querySelectorAll('.experience-item').length;
+        var firstForm = expContainer.querySelector('.experience-item');
         if (!firstForm) return;
-        
-        const newForm = firstForm.cloneNode(true);
-        const formsetPrefix = totalFormsExp.name.replace('-TOTAL_FORMS', '');
-        
-        // Update form fields
-        newForm.querySelectorAll('input, select, textarea').forEach(function(field) {
+
+        var newForm       = firstForm.cloneNode(true);
+        var formsetPrefix = totalFormsExp.name.replace('-TOTAL_FORMS', '');
+
+        newForm.querySelectorAll('input, select, textarea').forEach(function (field) {
           if (field.name) {
-            field.name = field.name.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
-            field.id = field.id.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
-            
-            // Clear values except for hidden fields (they'll be empty for new records)
+            field.name = field.name.replace(formsetPrefix + '-0-', formsetPrefix + '-' + formCount + '-');
+            field.id   = field.id.replace(formsetPrefix + '-0-', formsetPrefix + '-' + formCount + '-');
             if (field.type === 'checkbox') {
               field.checked = false;
             } else if (field.type === 'hidden' && field.name.includes('-id')) {
-              // Remove value from ID field for new records
               field.value = '';
             } else if (field.type !== 'hidden') {
               field.value = '';
             }
           }
         });
-        
-        // Update number
-        const expNumber = newForm.querySelector('.exp-number');
-        if (expNumber) {
-          expNumber.textContent = formCount + 1;
-        }
-        
-        // Show remove button
-        const removeBtn = newForm.querySelector('.btn-remove-exp');
+
+        var expNum = newForm.querySelector('.exp-number');
+        if (expNum) expNum.textContent = formCount + 1;
+
+        // Ensure remove button exists
+        var removeBtn = newForm.querySelector('.btn-remove-exp');
         if (removeBtn) {
           removeBtn.style.display = 'flex';
         } else {
-          const header = newForm.querySelector('.experience-header');
+          var header    = newForm.querySelector('.sub-item-header');
           if (header) {
-            const newRemoveBtn = document.createElement('button');
-            newRemoveBtn.type = 'button';
-            newRemoveBtn.className = 'btn-remove-exp';
-            newRemoveBtn.innerHTML = '<i class="bi bi-trash"></i>';
-            header.appendChild(newRemoveBtn);
+            var newBtn  = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.className = 'btn-remove btn-remove-exp';
+            newBtn.innerHTML = '<i class="bi bi-trash"></i> Remove';
+            header.appendChild(newBtn);
           }
         }
-        
-        experienceContainer.appendChild(newForm);
+
+        expContainer.appendChild(newForm);
         totalFormsExp.value = parseInt(totalFormsExp.value) + 1;
       });
-      
-      // Remove Experience
-      experienceContainer.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-remove-exp')) {
-          e.preventDefault();
-          
-          const experienceItem = e.target.closest('.experience-item');
-          const deleteCheckbox = experienceItem.querySelector('input[name$="-DELETE"]');
-          
-          if (deleteCheckbox) {
-            deleteCheckbox.checked = true;
-            experienceItem.style.display = 'none';
-          } else {
-            experienceItem.remove();
-            totalFormsExp.value = parseInt(totalFormsExp.value) - 1;
-          }
-          
-          // Update numbers
-          const visibleItems = experienceContainer.querySelectorAll('.experience-item:not([style*="display: none"])');
-          visibleItems.forEach(function(item, index) {
-            const numberSpan = item.querySelector('.exp-number');
-            if (numberSpan) {
-              numberSpan.textContent = index + 1;
-            }
-          });
+
+      // Remove (delegated)
+      expContainer.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-remove-exp');
+        if (!btn) return;
+        e.preventDefault();
+
+        var item          = btn.closest('.experience-item');
+        var deleteCheckbox = item.querySelector('input[name$="-DELETE"]');
+
+        if (deleteCheckbox) {
+          deleteCheckbox.checked = true;
+          item.style.display = 'none';
+        } else {
+          item.remove();
+          totalFormsExp.value = parseInt(totalFormsExp.value) - 1;
         }
+
+        // Renumber visible items
+        expContainer.querySelectorAll('.experience-item:not([style*="display: none"])').forEach(function (it, i) {
+          var n = it.querySelector('.exp-number');
+          if (n) n.textContent = i + 1;
+        });
       });
     }
   }
 
-  // ===================================
-  // SOCIAL FORMSET - EXACT SAME PATTERN AS REGISTRATION
-  // ===================================
-  const socialSection = document.getElementById('socialSection');
-  const addSocialBtn = document.getElementById('addSocial');
-  
+
+  // ==========================================
+  // 5. SOCIAL FORMSET
+  //    Exact same logic as before — untouched.
+  // ==========================================
+  var socialSection    = document.getElementById('socialSection');
+  var addSocialBtn     = document.getElementById('addSocial');
+
   if (socialSection && addSocialBtn) {
-    const socialContainer = socialSection.querySelector('.social-forms');
-    const totalFormsSocial = socialSection.querySelector('input[name$="-TOTAL_FORMS"]');
-    
-    if (totalFormsSocial && socialContainer) {
-      // Add Social
-      addSocialBtn.addEventListener('click', function(e) {
+    var socialContainer  = socialSection.querySelector('.social-forms');
+    var totalFormsSocial = socialSection.querySelector('input[name$="-TOTAL_FORMS"]');
+
+    if (socialContainer && totalFormsSocial) {
+
+      // Add
+      addSocialBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        
-        const formCount = socialContainer.querySelectorAll('.social-item').length;
-        const firstForm = socialContainer.querySelector('.social-item');
-        
+        var formCount = socialContainer.querySelectorAll('.social-item').length;
+        var firstForm = socialContainer.querySelector('.social-item');
         if (!firstForm) return;
-        
-        const newForm = firstForm.cloneNode(true);
-        const formsetPrefix = totalFormsSocial.name.replace('-TOTAL_FORMS', '');
-        
-        // Update form fields
-        newForm.querySelectorAll('input, select, textarea').forEach(function(field) {
+
+        var newForm       = firstForm.cloneNode(true);
+        var formsetPrefix = totalFormsSocial.name.replace('-TOTAL_FORMS', '');
+
+        newForm.querySelectorAll('input, select, textarea').forEach(function (field) {
           if (field.name) {
-            field.name = field.name.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
-            field.id = field.id.replace(`${formsetPrefix}-0-`, `${formsetPrefix}-${formCount}-`);
-            
-            // Clear values except for hidden fields (they'll be empty for new records)
+            field.name = field.name.replace(formsetPrefix + '-0-', formsetPrefix + '-' + formCount + '-');
+            field.id   = field.id.replace(formsetPrefix + '-0-', formsetPrefix + '-' + formCount + '-');
             if (field.type === 'checkbox') {
               field.checked = false;
             } else if (field.type === 'hidden' && field.name.includes('-id')) {
-              // Remove value from ID field for new records
               field.value = '';
             } else if (field.type !== 'hidden') {
               field.value = '';
             }
           }
         });
-        
-        // Update number
-        const socialNumber = newForm.querySelector('.social-number');
-        if (socialNumber) {
-          socialNumber.textContent = formCount + 1;
-        }
-        
-        // Show remove button
-        const removeBtn = newForm.querySelector('.btn-remove-social');
+
+        var socialNum = newForm.querySelector('.social-number');
+        if (socialNum) socialNum.textContent = formCount + 1;
+
+        var removeBtn = newForm.querySelector('.btn-remove-social');
         if (removeBtn) {
           removeBtn.style.display = 'flex';
         } else {
-          const header = newForm.querySelector('.social-header');
+          var header   = newForm.querySelector('.sub-item-header');
           if (header) {
-            const newRemoveBtn = document.createElement('button');
-            newRemoveBtn.type = 'button';
-            newRemoveBtn.className = 'btn-remove-social';
-            newRemoveBtn.innerHTML = '<i class="bi bi-trash"></i>';
-            header.appendChild(newRemoveBtn);
+            var newBtn = document.createElement('button');
+            newBtn.type = 'button';
+            newBtn.className = 'btn-remove btn-remove-social';
+            newBtn.innerHTML = '<i class="bi bi-trash"></i> Remove';
+            header.appendChild(newBtn);
           }
         }
-        
+
         socialContainer.appendChild(newForm);
         totalFormsSocial.value = parseInt(totalFormsSocial.value) + 1;
       });
-      
-      // Remove Social
-      socialContainer.addEventListener('click', function(e) {
-        if (e.target.closest('.btn-remove-social')) {
-          e.preventDefault();
-          
-          const socialItem = e.target.closest('.social-item');
-          const deleteCheckbox = socialItem.querySelector('input[name$="-DELETE"]');
-          
-          if (deleteCheckbox) {
-            deleteCheckbox.checked = true;
-            socialItem.style.display = 'none';
-          } else {
-            socialItem.remove();
-            totalFormsSocial.value = parseInt(totalFormsSocial.value) - 1;
-          }
-          
-          // Update numbers
-          const visibleItems = socialContainer.querySelectorAll('.social-item:not([style*="display: none"])');
-          visibleItems.forEach(function(item, index) {
-            const numberSpan = item.querySelector('.social-number');
-            if (numberSpan) {
-              numberSpan.textContent = index + 1;
-            }
-          });
+
+      // Remove (delegated)
+      socialContainer.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-remove-social');
+        if (!btn) return;
+        e.preventDefault();
+
+        var item           = btn.closest('.social-item');
+        var deleteCheckbox = item.querySelector('input[name$="-DELETE"]');
+
+        if (deleteCheckbox) {
+          deleteCheckbox.checked = true;
+          item.style.display = 'none';
+        } else {
+          item.remove();
+          totalFormsSocial.value = parseInt(totalFormsSocial.value) - 1;
         }
+
+        // Renumber
+        socialContainer.querySelectorAll('.social-item:not([style*="display: none"])').forEach(function (it, i) {
+          var n = it.querySelector('.social-number');
+          if (n) n.textContent = i + 1;
+        });
       });
     }
   }

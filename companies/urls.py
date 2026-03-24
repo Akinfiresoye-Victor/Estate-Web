@@ -29,3 +29,4 @@ urlpatterns = [
     path('remove_agent/<agent_uuid>', views.remove_agent, name='remove-agent'),
     path('employee/edit/<str:agent_uuid>', views.edit_employee, name='edit-employee')
 ]
+

@@ -14,3 +14,4 @@ class Migration(migrations.Migration):
             name='UserInformation',
         ),
     ]
+

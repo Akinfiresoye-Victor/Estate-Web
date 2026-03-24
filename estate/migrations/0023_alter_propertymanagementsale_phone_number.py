@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(max_length=12, verbose_name='Phone Number'),
         ),
     ]
+

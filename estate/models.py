@@ -24,3 +24,4 @@ class LeadInfo(models.Model):
     stages= models.CharField('Lead Stages', choices=LEAD_STAGES, default='New')
     tags=models.CharField('tags', default='None')
     lead_id = models.CharField('lead uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
+

@@ -61,3 +61,4 @@ class Migration(migrations.Migration):
             field=models.CharField(max_length=100, verbose_name='Nature of work'),
         ),
     ]
+

@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('X', 'X'), ('Linkdin', 'Linkdin'), ('Instagram', 'Instagram'), ('Company Website', 'Company Website'), ('Other', 'Other')], default='Instagram', max_length=20),
         ),
     ]
+

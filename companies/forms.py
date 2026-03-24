@@ -329,3 +329,4 @@ class EditEmployeeForm(forms.ModelForm):
         if len(name) < 2:
             raise forms.ValidationError('Name must be at least 2 characters.')
         return name
+

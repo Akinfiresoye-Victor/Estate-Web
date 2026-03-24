@@ -60,3 +60,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default=None, max_length=120, verbose_name='Short building tag'),
         ),
     ]
+

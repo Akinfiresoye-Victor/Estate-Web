@@ -26,3 +26,4 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, default='None', max_length=36, verbose_name='Company'),
         ),
     ]
+

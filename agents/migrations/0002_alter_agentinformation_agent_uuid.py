@@ -17,3 +17,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default=uuid.uuid4, max_length=36, unique=True, verbose_name='Agent uuid'),
         ),
     ]
+

@@ -20,3 +20,4 @@ class PropertySaleFilter(django_filters.FilterSet):
     class Meta:
         model=PropertyManagementSale
         fields=['property_category','state']
+

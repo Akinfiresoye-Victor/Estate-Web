@@ -64,3 +64,4 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(seed_data, reverse_code=unseed_data),
     ]
+

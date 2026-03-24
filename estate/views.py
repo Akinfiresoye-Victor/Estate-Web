@@ -19,7 +19,7 @@ from django.db.models import Avg, Count
 from django.core.exceptions import ObjectDoesNotExist
 from core.utils import refresh_activity_score
 from django.urls import reverse
-
+import traceback
 
 '''Algorithms Start👇'''
 
@@ -103,8 +103,9 @@ def buy_property(request):
         }
         return render(request, 'estate/buy_property.html', context)
  
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
  
  
 # ─── rent_property ────────────────────────────────────────────────────────────
@@ -139,8 +140,9 @@ def rent_property(request):
         }
         return render(request, 'estate/rent_property.html', context)
  
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
  
 
 # Add this import at the top of your views.py alongside the other scoring import:
@@ -204,8 +206,9 @@ def view_property_on_sale(request, property_id):
         messages.error(request, 'Property unavailable')
         return redirect(request.META.get('HTTP_REFERER', 'customer:buy-property'))
 
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def view_property_on_lease(request, property_id):
@@ -263,8 +266,9 @@ def view_property_on_lease(request, property_id):
         messages.error(request, 'Property unavailable')
         return redirect(request.META.get('HTTP_REFERER', 'customer:rent-property'))
 
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def user_profile(request):
@@ -279,8 +283,9 @@ def user_profile(request):
             messages.error(request, 'Different account different profile')
             return redirect('landing')
         return render(request, 'estate/user_profile.html', {'headline': ns.article_headline})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -301,9 +306,9 @@ def listed_properties(request):
             property1= PropertyManagementRent.objects.filter(user_id=model).order_by('-listed_date')
             property2= PropertyManagementSale.objects.filter(user_id=model).order_by('-listed_date')
             return render(request, 'estate/my_listings.html', {'property1':property1, 'property2':property2})
-    except Exception as e:
-        print(f'ERROR IS{e}')
-        return render(request, 'estate/error_page.html', {'e': e})'''
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})'''
 
 
 
@@ -358,10 +363,9 @@ def toggle_wishlist_rent(request, property_id):
  
         return redirect(request.META.get('HTTP_REFERER', 'customer:rent-property'))
  
-    except Exception as e:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': str(e)}, status=500)
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
  
  
 # ─── toggle_wishlist_buy ──────────────────────────────────────────────────────
@@ -412,10 +416,9 @@ def toggle_wishlist_buy(request, property_id):
  
         return redirect(request.META.get('HTTP_REFERER', 'customer:buy-property'))
  
-    except Exception as e:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': str(e)}, status=500)
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 def wishlist(request):
     if not request.user.is_authenticated:
@@ -451,8 +454,9 @@ def wishlist(request):
         }
         return render(request, 'estate/wishlist.html', context)
 
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e}) 
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id}) 
 
 
 def update_profile(request, user_id):
@@ -490,8 +494,9 @@ def update_profile(request, user_id):
         }
         return render(request, 'estate/update_profile.html',context)
     
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def change_password(request):
@@ -525,8 +530,9 @@ def change_password(request):
             form= PasswordChangeForm(request.user)
             return render(request, 'estate/change_passw.html', {'form': form, 'base_template':base_template})
         
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -547,8 +553,9 @@ def change_password_success(request):
             base_template='estate/base.html'
         return render(request, 'estate/succ_pass.html', {'base_template': base_template})
     
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -565,8 +572,9 @@ def profile_settings(request):
     try:
         return render(request, 'estate/settings.html')
     
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
     
 
 
@@ -593,13 +601,14 @@ def delete_account(request):
         try:
             wishlists.delete()
             user_id.delete()
-        except Exception as e:
+        except Exception:
             messages.error(request, 'There was an error, Try again later.....')
             return redirect('customer:user-profile')
         messages.success(request, 'Account deleted Successfully')
         return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -647,8 +656,9 @@ def review_company(request, company_uuid):
         
         return redirect('company:company-profile', company_uuid=company_uuid)
         
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def review_agent(request, agent_uuid):
@@ -696,8 +706,9 @@ def review_agent(request, agent_uuid):
         
         return redirect('agent:agent-profile', agent_uuid=agent_uuid)
         
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -773,7 +784,9 @@ def inquiry_form(request, property_type, property_id):
                 submitted=True
         
         return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted':submitted})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
-#todo make sure after a user ad something to wishlist it doesnt reload the page 
+
+

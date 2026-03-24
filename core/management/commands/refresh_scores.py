@@ -88,3 +88,4 @@ class Command(BaseCommand):
                 f'Done at {now.strftime("%Y-%m-%d %H:%M:%S")} UTC.'
             )
         )
+

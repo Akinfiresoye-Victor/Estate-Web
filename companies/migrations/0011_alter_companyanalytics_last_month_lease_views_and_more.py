@@ -26,3 +26,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=1, verbose_name='last month sale views'),
         ),
     ]
+

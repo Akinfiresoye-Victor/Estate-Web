@@ -47,3 +47,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='', max_length=20, verbose_name='Full/Part time'),
         ),
     ]
+

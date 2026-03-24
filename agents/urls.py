@@ -8,7 +8,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('form/',views.agent_form, name='agent-form'),
     path('profile/<agent_uuid>', views.agent_profile, name='agent-profile'),
-    path('profile/update/<agent_uuid>',views.update_agent_profile, name='update-agent' ),
+    path('profile_update',views.update_agent_profile, name='update-agent' ),
     path('lead/management', views.lead_management, name='leads'),
     path('analytics', views.analytics, name='analytics'),
     path('lead/detail/<lead_id>', views.lead_detail, name='lead-detail'),
@@ -21,3 +21,4 @@ urlpatterns = [
     path('delete/agent/<agent_uuid>', views.delete_agent, name='delete-agent'),
     path('invite/join/', views.join_via_invite, name='join_via_invite'),
 ]
+

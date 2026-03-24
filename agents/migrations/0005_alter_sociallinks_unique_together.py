@@ -15,3 +15,4 @@ class Migration(migrations.Migration):
             unique_together=set(),
         ),
     ]
+

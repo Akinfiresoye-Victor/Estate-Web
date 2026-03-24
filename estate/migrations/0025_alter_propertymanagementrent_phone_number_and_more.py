@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.CharField(verbose_name='Phone Number'),
         ),
     ]
+

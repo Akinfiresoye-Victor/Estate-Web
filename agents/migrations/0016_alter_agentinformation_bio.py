@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.TextField(max_length=1024, verbose_name='About You?'),
         ),
     ]
+

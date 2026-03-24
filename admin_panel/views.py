@@ -259,7 +259,7 @@ def all_properties(request):
                 return redirect('customers_url:landing')
                 
                 
-        except Exception as e:
+        except Exception:
             messages.error(f"an error occured {e}")
             return redirect('executive')
         
@@ -267,3 +267,4 @@ def all_properties(request):
         messages.warning(request, ('You need to be logged in to accesss this page'))
         return redirect('customers_url:landing')
     
+

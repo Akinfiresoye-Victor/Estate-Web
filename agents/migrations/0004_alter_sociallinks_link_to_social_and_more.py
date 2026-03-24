@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, choices=[('X', 'X'), ('linkedin', 'linkedin'), ('Instagram', 'Instagram'), ('Other', 'Other')], default='Instagram', max_length=20),
         ),
     ]
+

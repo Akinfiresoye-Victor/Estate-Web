@@ -127,3 +127,4 @@ class Migration(migrations.Migration):
             name='SalePropertyImage',
         ),
     ]
+

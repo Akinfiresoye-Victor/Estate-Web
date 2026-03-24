@@ -14,3 +14,4 @@ admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedbacks, 
                     AgentAnalytics, agent_session, CompanyRating,JobPost, CompanyActivityLog,Employees, InviteLink,
                     Partnership,PartnershipGoal
                     ])
+

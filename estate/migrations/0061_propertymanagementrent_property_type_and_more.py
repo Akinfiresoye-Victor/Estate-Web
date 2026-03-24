@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='Sale', verbose_name='property Type'),
         ),
     ]
+

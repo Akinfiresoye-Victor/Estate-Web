@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default=1, verbose_name='Price'),
         ),
     ]
+

@@ -12,3 +12,4 @@ urlpatterns = [
     
     path('company/register_user', views.register_company, name='register-company'),
 ]
+

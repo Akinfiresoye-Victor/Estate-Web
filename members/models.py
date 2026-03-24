@@ -14,3 +14,4 @@ class User(AbstractUser):
 
 
 # Set this in settings.py: AUTH_USER_MODEL = 'users.CustomUser'
+

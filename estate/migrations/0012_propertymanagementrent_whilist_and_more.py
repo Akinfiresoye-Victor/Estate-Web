@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False, verbose_name='Add to Whilist'),
         ),
     ]
+

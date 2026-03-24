@@ -21,3 +21,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='Not Added', max_length=30, verbose_name='Short building tag'),
         ),
     ]
+

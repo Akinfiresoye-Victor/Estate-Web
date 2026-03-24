@@ -1,25 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import AgentInformation, SessionId, AgentAnalytics, AgentRating
+from .models import AgentInformation, AgentAnalytics, AgentRating
 from django.contrib import messages
 from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
 from django.db import transaction
 from members.models import User
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments, ErrorLog
 from estate.models import LeadInfo
-from datetime import datetime
-from datetime import date
-from companies.views import property_views_count
+from datetime import datetime,date
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from .quotes import get_random_quote
 from django.db.models import Sum, Avg, Count
-from core.utils import monthly_change, engagement_rate, reset_button, total_agents_engagement_calculator
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
+from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator
 from companies.models import JobPost,CompanyInformation,InviteLink, CompanyActivityLog, Employees
 from django.urls import reverse
+import traceback
 
 
 # Create your views here.
@@ -35,18 +32,25 @@ def calculate_agent_profile_strength(has_picture, has_listing, has_phone):
 
 
 def dashboard(request):
+    """
+    Home Screen For Agents
+    """
+    
     if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
         return redirect('landing')
     if request.user.role != 'agent':
+        messages.warning(request, 'Agent\'s Account Only')
         return redirect('landing')
 
     try:
         agent_data = AgentInformation.objects.get(user_id=request.user.id)
-
-        # ── Name and greeting ─────────────────────────────────────────────────
+        
+        #Name and greeting
         agent_name = f"{agent_data.first_name} {agent_data.last_name}"
         first_name = agent_data.first_name
 
+        #Setting greeting automation
         raw_time     = timezone.localtime(timezone.now())
         current_hour = raw_time.hour
 
@@ -57,59 +61,41 @@ def dashboard(request):
         else:
             greeting = 'Good Evening'
 
-        quote = get_random_quote()
+        quote = get_random_quote() #Quotes
 
-        # ── Property IDs — fetched once, reused for counts ───────────────────
-        # Using .exists() and .count() on the same queryset hits DB twice.
-        # Fetching IDs once lets us do both with no extra queries.
-        rent_ids = set(
-            PropertyManagementRent.objects.filter(
-                agent_uuid=agent_data.agent_uuid
-            ).values_list('pk', flat=True)
-        )
-        sale_ids = set(
-            PropertyManagementSale.objects.filter(
-                agent_uuid=agent_data.agent_uuid
-            ).values_list('pk', flat=True)
-        )
+        
+        #fetching properties ID and the count of them in one place to Optimize Website Speed
+        rent_ids = set(PropertyManagementRent.objects.filter(agent_uuid=agent_data.agent_uuid).values_list('pk', flat=True))
+        sale_ids = set(PropertyManagementSale.objects.filter(agent_uuid=agent_data.agent_uuid).values_list('pk', flat=True))
         house_count = len(rent_ids) + len(sale_ids)
         has_listing = house_count > 0
 
-        # ── Leads ─────────────────────────────────────────────────────────────
-        # Fetch once, reuse for count, new_lead_count, and recent_inquiries.
-        # date_created is a DateField so compare with date() not datetime.
+
+        #fetching leads,leads count, leads entered in today
         leads         = LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
         lead_count    = leads.count()
         new_leads     = leads.filter(date_created=timezone.now().date())
         new_lead_count = new_leads.count()
 
-        # ── Appointments ──────────────────────────────────────────────────────
-        today_appointments = Appointments.objects.filter(
-            agent_uuid=agent_data.agent_uuid,
-            appointment=timezone.now().date()
-        )
+        #Appointments
+        today_appointments = Appointments.objects.filter(agent_uuid=agent_data.agent_uuid,appointment=timezone.now().date())
 
-        # ── Rating ────────────────────────────────────────────────────────────
-        rating_data = AgentRating.objects.filter(
-            agent_uuid=agent_data.agent_uuid
-        ).aggregate(avg_rating=Avg('rating'), total_reviews=Count('id'))
+        #Calculating the average reviews and the count of people who reviewd it also 
+        rating_data = AgentRating.objects.filter(agent_uuid=agent_data.agent_uuid).aggregate(avg_rating=Avg('rating'), total_reviews=Count('id'))
 
         average_rating = rating_data['avg_rating'] or 0.0
         total_reviews  = rating_data['total_reviews']
 
-        # ── Company name — only query if agent belongs to a company ──────────
-        # Avoids the query entirely for solo agents
+        #getting company name if agent is associated with the company
         company_name = None
         if agent_data.company_uuid:
             try:
-                company      = CompanyInformation.objects.get(
-                    unique_company_id=agent_data.company_uuid
-                )
+                company= CompanyInformation.objects.get(unique_company_id=agent_data.company_uuid)
                 company_name = company.company_name
             except CompanyInformation.DoesNotExist:
                 company_name = None
 
-        # ── Profile strength ──────────────────────────────────────────────────
+        #Profile strength 
         has_picture = bool(agent_data.profile_picture)
         has_phone   = bool(agent_data.phone_number)
 
@@ -141,32 +127,34 @@ def dashboard(request):
         })
 
     except AgentInformation.DoesNotExist:
-        messages.error(request, 'Set up your profile to access other pages')
+        messages.info(request, 'Set up your profile to access other pages')
         return redirect('agent:agent-form')
 
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
 
 def agent_form(request):
-    # Check authentication
+    """
+    Compulsory Form all agents must fill before they can access our tools
+    """
     if not request.user.is_authenticated:
         messages.info(request, 'You must be logged in to access this page')
         return redirect('landing')
-    
-    # Check if user is an agent
     if request.user.role != 'agent':
-        messages.error(request, 'Account must be an Agent account to access this page')
+        messages.error(request, 'Agent Account Only')
         return redirect('landing')
     
     try:
-        # Check if agent already has a profile
+        # Check if agent already has a profile & redirect to Dahboard
         if AgentInformation.objects.filter(user_id=request.user.id).exists():
-            messages.info(request, 'Form has been filled. Go into edit mode to edit details')
+            messages.info(request, 'Form has been filled. Go to settings to edit details')
             return redirect('agent:dashboard')
         
+        #to avoid submissin of form twice
         submitted = False
         
         if request.method == 'POST':
@@ -200,8 +188,6 @@ def agent_form(request):
                         agent.users = request.user
                         agent.first_name = request.user.first_name
                         agent.last_name  = request.user.last_name 
-                        # Handle universal_agent checkbox
-                        agent.universal_agent = request.POST.get('universal_agent') == 'on'
                         
                         agent.save()
                         
@@ -231,9 +217,9 @@ def agent_form(request):
                         messages.success(request, 'Profile created successfully!')
                         return HttpResponseRedirect(f"{request.path}?submitted=True")
                         
-                except Exception as e:
+                except Exception:
                     print(f"Error saving agent data")
-                    messages.error(request, f'Error saving data: {str(e)}')
+                    messages.error(request, 'Error saving data')
                     # Forms will be re-rendered with the POST data below
         
         else:
@@ -253,13 +239,12 @@ def agent_form(request):
             'submitted': submitted
         })
         
-    except Exception as e:
-        print(f"Unexpected error: {str(e)}")
-        messages.error(request, f'An error occurred: {str(e)}')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-def update_agent_profile(request, agent_uuid):
+def update_agent_profile(request):
     """
     Update agent profile with proper formset handling
     """
@@ -271,10 +256,9 @@ def update_agent_profile(request, agent_uuid):
     if request.user.role != 'agent':
         messages.error(request, 'Open an agent account to access this page')
         return redirect('landing')
-    
     try:
         # Get the agent information
-        agent_information = AgentInformation.objects.get(agent_uuid=agent_uuid)
+        agent_information = AgentInformation.objects.get(user_id=request.user.id)
         
         # Authorization check
         if request.user.id != agent_information.user_id:
@@ -314,9 +298,8 @@ def update_agent_profile(request, agent_uuid):
                         messages.success(request, 'Profile updated successfully!')
                         return redirect('agent:settings')
                         
-                except Exception as e:
-                    messages.error(request, f'Error saving profile: {str(e)}')
-                    print(f'Save error: {e}')
+                except Exception:
+                    messages.error(request, 'Error saving profile')
             else:
                 # Collect all errors for debugging
                 error_messages = []
@@ -353,9 +336,9 @@ def update_agent_profile(request, agent_uuid):
         messages.error(request, 'Agent profile not found')
         return redirect('agent:agent-settings')
     
-    except Exception as e:
-        print(f'Unexpected error: {e}')
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
         
 
     
@@ -370,6 +353,13 @@ def lead_management(request):
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
+        
+        #double checking to prevent loss of leads/clients
+        if agent.user_id != request.user.id:
+            messages.warning(request, 'Lead Belongs to another user')
+            return redirect('landing')
+        
+        #querying to get all the leads with their respective count
         leads=LeadInfo.objects.filter(agent_id=agent.agent_uuid)
         new_leads=leads.filter(date_created=date.today()).count()
         qualified_count=leads.filter(status='Qualified').count()
@@ -383,8 +373,9 @@ def lead_management(request):
             'qualified_count': qualified_count
         }
         return render(request, 'agent/agent_leads.html', context)
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -450,8 +441,9 @@ def agent_profile(request, agent_uuid):
         
         return render(request, 'agent/agent_profile.html', context)
         
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -704,9 +696,9 @@ def analytics(request):
         messages.error(request, 'Agent profile not found.')
         return redirect('landing')
 
-    except Exception as e:
-        print(f"Error in analytics view: {e}")
-        return render(request, 'estate/error_page.html', {'e': str(e)})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def lead_detail(request, lead_id):
@@ -724,8 +716,9 @@ def lead_detail(request, lead_id):
         else:
             property_intrested=PropertyManagementRent.objects.get(pk=lead.property_intrested)
         return render(request, 'agent/agent_lead_detail.html', {'lead':lead, 'property':property_intrested})
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 @require_POST
@@ -755,8 +748,9 @@ def agent_update_lead_status(request, lead_id):
         except ObjectDoesNotExist:
             messages.error(request, 'Lead Not found')
             return redirect('agent:leads')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 @require_POST
@@ -786,8 +780,9 @@ def agent_update_lead_stage(request, lead_id):
         except ObjectDoesNotExist:
             messages.error(request, 'Lead Not found')
             return redirect('agent:leads')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -807,8 +802,9 @@ def settings(request):
     except ObjectDoesNotExist:
         messages.error(request, 'Error Agent Info Missing')
         return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 def delete_lead(request, lead_id):
     if not request.user.is_authenticated:
@@ -827,8 +823,9 @@ def delete_lead(request, lead_id):
         else:
             messages.error(request, "Access Denied")
             return redirect('landing')
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -859,8 +856,9 @@ def job_listings(request):
         return render(request, 'agent/job_listings.html', {
             'jobs': zip(jobs, market_days)
         })
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 def job_detail(request, job_id):
@@ -872,9 +870,9 @@ def job_detail(request, job_id):
         return render(request, 'agent/job_detail.html', {'job':job})
     except ObjectDoesNotExist:
         messages.info(request, 'Error Job Data not found')
-    except Exception as e:
-        messages.error(request, 'Tell us the error')
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -914,9 +912,9 @@ def delete_agent(request, agent_uuid):
     except ObjectDoesNotExist:
         messages.error(request, 'Tell Us the error')
         return render(request, 'estate/error_page.html', {'e':'Object Doesnt Exist'})
-    except Exception as e:
-        messages.error(request, 'Tell us the error')
-        return render(request, 'estate/error_page.html', {'e':e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 
@@ -1019,5 +1017,7 @@ def join_via_invite(request):
         )
         return redirect('agent:dashboard')
 
-    except Exception as e:
-        return render(request, 'estate/error_page.html', {'e': e})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+

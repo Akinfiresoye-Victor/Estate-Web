@@ -16,3 +16,4 @@ class Migration(migrations.Migration):
             new_name='unique_company_id',
         ),
     ]
+

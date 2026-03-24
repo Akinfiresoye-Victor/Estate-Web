@@ -20,3 +20,4 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=1, verbose_name='Property ID Viewed'),
         ),
     ]
+

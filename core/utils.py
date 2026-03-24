@@ -537,3 +537,4 @@ def get_agent_company(agent):
         return CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
     except CompanyInformation.DoesNotExist:
         return None
+

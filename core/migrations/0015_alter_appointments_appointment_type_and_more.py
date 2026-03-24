@@ -26,3 +26,4 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, choices=[('Office Space', 'Office Space'), ('Co-Working Space', 'Co-Working Space'), ('Serviced Offices', 'Co-Working Space'), ('Corperate Buildings', 'Corperate Buildings'), ('Business Centers', 'Business Centers'), ('Shops', 'Shops'), ('Retail Spaces', 'Retail Spaces'), ('Shopping Complexes', 'Shopping Complexes'), ('Malls', 'Malls'), ('Showrooms', 'Showrooms'), ('Event Halls', 'Event Halls'), ('Conference Centers', 'Conference Centers'), ('Hotels', 'Hotels'), ('Guest Houses', 'Guest Houses')], default='Office Space', max_length=30),
         ),
     ]
+

@@ -17,3 +17,4 @@ class Migration(migrations.Migration):
             field=models.DateField(blank=True, default=django.utils.timezone.now, verbose_name='Date for viewing'),
         ),
     ]
+
