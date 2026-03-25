@@ -265,3 +265,8 @@ COMPANY_TIER=[
     ('enterprise', 'Enterprise') # unlimited
 ]
 
+PARTNERSHIP_STATUS=[
+    ('pending', 'Pending'),
+    ('success', 'Agree'),
+    ('denied', 'Deny')
+]

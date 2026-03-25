@@ -73,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'estate_web.urls'
@@ -179,8 +180,6 @@ if USE_CLOUDINARY:
         "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
     }
 
-
-
 else:
 
 # Local dev fallback (your existing media settings)
@@ -189,7 +188,6 @@ else:
 
 
 SESSION_COOKIE_HTTPONLY = True   # JS cannot read the cookie
-SESSION_COOKIE_SECURE   = True   # cookie only sent over HTTPS (Render uses HTTPS)
 SESSION_COOKIE_SAMESITE = 'Lax'  # blocks cross-site request cookie leaks
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 1209600     # 2 weeks in seconds
@@ -197,13 +195,28 @@ SESSION_COOKIE_AGE = 1209600     # 2 weeks in seconds
 # Clickjacking protection
 X_FRAME_OPTIONS = 'DENY'
 
-# HTTPS enforcement
-SECURE_SSL_REDIRECT          = True   # redirect all HTTP to HTTPS
-SECURE_HSTS_SECONDS          = 31536000  # tell browsers to always use HTTPS for 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD          = True
-SECURE_PROXY_SSL_HEADER      = ('HTTP_X_FORWARDED_PROTO', 'https')  # needed on Render
 
 # Cookie security
-CSRF_COOKIE_SECURE      = True
 CSRF_COOKIE_HTTPONLY    = True
+
+
+# --- SECURE SETTINGS ---
+if not DEBUG:
+    # Production Settings (Keep these for Render/VPS)
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000 
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+else:
+    # Local Development Settings
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+
+print('Debug Mode>', DEBUG)

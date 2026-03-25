@@ -36,6 +36,7 @@ class PropertyManagementSale(models.Model):
     total_likes=models.IntegerField('Wishlisted time', default=0, blank=False, null=False)
     listing_score=models.IntegerField('Listing Score', default=0, blank=False, null=False)
     featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False )
+    flagged=models.BooleanField('Flagged', default=False, blank=False, null=False)
 
 
 
@@ -69,6 +70,7 @@ class PropertyManagementRent(models.Model):
     total_likes=models.IntegerField('Wishlisted time', default=0, blank=False, null=False)
     listing_score=models.IntegerField('Listing Score', default=0, blank=False, null=False)
     featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False )
+    flagged=models.BooleanField('Flagged', default=False, blank=False, null=False)
 
 
 
@@ -246,6 +248,8 @@ class Partnership(models.Model):
     why_question = models.CharField('Why Partner with us', null=False, blank=False, max_length=200)
     property_types = models.ManyToManyField(PropertyFocus, blank=True)
     partnership_benefits = models.ManyToManyField(PartnershipGoal, blank=True)
+    status=models.CharField('Partnership Status', choices=PARTNERSHIP_STATUS, default='pending', null=False, blank=False)
+    created_at=models.DateTimeField(default=timezone.now)
     def __str__(self):
         return(f'{self.company_name}- {self.company_type}')
 

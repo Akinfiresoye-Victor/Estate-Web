@@ -1,0 +1,913 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Overview — Estate Web</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{% static 'admin_panel/css/admin_overview.css' %}">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     TOP NAV
+     ═══════════════════════════════════════════ -->
+<nav class="adm-topnav">
+  <div class="adm-topnav-left">
+    <button class="adm-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="adm-brand">
+      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web" height="28">
+      <span>Estate Web <strong>Admin</strong></span>
+    </div>
+  </div>
+  <div class="adm-topnav-right">
+    <div class="adm-notif-wrap">
+      <button class="adm-icon-btn" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        {% if pending_verifications > 0 %}
+          <span class="adm-notif-dot">{{ pending_verifications }}</span>
+        {% endif %}
+      </button>
+    </div>
+    <a href="{% url 'landing' %}" class="adm-icon-btn" title="View Site">
+      <i class="bi bi-box-arrow-up-right"></i>
+    </a>
+    <div class="adm-admin-pill">
+      <i class="bi bi-shield-fill-check"></i>
+      <span>{{ request.user.username }}</span>
+    </div>
+    <a href="{% url 'logout' %}" class="adm-icon-btn danger" title="Logout">
+      <i class="bi bi-box-arrow-right"></i>
+    </a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR
+     ═══════════════════════════════════════════ -->
+<div class="adm-sidebar" id="adminSidebar">
+  <div class="adm-sidebar-inner">
+
+    <div class="adm-nav-section">
+      <span class="adm-nav-label">Overview</span>
+      <a href="#" class="adm-nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-graph-up-arrow"></i> Analytics</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-file-earmark-bar-graph"></i> Reports</a>
+    </div>
+
+    <div class="adm-nav-section">
+      <span class="adm-nav-label">Users</span>
+      <a href="#" class="adm-nav-link">
+        <i class="bi bi-people-fill"></i> All Users
+        <span class="adm-nav-badge">{{ total_users }}</span>
+      </a>
+      <a href="#" class="adm-nav-link">
+        <i class="bi bi-person-fill"></i> Customers
+        <span class="adm-nav-badge">{{ total_customers }}</span>
+      </a>
+      <a href="#" class="adm-nav-link">
+        <i class="bi bi-award-fill"></i> Agents
+        <span class="adm-nav-badge">{{ total_agents }}</span>
+      </a>
+      <a href="#" class="adm-nav-link">
+        <i class="bi bi-building-fill"></i> Companies
+        <span class="adm-nav-badge">{{ total_companies }}</span>
+      </a>
+    </div>
+
+    <div class="adm-nav-section">
+      <span class="adm-nav-label">Verification</span>
+      <a href="#" class="adm-nav-link">
+        <i class="bi bi-patch-check-fill"></i> Verify Agents
+        {% if pending_agent_verifications > 0 %}
+          <span class="adm-nav-badge urgent">{{ pending_agent_verifications }}</span>
+        {% endif %}
+      </a>
+      <a href="#" class="adm-nav-link">
+        <i class="bi bi-building-check"></i> Verify Companies
+        {% if pending_company_verifications > 0 %}
+          <span class="adm-nav-badge urgent">{{ pending_company_verifications }}</span>
+        {% endif %}
+      </a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-card-checklist"></i> ID Documents</a>
+    </div>
+
+    <div class="adm-nav-section">
+      <span class="adm-nav-label">Properties</span>
+      <a href="#" class="adm-nav-link"><i class="bi bi-houses-fill"></i> All Listings</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-tag-fill"></i> For Sale</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-key-fill"></i> For Rent</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-flag-fill"></i> Flagged Listings</a>
+    </div>
+
+    <div class="adm-nav-section">
+      <span class="adm-nav-label">Business</span>
+      <a href="#" class="adm-nav-link"><i class="bi bi-handshake-fill"></i> Partnership Apps</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-briefcase-fill"></i> Job Listings</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-chat-dots-fill"></i> Inquiries</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-star-fill"></i> Reviews</a>
+    </div>
+
+    <div class="adm-nav-section">
+      <span class="adm-nav-label">Platform</span>
+      <a href="#" class="adm-nav-link"><i class="bi bi-megaphone-fill"></i> Announcements</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-newspaper"></i> Blog / Articles</a>
+      <a href="#" class="adm-nav-link"><i class="bi bi-gear-fill"></i> Settings</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="adm-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+
+<!-- ═══════════════════════════════════════════
+     MAIN CONTENT
+     ═══════════════════════════════════════════ -->
+<main class="adm-main" id="adminMain">
+<div class="adm-content">
+
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="adm-page-header">
+    <div>
+      <h1>Platform Overview</h1>
+      <p>Last updated: <span id="lastUpdated"></span> &nbsp;·&nbsp; {{ today|date:"l, F j, Y" }}</p>
+    </div>
+    <div class="adm-header-actions">
+      <button class="adm-btn secondary" onclick="window.location.reload()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+      <a href="#" class="adm-btn primary">
+        <i class="bi bi-file-earmark-arrow-down"></i> Export Report
+      </a>
+    </div>
+  </div>
+
+
+  <!-- ── ALERT STRIP — urgent items ── -->
+  {% if pending_agent_verifications > 0 or pending_company_verifications > 0 or flagged_listings > 0 %}
+  <div class="adm-alerts">
+    {% if pending_agent_verifications > 0 %}
+    <div class="adm-alert warn">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span><strong>{{ pending_agent_verifications }} agent{{ pending_agent_verifications|pluralize }}</strong> waiting for verification</span>
+      <a href="#">Review <i class="bi bi-arrow-right"></i></a>
+    </div>
+    {% endif %}
+    {% if pending_company_verifications > 0 %}
+    <div class="adm-alert warn">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span><strong>{{ pending_company_verifications }} company/companies</strong> waiting for verification</span>
+      <a href="#">Review <i class="bi bi-arrow-right"></i></a>
+    </div>
+    {% endif %}
+    {% if flagged_listings > 0 %}
+    <div class="adm-alert danger">
+      <i class="bi bi-flag-fill"></i>
+      <span><strong>{{ flagged_listings }} listing{{ flagged_listings|pluralize }}</strong> flagged for review</span>
+      <a href="#">View <i class="bi bi-arrow-right"></i></a>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+
+  <!-- ── KPI STRIP ── -->
+  <div class="adm-kpi-strip">
+
+    <div class="adm-kpi">
+      <div class="adm-kpi-icon users"><i class="bi bi-people-fill"></i></div>
+      <div class="adm-kpi-body">
+        <span class="adm-kpi-val">{{ total_users|intcomma }}</span>
+        <span class="adm-kpi-lbl">Total Users</span>
+        <span class="adm-kpi-trend up">
+          <i class="bi bi-arrow-up-short"></i> {{ new_users_this_week }} this week
+        </span>
+      </div>
+    </div>
+
+    <div class="adm-kpi-sep"></div>
+
+    <div class="adm-kpi">
+      <div class="adm-kpi-icon props"><i class="bi bi-houses-fill"></i></div>
+      <div class="adm-kpi-body">
+        <span class="adm-kpi-val">{{ total_properties|intcomma }}</span>
+        <span class="adm-kpi-lbl">Total Listings</span>
+        <span class="adm-kpi-trend up">
+          <i class="bi bi-arrow-up-short"></i> {{ new_listings_this_week }} this week
+        </span>
+      </div>
+    </div>
+
+    <div class="adm-kpi-sep"></div>
+
+    <div class="adm-kpi">
+      <div class="adm-kpi-icon live"><i class="bi bi-broadcast"></i></div>
+      <div class="adm-kpi-body">
+        <span class="adm-kpi-val">{{ live_listings|intcomma }}</span>
+        <span class="adm-kpi-lbl">Live Listings</span>
+        <span class="adm-kpi-sub">{{ stored_listings }} in inventory</span>
+      </div>
+    </div>
+
+    <div class="adm-kpi-sep"></div>
+
+    <div class="adm-kpi">
+      <div class="adm-kpi-icon inq"><i class="bi bi-chat-dots-fill"></i></div>
+      <div class="adm-kpi-body">
+        <span class="adm-kpi-val">{{ total_inquiries|intcomma }}</span>
+        <span class="adm-kpi-lbl">Total Inquiries</span>
+        <span class="adm-kpi-trend up">
+          <i class="bi bi-arrow-up-short"></i> {{ new_inquiries_today }} today
+        </span>
+      </div>
+    </div>
+
+    <div class="adm-kpi-sep"></div>
+
+    <div class="adm-kpi">
+      <div class="adm-kpi-icon partner"><i class="bi bi-handshake-fill"></i></div>
+      <div class="adm-kpi-body">
+        <span class="adm-kpi-val">{{ total_partnerships|intcomma }}</span>
+        <span class="adm-kpi-lbl">Partner Applications</span>
+        <span class="adm-kpi-sub">{{ pending_partnerships }} pending</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ── TWO COLUMN BODY ── -->
+  <div class="adm-body-grid">
+
+
+    <!-- ═══════════════ LEFT / MAIN ═══════════════ -->
+    <div class="adm-body-main">
+
+
+      <!-- User breakdown cards -->
+      <div class="adm-row-three">
+
+        <div class="adm-mini-card customers">
+          <div class="adm-mc-icon"><i class="bi bi-person-fill"></i></div>
+          <div class="adm-mc-body">
+            <span class="adm-mc-num">{{ total_customers|intcomma }}</span>
+            <span class="adm-mc-lbl">Customers</span>
+          </div>
+          <a href="#" class="adm-mc-link">View All <i class="bi bi-chevron-right"></i></a>
+        </div>
+
+        <div class="adm-mini-card agents">
+          <div class="adm-mc-icon"><i class="bi bi-award-fill"></i></div>
+          <div class="adm-mc-body">
+            <span class="adm-mc-num">{{ total_agents|intcomma }}</span>
+            <span class="adm-mc-lbl">Agents</span>
+            <span class="adm-mc-sub">{{ verified_agents }} verified</span>
+          </div>
+          <a href="#" class="adm-mc-link">View All <i class="bi bi-chevron-right"></i></a>
+        </div>
+
+        <div class="adm-mini-card companies">
+          <div class="adm-mc-icon"><i class="bi bi-building-fill"></i></div>
+          <div class="adm-mc-body">
+            <span class="adm-mc-num">{{ total_companies|intcomma }}</span>
+            <span class="adm-mc-lbl">Companies</span>
+            <span class="adm-mc-sub">{{ verified_companies }} verified</span>
+          </div>
+          <a href="#" class="adm-mc-link">View All <i class="bi bi-chevron-right"></i></a>
+        </div>
+
+      </div>
+
+
+      <!-- Pending Verifications -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-patch-exclamation-fill"></i>
+            <h3>Pending Verifications</h3>
+            {% if pending_verifications > 0 %}
+              <span class="adm-urgent-badge">{{ pending_verifications }} pending</span>
+            {% endif %}
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+
+          {% if pending_agent_list %}
+            {% for agent in pending_agent_list %}
+            <div class="adm-verify-row">
+              <div class="adm-verify-avatar">
+                {% if agent.profile_picture %}
+                  <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}">
+                {% else %}
+                  {{ agent.first_name|slice:":1"|upper }}
+                {% endif %}
+              </div>
+              <div class="adm-verify-info">
+                <strong>{{ agent.first_name }} {{ agent.last_name }}</strong>
+                <span><i class="bi bi-award-fill"></i> Agent · {{ agent.location }}</span>
+                <span class="adm-verify-date">Joined {{ agent.user.date_joined|timesince }} ago</span>
+              </div>
+              <div class="adm-verify-actions">
+                <button class="adm-btn-approve" onclick="verifyUser('agent', '{{ agent.agent_uuid }}')">
+                  <i class="bi bi-check-lg"></i> Approve
+                </button>
+                <a href="#" class="adm-btn-view-sm">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+
+          {% if pending_company_list %}
+            {% for company in pending_company_list %}
+            <div class="adm-verify-row">
+              <div class="adm-verify-avatar company">
+                {% if company.company_logo %}
+                  <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}">
+                {% else %}
+                  <i class="bi bi-building"></i>
+                {% endif %}
+              </div>
+              <div class="adm-verify-info">
+                <strong>{{ company.company_name }}</strong>
+                <span><i class="bi bi-building-fill"></i> Company · {{ company.address }}</span>
+                <span class="adm-verify-date">Applied {{ company.created_at|timesince }} ago</span>
+              </div>
+              <div class="adm-verify-actions">
+                <button class="adm-btn-approve" onclick="verifyUser('company', '{{ company.unique_company_id }}')">
+                  <i class="bi bi-check-lg"></i> Approve
+                </button>
+                <a href="#" class="adm-btn-view-sm">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          {% endif %}
+
+          {% if not pending_agent_list and not pending_company_list %}
+            <div class="adm-empty-state">
+              <i class="bi bi-check-circle-fill"></i>
+              <p>All caught up — no pending verifications.</p>
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+
+      <!-- Property Overview -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-houses-fill"></i>
+            <h3>Property Overview</h3>
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd">
+
+          <div class="adm-prop-bars">
+            <div class="adm-prop-bar-row">
+              <div class="adm-prop-bar-info">
+                <span class="adm-dot sale"></span>
+                <span>For Sale</span>
+              </div>
+              <div class="adm-bar-track">
+                {% widthratio total_sale total_properties 100 as sale_pct %}
+                <div class="adm-bar sale" style="width:{{ sale_pct }}%"></div>
+              </div>
+              <span class="adm-bar-num">{{ total_sale|intcomma }}</span>
+            </div>
+
+            <div class="adm-prop-bar-row">
+              <div class="adm-prop-bar-info">
+                <span class="adm-dot lease"></span>
+                <span>For Rent</span>
+              </div>
+              <div class="adm-bar-track">
+                {% widthratio total_rent total_properties 100 as rent_pct %}
+                <div class="adm-bar lease" style="width:{{ rent_pct }}%"></div>
+              </div>
+              <span class="adm-bar-num">{{ total_rent|intcomma }}</span>
+            </div>
+
+            <div class="adm-prop-bar-row">
+              <div class="adm-prop-bar-info">
+                <span class="adm-dot live"></span>
+                <span>Live</span>
+              </div>
+              <div class="adm-bar-track">
+                {% widthratio live_listings total_properties 100 as live_pct %}
+                <div class="adm-bar live" style="width:{{ live_pct }}%"></div>
+              </div>
+              <span class="adm-bar-num">{{ live_listings|intcomma }}</span>
+            </div>
+
+            <div class="adm-prop-bar-row">
+              <div class="adm-prop-bar-info">
+                <span class="adm-dot stored"></span>
+                <span>Stored</span>
+              </div>
+              <div class="adm-bar-track">
+                {% widthratio stored_listings total_properties 100 as stored_pct %}
+                <div class="adm-bar stored" style="width:{{ stored_pct }}%"></div>
+              </div>
+              <span class="adm-bar-num">{{ stored_listings|intcomma }}</span>
+            </div>
+          </div>
+
+          <!-- Category breakdown -->
+          <div class="adm-prop-cats">
+            <div class="adm-prop-cat">
+              <i class="bi bi-house-fill"></i>
+              <span class="adm-prop-cat-num">{{ residential_count|intcomma }}</span>
+              <span class="adm-prop-cat-lbl">Residential</span>
+            </div>
+            <div class="adm-prop-cat">
+              <i class="bi bi-building"></i>
+              <span class="adm-prop-cat-num">{{ commercial_count|intcomma }}</span>
+              <span class="adm-prop-cat-lbl">Commercial</span>
+            </div>
+            <div class="adm-prop-cat">
+              <i class="bi bi-map-fill"></i>
+              <span class="adm-prop-cat-num">{{ land_count|intcomma }}</span>
+              <span class="adm-prop-cat-lbl">Land</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Recent Listings -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-clock-history"></i>
+            <h3>Recent Listings</h3>
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+          {% for prop in recent_listings %}
+          <div class="adm-listing-row">
+            <div class="adm-listing-img">
+              {% if prop.base_image %}
+                <img src="{{ prop.base_image.url }}" alt="Property" loading="lazy">
+              {% else %}
+                <i class="bi bi-building"></i>
+              {% endif %}
+            </div>
+            <div class="adm-listing-info">
+              <strong>
+                {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+                {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+                {% else %}{{ prop.lands }}{% endif %}
+              </strong>
+              <span><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}, {{ prop.state }}</span>
+              <span>
+                <i class="bi bi-person-fill"></i>
+                {% if prop.agent_uuid %}Agent{% else %}Company{% endif %}
+              </span>
+            </div>
+            <div class="adm-listing-meta">
+              <span class="adm-type-badge {% if prop.listing_type == 'sale' %}sale{% else %}lease{% endif %}">
+                {% if prop.listing_type == 'sale' %}For Sale{% else %}For Rent{% endif %}
+              </span>
+              <span class="adm-status-badge {% if prop.is_listed %}live{% else %}stored{% endif %}">
+                {% if prop.is_listed %}Live{% else %}Stored{% endif %}
+              </span>
+              <span class="adm-listing-time">{{ prop.listed_date|timesince }} ago</span>
+            </div>
+            <div class="adm-listing-actions">
+              <a href="#" class="adm-action-icon" title="View"><i class="bi bi-eye"></i></a>
+              <a href="#" class="adm-action-icon danger" title="Remove"><i class="bi bi-trash3"></i></a>
+            </div>
+          </div>
+          {% empty %}
+            <div class="adm-empty-state">
+              <i class="bi bi-houses"></i>
+              <p>No listings yet.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+      <!-- Partnership Applications -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-handshake-fill"></i>
+            <h3>Partnership Applications</h3>
+            {% if pending_partnerships > 0 %}
+              <span class="adm-urgent-badge">{{ pending_partnerships }} new</span>
+            {% endif %}
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+          {% for partner in recent_partnerships %}
+          <div class="adm-partner-row">
+            <div class="adm-partner-info">
+              <strong>{{ partner.full_name }}</strong>
+              <span>{{ partner.email }}</span>
+              <span>{{ partner.phone_number }}</span>
+            </div>
+            <div class="adm-partner-meta">
+              <span class="adm-partner-type">{{ partner.partnership_type|default:"General" }}</span>
+              <span class="adm-partner-date">{{ partner.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div class="adm-listing-actions">
+              <a href="#" class="adm-action-icon" title="View"><i class="bi bi-eye"></i></a>
+              <a href="#" class="adm-action-icon success" title="Approve"><i class="bi bi-check-lg"></i></a>
+              <a href="#" class="adm-action-icon danger" title="Reject"><i class="bi bi-x-lg"></i></a>
+            </div>
+          </div>
+          {% empty %}
+            <div class="adm-empty-state">
+              <i class="bi bi-handshake"></i>
+              <p>No partnership applications yet.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+      <!-- Reviews Overview -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-star-fill"></i>
+            <h3>Recent Reviews</h3>
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+          {% for review in recent_reviews %}
+          <div class="adm-review-row">
+            <div class="adm-reviewer-av">{{ review.user.username|slice:":1"|upper }}</div>
+            <div class="adm-review-body">
+              <div class="adm-review-top">
+                <strong>{{ review.user.username }}</strong>
+                <div class="adm-review-stars">
+                  {% for i in "12345" %}
+                    <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
+                  {% endfor %}
+                </div>
+                <span class="adm-review-date">{{ review.created_at|timesince }} ago</span>
+              </div>
+              <p>{{ review.comment|truncatewords:20 }}</p>
+              <span class="adm-review-target">
+                {% if review.agent %}
+                  <i class="bi bi-award-fill"></i> {{ review.agent.first_name }} {{ review.agent.last_name }}
+                {% elif review.company %}
+                  <i class="bi bi-building-fill"></i> {{ review.company.company_name }}
+                {% endif %}
+              </span>
+            </div>
+            <div class="adm-listing-actions">
+              <a href="#" class="adm-action-icon danger" title="Remove"><i class="bi bi-trash3"></i></a>
+            </div>
+          </div>
+          {% empty %}
+            <div class="adm-empty-state">
+              <i class="bi bi-star"></i>
+              <p>No reviews yet.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+    </div><!-- end left/main -->
+
+
+    <!-- ═══════════════ RIGHT / SIDEBAR ═══════════════ -->
+    <aside class="adm-body-sidebar">
+
+
+      <!-- Quick Actions -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-lightning-charge-fill"></i>
+            <h3>Quick Actions</h3>
+          </div>
+        </div>
+        <div class="adm-card-bd">
+          <div class="adm-quick-grid">
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-patch-check-fill"></i>
+              <span>Verify Agents</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-building-check"></i>
+              <span>Verify Companies</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-flag-fill"></i>
+              <span>Flagged Listings</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-megaphone-fill"></i>
+              <span>Announcement</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-newspaper"></i>
+              <span>New Article</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-file-earmark-bar-graph"></i>
+              <span>View Reports</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-person-x-fill"></i>
+              <span>Suspend User</span>
+            </a>
+            <a href="#" class="adm-quick-btn">
+              <i class="bi bi-trash3-fill"></i>
+              <span>Remove Listing</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Platform Health -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-activity"></i>
+            <h3>Platform Health</h3>
+          </div>
+        </div>
+        <div class="adm-card-bd">
+
+          <div class="adm-health-row">
+            <div class="adm-health-label">
+              <span class="adm-health-dot green"></span> Live Listings
+            </div>
+            <span class="adm-health-val">{{ live_listings_pct|floatformat:0 }}%</span>
+          </div>
+          <div class="adm-health-row">
+            <div class="adm-health-label">
+              <span class="adm-health-dot green"></span> Verified Agents
+            </div>
+            <span class="adm-health-val">{{ verified_agents_pct|floatformat:0 }}%</span>
+          </div>
+          <div class="adm-health-row">
+            <div class="adm-health-label">
+              <span class="adm-health-dot green"></span> Verified Companies
+            </div>
+            <span class="adm-health-val">{{ verified_companies_pct|floatformat:0 }}%</span>
+          </div>
+          <div class="adm-health-row">
+            <div class="adm-health-label">
+              <span class="adm-health-dot {% if flagged_listings > 0 %}red{% else %}green{% endif %}"></span> Flagged Listings
+            </div>
+            <span class="adm-health-val {% if flagged_listings > 0 %}danger{% endif %}">{{ flagged_listings }}</span>
+          </div>
+          <div class="adm-health-row">
+            <div class="adm-health-label">
+              <span class="adm-health-dot {% if pending_verifications > 0 %}orange{% else %}green{% endif %}"></span> Pending Verifications
+            </div>
+            <span class="adm-health-val {% if pending_verifications > 5 %}warn{% endif %}">{{ pending_verifications }}</span>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Company Tiers -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-layers-fill"></i>
+            <h3>Company Tiers</h3>
+          </div>
+          <a href="#" class="adm-see-all">Manage</a>
+        </div>
+        <div class="adm-card-bd">
+          <div class="adm-tier-row">
+            <div class="adm-tier-icon starter"><i class="bi bi-box"></i></div>
+            <div class="adm-tier-info">
+              <span>Starter</span>
+              <small>50 inventory / 30 live</small>
+            </div>
+            <strong class="adm-tier-count">{{ starter_companies }}</strong>
+          </div>
+          <div class="adm-tier-row">
+            <div class="adm-tier-icon growth"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="adm-tier-info">
+              <span>Growth</span>
+              <small>200 inventory / 120 live</small>
+            </div>
+            <strong class="adm-tier-count">{{ growth_companies }}</strong>
+          </div>
+          <div class="adm-tier-row">
+            <div class="adm-tier-icon enterprise"><i class="bi bi-infinity"></i></div>
+            <div class="adm-tier-info">
+              <span>Enterprise</span>
+              <small>Unlimited</small>
+            </div>
+            <strong class="adm-tier-count">{{ enterprise_companies }}</strong>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Recent Signups -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-person-plus-fill"></i>
+            <h3>Recent Signups</h3>
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+          {% for user in recent_signups %}
+          <div class="adm-signup-row">
+            <div class="adm-signup-av">{{ user.username|slice:":1"|upper }}</div>
+            <div class="adm-signup-info">
+              <strong>{{ user.username }}</strong>
+              <span>{{ user.email }}</span>
+              <span class="adm-role-tag {{ user.role }}">{{ user.role|capfirst }}</span>
+            </div>
+            <span class="adm-signup-time">{{ user.date_joined|timesince }} ago</span>
+          </div>
+          {% empty %}
+            <div class="adm-empty-state"><p>No recent signups.</p></div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+      <!-- Top Agents by Listings -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-trophy-fill"></i>
+            <h3>Top Agents</h3>
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+          {% for item in top_agents %}
+          <div class="adm-top-row">
+            <div class="adm-top-rank">#{{ forloop.counter }}</div>
+            <div class="adm-top-av">
+              {% if item.agent.profile_picture %}
+                <img src="{{ item.agent.profile_picture.url }}" alt="{{ item.agent.first_name }}">
+              {% else %}
+                {{ item.agent.first_name|slice:":1"|upper }}
+              {% endif %}
+            </div>
+            <div class="adm-top-info">
+              <strong>{{ item.agent.first_name }} {{ item.agent.last_name }}</strong>
+              <span>{{ item.listing_count }} listings</span>
+            </div>
+            <a href="#" class="adm-action-icon" title="View Profile"><i class="bi bi-eye"></i></a>
+          </div>
+          {% empty %}
+            <div class="adm-empty-state"><p>No data yet.</p></div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+      <!-- Recent Inquiries -->
+      <div class="adm-card">
+        <div class="adm-card-hd">
+          <div class="adm-card-hd-left">
+            <i class="bi bi-chat-dots-fill"></i>
+            <h3>Recent Inquiries</h3>
+          </div>
+          <a href="#" class="adm-see-all">View All</a>
+        </div>
+        <div class="adm-card-bd no-pad">
+          {% for inq in recent_inquiries %}
+          <div class="adm-inq-row">
+            <div class="adm-inq-av">{{ inq.name|slice:":1"|upper }}</div>
+            <div class="adm-inq-info">
+              <strong>{{ inq.name }}</strong>
+              <span>{{ inq.property_name|truncatechars:30 }}</span>
+              <span class="adm-contact-type">{{ inq.contact_type }}</span>
+            </div>
+            <span class="adm-inq-time">{{ inq.date_created|timesince }} ago</span>
+          </div>
+          {% empty %}
+            <div class="adm-empty-state"><p>No inquiries yet.</p></div>
+          {% endfor %}
+        </div>
+      </div>
+
+
+    </aside><!-- end sidebar -->
+
+
+  </div><!-- end body grid -->
+
+
+</div><!-- end adm-content -->
+</main>
+
+
+<!-- ── VERIFY CONFIRMATION MODAL ── -->
+<div class="adm-modal-overlay" id="verifyModal">
+  <div class="adm-modal">
+    <div class="adm-modal-icon"><i class="bi bi-patch-check-fill"></i></div>
+    <h3>Confirm Verification</h3>
+    <p>Are you sure you want to verify this user? This will grant them a verified badge on the platform.</p>
+    <div class="adm-modal-actions">
+      <button class="adm-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="adm-modal-confirm" id="confirmVerifyBtn">Verify Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* Last updated time */
+  var el = document.getElementById('lastUpdated');
+  if (el) {
+    el.textContent = new Date().toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /* Sidebar toggle */
+  window.toggleSidebar = function () {
+    var sidebar = document.getElementById('adminSidebar');
+    var main    = document.getElementById('adminMain');
+    var overlay = document.getElementById('sidebarOverlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+  };
+
+  /* Verify modal */
+  var pendingType = '', pendingId = '';
+
+  window.verifyUser = function (type, id) {
+    pendingType = type;
+    pendingId   = id;
+    document.getElementById('verifyModal').classList.add('open');
+  };
+
+  document.getElementById('confirmVerifyBtn').addEventListener('click', function () {
+    if (!pendingId) return;
+    /* POST to verify endpoint — implement URL per type */
+    var url = pendingType === 'agent'
+      ? '/admin/verify-agent/' + pendingId + '/'
+      : '/admin/verify-company/' + pendingId + '/';
+    fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin',
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      closeModal();
+      if (d.success) window.location.reload();
+      else alert(d.error || 'Something went wrong.');
+    })
+    .catch(function () { closeModal(); alert('Request failed.'); });
+  });
+
+  window.closeModal = function () {
+    document.getElementById('verifyModal').classList.remove('open');
+    pendingType = ''; pendingId = '';
+  };
+
+  document.getElementById('verifyModal').addEventListener('click', function (e) {
+    if (e.target === this) closeModal();
+  });
+
+  /* CSRF helper */
+  function getCsrf() {
+    var name = 'csrftoken';
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var c = cookies[i].trim();
+      if (c.startsWith(name + '=')) return decodeURIComponent(c.slice(name.length + 1));
+    }
+    return '';
+  }
+
+}());
+</script>
+
+</body>
+</html>

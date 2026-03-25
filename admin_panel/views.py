@@ -1,270 +1,299 @@
-from django.shortcuts import render, redirect
-from datetime import date
-from estate.models import *
-from core.models import *
-from decouple import config
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from datetime import datetime, date
-from django.conf import settings
+from core.forms import *
+from django.http import HttpResponseRedirect, JsonResponse
+from django.db import transaction
+from companies.models import CompanyInformation, CompanyActivityLog
+from agents.models import AgentInformation
+from estate.models import LeadInfo
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from django.views.decorators.http import require_POST
+from core.utils import *
+from django.utils.http import url_has_allowed_host_and_scheme
+from agents.forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
+from members.models import User
 from django.utils import timezone
-from members.views import logout_user
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments, ErrorLog
+from agents.quotes import get_random_quote
+from django.db.models import Sum, Avg, Count,Q
+from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator
+from django.urls import reverse
+from companies.forms import SocialLinksFormset, CompanyForm,JobPostForm, InviteLinkForm, EditEmployeeForm
+from .models import *
+from datetime import date, timedelta
+from django.core.paginator import Paginator
+from core.utils import *
+import traceback
+from estate.models import *
+from estate.forms import *
+from members.forms import UpdateUserForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from core import news_scrape as ns
+from estate.filters import *
+from core.models import *
+import uuid
+from core.utils import refresh_activity_score
+from itertools import chain
 
-User=settings.AUTH_USER_MODEL
-# Create your views here.
-'''Analytics For admin'''
 
-admin= config('ADMIN')
 
-#Total Listings and sign uo
+
+
 def admin_dashboard(request):
-    if request.user.username == admin:
-        
-        '''Property Tracking'''
-        on_lease=PropertyManagementRent.objects.all()
-        on_sale= PropertyManagementSale.objects.all()
-        
-        # Listings Calculation
-        x_initial=PropertyManagementRent.objects.count() #where x is property on lease
-        y_initial=PropertyManagementSale.objects.count() #where y is property on lease
+    # ... your auth checks here ...
 
-        prop_calc=property_tracking(on_lease, on_sale, x_initial, y_initial)
-        user_track=user_tracking()
-        
-        #properties calc
-        total_listings=prop_calc[0]
-        total_perc=prop_calc[1]
-        percentage_rent= prop_calc[2]
-        percentage_sale=prop_calc[3]
-        final_rent_time= prop_calc[4]
-        final_sale_time=prop_calc[5]
-        final_update_time= prop_calc[6]
-        todays_property=prop_calc[7]
-        
-        '''User Tranking'''
-        user_count=user_track[0]
-        user_increase_percentage= user_track[1]
-        daily_active_users= user_track[2]
-        final_time=user_track[3]
+    now = timezone.now()
+    today = date.today()
+    one_week_ago = now - timedelta(days=7)
 
-        
-        context = {'users':user_count,
-                    'users_inc_perc': user_increase_percentage,
-                    'dau':daily_active_users,
-                    'user_reg_time':final_time,
-                    'on_lease_count': x_initial,
-                    'on_sale_count':y_initial,
-                    'total_listings': total_listings,
-                    'rent_perc': percentage_rent,
-                    'sale_perc': percentage_sale,
-                    'total_perc': total_perc,
-                    'rent_time':final_rent_time,
-                    'sale_time':final_sale_time,
-                    'final_update_time': final_update_time,
-                    'today_property':todays_property}
-        return render(request, 'admin_dashboard.html',context)
-        
+    # ─────────────────────────────────────────────────────────────────────
+    # 1. USER STATS — 1 query (aggregate everything in one hit)
+    # ─────────────────────────────────────────────────────────────────────
+    user_stats = User.objects.aggregate(
+        total=Count('id'),
+        customer_count=Count('id', filter=Q(role='customer')),
+        agent_count=Count('id', filter=Q(role='agent')),
+        company_count=Count('id', filter=Q(role='company')),
+        new_this_week=Count('id', filter=Q(date_joined__gte=one_week_ago)),
+    )
 
+    total_users     = user_stats['total']
+    total_customers = user_stats['customer_count']
+    total_agents    = user_stats['agent_count']
+    total_companies = user_stats['company_count']
+    new_this_week   = user_stats['new_this_week']
 
-def property_tracking(on_lease, on_sale, x_initial, y_initial):
-        
-        x=0
-        x_prev=0
-        y=0
-        y_prev=0
-        
-        '''Property count '''
-        for prop in on_lease:
-            if prop.listed_date.date() == date.today():
-                x+=1
-            else:
-                x_prev += 1
-        
-        for prop in on_sale:
-            if prop.listed_date.date() == date.today():
-                y+=1
-            else:
-                y_prev += 1
-        initial_time_listed_r=PropertyManagementRent.objects.order_by('-listed_date').first()
-        initial_time_listed_s=PropertyManagementSale.objects.order_by('-listed_date').first()
-        
-        "Recent history"
-        raw_rent_time=timezone.now() - initial_time_listed_r.listed_date
-        formatted_rent_time=abs(raw_rent_time.total_seconds() / 60)
-        final_rent_time=time_formatting(formatted_rent_time)
-        
-        raw_sale_time=abs(timezone.now() - initial_time_listed_s.listed_date)
-        formatted_sale_time=raw_sale_time.total_seconds() / 60
-        final_sale_time=time_formatting(formatted_sale_time)
-        
-        
-        raw_rent_update_time= timezone.now() - initial_time_listed_r.last_updated
-        formatted_rent_update_time=abs(raw_rent_update_time.total_seconds() / 60)
-        final_rent_update_time=time_formatting(formatted_rent_update_time)
-        
-        raw_sale_update_time= timezone.now() - initial_time_listed_s.last_updated
-        formatted_sale_update_time=abs(raw_sale_update_time.total_seconds() / 60)
-        
-        if formatted_sale_update_time > formatted_rent_update_time:
-            formatted_update_time=formatted_sale_update_time
-        elif formatted_sale_update_time < formatted_rent_update_time:
-            formatted_update_time=formatted_rent_update_time
-        else:
-            formatted_update_time= (formatted_rent_update_time + formatted_sale_update_time) /2
-        final_update_time= time_formatting(formatted_update_time)
-        
-        percentage_sale= (y/y_prev) * 100
-        percentage_rent= (x/x_prev) * 100   
-        
-        total_perc= percentage_rent + percentage_sale
-        total_listings= x_initial + y_initial
-        
-        property_listed_today=x + y
-        
-        calculated_percentages_list= [total_listings, total_perc, percentage_rent, percentage_sale, final_rent_time,
-                                    final_sale_time, final_update_time, property_listed_today]
-        return calculated_percentages_list
+    # ─────────────────────────────────────────────────────────────────────
+    # 2. AGENTS — 2 queries (one aggregate, one slice)
+    # ─────────────────────────────────────────────────────────────────────
+    agent_stats = AgentInformation.objects.aggregate(
+        # Rename 'verified' to 'verified_count'
+        verified_count=Count('id', filter=Q(verified=True)),
+        # Rename 'unverified' to 'unverified_count'
+        unverified_count=Count('id', filter=Q(verified=False)),
+    )
 
-def user_tracking():
-    user=User.objects.all()
-    user_count=User.objects.count()
-    
-    
-    users_today=0
-    prev_users=0
-    for users in user:
-        if users.date_joined.date() == date.today():
-            users_today += 1
-        else:
-            prev_users += 1
-            
-            
-    daily_active_users=0
-    for users in user:
-        if users.last_login.date() == date.today():
-            daily_active_users += 1
-    
-    user_increase_percentage= (users_today / prev_users) * 100
-    
-    
-    
-    # "%Y-%m-%d %H:%M:%S"
-    lates_user=User.objects.order_by('-date_joined').first()
-    user_reg_time= timezone.now() - lates_user.date_joined
-    formatted_time=user_reg_time.total_seconds()/60
-    final_time=time_formatting(formatted_time)
-    user_tracking_list= [user_count,user_increase_percentage, daily_active_users, final_time]
-    return user_tracking_list
+    # Then access them like this:
+    verified_agents = agent_stats['verified_count']
+    pending_agent_count = agent_stats['unverified_count']
+    verified_agents_pct = (verified_agents / total_agents * 100) if total_agents else 0
 
+    pending_agent_list = AgentInformation.objects.filter(verified=False)[:5]
 
+    # ─────────────────────────────────────────────────────────────────────
+    # 3. COMPANIES — 2 queries (one aggregate, one slice)
+    # ─────────────────────────────────────────────────────────────────────
+    company_stats = CompanyInformation.objects.aggregate(
+        verified_count=Count('id', filter=Q(verified=True)),
+        unverified_count=Count('id', filter=Q(verified=False)),
+        starter=Count('id', filter=Q(company_tier='starter')),
+        growth=Count('id', filter=Q(company_tier='growth')),
+        enterprise=Count('id', filter=Q(company_tier='enterprise')),
+    )
+    verified_companies     = company_stats['verified_count']
+    pending_company_count  = company_stats['unverified_count']
+    verified_companies_pct = (verified_companies / total_companies * 100) if total_companies else 0
+    starter_companies      = company_stats['starter']
+    growth_companies       = company_stats['growth']
+    enterprise_companies   = company_stats['enterprise']
 
-def time_formatting(formatted_time):
-    if formatted_time >= 60 and formatted_time <= 1439:
-        formatted_time/=60
-        if formatted_time == 1:
-            final_time=f'{int(formatted_time)} Hours ago'
-        else:
-            final_time=f'{int(formatted_time)} Hours ago'
-    elif formatted_time >= 1440:
-        formatted_time/=1400
-        if formatted_time == 1:
-            final_time=f'{int(formatted_time)} Day Ago'
-        else:
-            final_time=f'{int(formatted_time)} Days Ago'
-        
-    else:
-        if formatted_time <= 1:
-            final_time=f'{int(formatted_time)} minute ago'
-        else:
-            final_time=f'{int(formatted_time)} minutes ago'
-    return final_time
+    pending_company_list = CompanyInformation.objects.filter(verified=False)[:5]
 
+    pending_verifications = pending_agent_count + pending_company_count
 
+    # ─────────────────────────────────────────────────────────────────────
+    # 4. PROPERTIES — 2 queries (one aggregate each model)
+    # ─────────────────────────────────────────────────────────────────────
+    sale_stats = PropertyManagementSale.objects.aggregate(
+        total=Count('id'),
+        live=Count('id', filter=Q(is_listed=True)),
+        flagged=Count('id', filter=Q(flagged=True)),
+        residential=Count('id', filter=Q(property_category='Residential')),
+        commercial=Count('id', filter=Q(property_category='Commercial')),
+        land=Count('id', filter=Q(property_category='Land')),
+        new_this_week=Count('id', filter=Q(listed_date__gte=one_week_ago)),
+    )
+    rent_stats = PropertyManagementRent.objects.aggregate(
+        total=Count('id'),
+        live=Count('id', filter=Q(is_listed=True)),
+        flagged=Count('id', filter=Q(flagged=True)),
+        residential=Count('id', filter=Q(property_category='Residential')),
+        commercial=Count('id', filter=Q(property_category='Commercial')),
+        land=Count('id', filter=Q(property_category='Land')),
+        new_this_week=Count('id', filter=Q(listed_date__gte=one_week_ago)),
+    )
 
+    total_sale        = sale_stats['total']
+    total_rent        = rent_stats['total']
+    total_properties  = total_sale + total_rent
+    live_listings     = sale_stats['live'] + rent_stats['live']
+    stored_listings   = total_properties - live_listings
+    live_listings_pct = (live_listings / total_properties * 100) if total_properties else 0
+    flagged_listings  = sale_stats['flagged'] + rent_stats['flagged']
+    residential_count = sale_stats['residential'] + rent_stats['residential']
+    commercial_count  = sale_stats['commercial']  + rent_stats['commercial']
+    land_count        = sale_stats['land']        + rent_stats['land']
+    new_listings_this_week = sale_stats['new_this_week'] + rent_stats['new_this_week']
 
+    # Recent listings — combine both querysets, sort in Python (avoids UNION complexity)
+    # 2 queries
+    recent_sale = list(
+        PropertyManagementSale.objects.order_by('-listed_date')[:8]
+        .values('id', 'listed_date', 'property_category', 'location', 'state', 'is_listed')
+    )
+    recent_rent = list(
+        PropertyManagementRent.objects.order_by('-listed_date')[:8]
+        .values('id', 'listed_date', 'property_category', 'location', 'state', 'is_listed')
+    )
+    # Tag each so the template knows the type
+    for p in recent_sale: p['listing_type'] = 'Sale'
+    for p in recent_rent: p['listing_type'] = 'Rent'
+    recent_listings = sorted(
+        chain(recent_sale, recent_rent),
+        key=lambda x: x['listed_date'],
+        reverse=True
+    )[:8]
 
-#for admins only
-def view_feedbacks(request):
-    # is_staff is Django's built-in flag for admin users.
-    # It's safer than checking username == 'admin' because:
-    # 1. Your admin username could change
-    # 2. Another user could theoretically be named 'admin'
-    # 3. is_staff works with Django's permission system properly
-    print(request.user.id)
-    if not request.user.is_staff:
-        messages.warning(request, 'This page is for admins only.')
-        return redirect('landing')
+    # ─────────────────────────────────────────────────────────────────────
+    # 5. INQUIRIES — 1 query (aggregate) + 1 slice
+    # ─────────────────────────────────────────────────────────────────────
+    inquiry_stats = LeadInfo.objects.aggregate(
+        total=Count('id'),
+        today=Count('id', filter=Q(date_created=today)),
+    )
+    total_inquiries     = inquiry_stats['total']
+    new_inquiries_today = inquiry_stats['today']
+    recent_inquiries    = LeadInfo.objects.order_by('-date_created')[:6]
 
-    feedbacks = Feedbacks.objects.all().order_by('-submitted_at')
+    # ─────────────────────────────────────────────────────────────────────
+    # 6. PARTNERSHIPS — 1 query (aggregate) + 1 slice
+    # ─────────────────────────────────────────────────────────────────────
+    partnership_stats = Partnership.objects.aggregate(
+        total=Count('id'),
+        pending=Count('id', filter=Q(status='pending')),
+    )
+    total_partnerships   = partnership_stats['total']
+    pending_partnerships = partnership_stats['pending']
+    recent_partnerships  = Partnership.objects.order_by('-created_at')[:5]
 
-    # ── Stats for the 4 stat boxes at the top of the page ────────────
-    # These are simple database counts — Django does them in one query each.
-    bug_count     = feedbacks.filter(category='bug').count()
-    feature_count = feedbacks.filter(category='feature').count()
+    # ─────────────────────────────────────────────────────────────────────
+    # 7. REVIEWS — 2 queries, merged in Python
+    # ─────────────────────────────────────────────────────────────────────
+    recent_agent_reviews   = list(AgentRating.objects.order_by('-created_at')[:6]
+                                  .values('id', 'rating', 'created_at', 'rating'))
+    recent_company_reviews = list(CompanyRating.objects.order_by('-created_at')[:6]
+                                  .values('id', 'rating', 'created_at', 'rating'))
+    for r in recent_agent_reviews:   r['source'] = 'Agent'
+    for r in recent_company_reviews: r['source'] = 'Company'
+    recent_reviews = sorted(
+        chain(recent_agent_reviews, recent_company_reviews),
+        key=lambda x: x['created_at'],
+        reverse=True
+    )[:6]
 
-    # Average reaction score — only from submissions that have a reaction.
-    # We exclude nulls (old records) so they don't drag the average down.
-    from django.db.models import Avg
-    avg_result = feedbacks.exclude(reaction__isnull=True).aggregate(Avg('reaction'))
-    avg_raw    = avg_result['reaction__avg']
+    # ─────────────────────────────────────────────────────────────────────
+    # 8. RECENT SIGNUPS — 1 query
+    # ─────────────────────────────────────────────────────────────────────
+    recent_signups = User.objects.order_by('-date_joined')[:8]
 
-    # Round to 1 decimal place and show emoji next to it.
-    # If no reactions yet, show a dash instead of crashing.
-    if avg_raw is not None:
-        avg_reaction = f"{avg_raw:.1f} ⭐"
-    else:
-        avg_reaction = "—"
+    # ─────────────────────────────────────────────────────────────────────
+    # 9. TOP AGENTS — 1 query (annotated, no per-agent DB hits)
+    # ─────────────────────────────────────────────────────────────────────
+    top_agents = (
+        AgentInformation.objects
+        .annotate(listing_count=Count('agent_uuid', filter=Q(
+            # counts all sale + rent properties where agent_uuid matches
+            # adjust related_name to match your FK field name
+        )))
+        .order_by('-listing_count')[:5]
+    )
+    # NOTE: if PropertyManagementSale/Rent use agent_uuid as a CharField
+    # (not a FK), annotate from those models instead:
+    top_agents = (
+        AgentInformation.objects
+        .annotate(
+            sale_count=Count(
+                'agent_uuid',   # replace with your actual related_name
+                distinct=True
+            ),
+            rent_count=Count(
+                'agent_uuid',   # replace with your actual related_name
+                distinct=True
+            ),
+        )
+        .annotate(listing_count=Count('agent_uuid', distinct=True) +
+                                 Count('agent_uuid', distinct=True))
+        .order_by('-listing_count')[:5]
+    )
 
-    return render(request, 'view_feedback.html', {
-        'feedback':      feedbacks,
-        'bug_count':     bug_count,
-        'feature_count': feature_count,
-        'avg_reaction':  avg_reaction,
-    })
+    # ─────────────────────────────────────────────────────────────────────
+    # CONTEXT
+    # ─────────────────────────────────────────────────────────────────────
+    context = {
+        # Users
+        'total_users':               total_users,
+        'total_customers':           total_customers,
+        'total_agents':              total_agents,
+        'total_companies':           total_companies,
+        'new_users_this_week':       new_this_week,
 
-#for admins only
-def delete_feedback(request, feedback_id):
-    if request.user.is_authenticated:
-        if request.user.username == admin:
-            #getting the property_id which will be used to handle the deletion
-            feedback= Feedbacks.objects.get(pk=feedback_id)
-            #keeps another user from deleting a users data 
-            if request.user.id == 1:
-                #what does the actual deleting based on the property_id
-                feedback.delete()
-                messages.success(request, ("Feedback deleted successfully"))
-                return redirect('view-feedbacks')
-            else:
-                messages.error(request, ('You Arent authorized to delete this feedback'))
-                return redirect('all-listings')
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('customers_url:landing')
+        # Agent verification
+        'verified_agents':           verified_agents,
+        'verified_agents_pct':       round(verified_agents_pct, 1),
+        'pending_agent_verifications': pending_agent_count,
+        'pending_agent_list':        pending_agent_list,
 
+        # Company verification
+        'verified_companies':        verified_companies,
+        'verified_companies_pct':    round(verified_companies_pct, 1),
+        'pending_company_verifications': pending_company_count,
+        'pending_company_list':      pending_company_list,
 
+        # Combined verification
+        'pending_verifications':     pending_verifications,
 
-def all_properties(request):
-    if request.user.is_authenticated:
-        
-        try:
-            
-            model= request.user.id
-            #filtering the listings using both the users id and the properties id(Hacked my way through this🤡)
-            if request.user.username == admin:
-                property1= PropertyManagementRent.objects.order_by('-listed_date')
-                property2= PropertyManagementSale.objects.order_by('-listed_date')
-                return render(request, 'all_listings.html', {'property1':property1, 'property2':property2})
-            else:
-                messages.warning(request, 'Youre not authorized to access this page be warned or you will be suspended!!!')
-                logout_user(request)
-                return redirect('customers_url:landing')
-                
-                
-        except Exception:
-            messages.error(f"an error occured {e}")
-            return redirect('executive')
-        
-    else:
-        messages.warning(request, ('You need to be logged in to accesss this page'))
-        return redirect('customers_url:landing')
-    
+        # Properties
+        'total_properties':          total_properties,
+        'total_sale':                total_sale,
+        'total_rent':                total_rent,
+        'live_listings':             live_listings,
+        'stored_listings':           stored_listings,
+        'live_listings_pct':         round(live_listings_pct, 1),
+        'flagged_listings':          flagged_listings,
+        'residential_count':         residential_count,
+        'commercial_count':          commercial_count,
+        'land_count':                land_count,
+        'new_listings_this_week':    new_listings_this_week,
+        'recent_listings':           recent_listings,
 
+        # Inquiries
+        'total_inquiries':           total_inquiries,
+        'new_inquiries_today':       new_inquiries_today,
+        'recent_inquiries':          recent_inquiries,
+
+        # Partnerships
+        'total_partnerships':        total_partnerships,
+        'pending_partnerships':      pending_partnerships,
+        'recent_partnerships':       recent_partnerships,
+
+        # Reviews
+        'recent_reviews':            recent_reviews,
+
+        # Company tiers
+        'starter_companies':         starter_companies,
+        'growth_companies':          growth_companies,
+        'enterprise_companies':      enterprise_companies,
+
+        # Users
+        'recent_signups':            recent_signups,
+
+        # Top agents
+        'top_agents':                top_agents,
+
+        # Misc
+        'today':                     today,
+    }
+
+    return render(request, 'executive/admin_dashboard.html', context)
