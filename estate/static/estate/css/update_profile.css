@@ -1,3 +1,4 @@
+/* Mobile First Base Styles */
 /* General Layout */
 body {
     font-family: 'Poppins', sans-serif;
@@ -34,21 +35,22 @@ body {
 }
 
 .header-icon {
-    width: 90px;
-    height: 90px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 1.5rem;
-    font-size: 3rem;
+    font-size: 2rem;
     color: #fff;
     box-shadow: 0 8px 24px rgba(25, 118, 210, 0.3);
+    margin-bottom: 1rem;
 }
 
 .profile-title {
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #1565c0;
     margin-bottom: 0.5rem;
@@ -57,7 +59,7 @@ body {
 
 .profile-subtitle {
     color: #6c757d;
-    font-size: 1rem;
+    font-size: 0.85rem;
     margin: 0;
 }
 
@@ -120,8 +122,8 @@ body {
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
     margin-bottom: 2rem;
 }
 
@@ -131,7 +133,7 @@ body {
 }
 
 .form-group-full {
-    grid-column: 1 / -1;
+    grid-column: 1;
 }
 
 .form-label {
@@ -139,7 +141,7 @@ body {
     font-weight: 600;
     color: #1565c0;
     margin-bottom: 0.6rem;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .form-label i {
@@ -311,34 +313,34 @@ body {
     text-align: center;
     max-width: 500px;
     background: #fff;
-    padding: 3rem 2rem;
+    padding: 2rem 1.5rem;
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 .denied-icon {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     background: linear-gradient(135deg, #e53935 0%, #ef5350 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 2rem;
-    font-size: 3rem;
+    font-size: 2.2rem;
     color: #fff;
     box-shadow: 0 10px 30px rgba(229, 57, 53, 0.3);
 }
 
 .denied-title {
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #c62828;
     margin-bottom: 1rem;
 }
 
 .denied-message {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #6c757d;
     margin-bottom: 2rem;
 }
@@ -350,11 +352,11 @@ body {
     background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
     color: #fff;
     border: none;
-    padding: 1rem 2rem;
+    padding: 0.9rem 1.8rem;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -366,136 +368,129 @@ body {
     color: #fff;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+body {
+    padding: 0.5rem;
+}
+
+.profile-card {
+    padding: 1.5rem 1rem;
+}
+
+.form-input,
+    .form-textarea,
+    .form-input-file {
+    padding: 0.8rem 1rem;
+        font-size: 0.95rem;
+}
+
+.form-actions {
+    flex-direction: column;
+}
+
+.btn-submit,
+    .btn-cancel {
+    width: 100%;
+}
+
+.form-input,
+    .form-textarea,
+    .form-input-file,
+    .btn-submit,
+    .btn-cancel {
+    font-size: 0.9rem;
+}
+
+/* Tablet Styles */
+@media (min-width: 600px) {
     body {
         padding: 1rem 0.5rem;
     }
-
+    
     .profile-card {
         padding: 2rem 1.5rem;
     }
-
+    
     .header-icon {
         width: 70px;
         height: 70px;
         font-size: 2.5rem;
     }
-
+    
     .profile-title {
         font-size: 1.6rem;
     }
-
+    
     .profile-subtitle {
         font-size: 0.9rem;
     }
-
+    
+    .form-label {
+        font-size: 0.95rem;
+    }
+    
     .form-grid {
-        grid-template-columns: 1fr;
         gap: 1.2rem;
     }
-
-    .form-group-full {
-        grid-column: 1;
-    }
-
-    .denied-content {
-        padding: 2rem 1.5rem;
-    }
-
+    
     .denied-icon {
         width: 80px;
         height: 80px;
         font-size: 2.5rem;
     }
-
+    
     .denied-title {
         font-size: 1.6rem;
     }
-}
-
-@media (max-width: 576px) {
-    body {
-        padding: 0.5rem;
-    }
-
-    .profile-card {
-        padding: 1.5rem 1rem;
-    }
-
-    .header-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .profile-title {
-        font-size: 1.4rem;
-    }
-
-    .profile-subtitle {
-        font-size: 0.85rem;
-    }
-
-    .form-input,
-    .form-textarea,
-    .form-input-file {
-        padding: 0.8rem 1rem;
-        font-size: 0.95rem;
-    }
-
-    .form-label {
-        font-size: 0.9rem;
-    }
-
-    .form-grid {
-        gap: 1rem;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .btn-submit,
-    .btn-cancel {
-        width: 100%;
-    }
-
-    .denied-icon {
-        width: 70px;
-        height: 70px;
-        font-size: 2.2rem;
-    }
-
-    .denied-title {
-        font-size: 1.4rem;
-    }
-
+    
     .denied-message {
+        font-size: 1.1rem;
+    }
+    
+    .btn-login {
+        padding: 1rem 2rem;
         font-size: 1rem;
     }
-
-    .btn-login {
-        padding: 0.9rem 1.8rem;
-        font-size: 0.95rem;
+    
     }
-}
 
-@media (max-width: 400px) {
+/* Desktop Styles */
+@media (min-width: 900px) {
+    .header-icon {
+        width: 90px;
+        height: 90px;
+        font-size: 3rem;
+    }
+    
     .profile-title {
-        font-size: 1.2rem;
+        font-size: 2rem;
     }
-
+    
+    .profile-subtitle {
+        font-size: 1rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+    
+    .denied-content {
+        padding: 3rem 2rem;
+    }
+    
+    .denied-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 3rem;
+    }
+    
     .denied-title {
-        font-size: 1.2rem;
+        font-size: 2rem;
+    }
+    
     }
 
-    .form-input,
-    .form-textarea,
-    .form-input-file,
-    .btn-submit,
-    .btn-cancel {
-        font-size: 0.9rem;
-    }
-}

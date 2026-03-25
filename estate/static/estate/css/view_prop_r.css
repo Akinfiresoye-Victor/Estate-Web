@@ -4,27 +4,33 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-  --green:      #16a34a;
-  --green-dk:   #15803d;
-  --green-lt:   rgba(22,163,74,.10);
-  --green-xlt:  #f0fdf4;
-  --primary:    #1a3c4e;
-  --secondary:  #c19b76;
-  --text-dark:  #1e293b;
-  --text-mid:   #4a5568;
+  --green: #16a34a;
+  --green-dk: #15803d;
+  --green-lt: rgba(22, 163, 74, .10);
+  --green-xlt: #f0fdf4;
+  --primary: #1a3c4e;
+  --secondary: #c19b76;
+  --text-dark: #1e293b;
+  --text-mid: #4a5568;
   --text-light: #6b7280;
-  --bg:         #f4f6f8;
-  --white:      #ffffff;
-  --border:     #e5e7eb;
-  --shadow-sm:  0 1px 4px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
-  --shadow-md:  0 4px 16px rgba(0,0,0,.10);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,.14);
-  --radius:     14px;
-  --radius-sm:  8px;
-  --ease:       all 0.24s ease;
+  --bg: #f4f6f8;
+  --white: #ffffff;
+  --border: #e5e7eb;
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, .06), 0 2px 8px rgba(0, 0, 0, .04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, .10);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, .14);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --ease: all 0.24s ease;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   background: var(--bg);
@@ -102,7 +108,9 @@ body {
   transition: transform 0.4s ease;
 }
 
-.hero-image:hover img { transform: scale(1.04); }
+.hero-image:hover img {
+  transform: scale(1.04);
+}
 
 /* For Rent badge — overlaid on image */
 .hero-badge {
@@ -129,7 +137,7 @@ body {
   bottom: 12px;
   right: 12px;
   z-index: 2;
-  background: rgba(0,0,0,.72);
+  background: rgba(0, 0, 0, .72);
   backdrop-filter: blur(6px);
   color: var(--white);
   padding: 6px 13px;
@@ -174,7 +182,10 @@ body {
   color: var(--text-light);
 }
 
-.location-item i { color: var(--green); font-size: 0.82rem; }
+.location-item i {
+  color: var(--green);
+  font-size: 0.82rem;
+}
 
 
 /* ═══════════════════════════════════════════════════
@@ -188,7 +199,10 @@ body {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
-.gallery-strip::-webkit-scrollbar { display: none; }
+
+.gallery-strip::-webkit-scrollbar {
+  display: none;
+}
 
 .gallery-thumb {
   flex-shrink: 0;
@@ -201,11 +215,15 @@ body {
   transition: var(--ease);
 }
 
-.gallery-thumb:hover { border-color: var(--green); }
+.gallery-thumb:hover {
+  border-color: var(--green);
+}
 
 .gallery-thumb img {
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 
@@ -215,14 +233,16 @@ body {
    ═══════════════════════════════════════════════════ */
 .sticky-cta {
   position: fixed;
-  bottom: 0; left: 0; right: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 200;
   background: var(--white);
   border-top: 1.5px solid var(--border);
   padding: 10px 1rem;
   display: flex;
   gap: 8px;
-  box-shadow: 0 -4px 16px rgba(0,0,0,.10);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, .10);
 }
 
 .sticky-cta .btn-contact {
@@ -244,6 +264,7 @@ body {
   background: var(--green);
   color: var(--white);
 }
+
 .sticky-cta .btn-contact.primary:hover {
   background: var(--green-dk);
   color: var(--white);
@@ -254,13 +275,16 @@ body {
   color: var(--green-dk);
   border: 1.5px solid var(--green);
 }
+
 .sticky-cta .btn-contact.secondary:hover {
   background: var(--green);
   color: var(--white);
 }
 
 /* Extra bottom padding so content doesn't hide behind sticky bar */
-.detail-wrapper { padding-bottom: 90px; }
+.detail-wrapper {
+  padding-bottom: 90px;
+}
 
 
 /* ═══════════════════════════════════════════════════
@@ -449,6 +473,7 @@ body {
   background: var(--green);
   color: var(--white);
 }
+
 .btn-contact.primary:hover {
   background: var(--green-dk);
   color: var(--white);
@@ -461,6 +486,7 @@ body {
   color: var(--green);
   border: 1.5px solid var(--green);
 }
+
 .btn-contact.secondary:hover {
   background: var(--green);
   color: var(--white);
@@ -474,7 +500,9 @@ body {
 @media (min-width: 900px) {
 
   /* Hide sticky mobile CTA — sidebar has the buttons */
-  .sticky-cta { display: none; }
+  .sticky-cta {
+    display: none;
+  }
 
   .detail-wrapper {
     padding: 0 2rem 5rem;
@@ -482,14 +510,23 @@ body {
   }
 
   /* Hero image taller on desktop */
-  .hero-image { height: 420px; }
+  .hero-image {
+    height: 420px;
+  }
 
-  .hero-body { padding: 1.5rem 2rem 1.75rem; }
+  .hero-body {
+    padding: 1.5rem 2rem 1.75rem;
+  }
 
-  .property-title { font-size: 2rem; }
+  .property-title {
+    font-size: 2rem;
+  }
 
   /* Gallery thumbs larger on desktop */
-  .gallery-thumb { width: 130px; height: 88px; }
+  .gallery-thumb {
+    width: 130px;
+    height: 88px;
+  }
 
   /* Two-column layout — content + sidebar */
   .property-card {
@@ -548,7 +585,7 @@ body {
 
   .price-divider {
     height: 1px;
-    background: rgba(255,255,255,.22);
+    background: rgba(255, 255, 255, .22);
     margin: 1.25rem 0;
   }
 
@@ -562,29 +599,38 @@ body {
     background: var(--white);
     color: var(--green-dk);
   }
+
   .price-card .btn-contact.primary:hover {
     background: var(--green-xlt);
     color: var(--green-dk);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,.18);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .18);
   }
 
   .price-card .btn-contact.secondary {
-    background: rgba(255,255,255,.12);
+    background: rgba(255, 255, 255, .12);
     color: var(--white);
-    border: 1.5px solid rgba(255,255,255,.35);
+    border: 1.5px solid rgba(255, 255, 255, .35);
   }
+
   .price-card .btn-contact.secondary:hover {
-    background: rgba(255,255,255,.22);
+    background: rgba(255, 255, 255, .22);
     color: var(--white);
   }
 
   /* Features 4-col on desktop */
-  .features-grid { grid-template-columns: repeat(4, 1fr); }
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 
   /* Section cards more breathing room */
-  .section-head { padding: 1.1rem 1.75rem; }
-  .section-body { padding: 1.5rem 1.75rem; }
+  .section-head {
+    padding: 1.1rem 1.75rem;
+  }
+
+  .section-body {
+    padding: 1.5rem 1.75rem;
+  }
 
 }
 
@@ -593,9 +639,17 @@ body {
    1200px+ — wider content
    ═══════════════════════════════════════════════════ */
 @media (min-width: 1200px) {
-  .property-card { grid-template-columns: 1fr 380px; }
-  .hero-image { height: 480px; }
-  .detail-wrapper { padding: 0 3rem 5rem; }
+  .property-card {
+    grid-template-columns: 1fr 380px;
+  }
+
+  .hero-image {
+    height: 480px;
+  }
+
+  .detail-wrapper {
+    padding: 0 3rem 5rem;
+  }
 }
 
 
@@ -603,17 +657,67 @@ body {
    Reduced motion
    ═══════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-.price-card { display: none; }
-@media (min-width: 900px) { .price-card { display: block; } }
+.price-card {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .price-card {
+    display: block;
+  }
+}
 
 .description-text {
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: normal;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   FLAG LISTING BUTTON — report / flag a property
+   ═══════════════════════════════════════════════════ */
+.flag-listing-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 0 1rem;
+}
+
+.btn-flag-listing {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.2px;
+  color: #9ca3af;
+  background: transparent;
+  border: 1.5px solid #e5e7eb;
+  transition: var(--ease);
+  cursor: pointer;
+}
+
+.btn-flag-listing:hover {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fef2f2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
+}
+
+.btn-flag-listing i {
+  font-size: 0.82rem;
 }

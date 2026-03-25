@@ -4,7 +4,7 @@
 {% load humanize %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'estate/css/view_prop_r.css' %}">
+<link rel="stylesheet" href="{% static 'estate/css/view_prop_r.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -12,23 +12,22 @@
 {# ── Back Button ─────────────────────────────────────────────────── #}
 <div class="container">
   {% if role == 'customer' %}
-    <a href="{% url 'customer:rent-property' %}" class="back-button">
-      <i class="bi bi-arrow-left"></i> Go Back
-    </a>
+  <a href="{% url 'customer:rent-property' %}" class="back-button">
+    <i class="bi bi-arrow-left"></i> Go Back
+  </a>
   {% else %}
-    <a href="javascript:history.back()" class="back-button">
-      <i class="bi bi-arrow-left"></i> Go Back
-    </a>
+  <a href="javascript:history.back()" class="back-button">
+    <i class="bi bi-arrow-left"></i> Go Back
+  </a>
   {% endif %}
 </div>
 
 <div class="sticky-cta">
-  <a href="{% url 'customer:inquiry-form' property.property_type property.id %}"
-     class="btn-contact primary">
+  <a href="{% url 'customer:inquiry-form' property.property_type property.id %}" class="btn-contact primary">
     <i class="bi bi-envelope-fill"></i> Book Property
   </a>
   <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}"
-     class="btn-contact secondary">
+    class="btn-contact secondary">
     <i class="bi bi-telephone-fill"></i> Call Now
   </a>
 </div>
@@ -40,12 +39,11 @@
 
     <div class="hero-image">
       {% if property.base_image %}
-        <img src="{{ property.base_image.url }}"
-             onerror="this.onerror=null;this.src='https://placehold.co/1200x600/f0fdf4/16a34a?text=No+Image';"
-             alt="Property Image">
+      <img src="{{ property.base_image.url }}"
+        onerror="this.onerror=null;this.src='https://placehold.co/1200x600/f0fdf4/16a34a?text=No+Image';"
+        alt="Property Image">
       {% else %}
-        <img src="https://placehold.co/1200x600/f0fdf4/16a34a?text=No+Image"
-             alt="Placeholder">
+      <img src="https://placehold.co/1200x600/f0fdf4/16a34a?text=No+Image" alt="Placeholder">
       {% endif %}
 
       <span class="hero-badge">
@@ -60,29 +58,29 @@
 
     {# Gallery strip — scrollable thumbnails below the main image #}
     {% with property|get_images as images %}
-      {% if images %}
-        <div class="gallery-strip">
-          {% for img in images|slice:"1:8" %}
-            <div class="gallery-thumb">
-              <img src="{{ img.url }}"
-                   onerror="this.onerror=null;this.src='https://placehold.co/400x300/f0fdf4/16a34a?text=No+Image';"
-                   alt="Property Image {{ forloop.counter }}">
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
+    {% if images %}
+    <div class="gallery-strip">
+      {% for img in images|slice:"1:8" %}
+      <div class="gallery-thumb">
+        <img src="{{ img.url }}"
+          onerror="this.onerror=null;this.src='https://placehold.co/400x300/f0fdf4/16a34a?text=No+Image';"
+          alt="Property Image {{ forloop.counter }}">
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <div class="hero-body">
       <h1 class="property-title">
         {% if property.property_category == 'Commercial' %}
-          {{ property.commercial }}
+        {{ property.commercial }}
         {% elif property.property_category == 'Land' %}
-          {{ property.lands }}
+        {{ property.lands }}
         {% elif property.property_category == 'Residential' %}
-          {{ property.residential }}
+        {{ property.residential }}
         {% else %}
-          Property Listing
+        Property Listing
         {% endif %}
       </h1>
 
@@ -179,8 +177,7 @@
           <div class="map-placeholder">
             <i class="bi bi-geo-alt-fill"></i>
             <p>Map integration coming soon!</p>
-            <img src="https://placehold.co/1000x300/f0fdf4/16a34a?text=Map+Placeholder"
-                 alt="Map Placeholder">
+            <img src="https://placehold.co/1000x300/f0fdf4/16a34a?text=Map+Placeholder" alt="Map Placeholder">
           </div>
         </div>
       </div>
@@ -202,12 +199,11 @@
         <div class="price-divider"></div>
 
         <div class="contact-buttons">
-          <a href="{% url 'customer:inquiry-form' property.property_type property.id %}"
-             class="btn-contact primary">
+          <a href="{% url 'customer:inquiry-form' property.property_type property.id %}" class="btn-contact primary">
             <i class="bi bi-envelope-fill"></i> Book Property
           </a>
           <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}"
-             class="btn-contact secondary">
+            class="btn-contact secondary">
             <i class="bi bi-telephone-fill"></i> Call Now
           </a>
         </div>
@@ -226,11 +222,11 @@
               <span class="contact-label">Listed By</span>
               <span class="contact-value">
                 {% if agent_info %}
-                  {{ agent_info.first_name|default:"N/A" }}
+                {{ agent_info.first_name|default:"N/A" }}
                 {% elif company_info %}
-                  {{ company_info.company_name|default:"N/A" }}
+                {{ company_info.company_name|default:"N/A" }}
                 {% else %}
-                  {{ property.owner|default:"N/A" }}
+                {{ property.owner|default:"N/A" }}
                 {% endif %}
               </span>
             </div>
@@ -239,11 +235,11 @@
               <span class="contact-label">Phone</span>
               <span class="contact-value">
                 {% if agent_info %}
-                  {{ agent_info.phone_number|default:"N/A" }}
+                {{ agent_info.phone_number|default:"N/A" }}
                 {% elif company_info %}
-                  {{ company_info.phone_number|default:"N/A" }}
+                {{ company_info.phone_number|default:"N/A" }}
                 {% else %}
-                  {{ property.phone_number|default:"N/A" }}
+                {{ property.phone_number|default:"N/A" }}
                 {% endif %}
               </span>
             </div>
@@ -265,17 +261,16 @@
 
           <div class="contact-action-btns">
             {% if agent_info %}
-              <a href="{% url 'agent:agent-profile' agent_uuid=property.agent_uuid %}"
-                 class="btn-contact secondary">
-                <i class="bi bi-person-circle"></i> View Agent Profile
-              </a>
+            <a href="{% url 'agent:agent-profile' agent_uuid=property.agent_uuid %}" class="btn-contact secondary">
+              <i class="bi bi-person-circle"></i> View Agent Profile
+            </a>
             {% endif %}
 
             {% if company_info %}
-              <a href="{% url 'company:company-profile' company_uuid=company_info.unique_company_id %}"
-                 class="btn-contact secondary">
-                <i class="bi bi-building"></i> View Company Profile
-              </a>
+            <a href="{% url 'company:company-profile' company_uuid=company_info.unique_company_id %}"
+              class="btn-contact secondary">
+              <i class="bi bi-building"></i> View Company Profile
+            </a>
             {% endif %}
           </div>
 
@@ -285,6 +280,13 @@
     </div>{# end sidebar-content #}
 
   </div>{# end property-card #}
+
+  {# ── Flag / Report Listing ─────────────────────────────────────── #}
+  <div class="flag-listing-bar">
+    <a href="#" class="btn-flag-listing" id="flag-listing-btn">
+      <i class="bi bi-flag-fill"></i> Flag this Listing
+    </a>
+  </div>
 
 </div>{# end detail-wrapper #}
 
