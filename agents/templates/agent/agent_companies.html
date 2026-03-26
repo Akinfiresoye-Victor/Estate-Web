@@ -1,0 +1,545 @@
+{% extends base_template %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'agent/css/agent_company.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# CSRF token for leave_company POST #}
+<form id="leaveForm" method="POST" action="{% url 'agent:leave-company' %}" style="display:none;">
+  {% csrf_token %}
+</form>
+
+{% if not company %}
+{# ── NO COMPANY STATE ──────────────────────────────── #}
+<div class="mc-no-company">
+  <div class="mc-no-company-inner">
+    <div class="mc-no-icon"><i class="bi bi-building-x"></i></div>
+    <h2>You're not part of a company yet</h2>
+    <p>Join a company using an invite link from a company admin, or continue working as an independent agent.</p>
+    <div class="mc-no-actions">
+      <a href="#" class="mc-btn primary">
+        {# Link to: wherever agents enter invite links — agent:join_via_invite or similar #}
+        <i class="bi bi-link-45deg"></i> Enter Invite Link
+      </a>
+      <a href="{% url 'agent:dashboard' %}" class="mc-btn secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+    <div class="mc-solo-info">
+      <i class="bi bi-info-circle-fill"></i>
+      <p>As a solo agent your inventory and listing slots are personal. Joining a company gives you access to the company's shared pool.</p>
+    </div>
+  </div>
+</div>
+
+{% else %}
+{# ── HAS COMPANY ───────────────────────────────────── #}
+
+<!-- ── HERO ──────────────────────────────────────── -->
+<div class="mc-hero">
+  <div class="mc-hero-cover"></div>
+  <div class="mc-hero-body">
+
+    <a href="{% url 'agent:dashboard' %}" class="mc-back">
+      <i class="bi bi-arrow-left-circle"></i> Back
+    </a>
+
+    <div class="mc-hero-content">
+
+      <!-- Company logo -->
+      <div class="mc-logo-wrap">
+        {% if company.company_logo %}
+          <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}" class="mc-logo">
+        {% else %}
+          <div class="mc-logo-placeholder">
+            <i class="bi bi-building"></i>
+          </div>
+        {% endif %}
+        {% if company.verified %}
+          <span class="mc-verified-dot" title="Verified Company">
+            <i class="bi bi-patch-check-fill"></i>
+          </span>
+        {% endif %}
+      </div>
+
+      <!-- Company info -->
+      <div class="mc-hero-info">
+        <div class="mc-company-name-row">
+          <h1>{{ company.company_name }}</h1>
+          {% if company.verified %}
+            <span class="mc-verified-badge">
+              <i class="bi bi-patch-check-fill"></i> Verified
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Tier badge -->
+        <div class="mc-tier-badge {{ company.company_tier }}">
+          {% if company.company_tier == 'enterprise' %}
+            <i class="bi bi-infinity"></i> Enterprise
+          {% elif company.company_tier == 'growth' %}
+            <i class="bi bi-graph-up-arrow"></i> Growth
+          {% else %}
+            <i class="bi bi-box"></i> Starter
+          {% endif %}
+        </div>
+
+        <div class="mc-meta-row">
+          {% if company.address %}
+            <span class="mc-meta-chip"><i class="bi bi-geo-alt-fill"></i> {{ company.address }}</span>
+          {% endif %}
+          {% if company.year_established %}
+            <span class="mc-meta-chip"><i class="bi bi-calendar-check"></i> Est. {{ company.year_established }}</span>
+          {% endif %}
+          <span class="mc-meta-chip"><i class="bi bi-people-fill"></i> {{ total_team }} agent{{ total_team|pluralize }}</span>
+        </div>
+
+        <!-- My status inside the company -->
+        <div class="mc-my-status">
+          <i class="bi bi-award-fill"></i>
+          <span>You joined as <strong>{{ agent.work_type }}</strong></span>
+        </div>
+
+        <div class="mc-hero-actions">
+          <a href="{%url 'company:company-profile' company.unique_company_id%}" class="mc-btn primary">
+            <i class="bi bi-building-fill"></i> View Company Profile
+          </a>
+          <a href="tel:{{ company.phone_number }}" class="mc-btn secondary">
+            <i class="bi bi-telephone-fill"></i> Call Company
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ── SLOT METERS ──────────────────────────────── -->
+<div class="mc-slots">
+
+  <div class="mc-slot-card">
+    <div class="mc-slot-label"><i class="bi bi-archive-fill"></i> Company Inventory</div>
+    <div class="mc-slot-bar-wrap">
+      {% if inv_limit == '∞' %}
+        <div class="mc-slot-bar" style="width:20%"></div>
+      {% else %}
+        {% widthratio inv_used inv_limit 100 as inv_pct %}
+        <div class="mc-slot-bar {% if inv_pct >= 90 %}danger{% elif inv_pct >= 70 %}warn{% endif %}"
+             style="width:{{ inv_pct }}%"></div>
+      {% endif %}
+    </div>
+    <div class="mc-slot-nums">
+      <strong>{{ inv_used }}</strong> / {{ inv_limit }} <span>stored</span>
+    </div>
+  </div>
+
+  <div class="mc-slot-divider"></div>
+
+  <div class="mc-slot-card">
+    <div class="mc-slot-label"><i class="bi bi-broadcast"></i> Live Listings</div>
+    <div class="mc-slot-bar-wrap">
+      {% if live_limit == '∞' %}
+        <div class="mc-slot-bar live" style="width:20%"></div>
+      {% else %}
+        {% widthratio live_used live_limit 100 as live_pct %}
+        <div class="mc-slot-bar live {% if live_pct >= 90 %}danger{% elif live_pct >= 70 %}warn{% endif %}"
+             style="width:{{ live_pct }}%"></div>
+      {% endif %}
+    </div>
+    <div class="mc-slot-nums">
+      <strong>{{ live_used }}</strong> / {{ live_limit }} <span>public</span>
+    </div>
+  </div>
+
+  <div class="mc-slot-divider"></div>
+
+  <div class="mc-slot-card center">
+    <div class="mc-slot-label"><i class="bi bi-person-fill"></i> My Contribution</div>
+    <div class="mc-my-count">{{ my_listings_count }}</div>
+    <div class="mc-slot-sub">listings from you</div>
+  </div>
+
+</div>
+
+
+<!-- ── MAIN PAGE ──────────────────────────────── -->
+<div class="mc-page">
+
+  <!-- ── MAIN COLUMN ── -->
+  <main class="mc-main">
+
+
+    <!-- Company listings -->
+    <div class="mc-card">
+      <div class="mc-card-hd">
+        <i class="bi bi-houses-fill"></i>
+        <h2>Company Listings</h2>
+        <a href="{% url 'listings' %}" class="mc-see-all">
+          {# Link to: listings page filtered by company #}
+          Manage All <i class="bi bi-chevron-right"></i>
+        </a>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="mc-tab-row">
+        <button class="mc-tab active" data-target="sale">For Sale ({{ company_sale_props.count }})</button>
+        <button class="mc-tab" data-target="rent">For Rent ({{ company_rent_props.count }})</button>
+      </div>
+
+      <div class="mc-tab-panel" id="mc-panel-sale">
+        {% if company_sale_props %}
+          <div class="mc-prop-list">
+            {% for prop in company_sale_props %}
+            <div class="mc-prop-row">
+              <div class="mc-prop-img">
+                {% if prop.base_image %}
+                  <img src="{{ prop.base_image.url }}" alt="Property" loading="lazy">
+                {% else %}
+                  <i class="bi bi-building"></i>
+                {% endif %}
+              </div>
+              <div class="mc-prop-info">
+                <h4>
+                  {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+                  {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+                  {% else %}{{ prop.lands }}{% endif %}
+                </h4>
+                <span><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}, {{ prop.state }}</span>
+                <span class="mc-prop-price">₦{{ prop.price|floatformat:0|intcomma }}</span>
+              </div>
+              <div class="mc-prop-actions">
+                <span class="mc-live-badge {% if prop.is_listed %}live{% else %}stored{% endif %}">
+                  {% if prop.is_listed %}<i class="bi bi-broadcast"></i> Live
+                  {% else %}<i class="bi bi-archive-fill"></i> Stored{% endif %}
+                </span>
+                <a href="#" class="mc-icon-btn">
+                  {# Link to: customer:view-property-s with prop.id #}
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="mc-empty">
+            <i class="bi bi-house-x"></i>
+            <p>No sale listings yet from your company.</p>
+            <a href="{% url 'sell-property' %}" class="mc-btn primary sm">
+              <i class="bi bi-plus-circle"></i> Add Sale Listing
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mc-tab-panel hidden" id="mc-panel-rent">
+        {% if company_rent_props %}
+          <div class="mc-prop-list">
+            {% for prop in company_rent_props %}
+            <div class="mc-prop-row">
+              <div class="mc-prop-img">
+                {% if prop.base_image %}
+                  <img src="{{ prop.base_image.url }}" alt="Property" loading="lazy">
+                {% else %}
+                  <i class="bi bi-building"></i>
+                {% endif %}
+              </div>
+              <div class="mc-prop-info">
+                <h4>
+                  {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+                  {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+                  {% else %}{{ prop.lands }}{% endif %}
+                </h4>
+                <span><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}, {{ prop.state }}</span>
+                <span class="mc-prop-price">₦{{ prop.price_range|floatformat:0|intcomma }}<small>/mo</small></span>
+              </div>
+              <div class="mc-prop-actions">
+                <span class="mc-live-badge {% if prop.is_listed %}live{% else %}stored{% endif %}">
+                  {% if prop.is_listed %}<i class="bi bi-broadcast"></i> Live
+                  {% else %}<i class="bi bi-archive-fill"></i> Stored{% endif %}
+                </span>
+                <a href="#" class="mc-icon-btn">
+                  {# Link to: customer:view-property-r with prop.id #}
+                  <i class="bi bi-eye"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="mc-empty">
+            <i class="bi bi-house-x"></i>
+            <p>No rental listings yet from your company.</p>
+            <a href="{% url 'lease-property' %}" class="mc-btn primary sm">
+              <i class="bi bi-plus-circle"></i> Add Rental Listing
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+
+    <!-- Team / Teammates -->
+    <div class="mc-card">
+      <div class="mc-card-hd">
+        <i class="bi bi-people-fill"></i>
+        <h2>Your Team</h2>
+        <span class="mc-card-count">{{ total_team }} agent{{ total_team|pluralize }}</span>
+      </div>
+      <div class="mc-card-bd no-pad">
+
+        <!-- Me first -->
+        <div class="mc-team-row me">
+          <div class="mc-team-av">
+            {% if agent.profile_picture %}
+              <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }}">
+            {% else %}
+              {{ agent.first_name|slice:":1"|upper }}
+            {% endif %}
+            <span class="mc-av-online"></span>
+          </div>
+          <div class="mc-team-info">
+            <strong>{{ agent.first_name }} {{ agent.last_name }} <span class="mc-you-tag">You</span></strong>
+            <span>{{ agent.work_type }}</span>
+            <span><i class="bi bi-geo-alt-fill"></i> {{ agent.location }}</span>
+          </div>
+          <div class="mc-team-actions">
+            {% if agent.verified %}
+              <span class="mc-v-badge"><i class="bi bi-patch-check-fill"></i></span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% for teammate in teammates %}
+        <div class="mc-team-row">
+          <div class="mc-team-av">
+            {% if teammate.profile_picture %}
+              <img src="{{ teammate.profile_picture.url }}" alt="{{ teammate.first_name }}">
+            {% else %}
+              {{ teammate.first_name|slice:":1"|upper }}
+            {% endif %}
+          </div>
+          <div class="mc-team-info">
+            <strong>{{ teammate.first_name }} {{ teammate.last_name }}</strong>
+            <span>{{ teammate.work_type }}</span>
+            <span><i class="bi bi-geo-alt-fill"></i> {{ teammate.location }}</span>
+          </div>
+          <div class="mc-team-actions">
+            {% if teammate.verified %}
+              <span class="mc-v-badge"><i class="bi bi-patch-check-fill"></i></span>
+            {% endif %}
+            <a href="{%url 'agent:agent-profile' teammate.agent_uuid%}" class="mc-icon-btn">
+              <i class="bi bi-eye"></i>
+            </a>
+          </div>
+        </div>
+        {% empty %}
+        <div class="mc-empty">
+          <i class="bi bi-people"></i>
+          <p>You're the only agent here so far. Share the invite link to grow the team.</p>
+        </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+
+  </main>
+
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="mc-sidebar">
+
+    <!-- Company contact card -->
+    <div class="mc-card">
+      <div class="mc-card-hd">
+        <i class="bi bi-telephone-fill"></i>
+        <h2>Company Contact</h2>
+      </div>
+      <div class="mc-card-bd">
+
+        <a href="tel:{{ company.phone_number }}" class="mc-contact-row">
+          <div class="mc-contact-icon"><i class="bi bi-phone"></i></div>
+          <div>
+            <span class="mc-contact-label">Phone</span>
+            <span class="mc-contact-val">{{ company.phone_number }}</span>
+          </div>
+        </a>
+
+        <a href="mailto:{{ company.email }}" class="mc-contact-row">
+          <div class="mc-contact-icon"><i class="bi bi-envelope-fill"></i></div>
+          <div>
+            <span class="mc-contact-label">Email</span>
+            <span class="mc-contact-val">{{ company.email }}</span>
+          </div>
+        </a>
+
+        <div class="mc-contact-row no-link">
+          <div class="mc-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+          <div>
+            <span class="mc-contact-label">Address</span>
+            <span class="mc-contact-val">{{ company.address }}</span>
+          </div>
+        </div>
+
+        {% if company.principal_broker %}
+        <div class="mc-contact-row no-link">
+          <div class="mc-contact-icon"><i class="bi bi-person-badge-fill"></i></div>
+          <div>
+            <span class="mc-contact-label">Principal Broker</span>
+            <span class="mc-contact-val">{{ company.principal_broker }}</span>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+
+    <!-- Quick Actions -->
+    <div class="mc-card">
+      <div class="mc-card-hd">
+        <i class="bi bi-lightning-charge-fill"></i>
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="mc-card-bd">
+        <div class="mc-quick-grid">
+
+          <a href="{% url 'sell-property' %}" class="mc-quick-btn">
+            <div class="mc-qb-icon sale"><i class="bi bi-tag-fill"></i></div>
+            <span>List for Sale</span>
+          </a>
+
+          <a href="{% url 'lease-property' %}" class="mc-quick-btn">
+            <div class="mc-qb-icon lease"><i class="bi bi-house-add-fill"></i></div>
+            <span>List for Rent</span>
+          </a>
+
+          <a href="{% url 'listings' %}" class="mc-quick-btn">
+            <div class="mc-qb-icon listings"><i class="bi bi-buildings-fill"></i></div>
+            <span>My Listings</span>
+          </a>
+
+          <a href="{% url 'agent:leads' %}" class="mc-quick-btn">
+            <div class="mc-qb-icon leads"><i class="bi bi-people-fill"></i></div>
+            <span>My Leads</span>
+          </a>
+
+          <a href="{% url 'agent:analytics' %}" class="mc-quick-btn">
+            <div class="mc-qb-icon analytics"><i class="bi bi-graph-up-arrow"></i></div>
+            <span>Analytics</span>
+          </a>
+
+          <a href="{%url 'company:company-profile' company.unique_company_id%}" class="mc-quick-btn">
+            <div class="mc-qb-icon profile"><i class="bi bi-building-fill"></i></div>
+            <span>Company Profile</span>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- About company -->
+    <div class="mc-card">
+      <div class="mc-card-hd">
+        <i class="bi bi-info-circle-fill"></i>
+        <h2>About</h2>
+      </div>
+      <div class="mc-card-bd">
+        <p class="mc-about-text">{{ company.company_bio|default:"No company description provided yet." }}</p>
+        {% if company.service_areas %}
+          <div class="mc-info-chip-row">
+            <span class="mc-info-chip"><i class="bi bi-geo-fill"></i> {{ company.service_areas }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+
+    <!-- Leave company — destructive action at the bottom -->
+    <div class="mc-card danger-card">
+      <div class="mc-card-hd">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <h2>Membership</h2>
+      </div>
+      <div class="mc-card-bd">
+        <p class="mc-danger-text">
+          Leaving the company will remove you from the team. Your listings will stay attributed to the company.
+        </p>
+        <button class="mc-leave-btn" onclick="confirmLeave()">
+          <i class="bi bi-door-open-fill"></i> Leave Company
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+</div><!-- end .mc-page -->
+
+
+<!-- ── LEAVE CONFIRM MODAL ── -->
+<div class="mc-modal-overlay" id="leaveModal">
+  <div class="mc-modal">
+    <div class="mc-modal-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+    <h3>Leave {{ company.company_name }}?</h3>
+    <p>You will be removed from the team. Your existing listings will remain with the company and cannot be taken with you.</p>
+    <div class="mc-modal-actions">
+      <button class="mc-modal-cancel" onclick="closeLeaveModal()">Cancel</button>
+      <button class="mc-modal-confirm" onclick="performLeave()">
+        {# POSTs to agent:leave_company with CSRF confirmation #}
+        Yes, Leave
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endif %}{# end has company #}
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+ 
+  /* ── Tab switcher ── */
+  document.querySelectorAll('.mc-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.mc-tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.mc-tab-panel').forEach(function (p) { p.classList.add('hidden'); });
+      tab.classList.add('active');
+      document.getElementById('mc-panel-' + tab.dataset.target).classList.remove('hidden');
+    });
+  });
+ 
+  /* ── Leave modal ── */
+  window.confirmLeave = function () {
+    document.getElementById('leaveModal').classList.add('open');
+  };
+ 
+  window.closeLeaveModal = function () {
+    document.getElementById('leaveModal').classList.remove('open');
+  };
+ 
+  /* Simply submit the hidden form — view handles redirect and messages */
+  window.performLeave = function () {
+    var btn = document.querySelector('.mc-modal-confirm');
+    btn.disabled = true;
+    btn.textContent = 'Leaving...';
+    document.getElementById('leaveForm').submit();
+  };
+ 
+  document.getElementById('leaveModal').addEventListener('click', function (e) {
+    if (e.target === this) closeLeaveModal();
+  });
+ 
+}());
+</script>
+{% endblock %}

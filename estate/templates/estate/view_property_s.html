@@ -172,49 +172,6 @@
         </div>
       </div>
 
-      {# Property Flags #}
-      <div class="section-card">
-        <div class="section-head">
-          <i class="bi bi-flag-fill"></i>
-          <h3>Property Flags</h3>
-        </div>
-        <div class="section-body">
-          <div class="flags-list">
-            <span class="flag-pill {% if property.is_furnished %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.is_furnished %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Furnished
-            </span>
-            <span class="flag-pill {% if property.is_serviced %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.is_serviced %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Serviced
-            </span>
-            <span class="flag-pill {% if property.is_newly_built %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.is_newly_built %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Newly Built
-            </span>
-            <span class="flag-pill {% if property.has_swimming_pool %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.has_swimming_pool %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Swimming Pool
-            </span>
-            <span class="flag-pill {% if property.has_gym %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.has_gym %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Gym
-            </span>
-            <span class="flag-pill {% if property.has_security %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.has_security %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              24/7 Security
-            </span>
-            <span class="flag-pill {% if property.has_borehole %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.has_borehole %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Borehole
-            </span>
-            <span class="flag-pill {% if property.has_generator %}flag-yes{% else %}flag-no{% endif %}">
-              <i class="bi bi-{% if property.has_generator %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
-              Generator
-            </span>
-          </div>
-        </div>
-      </div>
 
       {# Map #}
       <div class="section-card">
@@ -338,8 +295,8 @@
 
   {# ── Flag / Report Listing ─────────────────────────────────────── #}
   <div class="flag-listing-bar">
-    <a href="#" class="btn-flag-listing" id="flag-listing-btn">
-      <i class="bi bi-flag-fill"></i> Flag this Listing
+    <a href="{%url 'customer:flag-listing' property_type=property.property_type property_id=property.id%}" class="btn-flag-listing" id="flag-listing-btn">
+      <i class="bi bi-flag-fill"></i> Report Listing
     </a>
   </div>
 

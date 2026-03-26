@@ -11,8 +11,8 @@ from django.conf import settings
 class PropertyManagementSale(models.Model):
     users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     user_id=models.IntegerField('Listee Users ID', blank=False, default=1)
-    company_uuid=models.CharField('Company_uuid', max_length=40, default='None', blank=True)
-    agent_uuid= models.CharField('Agent_uuid', max_length=36, default='None', blank=True)
+    company_uuid=models.CharField('Company_uuid', max_length=40, default=None, blank=True, null=True)
+    agent_uuid= models.CharField('Agent_uuid', max_length=36, default=None, blank=True, null=True)
     property_description = models.TextField('Description', max_length=3000, blank=True,help_text="Detailed description of the property (Max 3,000 characters).")
     location = models.CharField('Location', max_length=100)
     state= models.CharField(max_length=20,choices=STATES, default='Lagos')
@@ -45,8 +45,8 @@ class PropertyManagementSale(models.Model):
 class PropertyManagementRent(models.Model):
     users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     user_id=models.IntegerField('Landlord', blank=False, default=1)
-    company_uuid=models.CharField('Company', max_length=36, default='None', blank=True)
-    agent_uuid= models.CharField('Agent', max_length=36, default='None', blank=True)
+    company_uuid=models.CharField('Company', max_length=36, default=None, blank=True, null=True)
+    agent_uuid= models.CharField('Agent', max_length=36, default=None, blank=True, null=True)
     description = models.TextField('Description', max_length=3000, blank=True,help_text="Detailed description of the property (Max 3,000 characters).")
     location= models.CharField('Location', max_length=100, blank=False)
     state= models.CharField(max_length=20,choices=STATES, default='Lagos State')
@@ -73,6 +73,14 @@ class PropertyManagementRent(models.Model):
     flagged=models.BooleanField('Flagged', default=False, blank=False, null=False)
 
 
+#To avoid mass Report
+class UsersSaleFlags(models.Model):
+    property=models.ForeignKey(PropertyManagementSale, on_delete=models.CASCADE, related_name='sale_flags')
+    users_id=models.IntegerField('Users Who Flagged',blank=False, null=False)
+
+class UsersLeaseFlags(models.Model):
+    property=models.ForeignKey(PropertyManagementRent, on_delete=models.CASCADE, related_name='sale_flags')
+    users_id=models.IntegerField('Users Who Flagged',blank=False, null=False)
 
 
 '''Image Handling'''

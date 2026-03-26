@@ -48,6 +48,40 @@
 </nav>
 
 
+
+  <div class="messages-container">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'error' or message.tags == 'danger' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'warning' %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% elif message.tags == 'info' %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% else %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
+
 <!-- ═══════════════════════════════════════════
      SIDEBAR
      ═══════════════════════════════════════════ -->
@@ -317,10 +351,12 @@
                 <span class="adm-verify-date">Joined {{ agent.user.date_joined|timesince }} ago</span>
               </div>
               <div class="adm-verify-actions">
-                <button class="adm-btn-approve" onclick="verifyUser('agent', '{{ agent.agent_uuid }}')">
+                <button class="adm-btn-approve"
+                  data-verify-url="{% url 'executive:verify-agent' agent.agent_uuid %}"
+                  onclick="verifyUser(this)">
                   <i class="bi bi-check-lg"></i> Approve
                 </button>
-                <a href="#" class="adm-btn-view-sm">
+                <a href="{%url 'agent:agent-profile' agent.agent_uuid%}" class="adm-btn-view-sm">
                   <i class="bi bi-eye"></i>
                 </a>
               </div>
@@ -344,10 +380,12 @@
                 <span class="adm-verify-date">Applied {{ company.created_at|timesince }} ago</span>
               </div>
               <div class="adm-verify-actions">
-                <button class="adm-btn-approve" onclick="verifyUser('company', '{{ company.unique_company_id }}')">
+                <button class="adm-btn-approve"
+                data-verify-url="{% url 'executive:verify-company' company.unique_company_id %}"
+                onclick="verifyUser(this)">
                   <i class="bi bi-check-lg"></i> Approve
                 </button>
-                <a href="#" class="adm-btn-view-sm">
+                <a href="{%url 'company:company-profile' company.unique_company_id%}" class="adm-btn-view-sm">
                   <i class="bi bi-eye"></i>
                 </a>
               </div>
@@ -482,8 +520,8 @@
               </span>
             </div>
             <div class="adm-listing-meta">
-              <span class="adm-type-badge {% if prop.listing_type == 'sale' %}sale{% else %}lease{% endif %}">
-                {% if prop.listing_type == 'sale' %}For Sale{% else %}For Rent{% endif %}
+              <span class="adm-type-badge {% if prop.property_type == 'Sale' %}Sale{% else %}Lease{% endif %}">
+                {% if prop.property_type == 'Sale' %}For Sale{% else %}For Rent{% endif %}
               </span>
               <span class="adm-status-badge {% if prop.is_listed %}live{% else %}stored{% endif %}">
                 {% if prop.is_listed %}Live{% else %}Stored{% endif %}
@@ -491,8 +529,13 @@
               <span class="adm-listing-time">{{ prop.listed_date|timesince }} ago</span>
             </div>
             <div class="adm-listing-actions">
-              <a href="#" class="adm-action-icon" title="View"><i class="bi bi-eye"></i></a>
+            {%if prop.property_type == 'Rent'%}
+              <a href="{%url 'customer:view-property-r' prop.id%}" class="adm-action-icon" title="View"><i class="bi bi-eye"></i></a>
               <a href="#" class="adm-action-icon danger" title="Remove"><i class="bi bi-trash3"></i></a>
+            {%else%}
+              <a href="{%url 'customer:view-property-s' prop.id%}" class="adm-action-icon" title="View"><i class="bi bi-eye"></i></a>
+              <a href="#" class="adm-action-icon danger" title="Remove"><i class="bi bi-trash3"></i></a>
+            {%endif%}
             </div>
           </div>
           {% empty %}
@@ -521,12 +564,12 @@
           {% for partner in recent_partnerships %}
           <div class="adm-partner-row">
             <div class="adm-partner-info">
-              <strong>{{ partner.full_name }}</strong>
+              <strong>{{ partner.person_of_contact }}</strong>
               <span>{{ partner.email }}</span>
               <span>{{ partner.phone_number }}</span>
             </div>
             <div class="adm-partner-meta">
-              <span class="adm-partner-type">{{ partner.partnership_type|default:"General" }}</span>
+              <span class="adm-partner-type">{{ partner.company_type|default:"General"|capfirst }}</span>
               <span class="adm-partner-date">{{ partner.created_at|date:"M d, Y" }}</span>
             </div>
             <div class="adm-listing-actions">
@@ -570,11 +613,8 @@
               </div>
               <p>{{ review.comment|truncatewords:20 }}</p>
               <span class="adm-review-target">
-                {% if review.agent %}
-                  <i class="bi bi-award-fill"></i> {{ review.agent.first_name }} {{ review.agent.last_name }}
-                {% elif review.company %}
-                  <i class="bi bi-building-fill"></i> {{ review.company.company_name }}
-                {% endif %}
+                <i class="bi bi-{{ review.source|lower }}-fill"></i>
+                {{ review.source }}: {{ review.target_name }}
               </span>
             </div>
             <div class="adm-listing-actions">
@@ -787,7 +827,7 @@
         </div>
       </div>
 
-
+{% comment %} TODO adjust the verify link {% endcomment %}
       <!-- Recent Inquiries -->
       <div class="adm-card">
         <div class="adm-card-hd">
@@ -822,6 +862,7 @@
 
 
 </div><!-- end adm-content -->
+<form id="csrfForm" style="display:none">{% csrf_token %}</form>
 </main>
 
 
@@ -851,59 +892,76 @@
   /* Sidebar toggle */
   window.toggleSidebar = function () {
     var sidebar = document.getElementById('adminSidebar');
-    var main    = document.getElementById('adminMain');
     var overlay = document.getElementById('sidebarOverlay');
     sidebar.classList.toggle('open');
     overlay.classList.toggle('open');
   };
 
-  /* Verify modal */
-  var pendingType = '', pendingId = '';
+  /* Verify modal — now receives the button element */
+  var pendingUrl = '';
 
-  window.verifyUser = function (type, id) {
-    pendingType = type;
-    pendingId   = id;
+  window.verifyUser = function (btn) {
+    pendingUrl = btn.getAttribute('data-verify-url');
     document.getElementById('verifyModal').classList.add('open');
   };
 
-  document.getElementById('confirmVerifyBtn').addEventListener('click', function () {
-    if (!pendingId) return;
-    /* POST to verify endpoint — implement URL per type */
-    var url = pendingType === 'agent'
-      ? '/admin/verify-agent/' + pendingId + '/'
-      : '/admin/verify-company/' + pendingId + '/';
-    fetch(url, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' },
-      credentials: 'same-origin',
-    })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      closeModal();
-      if (d.success) window.location.reload();
-      else alert(d.error || 'Something went wrong.');
-    })
-    .catch(function () { closeModal(); alert('Request failed.'); });
-  });
+document.getElementById('confirmVerifyBtn').addEventListener('click', function () {
+  if (!pendingUrl) return;
 
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+
+  fetch(pendingUrl, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCsrf(),
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'same-origin',
+  })
+  .then(function (r) {
+    /* If the view returns a redirect or any 2xx/3xx — treat as success */
+    if (r.ok || r.redirected) {
+      closeModal();
+      window.location.reload();
+      return;
+    }
+    /* Only try to parse JSON if the server explicitly sent it */
+    var contentType = r.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return r.json().then(function (d) {
+        closeModal();
+        if (d.success) window.location.reload();
+        else alert(d.error || 'Something went wrong.');
+      });
+    }
+    /* Non-JSON error response */
+    closeModal();
+    alert('Verification failed. Status: ' + r.status);
+  })
+  .catch(function () {
+    closeModal();
+    alert('Network error. Please try again.');
+  })
+  .finally(function () {
+    btn.disabled = false;
+    btn.textContent = 'Verify Now';
+  });
+});
   window.closeModal = function () {
     document.getElementById('verifyModal').classList.remove('open');
-    pendingType = ''; pendingId = '';
+    pendingUrl = '';
   };
 
   document.getElementById('verifyModal').addEventListener('click', function (e) {
     if (e.target === this) closeModal();
   });
 
-  /* CSRF helper */
+  /* CSRF — read from the hidden form Django rendered */
   function getCsrf() {
-    var name = 'csrftoken';
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-      var c = cookies[i].trim();
-      if (c.startsWith(name + '=')) return decodeURIComponent(c.slice(name.length + 1));
-    }
-    return '';
+    var input = document.querySelector('#csrfForm [name=csrfmiddlewaretoken]');
+    return input ? input.value : '';
   }
 
 }());

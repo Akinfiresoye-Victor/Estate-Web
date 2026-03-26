@@ -10,8 +10,8 @@
 {% block content %}
 
 <div class="jobs-container">
-  
-  <!-- Page Header -->
+
+  <!-- ═══════════════ PAGE HEADER ═══════════════ -->
   <div class="page-header">
     <div class="header-content">
       <h1 class="page-title">Job Openings</h1>
@@ -29,33 +29,29 @@
     </div>
   </div>
 
-  <!-- Filters Section -->
+  <!-- ═══════════════ FILTERS ═══════════════ -->
   <div class="filters-section">
-    
-    <!-- Search Bar -->
+
     <div class="search-bar-container">
       <div class="search-bar">
         <i class="bi bi-search"></i>
-        <input 
-          type="text" 
-          id="searchInput" 
-          class="search-input" 
-          placeholder="Search by job title, skills, company, or keywords (e.g. Django, Sales, Remote)..."
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search job title, skills, company…"
+          autocomplete="off"
         >
-        <button id="clearSearch" class="clear-search-btn" style="display: none;">
+        <button id="clearSearch" class="clear-search-btn" style="display:none;" aria-label="Clear search">
           <i class="bi bi-x"></i>
         </button>
       </div>
     </div>
 
     <div class="filters-grid">
-      
-      <!-- Job Type Filter -->
+
       <div class="filter-group">
-        <label for="jobType" class="filter-label">
-          <i class="bi bi-briefcase"></i>
-          Job Type
-        </label>
+        <label for="jobType" class="filter-label"><i class="bi bi-briefcase"></i> Job Type</label>
         <select class="filter-select" id="jobType">
           <option value="">All Types</option>
           <option value="full-time">Full-Time</option>
@@ -66,12 +62,8 @@
         </select>
       </div>
 
-      <!-- Location Filter -->
       <div class="filter-group">
-        <label for="location" class="filter-label">
-          <i class="bi bi-geo-alt"></i>
-          Location
-        </label>
+        <label for="location" class="filter-label"><i class="bi bi-geo-alt"></i> Location</label>
         <select class="filter-select" id="location">
           <option value="">All Locations</option>
           <option value="lagos">Lagos</option>
@@ -85,12 +77,8 @@
         </select>
       </div>
 
-      <!-- Experience Level Filter -->
       <div class="filter-group">
-        <label for="experience" class="filter-label">
-          <i class="bi bi-award"></i>
-          Experience
-        </label>
+        <label for="experience" class="filter-label"><i class="bi bi-award"></i> Experience</label>
         <select class="filter-select" id="experience">
           <option value="">Any Level</option>
           <option value="entry">Entry Level</option>
@@ -100,28 +88,20 @@
         </select>
       </div>
 
-      <!-- Salary Range Filter -->
       <div class="filter-group">
-        <label for="salaryRange" class="filter-label">
-          <i class="bi bi-cash-stack"></i>
-          Salary Range
-        </label>
+        <label for="salaryRange" class="filter-label"><i class="bi bi-cash-stack"></i> Salary</label>
         <select class="filter-select" id="salaryRange">
           <option value="">Any Salary</option>
           <option value="0-100000">Under ₦100k</option>
-          <option value="100000-300000">₦100k - ₦300k</option>
-          <option value="300000-500000">₦300k - ₦500k</option>
-          <option value="500000-1000000">₦500k - ₦1M</option>
+          <option value="100000-300000">₦100k – ₦300k</option>
+          <option value="300000-500000">₦300k – ₦500k</option>
+          <option value="500000-1000000">₦500k – ₦1M</option>
           <option value="1000000-999999999">Above ₦1M</option>
         </select>
       </div>
 
-      <!-- Date Posted Filter -->
       <div class="filter-group">
-        <label for="datePosted" class="filter-label">
-          <i class="bi bi-clock"></i>
-          Posted
-        </label>
+        <label for="datePosted" class="filter-label"><i class="bi bi-clock"></i> Posted</label>
         <select class="filter-select" id="datePosted">
           <option value="">Any Time</option>
           <option value="today">Today</option>
@@ -131,12 +111,8 @@
         </select>
       </div>
 
-      <!-- Sort By -->
       <div class="filter-group">
-        <label for="sortBy" class="filter-label">
-          <i class="bi bi-sort-down"></i>
-          Sort By
-        </label>
+        <label for="sortBy" class="filter-label"><i class="bi bi-sort-down"></i> Sort By</label>
         <select class="filter-select" id="sortBy">
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
@@ -148,22 +124,22 @@
 
     </div>
 
-    <!-- Results Count & Clear Filters -->
     <div class="filter-results">
       <span id="resultsCount">Showing all {{ jobs|length }} job{{ jobs|length|pluralize }}</span>
-      <button id="clearFilters" class="clear-filters-btn" style="display: none;">
-        <i class="bi bi-x-circle"></i>
-        Clear All Filters
+      <button id="clearFilters" class="clear-filters-btn" style="display:none;">
+        <i class="bi bi-x-circle"></i> Clear All Filters
       </button>
     </div>
+
   </div>
 
-  <!-- Job Listings -->
+  <!-- ═══════════════ JOB CARDS ═══════════════ -->
   <div class="job-listings" id="jobListings">
-    {% for job,market_days in jobs %}
-    <div class="job-card" 
-         data-job-type="{{ job.job_type|lower }}" 
-         data-location="{{ job.job_location|lower }}" 
+
+    {% for job, market_days in jobs %}
+    <div class="job-card"
+         data-job-type="{{ job.job_type|lower }}"
+         data-location="{{ job.job_location|lower }}"
          data-days="{{ market_days }}"
          data-min-pay="{{ job.min_pay|default:0 }}"
          data-max-pay="{{ job.max_pay|default:0 }}"
@@ -175,18 +151,16 @@
          data-deadline="{{ job.application_deadline|default:'' }}"
          data-is-active="{{ job.is_active|default:True }}"
          data-posted="{{ job.date_posted|date:'Y-m-d' }}">
-      
-      <!-- Job Card Header -->
+
+      <!-- Header -->
       <div class="job-header">
         <div class="company-info">
-          <div class="company-logo">{{ company_name|truncatewords:1|slice:":2"|upper }}</div>
+          <div class="company-logo">{{ job.company_name|truncatewords:1|slice:":2"|upper }}</div>
           <div class="company-details">
             <h2 class="job-title">{{ job.job_title }}</h2>
             <p class="company-name">{{ job.company_name }}</p>
           </div>
         </div>
-        
-        <!-- Status Badges -->
         <div class="job-badges">
           {% if job.is_featured %}
           <span class="badge-featured" title="Featured Job">
@@ -198,21 +172,18 @@
           </a>
         </div>
       </div>
-      
-      <!-- Job Tags -->
+
+      <!-- Tags -->
       <div class="job-tags">
         <span class="job-tag type">
-          <i class="bi bi-briefcase-fill"></i>
-          {{ job.job_type }}
+          <i class="bi bi-briefcase-fill"></i> {{ job.job_type }}
         </span>
         <span class="job-tag location">
-          <i class="bi bi-geo-alt-fill"></i>
-          {{ job.job_location }}
+          <i class="bi bi-geo-alt-fill"></i> {{ job.job_location }}
         </span>
         {% if job.experience_required %}
         <span class="job-tag experience">
-          <i class="bi bi-award-fill"></i>
-          {{ job.experience_required }}
+          <i class="bi bi-award-fill"></i> {{ job.experience_required }}
         </span>
         {% endif %}
         {% if job.positions_available and job.positions_available > 1 %}
@@ -223,18 +194,16 @@
         {% endif %}
       </div>
 
-      <!-- Job Description -->
-      <p class="job-description">
-        {{ job.short_description }}
-      </p>
-      <!-- Job Footer -->
+      <!-- Description -->
+      <p class="job-description">{{ job.short_description }}</p>
+
+      <!-- Footer -->
       <div class="job-footer">
         <div class="footer-left">
-          <!-- Salary -->
           <span class="salary">
             <i class="bi bi-cash-coin"></i>
             {% if job.min_pay and job.max_pay %}
-              {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} - {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }}
+              {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} – {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }}
               <span class="salary-period">/{{ job.salary_period|default:"month"|lower }}</span>
             {% elif job.min_pay %}
               From {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }}
@@ -244,35 +213,30 @@
             {% endif %}
           </span>
         </div>
-        
+
         <div class="footer-right">
-          <!-- Posted Date -->
           <span class="posted-date">
             <i class="bi bi-clock-history"></i>
-            {% if market_days == 0 %}
-              Today
-            {% elif market_days == 1 %}
-              Yesterday
-            {% else %}
-              {{ market_days }} day{{ market_days|pluralize }} ago
+            {% if market_days == 0 %}Today
+            {% elif market_days == 1 %}Yesterday
+            {% else %}{{ market_days }} day{{ market_days|pluralize }} ago
             {% endif %}
           </span>
-          
-          <!-- Deadline Warning (if close) -->
+
           {% if job.application_deadline %}
             {% load tz %}
             {% now "U" as current_timestamp %}
             {% with deadline_timestamp=job.application_deadline|date:"U" %}
               {% if deadline_timestamp|add:"-604800" < current_timestamp %}
-                <span class="deadline-warning" title="Application deadline: {{ job.application_deadline|date:'M d, Y' }}">
-                  <i class="bi bi-exclamation-triangle-fill"></i>
-                  Closes soon
+                <span class="deadline-warning" title="Deadline: {{ job.application_deadline|date:'M d, Y' }}">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Closes soon
                 </span>
               {% endif %}
             {% endwith %}
           {% endif %}
         </div>
       </div>
+
     </div>
     {% empty %}
     <div class="no-jobs">
@@ -281,16 +245,16 @@
       <p>Check back soon for new opportunities</p>
     </div>
     {% endfor %}
+
   </div>
 
-  <!-- No Results Message (Hidden by default) -->
-  <div class="no-results" id="noResults" style="display: none;">
+  <!-- No Results (JS toggled) -->
+  <div class="no-results" id="noResults" style="display:none;">
     <i class="bi bi-search"></i>
     <h3>No Jobs Found</h3>
     <p>Try adjusting your filters to see more results</p>
     <button id="resetFromNoResults" class="btn-reset">
-      <i class="bi bi-arrow-counterclockwise"></i>
-      Reset Filters
+      <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
     </button>
   </div>
 

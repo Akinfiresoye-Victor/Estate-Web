@@ -283,8 +283,8 @@
 
   {# ── Flag / Report Listing ─────────────────────────────────────── #}
   <div class="flag-listing-bar">
-    <a href="#" class="btn-flag-listing" id="flag-listing-btn">
-      <i class="bi bi-flag-fill"></i> Flag this Listing
+    <a href="{%url 'customer:flag-listing' property_type=property.property_type property_id=property.id%}" class="btn-flag-listing" id="flag-listing-btn">
+      <i class="bi bi-flag-fill"></i> Report Listing
     </a>
   </div>
 

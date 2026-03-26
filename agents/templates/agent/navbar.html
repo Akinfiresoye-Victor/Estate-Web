@@ -25,8 +25,9 @@
       <a href="{% url 'appointment' %}" class="nb-link">
         <i class="bi bi-calendar-check-fill"></i> Schedule
       </a>
-      <a href="{% url 'agent:job-listings' %}" class="nb-link">
-        <i class="bi bi-briefcase-fill"></i> Jobs
+
+      <a href="{% url 'agent:my-company' %}" class="nb-link">
+        <i class="bi bi-building-fill"></i> My Company
       </a>
     </div>
 
@@ -172,11 +173,13 @@
         <i class="bi bi-chevron-right nb-canvas-arrow"></i>
       </a>
 
-      <a href="{% url 'agent:job-listings' %}" class="nb-canvas-link">
-        <div class="nb-canvas-icon jobs"><i class="bi bi-briefcase-fill"></i></div>
+
+
+      <a href="{% url 'agent:my-company' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon company"><i class="bi bi-building-fill"></i></div>
         <div class="nb-canvas-text">
-          <strong>Job Listings</strong>
-          <span>Find work with companies</span>
+          <strong>My Company</strong>
+          <span>Manage team and company</span>
         </div>
         <i class="bi bi-chevron-right nb-canvas-arrow"></i>
       </a>

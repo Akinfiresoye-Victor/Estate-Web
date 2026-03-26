@@ -47,9 +47,8 @@ def property_view_count(property_id, property_type, users_id, users_uuid):
     Tracks Property Views
     """
     all_views=set(PropertyViews.objects.filter(property_type=property_type, property_id=property_id).values_list('user_id', flat=True))
-    viewers_id=[users_id in all_views]
     if users_id not in all_views:
-        new_object = PropertyViews.objects.create(
+        PropertyViews.objects.create(
             user_id=users_id,
             property_type=property_type,
             property_id=property_id,
@@ -786,3 +785,54 @@ def inquiry_form(request, property_type, property_id):
 
 
 
+
+def flag_listing(request, property_id, property_type):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    try:
+        if property_type == 'Sale':
+            onsale_property=PropertyManagementSale.objects.get(pk=property_id)
+            all_reports=set(UsersSaleFlags.objects.filter(property=onsale_property).values_list('users_id', flat=True))
+            if request.user.id not in all_reports:
+                UsersSaleFlags.objects.create(
+                    property=onsale_property,
+                    users_id=request.user.id
+                )
+                onsale_property.flagged=True
+                onsale_property.save()
+                messages.success(request,'Thanks for keeping EstateWeb Safe')
+            else:
+                messages.error(request, 'Property Already Flagged')
+            if 'HTTP_REFERER' in request.META:
+                return redirect(request.META['HTTP_REFERER'])  
+            else:
+                return redirect('landing')
+        elif property_type == 'Rent':
+            leased_property=PropertyManagementRent.objects.get(pk=property_id)
+            all_reports=set(UsersLeaseFlags.objects.filter(property=leased_property).values_list('users_id', flat=True))
+            if request.user.id not in all_reports:
+                UsersLeaseFlags.objects.create(
+                    property=leased_property,
+                    users_id=request.user.id
+                )
+                leased_property.flagged=True
+                leased_property.save()
+                messages.success(request,'Thanks for keeping EstateWeb Safe')
+            if 'HTTP_REFERER' in request.META:
+                return redirect(request.META['HTTP_REFERER'])  
+            else:
+                return redirect('landing')
+            
+            
+        else:
+            messages.error(request, 'Error getting property type')
+            if 'HTTP_REFERER' in request.META:
+                return redirect(request.META['HTTP_REFERER'])  
+            else:
+                return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+#FIXME Customers cant see the error page due to the name of the folder being estate and not customer

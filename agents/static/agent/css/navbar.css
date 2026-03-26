@@ -159,6 +159,8 @@
 .nb-canvas-icon.feedback{ background: #059669; }
 .nb-canvas-icon.terms   { background: #374151; }
 .nb-canvas-icon.partner { background: linear-gradient(135deg, var(--nb-secondary), var(--nb-accent)); }
+.nb-canvas-icon.company { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+.nb-canvas-icon.jobs    { background: #f59e0b; }
 
 /* Link text */
 .nb-canvas-text { flex: 1; min-width: 0; }

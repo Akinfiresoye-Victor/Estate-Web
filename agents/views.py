@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from .quotes import get_random_quote
 from django.db.models import Sum, Avg, Count
-from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator
+from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator,get_inventory_count,get_listing_count
 from companies.models import JobPost,CompanyInformation,InviteLink, CompanyActivityLog, Employees
 from django.urls import reverse
 import traceback
@@ -898,10 +898,11 @@ def job_detail(request, job_id):
         messages.info(request, 'Login Required')
         return redirect('login')
     try:
-        job=JobPost.objects.get(pk=job_id)
-        return render(request, 'agent/job_detail.html', {'job':job})
+        job = JobPost.objects.select_related('company').get(pk=job_id)
+        return render(request, 'agent/job_detail.html', {'job': job})
     except ObjectDoesNotExist:
-        messages.info(request, 'Error Job Data not found')
+        messages.info(request, 'Job not found.')
+        return redirect('agent:job-listings')   # ← added return so it actually redirects
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -1042,6 +1043,93 @@ def join_via_invite(request):
         )
         return redirect('agent:dashboard')
 
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def my_company(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, 'Agent Account Only')
+        return redirect('landing')
+    try:
+        agent=AgentInformation.objects.get(user_id=request.user.id)
+        if agent.company_uuid:
+            company=CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
+            teamates=AgentInformation.objects.filter(company_uuid=agent.company_uuid)
+            company_property_sale= PropertyManagementSale.objects.filter(company_uuid=agent.company_uuid)
+            company_property_rent=PropertyManagementRent.objects.filter(company_uuid=agent.company_uuid)
+            inventory_used=get_inventory_count(agent, company)
+            live_used=get_listing_count(agent, company)
+            inv_limit=company.inventory_slots if company.company_tier != 'enterprise' else '∞'
+            live_limit=company.listing_slots if company.company_tier != 'enterprise' else '∞'
+            my_listing_count=PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count() + PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count()
+        else:
+            company=None
+        context={
+            'agent':agent,
+            'company':company,
+            'teammates':teamates[:10],
+            'company_sale_props': company_property_sale,
+            'company_rent_props': company_property_rent,
+            'inv_used': inventory_used,
+            'live_used':live_used,
+            'live_limit':live_limit,
+            'inv_limit':inv_limit,
+            'total_team': teamates.count(),
+            'my_listings_count':my_listing_count
+        }
+        return render(request, 'agent/agent_companies.html', context)
+    except ObjectDoesNotExist:
+        messages.error(request, 'Data Not Found')
+        return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def leave_company(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, 'Agents Only')
+        return redirect('landing')
+    try:
+        agent=AgentInformation.objects.get(user_id=request.user.id)
+        if not agent.company_uuid:
+            messages.error(request, 'Join a Company to perform this action')
+            return redirect('landing')
+        
+        company=CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
+        employee=Employees.objects.get(agent_uuid=agent.agent_uuid)
+        
+        if not employee.company == company:
+            messages.warning(request, 'Unauthorized Action')
+            return redirect('landing')
+        
+        agent=AgentInformation.objects.get(agent_uuid=agent.agent_uuid)
+        #handing every property and lead data back to the company
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None,user_id=company.user_id)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None, user_id=company.user_id)
+        LeadInfo.objects.filter(agent_id=agent.agent_uuid).update(agent_id=None)
+        Appointments.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
+        agent.company_uuid = None
+        agent.save()
+        employee.delete()
+        messages.success(request, 'Agent Removed Successfully')
+        CompanyActivityLog.objects.create(
+            company=company,
+            action=f'{agent.first_name} Left Company'
+        )
+        messages.success(request, 'Company Left Successfully')
+        return redirect('landing')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Data Not Found')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

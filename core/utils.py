@@ -478,8 +478,7 @@ def get_inventory_count(agent, company=None):
     elif agent:
         #Solo agent - only their own properties
         return(PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count()+
-                PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count()
-                )
+                PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count())
 
 def get_listing_count(agent, company=None):
     """
@@ -487,14 +486,13 @@ def get_listing_count(agent, company=None):
     """
     if company:
         return(
-            PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id, is_listed=True).count()+
-            PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id, is_listed=True).count()
+            PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id,is_listed=True).count()+
+            PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id,is_listed=True).count()
         )
     elif agent:
         return(
-            PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count() + 
-            PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count()
-            
+            PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid,is_listed=True).count() + 
+            PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid,is_listed=True).count()
         )
 
 def can_add_to_inventory(agent, company=None):

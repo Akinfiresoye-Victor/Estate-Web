@@ -36,7 +36,7 @@ from core.models import *
 import uuid
 from core.utils import refresh_activity_score
 from itertools import chain
-
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 
@@ -139,20 +139,13 @@ def admin_dashboard(request):
 
     # Recent listings — combine both querysets, sort in Python (avoids UNION complexity)
     # 2 queries
-    recent_sale = list(
-        PropertyManagementSale.objects.order_by('-listed_date')[:8]
-        .values('id', 'listed_date', 'property_category', 'location', 'state', 'is_listed')
-    )
-    recent_rent = list(
-        PropertyManagementRent.objects.order_by('-listed_date')[:8]
-        .values('id', 'listed_date', 'property_category', 'location', 'state', 'is_listed')
-    )
-    # Tag each so the template knows the type
-    for p in recent_sale: p['listing_type'] = 'Sale'
-    for p in recent_rent: p['listing_type'] = 'Rent'
+    recent_sale = list(PropertyManagementSale.objects.order_by('-listed_date')[:8])
+    recent_rent = list(PropertyManagementRent.objects.order_by('-listed_date')[:8])
+
+    # Keep as model instances so template properties like .base_image and .residential work correctly.
     recent_listings = sorted(
         chain(recent_sale, recent_rent),
-        key=lambda x: x['listed_date'],
+        key=lambda x: x.listed_date,
         reverse=True
     )[:8]
 
@@ -181,14 +174,42 @@ def admin_dashboard(request):
     # ─────────────────────────────────────────────────────────────────────
     # 7. REVIEWS — 2 queries, merged in Python
     # ─────────────────────────────────────────────────────────────────────
-    recent_agent_reviews   = list(AgentRating.objects.order_by('-created_at')[:6]
-                                  .values('id', 'rating', 'created_at', 'rating'))
-    recent_company_reviews = list(CompanyRating.objects.order_by('-created_at')[:6]
-                                  .values('id', 'rating', 'created_at', 'rating'))
-    for r in recent_agent_reviews:   r['source'] = 'Agent'
-    for r in recent_company_reviews: r['source'] = 'Company'
+    agent_name_map = {
+        a.agent_uuid: f"{a.first_name} {a.last_name}"
+        for a in AgentInformation.objects.only('agent_uuid', 'first_name', 'last_name')
+    }
+    company_name_map = {
+        c.unique_company_id: c.company_name
+        for c in CompanyInformation.objects.only('unique_company_id', 'company_name')
+    }
+
+    recent_agent_reviews = AgentRating.objects.select_related('user').order_by('-created_at')[:6]
+    recent_company_reviews = CompanyRating.objects.select_related('user').order_by('-created_at')[:6]
+
+    recent_reviews = []
+    for r in recent_agent_reviews:
+        recent_reviews.append({
+            'user': r.user,
+            'rating': r.rating,
+            'comment': r.comment,
+            'created_at': r.created_at,
+            'source': 'Agent',
+            'target_uuid': r.agent_uuid,
+            'target_name': agent_name_map.get(r.agent_uuid, 'Unknown Agent'),
+        })
+    for r in recent_company_reviews:
+        recent_reviews.append({
+            'user': r.user,
+            'rating': r.rating,
+            'comment': r.comment,
+            'created_at': r.created_at,
+            'source': 'Company',
+            'target_uuid': r.company_uuid,
+            'target_name': company_name_map.get(r.company_uuid, 'Unknown Company'),
+        })
+
     recent_reviews = sorted(
-        chain(recent_agent_reviews, recent_company_reviews),
+        recent_reviews,
         key=lambda x: x['created_at'],
         reverse=True
     )[:6]
@@ -199,34 +220,31 @@ def admin_dashboard(request):
     recent_signups = User.objects.order_by('-date_joined')[:8]
 
     # ─────────────────────────────────────────────────────────────────────
-    # 9. TOP AGENTS — 1 query (annotated, no per-agent DB hits)
+    # 9. TOP AGENTS — counts from both sale + rent flows
     # ─────────────────────────────────────────────────────────────────────
-    top_agents = (
-        AgentInformation.objects
-        .annotate(listing_count=Count('agent_uuid', filter=Q(
-            # counts all sale + rent properties where agent_uuid matches
-            # adjust related_name to match your FK field name
-        )))
-        .order_by('-listing_count')[:5]
-    )
-    # NOTE: if PropertyManagementSale/Rent use agent_uuid as a CharField
-    # (not a FK), annotate from those models instead:
-    top_agents = (
-        AgentInformation.objects
-        .annotate(
-            sale_count=Count(
-                'agent_uuid',   # replace with your actual related_name
-                distinct=True
-            ),
-            rent_count=Count(
-                'agent_uuid',   # replace with your actual related_name
-                distinct=True
-            ),
-        )
-        .annotate(listing_count=Count('agent_uuid', distinct=True) +
-                                 Count('agent_uuid', distinct=True))
-        .order_by('-listing_count')[:5]
-    )
+    sale_counts = PropertyManagementSale.objects.values('agent_uuid').annotate(count=Count('id'))
+    rent_counts = PropertyManagementRent.objects.values('agent_uuid').annotate(count=Count('id'))
+
+    agent_listing_counts = {}
+    for item in sale_counts:
+        if item['agent_uuid']:
+            agent_listing_counts[item['agent_uuid']] = agent_listing_counts.get(item['agent_uuid'], 0) + item['count']
+    for item in rent_counts:
+        if item['agent_uuid']:
+            agent_listing_counts[item['agent_uuid']] = agent_listing_counts.get(item['agent_uuid'], 0) + item['count']
+
+    top_agent_uuids = sorted(agent_listing_counts, key=lambda k: agent_listing_counts[k], reverse=True)[:5]
+
+    top_agents = []
+    for agent_uuid in top_agent_uuids:
+        agent = AgentInformation.objects.filter(agent_uuid=agent_uuid).first()
+        if not agent:
+            continue
+        top_agents.append({
+            'agent': agent,
+            'listing_count': agent_listing_counts.get(agent_uuid, 0),
+        })
+
 
     # ─────────────────────────────────────────────────────────────────────
     # CONTEXT
@@ -297,3 +315,36 @@ def admin_dashboard(request):
     }
 
     return render(request, 'executive/admin_dashboard.html', context)
+
+
+@ensure_csrf_cookie
+def agent_verification(request, agent_uuid):
+    try:
+        AgentInformation.objects.filter(agent_uuid=agent_uuid).update(verified=True)
+        messages.success(request, 'Agent Verified')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])
+        else:
+            return redirect('executive:admin-dashboard')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Company Doesnt exists')
+    except:
+        messages.error(request, 'An Error Occured')
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+@ensure_csrf_cookie
+def company_verification(request, company_uuid):
+    try:
+        CompanyInformation.objects.filter(unique_company_id=company_uuid).update(verified=True)
+        messages.success(request, 'Company Verified')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])
+        else:
+            return redirect('executive:admin-dashboard')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Company Doesnt exists')
+    except:
+        messages.error(request, 'An Error Occured')
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

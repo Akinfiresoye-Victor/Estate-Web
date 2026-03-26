@@ -3,17 +3,64 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}Real Estate Agent - Estate Web Properties{% endblock %}
+{% block title %}{{ job.job_title }} — Estate Web{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'agent/css/job_detail.css' %}">
 {% endblock %}
 
+<script>
+window.shareJobLink = function() {
+  const url = window.location.href;
+  const icon = document.getElementById('copyIcon');
+  
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(function() {
+      // Success feedback
+      const originalIcon = icon.className;
+      icon.className = 'bi bi-clipboard-check';
+      setTimeout(() => {
+        icon.className = originalIcon;
+      }, 2000);
+      
+      // Optional toast
+      const toast = document.createElement('div');
+      toast.textContent = 'Job link copied!';
+      toast.style.cssText = `
+        position: fixed; top: 20px; right: 20px; 
+        background: #000; color: #fff; padding: 12px 20px; 
+        border-radius: 8px; font-family: sans-serif; 
+        z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }).catch(() => fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
+};
+
+function fallbackCopy(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    // Feedback same as above
+  } catch (err) {
+    console.error('Copy failed', err);
+  }
+  document.body.removeChild(textArea);
+}
+</script>
+
 {% block content %}
 
 <div class="job-detail-container">
-  
-  <!-- Back Navigation -->
+
+  <!-- ═══════════════ BACK NAV ═══════════════ -->
   <div class="back-nav">
     <a href="{% url 'agent:job-listings' %}" class="back-link">
       <i class="bi bi-arrow-left"></i>
@@ -21,18 +68,15 @@
     </a>
   </div>
 
-  <!-- Job Header -->
+  <!-- ═══════════════ JOB HEADER CARD ═══════════════ -->
   <div class="job-header-card">
+
     <div class="job-header-content">
-      {% if company_name %}
-      <div class="company-logo-large">{{ company_name|slice:":2"|upper }}</div>
-      {% else %}
-      <div class="company-logo-large">{{ job.company_uuid|slice:":2"|upper }}</div>
-      {% endif %}
+      <div class="company-logo-large">{{ job.company_name|slice:":2"|upper }}</div>
       <div class="job-header-info">
         <h1 class="job-title-large">{{ job.job_title }}</h1>
-        <p class="company-name-large">{{ company_name|default:"Company" }}</p>
-        
+        <p class="company-name-large">{{ job.company_name|default:"Company" }}</p>
+
         <div class="job-meta">
           <span class="meta-item">
             <i class="bi bi-briefcase"></i>
@@ -51,7 +95,7 @@
         <div class="job-salary-large">
           <i class="bi bi-cash-stack"></i>
           {% if job.min_pay and job.max_pay %}
-            {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} - {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }} per {{ job.salary_period|default:"month"|lower }}
+            {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} – {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }} per {{ job.salary_period|default:"month"|lower }}
           {% elif job.min_pay %}
             From {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} per {{ job.salary_period|default:"month"|lower }}
           {% else %}
@@ -66,49 +110,46 @@
         <i class="bi bi-send"></i>
         Apply Now
       </button>
-      <button class="btn-save">
-        <i class="bi bi-bookmark"></i>
-      </button>
-      <button class="btn-share">
-        <i class="bi bi-share"></i>
-      </button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-save" title="Save job"><i class="bi bi-bookmark"></i></button>
+        <button class="btn-share" onclick="shareJobLink()" title="Share job"><i class="bi bi-share"></i></button>
+      </div>
     </div>
+
   </div>
 
-  <!-- Main Content Grid -->
+  <!-- ═══════════════ CONTENT GRID ═══════════════ -->
   <div class="content-grid">
-    
-    <!-- Left Column - Job Details -->
+
+    <!-- ── LEFT — Job Details ── -->
     <div class="job-content">
-      
-      <!-- Job Overview -->
+
+      <!-- Overview -->
       <section class="content-section">
         <h2 class="section-title">
-          <i class="bi bi-info-circle"></i>
-          Job Overview
+          <i class="bi bi-info-circle"></i> Job Overview
         </h2>
         <p class="job-overview-text">
           {{ job.short_description|default:"No short description provided." }}
         </p>
       </section>
 
-      <!-- Job Description -->
+      <!-- Full Description -->
       <section class="content-section">
         <h2 class="section-title">
-          <i class="bi bi-file-text"></i>
-          Job Description
+          <i class="bi bi-file-text"></i> Job Description
         </h2>
         <div class="description-content">
           {{ job.full_description|linebreaks|default:"No full description provided." }}
 
           {% if job.responsibilities %}
-          <h3>Key Responsibilities:</h3>
-          {{ job.responsibilities|linebreaks }}
+            <h3>Key Responsibilities</h3>
+            {{ job.responsibilities|linebreaks }}
           {% endif %}
 
           {% if job.benefits %}
-          <h3>What We Offer:</h3>
-          {{ job.benefits|linebreaks }}
+            <h3>What We Offer</h3>
+            {{ job.benefits|linebreaks }}
           {% endif %}
         </div>
       </section>
@@ -116,11 +157,11 @@
       <!-- Requirements -->
       <section class="content-section">
         <h2 class="section-title">
-          <i class="bi bi-check-circle"></i>
-          Requirements
+          <i class="bi bi-check-circle"></i> Requirements
         </h2>
         <div class="requirements-content">
-          <h3>Qualifications:</h3>
+
+          <h3>Qualifications</h3>
           <ul>
             {% if job.education_required %}
               <li>{{ job.education_required }}</li>
@@ -129,42 +170,38 @@
               <li>{{ job.experience_required }}</li>
             {% endif %}
             {% if job.positions_available %}
-              <li>Hiring: {{ job.positions_available }} position{{ job.positions_available|pluralize }}</li>
+              <li>Hiring {{ job.positions_available }} position{{ job.positions_available|pluralize }}</li>
             {% endif %}
             {% if job.applicants is not None %}
-              <li>{{ job.applicants }} applicant{{ job.applicants|pluralize }}</li>
+              <li>{{ job.applicants }} applicant{{ job.applicants|pluralize }} so far</li>
             {% endif %}
           </ul>
 
-          <h3>Skills & Competencies:</h3>
+          <h3>Skills &amp; Competencies</h3>
           {% if job.skills_required %}
             <p>{{ job.skills_required }}</p>
           {% else %}
             <p>Not specified</p>
           {% endif %}
 
-          {% if job.preferences %}
-          <h3>Preferred Qualifications:</h3>
-          {{ job.preferences|linebreaks }}
-          {% endif %}
+
         </div>
       </section>
 
       <!-- How to Apply -->
       <section class="content-section">
         <h2 class="section-title">
-          <i class="bi bi-envelope"></i>
-          How to Apply
+          <i class="bi bi-envelope"></i> How to Apply
         </h2>
         <div class="apply-content">
           <p>
-            Interested candidates should submit their resume, cover letter, and any relevant 
-            certifications through our online application portal. Please include examples of 
-            successful transactions or client testimonials if available.
+            Interested candidates should submit their resume, cover letter, and any relevant
+            certifications through our online application portal. Include examples of successful
+            transactions or client testimonials if available.
           </p>
           <p>
-            Applications will be reviewed on a rolling basis. Only shortlisted candidates will 
-            be contacted for interviews.
+            Applications are reviewed on a rolling basis. Only shortlisted candidates will be
+            contacted for interviews.
           </p>
           <div class="apply-deadline">
             <i class="bi bi-calendar-event"></i>
@@ -178,27 +215,28 @@
         </div>
       </section>
 
-      <!-- Apply Button (Bottom) -->
+      <!-- Bottom CTA -->
       <div class="apply-section">
         <button class="btn-apply-large" data-job-id="{{ job.pk }}">
           <i class="bi bi-send"></i>
           Apply for this Position
         </button>
         <p class="apply-note">
-          By applying, you agree to our <a href="#">Terms of Service</a> and 
+          By applying, you agree to our <a href="#">Terms of Service</a> and
           <a href="#">Privacy Policy</a>
         </p>
       </div>
 
-    </div>
+    </div><!-- end job-content -->
 
-    <!-- Right Sidebar - Company Info & Quick Facts -->
+    <!-- ── RIGHT — Sidebar ── -->
     <aside class="job-sidebar">
-      
+
       <!-- Quick Facts -->
       <div class="sidebar-card">
         <h3 class="sidebar-title">Quick Facts</h3>
         <div class="quick-facts">
+
           <div class="fact-item">
             <i class="bi bi-calendar-check"></i>
             <div class="fact-content">
@@ -206,6 +244,7 @@
               <span class="fact-value">{{ job.date_posted|timesince }} ago</span>
             </div>
           </div>
+
           <div class="fact-item">
             <i class="bi bi-people"></i>
             <div class="fact-content">
@@ -213,6 +252,7 @@
               <span class="fact-value">{{ job.applicants|default:0 }} candidates</span>
             </div>
           </div>
+
           <div class="fact-item">
             <i class="bi bi-briefcase"></i>
             <div class="fact-content">
@@ -220,6 +260,7 @@
               <span class="fact-value">{{ job.job_type|default:"Not specified" }}</span>
             </div>
           </div>
+
           <div class="fact-item">
             <i class="bi bi-clock"></i>
             <div class="fact-content">
@@ -227,6 +268,7 @@
               <span class="fact-value">{{ job.salary_period|default:"Flexible" }}</span>
             </div>
           </div>
+
           <div class="fact-item">
             <i class="bi bi-geo-alt"></i>
             <div class="fact-content">
@@ -234,13 +276,14 @@
               <span class="fact-value">{{ job.job_location|default:"Not specified" }}</span>
             </div>
           </div>
+
           <div class="fact-item">
             <i class="bi bi-currency-exchange"></i>
             <div class="fact-content">
               <span class="fact-label">Salary Range</span>
               <span class="fact-value">
                 {% if job.min_pay and job.max_pay %}
-                  {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} - {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }}/{{ job.salary_period|default:"month"|lower }}
+                  {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }} – {{ job.salary_currency|default:"₦" }}{{ job.max_pay|floatformat:0|intcomma }}/{{ job.salary_period|default:"month"|lower }}
                 {% elif job.min_pay %}
                   From {{ job.salary_currency|default:"₦" }}{{ job.min_pay|floatformat:0|intcomma }}/{{ job.salary_period|default:"month"|lower }}
                 {% else %}
@@ -249,25 +292,26 @@
               </span>
             </div>
           </div>
+
         </div>
       </div>
 
-      <!-- Company Information -->
+      <!-- Company Info -->
       <div class="sidebar-card">
         <h3 class="sidebar-title">About the Company</h3>
         <div class="company-info">
           <div class="company-logo-sidebar">EP</div>
           <h4 class="company-name">Estate Web Properties</h4>
           <p class="company-description">
-            Estate Web Properties is a leading real estate firm in Lagos, specializing in 
-            residential and commercial property sales, leasing, and property management services. 
-            We pride ourselves on exceptional customer service and innovative solutions.
+            Estate Web Properties is a leading real estate firm in Lagos, specialising in
+            residential and commercial property sales, leasing, and property management.
+            We are known for exceptional client service and innovative solutions.
           </p>
-          
+
           <div class="company-stats">
             <div class="stat-item">
               <strong>100+</strong>
-              <span>Properties Listed</span>
+              <span>Properties</span>
             </div>
             <div class="stat-item">
               <strong>50+</strong>
@@ -275,49 +319,34 @@
             </div>
             <div class="stat-item">
               <strong>500+</strong>
-              <span>Clients Served</span>
+              <span>Clients</span>
             </div>
           </div>
 
           <div class="company-links">
             <a href="#" class="company-link">
-              <i class="bi bi-globe"></i>
-              Visit Website
+              <i class="bi bi-globe"></i> Website
             </a>
             <a href="#" class="company-link">
-              <i class="bi bi-briefcase"></i>
-              View All Jobs
+              <i class="bi bi-briefcase"></i> All Jobs
             </a>
           </div>
         </div>
       </div>
 
-      <!-- Share Job -->
-      <div class="sidebar-card">
-        <h3 class="sidebar-title">Share This Job</h3>
-        <div class="share-buttons">
-          <button class="share-btn twitter">
-            <i class="bi bi-twitter"></i>
-            Twitter
-          </button>
-          <button class="share-btn facebook">
-            <i class="bi bi-facebook"></i>
-            Facebook
-          </button>
-          <button class="share-btn linkedin">
-            <i class="bi bi-linkedin"></i>
-            LinkedIn
-          </button>
-          <button class="share-btn whatsapp">
-            <i class="bi bi-whatsapp"></i>
-            WhatsApp
-          </button>
-          <button class="share-btn copy">
+        <!-- Share -->
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Share This Job</h3>
+          <div class="share-coming-soon">
+            <i class="bi bi-rocket-takeoff"></i>
+            <p>Social sharing <span>coming soon</span></p>
+            <small>More share options launching shortly</small>
+          </div>
+          <button class="share-btn copy" id="copyLinkBtn" onclick="copyJobUrl()">
             <i class="bi bi-link-45deg"></i>
-            Copy Link
+            <span id="copyLinkText">Copy Link</span>
           </button>
         </div>
-      </div>
 
       <!-- Similar Jobs -->
       <div class="sidebar-card">
@@ -327,30 +356,21 @@
             <div class="similar-job-info">
               <h5>Property Manager</h5>
               <p>Urban Estates Ltd.</p>
-              <span class="similar-job-location">
-                <i class="bi bi-geo-alt"></i>
-                Abuja
-              </span>
+              <span class="similar-job-location"><i class="bi bi-geo-alt"></i> Abuja</span>
             </div>
           </a>
           <a href="#" class="similar-job-item">
             <div class="similar-job-info">
               <h5>Sales Executive</h5>
               <p>Prime Properties</p>
-              <span class="similar-job-location">
-                <i class="bi bi-geo-alt"></i>
-                Lagos
-              </span>
+              <span class="similar-job-location"><i class="bi bi-geo-alt"></i> Lagos</span>
             </div>
           </a>
           <a href="#" class="similar-job-item">
             <div class="similar-job-info">
               <h5>Real Estate Consultant</h5>
               <p>Apex Realty</p>
-              <span class="similar-job-location">
-                <i class="bi bi-geo-alt"></i>
-                Port Harcourt
-              </span>
+              <span class="similar-job-location"><i class="bi bi-geo-alt"></i> Port Harcourt</span>
             </div>
           </a>
         </div>
@@ -358,8 +378,47 @@
 
     </aside>
 
-  </div>
+  </div><!-- end content-grid -->
 
 </div>
+<script>
+function copyJobUrl() {
+  var url  = window.location.href;
+  var btn  = document.getElementById('copyLinkBtn');
+  var text = document.getElementById('copyLinkText');
 
+  function onSuccess() {
+    text.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function () {
+      text.textContent = 'Copy Link';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  /* Modern way — works on HTTPS / localhost */
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(onSuccess).catch(fallback);
+  } else {
+    fallback();
+  }
+
+  /* Fallback — creates a temporary input, selects it, copies */
+  function fallback() {
+    var input = document.createElement('input');
+    input.value = url;
+    input.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+    try {
+      document.execCommand('copy');
+      onSuccess();
+    } catch (e) {
+      text.textContent = 'Copy failed';
+    }
+    document.body.removeChild(input);
+  }
+}
+</script>
 {% endblock %}
