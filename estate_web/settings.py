@@ -61,7 +61,12 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'django.contrib.humanize',
-    'axes'
+    'axes',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 # Middleware
@@ -75,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'estate_web.urls'
@@ -105,17 +111,28 @@ else:
 
 
 
+# EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
+# DEFAULT_FROM_EMAIL = 'contact@estatewebng.com' 
+# ZOHO_ZEPTOMAIL_API_KEY_TOKEN = 'Send Mail Token' 
+# ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = config('EMAIL_USER')
-# EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
 
-
-
+LOGIN_URL = 'login'
+LOGOUT_URL='logout'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'landing'
+LOGIN_REDIRECT_URL = 'landing'
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -127,7 +144,9 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
 #TODO set up password warning and forget password functinality
 AXES_FAILURE_LIMIT = 5        # lock after 5 failed attempts
 AXES_COOLOFF_TIME  = 1        # lock for 1 hour
@@ -221,3 +240,5 @@ else:
     SECURE_HSTS_PRELOAD = False
 
 print('Debug Mode>', DEBUG)
+SITE_ID = 1
+SOCIALACCOUNT_LOGIN_ON_GET = True

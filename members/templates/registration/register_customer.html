@@ -1,5 +1,6 @@
 <!doctype html>
 {% load static %}
+{% load socialaccount %}
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -130,7 +131,14 @@
           <span>Create Customer Account</span>
           <i class="bi bi-arrow-right-circle-fill"></i>
         </button>
+          <div class="gc-or-divider">
+            <span>or</span>
+          </div>
 
+          <a href="{% provider_login_url 'google' next=request.GET.next %}" class="gc-google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+            Sign up with Google
+          </a>
         <div class="login-section">
           <p class="login-text">Already have an account?</p>
           <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="btn-login">Sign In</a>

@@ -14,6 +14,14 @@ from core.utils import *
 from .models import ErrorLog
 import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
+# from django.core.mail import send_mail
+
+# send_mail(
+#     subject='Hello!',
+#     message='This is an acknowledgement for your action on our website',
+#     from_email='rebecca@zylker.com',
+#     recipient_list=['sam@zylker.com']
+# )
 
 # Create your views here.
 

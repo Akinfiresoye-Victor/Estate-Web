@@ -1,0 +1,276 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Continue with Google — Estate Web</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+  <style>
+    :root {
+      --ink:        #0d1117;
+      --ink-soft:   #1c2733;
+      --ink-mid:    #243447;
+      --gold:       #c19b76;
+      --gold-lt:    #d4b896;
+      --gold-dk:    #9a7655;
+      --slate:      #8a8f98;
+      --border:     rgba(255,255,255,.09);
+      --shadow-gold: 0 8px 40px rgba(193,155,118,.2);
+      --shadow-dark: 0 16px 56px rgba(13,17,23,.5);
+      --radius:     16px;
+      --radius-sm:  8px;
+      --display:    'Cormorant Garamond', Georgia, serif;
+      --body:       'Poppins', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--body);
+      background: var(--ink);
+      color: #fff;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    /* Subtle background glow — same as login/register pages */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(193,155,118,.07) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(193,155,118,.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gc-card {
+      position: relative;
+      z-index: 1;
+      background: var(--ink-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-dark);
+      text-align: center;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Brand logo icon */
+    .gc-brand-logo {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--gold-dk), var(--gold));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: var(--ink);
+      margin: 0 auto 1rem;
+      box-shadow: 0 4px 20px rgba(193,155,118,.3);
+    }
+
+    .gc-brand-name {
+      font-family: var(--display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Divider line with icon */
+    .gc-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .gc-divider::before,
+    .gc-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .gc-divider-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .gc-divider-icon img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    /* Heading + subtitle */
+    .gc-title {
+      font-family: var(--display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .gc-subtitle {
+      font-size: 0.82rem;
+      color: var(--slate);
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+
+    /* The allauth form wraps the Continue button — we style it here */
+    form { width: 100%; }
+
+    /* Continue / submit button */
+    .gc-btn-continue {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: var(--body);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.26s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .gc-btn-continue:hover {
+      background: var(--gold-lt);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-gold);
+    }
+
+    .gc-btn-continue:active { transform: translateY(0); }
+
+    .gc-btn-continue img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    /* Back link */
+    .gc-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1.25rem;
+      font-size: 0.78rem;
+      color: var(--slate);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .gc-back:hover { color: var(--gold); }
+
+    /* Security note */
+    .gc-security-note {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      text-align: left;
+    }
+
+    .gc-security-note i {
+      color: var(--gold);
+      font-size: 0.9rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .gc-security-note p {
+      font-size: 0.72rem;
+      color: var(--slate);
+      line-height: 1.55;
+      margin: 0;
+    }
+    /* Hide allauth's auto-rendered form fields — we use our own button */
+    form p { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="gc-card">
+
+    <!-- Brand -->
+    <div class="gc-brand-logo">
+      <i class="bi bi-house-door-fill"></i>
+    </div>
+    <div class="gc-brand-name">Estate Web</div>
+
+    <!-- Google icon divider -->
+    <div class="gc-divider">
+      <div class="gc-divider-icon">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+      </div>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="gc-title">Continue with Google</h1>
+    <p class="gc-subtitle">
+      You're one step away from signing in to Estate Web using your Google account.
+    </p>
+
+    <!-- Allauth's form — just wraps the Continue button -->
+    <form method="post" action="{{ form.action_url }}">
+      {% csrf_token %}
+      {{ form.as_p }}  {# hidden fields allauth needs #}
+      <button type="submit" class="gc-btn-continue">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+        Continue with Google
+      </button>
+    </form>
+
+    <!-- Back link -->
+    <a href="{% url 'login' %}" class="gc-back">
+      <i class="bi bi-arrow-left"></i> Back to Sign In
+    </a>
+
+    <!-- Security reassurance -->
+    <div class="gc-security-note">
+      <i class="bi bi-shield-check-fill"></i>
+      <p>Estate Web will never see your Google password. You'll be securely redirected to Google to complete sign-in.</p>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -8,6 +8,7 @@ from .models import User
 from core.models import ErrorLog
 import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
+from typing import cast
 
 # ─── login ────────────────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ def login_user(request):
             form = AuthenticationForm(request, data=request.POST)
             
             if form.is_valid():
-                user = form.get_user()
+                user = cast(User, form.get_user())
                 login(request, user)
                 messages.success(request, f'Welcome Back {user.username}')
 
@@ -54,7 +55,7 @@ def login_user(request):
             else:
                 # Form contains specific errors if credentials don't match
                 messages.error(request, 'Incorrect Credentials')
-                return redirect('login')
+                return redirect('login')    
         else:
             # Handle GET request
             form = AuthenticationForm()
@@ -93,7 +94,7 @@ def register_customer(request):
                 password = form.cleaned_data.get('password1')
                 
                 # Authenticate and Login
-                user = authenticate(request, username=username, password=password)
+                user = cast(User, authenticate(request, username=username, password=password))
                 if user:
                     login(request, user)
                     messages.success(request, f'Welcome {user.username}, and Thanks for joining Estate Web!')
@@ -140,7 +141,7 @@ def register_agent(request):
                 password = form.cleaned_data.get('password1')
                 
                 # Authenticate and Login the new agent
-                user = authenticate(request, username=username, password=password)
+                user = cast(User, authenticate(request, username=username, password=password))
                 if user is not None:
                     login(request, user)
                     messages.success(request, f'Welcome {user.username}, and Thanks for joining Estate Web!')
@@ -168,7 +169,6 @@ def register_agent(request):
             
     except Exception:
         # Using your existing ErrorLog model for tracking
-        from .models import ErrorLog 
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
@@ -191,7 +191,7 @@ def register_company(request):
                 password = form.cleaned_data.get('password1')
                 
                 # Log the new company user in immediately
-                user = authenticate(request, username=username, password=password)
+                user = cast(User, authenticate(request, username=username, password=password))
                 if user is not None:
                     login(request, user)
                     messages.success(request, f'Welcome {user.username}, and Thanks for joining Estate Web!')
@@ -219,6 +219,5 @@ def register_company(request):
             
     except Exception:
         # Log any system crashes using your ErrorLog model
-        from .models import ErrorLog 
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

@@ -1,4 +1,5 @@
 {%load static%}
+{% load socialaccount %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -115,7 +116,14 @@
           <span>Sign In</span>
           <i class="bi bi-arrow-right-circle-fill"></i>
         </button>
+          <div class="gc-or-divider">
+            <span>or</span>
+          </div>
 
+          <a href="{% provider_login_url 'google' next=request.GET.next %}" class="gc-google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+            Continue with Google
+          </a>
         <div class="form-links">
           <a href="#" class="form-link">
             <i class="bi bi-key-fill me-1"></i>Forgot Password?
