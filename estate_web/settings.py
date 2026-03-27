@@ -111,10 +111,10 @@ else:
 
 
 
-# EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
-# DEFAULT_FROM_EMAIL = 'contact@estatewebng.com' 
-# ZOHO_ZEPTOMAIL_API_KEY_TOKEN = 'Send Mail Token' 
-# ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
+EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
+ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
+ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com' 
+DEFAULT_FROM_EMAIL = 'contact@estatewebng.com'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
