@@ -80,7 +80,7 @@ def login_user(request):
 
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        print(error)
+        print(traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
@@ -138,7 +138,7 @@ def register_customer(request):
             return render(request, 'registration/register_customer.html', {'form': form, 'role': 'Customer'})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        print(error)
+        print(traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
