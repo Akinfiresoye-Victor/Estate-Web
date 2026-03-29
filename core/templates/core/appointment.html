@@ -255,6 +255,9 @@
                 <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="action-btn view" title="View Details">
                   <i class="bi bi-eye"></i>
                 </a>
+                <a href="{{ appointment.google_calendar_url }}" target="_blank" class="action-btn view" title="Add to Google Calendar" style="color:#C19B76;">
+                  <i class="bi bi-google"></i>
+                </a>
                 <a href="#" class="action-btn delete" data-delete-url="#" data-delete-title="Delete Appointment?" data-delete-message="Are you sure you want to delete this appointment? This action cannot be undone." title="Delete">
                   <i class="bi bi-trash"></i>
                 </a>
@@ -311,7 +314,8 @@
             propertyType: '{{ appointment.property_type|default:"N/A" }}',
             agentUuid: '{% if appointment.agent_uuid %}{{ appointment.agent_uuid }}{% else %}N/A{% endif %}',
             leadUuid: '{% if appointment.lead_uuid %}{{ appointment.lead_uuid }}{% else %}null{% endif %}',
-            aptUuid: '{{ appointment.appointment_uuid }}'
+            aptUuid: '{{ appointment.appointment_uuid }}',
+            googleCalendarUrl: '{{ appointment.google_calendar_url|escapejs }}'
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
@@ -449,6 +453,9 @@
                                   onclick="window.location.href = '/schedule_detail/${apt.aptUuid}'">
                               <i class="bi bi-eye"></i>
                           </button>
+                          <a href="${apt.googleCalendarUrl}" target="_blank" class="action-btn view" title="Add to Google Calendar" style="color:#C19B76;">
+                              <i class="bi bi-google"></i>
+                          </a>
                           <button class="action-btn delete" 
                                   data-delete-url="/schedule/delete/${apt.aptUuid}" 
                                   data-delete-title="Delete Appointment?" 

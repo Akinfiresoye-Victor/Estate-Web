@@ -235,7 +235,7 @@ def dashboard(request):
         return render(request, 'company/dashboard.html', context)
 
     except CompanyInformation.DoesNotExist:
-        messages.warning(request, 'Set company profile')
+        messages.warning(request, 'Please set up your company profile to continue.')
         return redirect('company:company_form')
 
     except Exception:
@@ -246,10 +246,10 @@ def dashboard(request):
 #form all companies must fill before they access the dashboard
 def company_form(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.error(request, 'Company account only')
+        messages.error(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     try:
         submitted=False
@@ -268,7 +268,7 @@ def company_form(request):
                         company_form.save()
                         link_form.instance=company_form
                         link_form.save()
-                        messages.success(request, 'Profile Successfully Set')
+                        messages.success(request, 'Company profile successfully created.')
                         return HttpResponseRedirect('?submitted=True')
                 CompanyActivityLog.objects.create(
                 company=CompanyInformation.objects.get(user_id=request.user.id),
@@ -292,15 +292,15 @@ def company_form(request):
 
 def update_company_profile(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.info(request, 'Company account only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     try:
         company_information=CompanyInformation.objects.get(user_id=request.user.id)
         if request.user.id != company_information.user_id:
-            messages.error(request, 'Unauthorized Access')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         if request.method == 'POST':
             comp_form = CompanyForm(request.POST, request.FILES, instance=company_information)
@@ -311,7 +311,7 @@ def update_company_profile(request):
                     company.user_id = request.user.id
                     company.save()
                     link_form.save()
-                    messages.success(request, 'Profile Updated Successfully')
+                    messages.success(request, 'Company profile updated successfully.')
                     return redirect('company:company-settings')
         else:
             comp_form = CompanyForm(instance=company_information)
@@ -325,7 +325,7 @@ def update_company_profile(request):
             'social': link_form
         })
     except ObjectDoesNotExist:
-        messages.info(request, 'Company data missing')
+        messages.info(request, 'Company profile data is missing.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -676,16 +676,16 @@ def lead_management(request):
 
 def lead_detail(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.info(request, 'Company account only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     try:
         company=CompanyInformation.objects.get(user_id=request.user.id)
         client=LeadInfo.objects.get(lead_id=lead_id)
         if client.company_uuid != company.unique_company_id:
-            messages.warning(request, 'Access Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         try:
             if client.property_type =='Sale':
@@ -703,19 +703,19 @@ def lead_detail(request, lead_id):
 
 def delete_lead(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.error(request, 'Access denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         company= CompanyInformation.objects.get(user_id=request.user.id)
         lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
         if company.unique_company_id != lead_to_delete.company_uuid:
-            messages.error(request, "Access Denied")
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         lead_to_delete.delete()
-        messages.success(request, "Lead Deleted")
+        messages.success(request, "Lead deleted successfully.")
         CompanyActivityLog.objects.create(
             company=company,
             action='Lead Deleted'
@@ -730,26 +730,26 @@ def delete_lead(request, lead_id):
 @require_POST
 def update_lead_status(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'log in to access this page')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role !='company':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         try:
             company= CompanyInformation.objects.get(user_id= request.user.id)
             lead=LeadInfo.objects.get(pk=lead_id)
             if lead.company_uuid != company.unique_company_id:
-                messages.error(request, 'Access Denied')
+                messages.error(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
             new_status= request.POST.get('new_status')
             if not new_status:
-                messages.error(request, 'Status Missing')
+                messages.error(request, 'Please provide a lead status.')
                 return redirect('company:lead-management')
             
             from core.choices import LEAD_STATUS
             if new_status not in [choice[0] for choice in LEAD_STATUS]:
-                messages.error(request, 'Invalid status value')
+                messages.error(request, 'The provided status value is invalid.')
                 return redirect('company:lead-management')
             
             lead.status=new_status
@@ -759,10 +759,10 @@ def update_lead_status(request, lead_id):
                 company=company,
                 action='Lead Status Updated'
             )
-            messages.success(request, 'Status Updated Successfully')
+            messages.success(request, 'Lead status updated successfully.')
             return redirect('company:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
-            messages.error(request, 'Lead Not found')
+            messages.error(request, 'The requested lead could not be found.')
             return redirect('company:lead-management')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -773,26 +773,26 @@ def update_lead_status(request, lead_id):
 @require_POST
 def update_lead_stage(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role != 'company':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         try:
             company= CompanyInformation.objects.get(user_id= request.user.id)
             lead=LeadInfo.objects.get(pk=lead_id)
             if lead.company_uuid != company.unique_company_id:
-                messages.error(request, 'Access Denied')
+                messages.error(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
             new_stage = request.POST.get('new_stage')
             if not new_stage:
-                messages.error(request, 'Stage Missing')
+                messages.error(request, 'Please provide a lead stage.')
                 return redirect('company:lead-management')
             
             from core.choices import LEAD_STAGES
             if new_stage not in [choice[0] for choice in LEAD_STAGES]:
-                messages.error(request, 'Invalid stage value')
+                messages.error(request, 'The provided stage value is invalid.')
                 return redirect('company:lead-management')
             
             lead.stages = new_stage
@@ -802,10 +802,10 @@ def update_lead_stage(request, lead_id):
                 company=company,
                 action= 'Lead Stage Updated'
             )
-            messages.success(request, 'Stage Updated Successfully')
+            messages.success(request, 'Lead stage updated successfully.')
             return redirect('company:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
-            messages.error(request, 'Lead Not found')
+            messages.error(request, 'The requested lead could not be found.')
             return redirect('company:lead-management')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -815,10 +815,10 @@ def update_lead_stage(request, lead_id):
 
 def company_profile(request, company_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role == 'company':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     role=request.user.role
     if role=='company':
@@ -916,7 +916,7 @@ def company_profile(request, company_uuid):
         
         return render(request, 'company/company_profile.html', context)
     except ObjectDoesNotExist:
-        messages.error(request, 'Company Not Found')
+        messages.error(request, 'The requested company could not be found.')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
         else:
@@ -928,10 +928,10 @@ def company_profile(request, company_uuid):
 
 def properties_by_company(request, company_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role !='customer':
-        messages.info(request, 'Customers Only')
+        messages.info(request, 'Access denied: This page is for customer accounts only.')
         return redirect('landing')
     try:
         company=CompanyInformation.objects.filter(unique_company_id=company_uuid).values_list('user_id', flat=True).first()
@@ -950,10 +950,10 @@ def properties_by_company(request, company_uuid):
 
 def find_talents(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role !='company':
-        messages.info(request, 'Company Account Only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
@@ -966,10 +966,10 @@ def find_talents(request):
 
 def manage_applications(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role != 'company':
-        messages.info(request, 'Company Account Only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
@@ -991,7 +991,7 @@ def manage_applications(request):
         }
         return render(request, 'company/manage_applications.html', context)
     except CompanyInformation.DoesNotExist:
-        messages.error(request, 'Company Data missing')
+        messages.error(request, 'Company profile data is missing.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1000,10 +1000,10 @@ def manage_applications(request):
 
 def manage_company(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role !='company':
-        messages.info(request, 'Company Account Only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
@@ -1049,16 +1049,16 @@ def manage_company(request):
 
 def delete_company(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.info(request, 'Companies Only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
         company_data= CompanyInformation.objects.get(user_id=request.user.id)
         if company_data.user_id != request.user.id:
-            messages.warning(request, 'Unauthorized Access')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         leads= LeadInfo.objects.filter(company_uuid=company_data.unique_company_id)
         appointments=Appointments.objects.filter(company_uuid=company_data.unique_company_id)
@@ -1076,13 +1076,15 @@ def delete_company(request):
             ratings.delete()
             user_id.delete()
         except:
-            messages.error(request, 'An error Occured.....')
+            messages.error(request, 'An unexpected error occurred. Please try again.')
             return redirect('landing')
-        messages.success(request, 'User deleted successfully')
+        messages.success(request, 'Company account and all associated data deleted successfully.')
         return redirect('landing')
     except ObjectDoesNotExist:
-        messages.error(request, 'Company not found')
-        return render(request, 'estate/error_page.html', {'e':'Object Does Not Exist'})
+        user_id=User.objects.get(pk=request.user.id)
+        user_id.delete()
+        messages.error(request, 'The company profile could not be found.')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -1090,11 +1092,11 @@ def delete_company(request):
 
 def vacancy_form(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     if request.user.role != 'company':
-        messages.warning(request, 'Companies Only')
+        messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
@@ -1115,7 +1117,7 @@ def vacancy_form(request):
                         company=company,
                         action= 'Job Posted'
                     )
-                    messages.success(request, 'Job Posted Successfully!')
+                    messages.success(request, 'Job listing posted successfully.')
                     return redirect('company:application-management')
             else:
                 # Display form errors
@@ -1132,7 +1134,7 @@ def vacancy_form(request):
         return render(request, 'company/vacancy_form.html', context)
         
     except ObjectDoesNotExist:
-        messages.error(request, 'Company Profile Not Found. Please complete your company profile first.')
+        messages.error(request, 'Company profile not found. Please complete your profile before posting a job.')
         return redirect('landing')
         
     except Exception:
@@ -1143,16 +1145,16 @@ def vacancy_form(request):
 def update_vacancy(request, job_id):
     """View to update an existing job posting"""
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     if request.user.role != 'company':
-        messages.warning(request, 'Companies Only')
+        messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     company=CompanyInformation.objects.get(user_id= request.user.id)
     job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
     if job.company_uuid != company.unique_company_id:
-        messages.error(request, 'You do not have permission to edit this job posting.')
+        messages.error(request, 'Access denied: You do not have permission to edit this job listing.')
         return redirect('landing')
     try:
         if request.method == 'POST':
@@ -1161,7 +1163,7 @@ def update_vacancy(request, job_id):
             if job_form.is_valid():
                 with transaction.atomic():
                     job_form.save()
-                    messages.success(request, 'Job Updated Successfully!')
+                    messages.success(request, 'Job listing updated successfully.')
                     CompanyActivityLog.objects.create(
                         company=company,
                         action= 'Job Post Updated'
@@ -1182,7 +1184,7 @@ def update_vacancy(request, job_id):
         return render(request, 'company/vacancy_form.html', context)
         
     except JobPost.DoesNotExist:
-        messages.error(request, 'Job posting not found or you do not have permission to edit it.')
+        messages.error(request, 'Job listing not found or unauthorized access.')
         return redirect('company:application-management')
         
     except Exception:
@@ -1193,18 +1195,18 @@ def update_vacancy(request, job_id):
 def delete_vacancy(request, job_id):
     """View to delete a job posting"""
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     if request.user.role != 'company':
-        messages.warning(request, 'Companies Only')
+        messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
         job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
         company=CompanyInformation.objects.get(user_id=request.user.id)
         if job.company_uuid != company.unique_company_id:
-            messages.warning(request, 'Unauthorized Action')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         job_title = job.job_title
         job.delete()
@@ -1212,33 +1214,33 @@ def delete_vacancy(request, job_id):
         company=company,
         action= 'Job Post Deleted'
         )
-        messages.success(request, f'Job posting "{job_title}" deleted successfully.')
+        messages.success(request, f'Job listing "{job_title}" has been deleted successfully.')
         return redirect('company:application-management')
         
     except JobPost.DoesNotExist:
-        messages.error(request, 'Job posting not found or you do not have permission to delete it.')
+        messages.error(request, 'Job listing not found or unauthorized access.')
         return redirect('company:application-management')
         
     except Exception:
-        messages.error(request, 'An error occurred while deleting job post')
+        messages.error(request, 'An unexpected error occurred while deleting the job listing.')
         return redirect('company:application-management')
 
 
 def toggle_job_status(request, job_id):
     """Toggle job active/inactive status"""
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     if request.user.role != 'company':
-        messages.warning(request, 'Companies Only')
+        messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
         job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
         company=CompanyInformation.objects.get(user_id=request.user.id)
         if job.company_uuid != company.unique_company_id:
-            messages.warning(request, 'Unauthorized Action')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         job.is_active = not job.is_active
         job.save()
@@ -1248,15 +1250,15 @@ def toggle_job_status(request, job_id):
         )
         
         status = "activated" if job.is_active else "deactivated"
-        messages.success(request, f'Job posting "{job.job_title}" {status} successfully.')
+        messages.success(request, f'The job listing "{job.job_title}" has been {status} successfully.')
         return redirect('company:application-management')
         
     except JobPost.DoesNotExist:
-        messages.error(request, 'Job posting not found.')
+        messages.error(request, 'The requested job listing could not be found.')
         return redirect('company:application-management')
         
     except Exception:
-        messages.error(request, 'An error occurred:')
+        messages.error(request, 'An unexpected error occurred.')
         return redirect('company:application-management')
 
 
@@ -1264,22 +1266,22 @@ def toggle_job_status(request, job_id):
 #for manual add
 def onboard_agent(request, agent_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.info(request, 'Companies Only')
+        messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     
     try:
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
         company=CompanyInformation.objects.get(user_id=request.user.id)
         if company.user_id != request.user.id:
-            messages.error(request, 'Action Denied')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         try:
             #checking if employee is present
             Employees.objects.get(agent_uuid=agent_uuid)
-            messages.success(request, 'Agent Added Successfully')
+            messages.success(request, 'Agent has been added successfully.')
             return redirect('landing')
         except ObjectDoesNotExist:
             Employees.objects.create(
@@ -1298,11 +1300,11 @@ def onboard_agent(request, agent_uuid):
                 company=company,
                 action='Agent Onboarded'
             )
-            messages.success(request, 'Agent Onboarded Successfully')
+            messages.success(request, 'Agent has been successfully onboarded.')
             if 'HTTP_REFERER' in request.META:
                 return redirect(request.META['HTTP_REFERER'])  
             else:
-                messages.error(request, 'Error Redirecting')
+                messages.error(request, 'Unable to redirect. Please try again.')
                 return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1311,16 +1313,16 @@ def onboard_agent(request, agent_uuid):
 
 def generate_invite_link(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.error(request, 'Company Account Only')
+        messages.error(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
 
     try:
         company = CompanyInformation.objects.get(user_id=request.user.id)
         if company.user_id != request.user.id:
-            messages.warning(request, 'Action Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
 
         if request.method == 'POST':
@@ -1353,7 +1355,7 @@ def generate_invite_link(request):
                 )
 
                 # Pass the generated URL back to the template for the copy button
-                messages.success(request, 'Invite link generated! Copy it from the panel below.')
+                messages.success(request, 'Invite link generated successfully. You can copy it from the panel below.')
                 return redirect('company:manage-company')
 
         else:
@@ -1371,10 +1373,10 @@ def generate_invite_link(request):
 
 def revoke_invite_link(request, token):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.warning(request, 'Access Denied')
+        messages.warning(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     
     try:
@@ -1382,7 +1384,7 @@ def revoke_invite_link(request, token):
         company=CompanyInformation.objects.get(user_id=request.user.id)
         
         if invite_link.company!=company:
-            messages.error(request, 'RESTRICTED ACCESS')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         invite_link.is_active=False
         invite_link.save()
@@ -1391,7 +1393,7 @@ def revoke_invite_link(request, token):
             action='Invite Link Deactivated'
         )
         
-        messages.success(request, 'Invite Link Revoked')
+        messages.success(request, 'The invite link has been successfully revoked.')
         return redirect('company:manage-company')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1400,17 +1402,17 @@ def revoke_invite_link(request, token):
 
 def remove_agent(request, agent_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'company':
-        messages.warning(request, 'Access Denied')
+        messages.warning(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     
     try:
         company=CompanyInformation.objects.get(user_id=request.user.id)
         employee=Employees.objects.get(agent_uuid=agent_uuid)
         if not employee.company == company:
-            messages.warning(request, 'Unauthorized Action')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
         #handing every property and lead data back to the company
@@ -1421,14 +1423,14 @@ def remove_agent(request, agent_uuid):
         agent.company_uuid = None
         agent.save()
         employee.delete()
-        messages.success(request, 'Agent Removed Successfully')
+        messages.success(request, 'Agent has been successfully removed from the company.')
         CompanyActivityLog.objects.create(
             company=company,
             action='Agent Deleted'
         )
         return redirect('company:manage-company')
     except ObjectDoesNotExist:
-        messages.error(request, 'Agent data not Found')
+        messages.error(request, 'Agent data could not be found.')
         return redirect('company:manage-company')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1441,10 +1443,10 @@ def remove_agent(request, agent_uuid):
 def edit_employee(request, agent_uuid):
 
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role != 'company':
-        messages.warning(request, 'Company Access Only')
+        messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     company = get_object_or_404(CompanyInformation, user_id=request.user.id)
 
@@ -1456,11 +1458,11 @@ def edit_employee(request, agent_uuid):
 
         if form.is_valid():
             form.save()
-            messages.success(request,f"{employee.agent_name}'s details have been updated successfully.")
+            messages.success(request,f"Details for {employee.agent_name} have been updated successfully.")
             return redirect('company:edit-employee', agent_uuid=agent_uuid)
 
         else:
-            messages.error(request,'Please fix the errors below and try again.')
+            messages.error(request,'Please correct the errors in the form.')
 
     # ── 4. Handle page load (GET) ──────────────────────────────────────────
     else:

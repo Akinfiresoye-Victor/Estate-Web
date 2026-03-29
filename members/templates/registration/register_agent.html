@@ -16,21 +16,7 @@
 </head>
 <body>
 
-<div class="messages-container">
-  {% if messages %}
-    {% for message in messages %}
-      {% if message.tags == 'error' %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
-      {% elif message.tags == 'info' %}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
-      {% elif message.tags == 'warning' %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
-      {% else %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-</div>
+{% include 'estate/includes/messages.html' %}
 
 <div class="register-wrapper">
   <div class="register-container">
@@ -133,9 +119,9 @@
   <span>or</span>
 </div>
 
-        <a href="{% provider_login_url 'google' next=request.GET.next %}" class="gc-google-btn">
+        <a href="{% url 'agent_google_login' %}"class="gc-google-btn">
           <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
-          Sign up with Google
+          Agent Google Signup
         </a>
         <div class="login-section">
           <p class="login-text">Already have an account?</p>
@@ -163,12 +149,5 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'members/js/password_rules.js' %}"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.alert').forEach(function (a) {
-      setTimeout(function () { a.classList.remove('show'); setTimeout(function () { a.remove(); }, 500); }, 5000);
-    });
-  });
-</script>
 </body>
 </html>

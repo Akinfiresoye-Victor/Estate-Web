@@ -202,7 +202,7 @@ def view_property_on_sale(request, property_id):
         })
 
     except ObjectDoesNotExist:
-        messages.error(request, 'Property unavailable')
+        messages.error(request, 'This property is no longer available.')
         return redirect(request.META.get('HTTP_REFERER', 'customer:buy-property'))
 
     except Exception:
@@ -262,7 +262,7 @@ def view_property_on_lease(request, property_id):
         })
 
     except ObjectDoesNotExist:
-        messages.error(request, 'Property unavailable')
+        messages.error(request, 'This property is no longer available.')
         return redirect(request.META.get('HTTP_REFERER', 'customer:rent-property'))
 
     except Exception:
@@ -276,10 +276,10 @@ def user_profile(request):
     """
     try:
         if not request.user.is_authenticated:
-            messages.info(request, 'login Required')
+            messages.info(request, 'Please sign in to access your profile.')
             return redirect('login')
         if not request.user.role == 'customer':
-            messages.error(request, 'Different account different profile')
+            messages.error(request, 'Access denied: Customer profile only.')
             return redirect('landing')
         return render(request, 'estate/user_profile.html', {'headline': ns.article_headline})
     except Exception:
@@ -293,7 +293,7 @@ def user_profile(request):
     """
 def listed_properties(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to g ain access')
+        messages.info(request, 'Please sign in to access your properties.')
         return redirect('login')
     try:
         model= request.user.id
@@ -330,7 +330,7 @@ def toggle_wishlist_rent(request, property_id):
     if not request.user.role == 'customer':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': 'forbidden'}, status=403)
-        messages.error(request, 'Only Customers can Save Properties')
+        messages.error(request, 'Saving properties is exclusive to customers.')
         return redirect('landing')
  
     try:
@@ -383,7 +383,7 @@ def toggle_wishlist_buy(request, property_id):
     if not request.user.role == 'customer':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'error': 'forbidden'}, status=403)
-        messages.error(request, 'Customer Access Only')
+        messages.error(request, 'Access restricted to customer accounts.')
         return redirect('landing')
  
     try:
@@ -423,7 +423,7 @@ def wishlist(request):
     if not request.user.is_authenticated:
         return redirect(f"{reverse('login')}?next={request.get_full_path()}")
     if not request.user.role == 'customer':
-        messages.error(request, 'Customer Access Only')
+        messages.error(request, 'Access denied: Customer accounts only.')
         return redirect('landing')
     try:
         # Get the wishlisted property IDs for this user
@@ -464,10 +464,10 @@ def update_profile(request):
     Only The User can edit his/her own profile
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'log in to gain access')
+        messages.info(request, 'Please sign in to update your profile.')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.error(request, 'Customers account only')
+        messages.error(request, 'Profile updates are for customers only.')
         return redirect('landing')
     try:
         
@@ -480,7 +480,7 @@ def update_profile(request):
                 form.save()
                 return redirect('customer:user-profile')
             else:
-                messages.error(request, 'check for errors')
+                messages.error(request, 'Please correct the errors in the form.')
         else:
             form=UpdateUserForm(instance=profile)
         context={
@@ -499,7 +499,7 @@ def change_password(request):
     Change User Passwords with precise lines of code
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain acess')
+        messages.info(request, 'Please sign in to change your password.')
         return redirect('login')
     try:
         user_role=request.user.role
@@ -514,11 +514,11 @@ def change_password(request):
             if form.is_valid():
                 new_pass=form.save() 
                 update_session_auth_hash(request, new_pass)
-                messages.success(request, 'Password Changed successfully')
+                messages.success(request, 'Your password has been updated successfully.')
                 return redirect('customer:password-success')
             
             else:
-                messages.error(request, 'Error Changing password...')
+                messages.error(request, 'Unable to update password. Please try again.')
                 return redirect('customer:change-password')
             
         else:
@@ -536,7 +536,7 @@ def change_password_success(request):
     Success Page after chaging password
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     try:
         user_role=request.user.role
@@ -559,10 +559,10 @@ def profile_settings(request):
     User settings
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if not request.user.role == 'customer':
-        messages.error(request, 'Customer Access Only')
+        messages.error(request, 'Access denied: Customer accounts only.')
         return redirect('landing')
     try:
         return render(request, 'estate/settings.html')
@@ -581,25 +581,25 @@ def delete_account(request):
     Delete user account view
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'login Required')
+        messages.info(request, 'Please sign in to delete your account.')
         return redirect('login')
     if request.user.role != 'customer':
-        messages.error(request, 'Customer Access Only')
+        messages.error(request, 'Account deletion is for customers only.')
         return redirect('landing')
     try:
         
         user_id=User.objects.get(pk=request.user.id)
         if request.user != user_id:
-            messages.warning(request, 'Unauthorized Access')
+            messages.warning(request, 'Security Alert: Unauthorized access attempt.')
             return redirect('landing')
         wishlists= WishlistStorageUnit.objects.filter(user_id=request.user.id)
         try:
             wishlists.delete()
             user_id.delete()
         except Exception:
-            messages.error(request, 'There was an error, Try again later.....')
+            messages.error(request, 'Unable to process your request. Please try again later.')
             return redirect('customer:user-profile')
-        messages.success(request, 'Account deleted Successfully')
+        messages.success(request, 'Your account has been successfully closed.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -613,10 +613,10 @@ def delete_account(request):
 def review_company(request, company_uuid):
     # Check if user is a customer
     if request.user.role != 'customer':
-        messages.error(request, 'Only customers can submit reviews')
+        messages.error(request, 'Reviews are restricted to customer accounts.')
         return redirect('company:company-profile', company_uuid=company_uuid)
     if not request.user.is_authenticated:
-        messages.info(request, 'Login to gain access')
+        messages.info(request, 'Please sign in to submit a review.')
         return redirect('landing')
     try:
         company = get_object_or_404(CompanyInformation, unique_company_id=company_uuid)
@@ -628,7 +628,7 @@ def review_company(request, company_uuid):
         ).first()
         
         if existing_review:
-            messages.warning(request, 'You have already reviewed this company')
+            messages.warning(request, 'You have already submitted a review for this company.')
             return redirect('company:company-profile', company_uuid=company_uuid)
         
         if request.method == 'POST':
@@ -640,14 +640,14 @@ def review_company(request, company_uuid):
                 
                 # Ensure rating is between 1 and 5
                 if not (1 <= review.rating <= 5):
-                    messages.error(request, 'Rating must be between 1 and 5 stars')
+                    messages.error(request, 'Please provide a rating between 1 and 5 stars.')
                     return redirect('company:company-profile', company_uuid=company_uuid)
                 
                 review.save()
-                messages.success(request, 'Thank you for your review!!!')
+                messages.success(request, 'Thank you for sharing your feedback!')
                 return redirect('company:company-profile', company_uuid=company_uuid)
             else:
-                messages.error(request, 'Please correct the errors below')
+                messages.error(request, 'Please correct the errors in your review.')
         
         return redirect('company:company-profile', company_uuid=company_uuid)
         
@@ -660,12 +660,12 @@ def review_agent(request, agent_uuid):
     """Handle agent review submission"""
     # Check role
     if hasattr(request.user, 'role') and request.user.role != 'customer':
-        messages.error(request, 'Only Customers can submit reviews')
+        messages.error(request, 'Reviews are restricted to customer accounts.')
         return redirect('agent:agent-profile', agent_uuid=agent_uuid)
     
     # Check authentication
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     try:
@@ -678,7 +678,7 @@ def review_agent(request, agent_uuid):
         ).first()
         
         if existing_review:
-            messages.warning(request, 'Review already submitted')
+            messages.warning(request, 'You have already submitted a review for this agent.')
             return redirect('agent:agent-profile', agent_uuid=agent_uuid)
         
         if request.method == 'POST':
@@ -690,14 +690,14 @@ def review_agent(request, agent_uuid):
                 
                 # Validate rating range
                 if not (1 <= review.rating <= 5):
-                    messages.error(request, 'Rating must be between 1 and 5 stars')
+                    messages.error(request, 'Please provide a rating between 1 and 5 stars.')
                     return redirect('agent:agent-profile', agent_uuid=agent_uuid)
                 
                 review.save()
-                messages.success(request, 'Thanks for your review!!!')
+                messages.success(request, 'Thank you for sharing your feedback!')
                 return redirect('agent:agent-profile', agent_uuid=agent_uuid)
             else:
-                messages.error(request, 'Please correct the errors below')
+                messages.error(request, 'Please correct the errors in your review.')
         
         return redirect('agent:agent-profile', agent_uuid=agent_uuid)
         
@@ -712,11 +712,11 @@ def review_agent(request, agent_uuid):
 
 def inquiry_form(request, property_type, property_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
+        messages.info(request, 'Please sign in to send an inquiry.')
         return redirect('login')
     
     if request.user.role != 'customer':
-        messages.error(request, 'Customer access only')
+        messages.error(request, 'Inquiries are restricted to customer accounts.')
         return redirect('landing')
     
     try:
@@ -726,7 +726,7 @@ def inquiry_form(request, property_type, property_id):
         elif property_type == 'Rent':
             asset= PropertyManagementRent.objects.get(pk=property_id)
         else:
-            messages.error(request, 'Something went wrong')
+            messages.error(request, 'An unexpected error occurred. Please try again.')
             return redirect('javascript:history.back()')
         if request.method == 'POST':
             inq_form= InquiryForm(request.POST or None)
@@ -759,7 +759,7 @@ def inquiry_form(request, property_type, property_id):
                             lead_uuid=inq_form.lead_id
                         )
                         appointment.save()
-                inq_form.property_intrested=asset.id
+                inq_form.property_intrested=asset.pk
                 inq_form.agent_id=asset.agent_uuid
                 inq_form.property_type=asset.property_type
                 if asset.property_category == 'Residential':
@@ -788,7 +788,7 @@ def inquiry_form(request, property_type, property_id):
 
 def flag_listing(request, property_id, property_type):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to report this listing.')
         return redirect('login')
     try:
         if property_type == 'Sale':
@@ -801,9 +801,9 @@ def flag_listing(request, property_id, property_type):
                 )
                 onsale_property.flagged=True
                 onsale_property.save()
-                messages.success(request,'Thanks for keeping EstateWeb Safe')
+                messages.success(request, 'Thank you for your report. We will review this listing shortly.')
             else:
-                messages.error(request, 'Property Already Flagged')
+                messages.error(request, 'This listing has already been reported.')
             if 'HTTP_REFERER' in request.META:
                 return redirect(request.META['HTTP_REFERER'])  
             else:
@@ -818,7 +818,7 @@ def flag_listing(request, property_id, property_type):
                 )
                 leased_property.flagged=True
                 leased_property.save()
-                messages.success(request,'Thanks for keeping EstateWeb Safe')
+                messages.success(request, 'Thank you for your report. We will review this listing shortly.')
             if 'HTTP_REFERER' in request.META:
                 return redirect(request.META['HTTP_REFERER'])  
             else:
@@ -826,11 +826,76 @@ def flag_listing(request, property_id, property_type):
             
             
         else:
-            messages.error(request, 'Error getting property type')
+            messages.error(request, 'An error occurred while identifying the property type.')
             if 'HTTP_REFERER' in request.META:
                 return redirect(request.META['HTTP_REFERER'])  
             else:
                 return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def toggle_compare(request, property_type, property_id):
+    """
+    Adds or removes a property from the compare session list.
+    property_type: 'sale' or 'rent'
+    Max 3 properties allowed.
+    AJAX only — returns JSON.
+    """
+    try:
+        key = f'compare_{property_type}'
+        ids = request.session.get(key, [])
+
+        if property_id in ids:
+            ids.remove(property_id)
+            action = 'removed'
+        else:
+            if len(ids) >= 3:
+                return JsonResponse({'error': 'max_reached',
+                                    'message': 'You can only compare up to 3 properties.'}, status=400)
+            ids.append(property_id)
+            action = 'added'
+
+        request.session[key] = ids
+        request.session.modified = True
+
+        return JsonResponse({
+            'action':  action,
+            'count':   len(ids),
+            'type':    property_type,
+        })
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+def compare_properties(request):
+    try:
+        sale_ids  = request.session.get('compare_sale', [])
+        rent_ids  = request.session.get('compare_rent', [])
+
+        sale_props = list(PropertyManagementSale.objects.filter(id__in=sale_ids, is_listed=True))
+        rent_props = list(PropertyManagementRent.objects.filter(id__in=rent_ids, is_listed=True))
+
+        # Combine — you compare across types
+        all_props = sale_props + rent_props
+
+        return render(request, 'estate/compare_page.html', {
+            'properties':  all_props,
+            'base_template': 'estate/base.html',  # adjust per role
+        })
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def clear_compare(request):
+    try:
+        request.session.pop('compare_sale', None)
+        request.session.pop('compare_rent', None)
+        return JsonResponse({'success': True})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

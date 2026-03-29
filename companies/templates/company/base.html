@@ -52,66 +52,6 @@
       padding-top: 80px !important;
     }
 
-    /* Messages Container */
-    .messages-container {
-      position: fixed;
-      top: 2rem;
-      right: 2rem;
-      z-index: 9999;
-      max-width: 400px;
-    }
-
-    .alert {
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-      animation: slideInRight 0.5s ease;
-      margin-bottom: 1rem;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: opacity 0.5s ease;
-    }
-
-    .alert .btn-close {
-      width: 1.5rem !important;
-      height: 1.5rem !important;
-      min-width: 1.5rem !important;
-      min-height: 1.5rem !important;
-      padding: 0.3rem !important;
-      flex-shrink: 0 !important;
-      background-size: 1rem !important;
-    }
-
-    .alert.fade:not(.show) {
-      opacity: 0;
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    /* Main Content Container */
-    .main-content {
-      padding: 0 0 4rem;
-    }
-
-    @media (max-width: 768px) {
-      .messages-container {
-        top: 1rem;
-        right: 1rem;
-        left: 1rem;
-        max-width: none;
-      }
-    }
   </style>
 
   {% block extra_css %}{% endblock %}
@@ -495,38 +435,8 @@
   <!-- Navbar (includes logo) -->
   {% include 'company/navbar.html' %}
 
-  <!-- Messages Container -->
-  <div class="messages-container">
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags == 'error' or message.tags == 'danger' %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% elif message.tags == 'warning' %}
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% elif message.tags == 'info' %}
-          <div class="alert alert-info alert-dismissible fade show" role="alert">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% else %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-  </div>
+  <!-- Messages -->
+  {% include 'estate/includes/messages.html' %}
 
   <!-- Main Content Area -->
   <main class="main-content">
@@ -540,18 +450,6 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Auto-dismiss alerts -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const alerts = document.querySelectorAll('.alert');
-      alerts.forEach(function(alert) {
-        setTimeout(function() {
-          alert.classList.remove('show');
-          setTimeout(() => alert.remove(), 300);
-        }, 5000);
-      });
-    });
-  </script>
 
   {% block extra_js %}{% endblock %}
 

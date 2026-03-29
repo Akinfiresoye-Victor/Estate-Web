@@ -100,6 +100,13 @@
                   aria-label="{% if wishlist %}Remove from wishlist{% else %}Add to wishlist{% endif %}">
             <i class="bi bi-heart{% if wishlist %}-fill{% endif %}"></i>
           </button>
+          <button class="cmp-toggle-btn"
+                  data-url="{% url 'customer:toggle-compare' 'rent' lease.id %}"
+                  data-type="rent"
+                  data-id="{{ lease.id }}"
+                  title="Compare">
+            <i class="bi bi-bar-chart-steps"></i>
+          </button>
         </div>
 
         <div class="rent-card-body">
@@ -224,11 +231,16 @@ function toggleFilters() {
         return res.json();
       })
       .then(function (data) {
-        if (!data) return;
         /* Confirm with server's actual state */
         setHeart(icon, data.added);
         btn.dataset.added = String(data.added);
         btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+        
+        // Show premium toast
+        window.showEstateToast(
+          data.added ? 'Property added to your wishlist.' : 'Property removed from your wishlist.',
+          'success'
+        );
       })
       .catch(function () {
         /* Network failure — roll back */
@@ -247,6 +259,33 @@ function toggleFilters() {
     icon.style.color = isAdded ? '#ef4444' : '';
   }
 }());
+document.querySelectorAll('.cmp-toggle-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    fetch(btn.dataset.url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'same-origin',
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.error === 'max_reached') {
+        window.showEstateToast(d.message, 'warning');
+        return;
+      }
+      btn.classList.toggle('active', d.action === 'added');
+      window.showEstateToast(
+        d.action === 'added' ? 'Added to comparison list.' : 'Removed from comparison list.',
+        'success'
+      );
+    })
+    .catch(function () {
+      window.showEstateToast('Unable to complete request. Please try again.', 'error');
+    });
+  });
+});
 </script>
 
 {% endblock %}

@@ -22,6 +22,9 @@
       <a href="{% url 'customer:wishlist' %}" class="nb-link">
         <i class="bi bi-heart-fill"></i> Wishlist
       </a>
+      <a href="{% url 'customer:compare' %}" class="nb-link">
+        <i class="bi bi-bar-chart-steps"></i> Side by Side
+      </a>
       <a href="{% url 'faq' %}" class="nb-link">
         <i class="bi bi-question-circle-fill"></i> Help
       </a>
@@ -121,6 +124,16 @@
         <div class="nb-canvas-text">
           <strong>My Wishlist</strong>
           <span>Your saved properties</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:compare' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon compare">
+          <i class="bi bi-bar-chart-steps"></i>
+        </div>
+        <div class="nb-canvas-text">
+          <strong>Compare Properties</strong>
         </div>
         <i class="bi bi-chevron-right nb-canvas-arrow"></i>
       </a>
@@ -251,5 +264,34 @@
       document.getElementById('nbMoreMenu').classList.remove('open');
     }
   });
+}());
+/* ── Compare counter in navbar ── */
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'cmp_count';
+
+  /* Read count from localStorage and update badge on every page load */
+  function refreshBadge() {
+    var count = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+    var badge = document.getElementById('cmpNavBadge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count + '/3';
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  /* Call this after every successful toggle AJAX response */
+  window.updateCompareBar = function (count) {
+    localStorage.setItem(STORAGE_KEY, count);
+    refreshBadge();
+  };
+
+  /* Run on every page load */
+  refreshBadge();
+
 }());
 </script>

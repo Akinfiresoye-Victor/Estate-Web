@@ -21,7 +21,10 @@ urlpatterns = [
     path('form/inquiry/<str:property_type>/<int:property_id>', views.inquiry_form, name='inquiry-form'),
     path('review_company/<str:company_uuid>/', views.review_company, name='review-company'),
     path('review_agent/<str:agent_uuid>/', views.review_agent, name='review-agent'),
-    path('report_listing/<int:property_id>/<str:property_type>', views.flag_listing, name='flag-listing')
+    path('report_listing/<int:property_id>/<str:property_type>', views.flag_listing, name='flag-listing'),
+    path('compare/', views.compare_properties, name='compare'),
+    path('compare/toggle/<str:property_type>/<int:property_id>/',views.toggle_compare, name='toggle-compare'),
+    path('compare/clear/', views.clear_compare, name='clear-compare'),
 ]
 
 

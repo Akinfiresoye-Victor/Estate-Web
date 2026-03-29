@@ -1,0 +1,399 @@
+{% extends base_template %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/compare_page.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+<!-- ── HERO ── -->
+<div class="cmp-hero">
+  <div class="cmp-hero-inner">
+    <a href="javascript:history.back()" class="cmp-back">
+      <i class="bi bi-arrow-left-circle"></i> Back
+    </a>
+    <div class="cmp-hero-text">
+      <h1><i class="bi bi-bar-chart-steps"></i> Compare Properties</h1>
+      <p>{{ properties|length }} of 3 properties selected</p>
+    </div>
+    <button class="cmp-clear-btn" id="cmpClearBtn">
+      <i class="bi bi-trash3"></i> Clear All
+    </button>
+  </div>
+</div>
+
+
+{% if not properties %}
+<!-- ── EMPTY STATE ── -->
+<div class="cmp-empty-wrap">
+  <div class="cmp-empty">
+    <div class="cmp-empty-icon"><i class="bi bi-bar-chart-steps"></i></div>
+    <h2>Nothing to compare yet</h2>
+    <p>Browse listings and tap the <i class="bi bi-bar-chart-steps"></i> icon on any property to add it here. You can compare up to 3 at once.</p>
+    <div class="cmp-empty-actions">
+      <a href="{% url 'customer:buy-property' %}" class="cmp-btn sale">
+        <i class="bi bi-house-fill"></i> Browse For Sale
+      </a>
+      <a href="{% url 'customer:rent-property' %}" class="cmp-btn lease">
+        <i class="bi bi-key-fill"></i> Browse For Rent
+      </a>
+    </div>
+  </div>
+</div>
+
+{% else %}
+
+<!-- ── MOBILE: SWIPEABLE CARDS ───────────────────── -->
+<div class="cmp-mobile-strip" id="cmpMobileStrip">
+  {% for prop in properties %}
+  <div class="cmp-mobile-card">
+
+    <!-- Image -->
+    <div class="cmp-img-wrap">
+      {% if prop.base_image %}
+        <img src="{{ prop.base_image.url }}" alt="Property" loading="lazy">
+      {% else %}
+        <div class="cmp-img-placeholder"><i class="bi bi-building"></i></div>
+      {% endif %}
+      <span class="cmp-type-badge {% if prop.price %}sale{% else %}lease{% endif %}">
+        {% if prop.price %}For Sale{% else %}For Rent{% endif %}
+      </span>
+      <button class="cmp-remove-card"
+              data-type="{% if prop.price %}sale{% else %}rent{% endif %}"
+              data-id="{{ prop.id }}"
+              title="Remove from compare">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Title & price -->
+    <div class="cmp-card-top">
+      <h3>
+        {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+        {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+        {% else %}{{ prop.lands }}{% endif %}
+      </h3>
+      <div class="cmp-location"><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}, {{ prop.state }}</div>
+      <div class="cmp-price">
+        {% if prop.price %}
+          ₦{{ prop.price|floatformat:0|intcomma }}
+        {% else %}
+          ₦{{ prop.price_range|floatformat:0|intcomma }}<span>/mo</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="cmp-stats">
+      <div class="cmp-stat">
+        <i class="bi bi-door-open-fill"></i>
+        <span>{{ prop.bedrooms|default:"—" }}</span>
+        <small>Beds</small>
+      </div>
+      <div class="cmp-stat-sep"></div>
+      <div class="cmp-stat">
+        <i class="bi bi-droplet-fill"></i>
+        <span>{{ prop.bathrooms|default:"—" }}</span>
+        <small>Baths</small>
+      </div>
+      <div class="cmp-stat-sep"></div>
+      <div class="cmp-stat">
+        <i class="bi bi-p-circle-fill"></i>
+        <span>{{ prop.parking_spaces|default:"—" }}</span>
+        <small>Parking</small>
+      </div>
+      <div class="cmp-stat-sep"></div>
+      <div class="cmp-stat">
+        <i class="bi bi-rulers"></i>
+        <span>{{ prop.size|default:"—" }}</span>
+        <small>sqft</small>
+      </div>
+    </div>
+
+    <!-- Details table -->
+    <div class="cmp-details">
+      <div class="cmp-detail-row">
+        <span class="cmp-detail-lbl">Category</span>
+        <span class="cmp-detail-val">{{ prop.property_category }}</span>
+      </div>
+      <div class="cmp-detail-row">
+        <span class="cmp-detail-lbl">Status</span>
+        <span class="cmp-detail-val">
+          <span class="cmp-status {% if prop.is_listed %}live{% else %}stored{% endif %}">
+            {% if prop.is_listed %}Available{% else %}Off Market{% endif %}
+          </span>
+        </span>
+      </div>
+      <div class="cmp-detail-row">
+        <span class="cmp-detail-lbl">Listed</span>
+        <span class="cmp-detail-val">{{ prop.listed_date|date:"M d, Y"|default:"—" }}</span>
+      </div>
+      <div class="cmp-detail-row">
+        <span class="cmp-detail-lbl">Listed by</span>
+        <span class="cmp-detail-val">
+          {% if prop.agent_uuid %}Agent{% else %}Company{% endif %}
+        </span>
+      </div>
+    </div>
+
+    <!-- Description snippet -->
+    <div class="cmp-desc">
+      <p class="cmp-desc-lbl">Description</p>
+      <p>
+        {% if prop.property_description %}
+          {{ prop.property_description|truncatewords:25 }}
+        {% elif prop.description %}
+          {{ prop.description|truncatewords:25 }}
+        {% else %}
+          No description provided.
+        {% endif %}
+      </p>
+    </div>
+
+    <!-- CTA -->
+    <a href="{% if prop.property_type == 'Sale' %}{% url 'customer:view-property-s' prop.id %}{% else %}{% url 'customer:view-property-r' prop.id %}{% endif %}" class="cmp-view-btn {% if prop.property_type == 'Sale' %}sale{% else %}lease{% endif %}">
+      <i class="bi bi-eye-fill"></i> View Full Listing
+    </a>
+
+    <!-- Inquiry button -->
+    <a href="{% url 'customer:inquiry-form' prop.property_type prop.id %}" class="cmp-inq-btn">
+      <i class="bi bi-send-fill"></i> Enquire
+    </a>
+
+  </div>
+  {% endfor %}
+
+  <!-- Empty slot(s) if fewer than 3 -->
+  {% for i in "123" %}
+    {% if forloop.counter > properties|length %}
+    <div class="cmp-add-slot">
+      <div class="cmp-add-slot-inner">
+        <i class="bi bi-plus-circle"></i>
+        <p>Add another property</p>
+        <a href="{% url 'customer:buy-property' %}" class="cmp-btn sale sm">
+          Browse Listings
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+</div>
+
+
+<!-- ── SCROLL DOTS (mobile) ── -->
+<div class="cmp-dots" id="cmpDots">
+  {% for prop in properties %}<span class="cmp-dot {% if forloop.first %}active{% endif %}"></span>{% endfor %}
+  {% for i in "123" %}{% if forloop.counter > properties|length %}<span class="cmp-dot empty"></span>{% endif %}{% endfor %}
+</div>
+
+
+<!-- ── DESKTOP: SIDE BY SIDE TABLE ───────────────── -->
+<div class="cmp-desktop-wrap">
+  <table class="cmp-table">
+
+    <!-- Images row -->
+    <tr class="cmp-img-row">
+      <th class="cmp-row-label">Property</th>
+      {% for prop in properties %}
+      <td>
+        <div class="cmp-td-img">
+          {% if prop.base_image %}
+            <img src="{{ prop.base_image.url }}" alt="Property" loading="lazy">
+          {% else %}
+            <div class="cmp-img-placeholder sm"><i class="bi bi-building"></i></div>
+          {% endif %}
+          <span class="cmp-type-badge {% if prop.price %}sale{% else %}lease{% endif %}">
+            {% if prop.price %}For Sale{% else %}For Rent{% endif %}
+          </span>
+          <button class="cmp-remove-card sm"
+                  title="Remove"
+                  data-type="{% if prop.price %}sale{% else %}rent{% endif %}"
+                  data-id="{{ prop.id }}">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </td>
+      {% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}
+        <td class="cmp-empty-col">
+          <div class="cmp-add-col">
+            <i class="bi bi-plus-circle"></i>
+            <a href="{% url 'customer:buy-property' %}">Add Property</a>
+          </div>
+        </td>
+      {% endif %}{% endfor %}
+    </tr>
+
+    <!-- Title -->
+    <tr>
+      <th>Name</th>
+      {% for prop in properties %}
+      <td class="cmp-name-cell">
+        {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+        {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+        {% else %}{{ prop.lands }}{% endif %}
+        <small><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}, {{ prop.state }}</small>
+      </td>
+      {% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Price -->
+    <tr class="cmp-highlight-row">
+      <th>Price</th>
+      {% for prop in properties %}
+      <td class="cmp-price-cell">
+        {% if prop.price %}₦{{ prop.price|floatformat:0|intcomma }}
+        {% else %}₦{{ prop.price_range|floatformat:0|intcomma }}<span class="cmp-per">/mo</span>{% endif %}
+      </td>
+      {% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Bedrooms -->
+    <tr>
+      <th><i class="bi bi-door-open-fill"></i> Bedrooms</th>
+      {% for prop in properties %}<td>{{ prop.bedrooms|default:"—" }}</td>{% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Bathrooms -->
+    <tr>
+      <th><i class="bi bi-droplet-fill"></i> Bathrooms</th>
+      {% for prop in properties %}<td>{{ prop.bathrooms|default:"—" }}</td>{% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Parking -->
+    <tr>
+      <th><i class="bi bi-p-circle-fill"></i> Parking</th>
+      {% for prop in properties %}<td>{{ prop.parking_spaces|default:"—" }}</td>{% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Size -->
+    <tr>
+      <th><i class="bi bi-rulers"></i> Size (sqft)</th>
+      {% for prop in properties %}<td>{{ prop.size|default:"—" }}</td>{% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Category -->
+    <tr>
+      <th>Category</th>
+      {% for prop in properties %}<td>{{ prop.property_category }}</td>{% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Status -->
+    <tr>
+      <th>Availability</th>
+      {% for prop in properties %}
+      <td>
+        <span class="cmp-status {% if prop.is_listed %}live{% else %}stored{% endif %}">
+          {% if prop.is_listed %}Available{% else %}Off Market{% endif %}
+        </span>
+      </td>
+      {% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Listed date -->
+    <tr>
+      <th>Listed On</th>
+      {% for prop in properties %}<td>{{ prop.listed_date|date:"M d, Y"|default:"—" }}</td>{% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Listed by -->
+    <tr>
+      <th>Listed By</th>
+      {% for prop in properties %}
+      <td>{% if prop.agent_uuid %}Agent{% else %}Company{% endif %}</td>
+      {% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}
+    </tr>
+
+    <!-- Actions -->
+    <tr class="cmp-actions-row">
+      <th>Actions</th>
+      {% for prop in properties %}
+      <td>
+        <div class="cmp-td-actions">
+          <a href="{% if prop.property_type == 'Sale' %}{% url 'customer:view-property-s' prop.id %}{% else %}{% url 'customer:view-property-r' prop.id %}{% endif %}" class="cmp-view-btn {% if prop.property_type == 'Sale' %}sale{% else %}lease{% endif %}">
+            <i class="bi bi-eye-fill"></i> View
+          </a>
+          <a href="{%url 'customer:inquiry-form' prop.property_type prop.id %}" class="cmp-inq-btn">
+            <i class="bi bi-send-fill"></i> Enquire
+          </a>
+        </div>
+      </td>
+      {% endfor %}
+      {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col"></td>{% endif %}{% endfor %}
+    </tr>
+
+  </table>
+</div>
+
+{% endif %}{# end has properties #}
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  var CSRF = '{{ csrf_token }}';
+
+  /* ── Mobile scroll dots ── */
+  var strip = document.getElementById('cmpMobileStrip');
+  var dots  = document.querySelectorAll('.cmp-dot:not(.empty)');
+  if (strip && dots.length) {
+    strip.addEventListener('scroll', function () {
+      var cardW = strip.firstElementChild ? strip.firstElementChild.offsetWidth : 1;
+      var idx   = Math.round(strip.scrollLeft / (cardW + 16));
+      dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+    }, { passive: true });
+  }
+
+  /* ── Clear all ── */
+  var clearBtn = document.getElementById('cmpClearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      if (!confirm('Clear all properties from comparison?')) return;
+      fetch('{% url "customer:clear-compare" %}', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+      }).then(function () { window.location.reload(); });
+    });
+  }
+
+  /* ── Remove individual card ── */
+  document.querySelectorAll('.cmp-remove-card').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var type = btn.dataset.type;
+      var id   = btn.dataset.id;
+      if (!type || !id) return;
+      fetch('/customer/compare/toggle/' + type + '/' + id + '/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+      }).then(function () { window.location.reload(); });
+    });
+  });
+
+  /* ── Sync counter on load ── */
+  if (window.updateCompareBar) {
+    updateCompareBar({{ properties|length }});
+  }
+
+}());
+</script>
+{% endblock %}

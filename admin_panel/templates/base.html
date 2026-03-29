@@ -20,61 +20,6 @@
         padding-top: 80px !important;
       }
 
-      /* Messages Container */
-      .messages-container {
-        position: fixed;
-        top: 2rem;
-        right: 2rem;
-        z-index: 9999;
-        max-width: 400px;
-      }
-
-      .alert {
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-        animation: slideInRight 0.5s ease;
-        margin-bottom: 1rem;
-        border: none;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transition: opacity 0.5s ease;
-      }
-
-      .alert .btn-close {
-        width: 1.5rem !important;
-        height: 1.5rem !important;
-        min-width: 1.5rem !important;
-        min-height: 1.5rem !important;
-        padding: 0.3rem !important;
-        flex-shrink: 0 !important;
-        background-size: 1rem !important;
-      }
-
-      .alert.fade:not(.show) {
-        opacity: 0;
-      }
-
-      @keyframes slideInRight {
-        from {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-
-      @media (max-width: 768px) {
-        .messages-container {
-          top: 1rem;
-          right: 1rem;
-          left: 1rem;
-          max-width: none;
-        }
-      }
     </style>
 
     {# ================================================================ #}
@@ -438,42 +383,8 @@
     {% include 'estate/navbar.html' %}
     <br/><br/>
     
-    <!-- Messages Container -->
-    <div class="messages-container">
-{% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'error' %}
-            {% with 'danger' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% elif message.tags == 'info' %}
-            {% with 'info' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% elif message.tags == 'warning' %}
-            {% with 'warning' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% else %}
-            {% with 'success' as alert_class %}
-                <div class="alert alert-{{ alert_class }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endwith %}
-        {% endif %}
-    {% endfor %}
-{% endif %}
-    </div>
+    <!-- Messages -->
+    {% include 'estate/includes/messages.html' %}
     
     <div class="container">
         {% block content %}
@@ -482,20 +393,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Auto-dismiss alerts -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-          setTimeout(function() {
-            alert.classList.remove('show');
-            setTimeout(function() {
-              alert.remove();
-            }, 500);
-          }, 5000);
-        });
-      });
-    </script>
 
     {# ================================================================ #}
     {# FEEDBACK SYSTEM — ADDED HTML + JS (do not modify anything above) #}

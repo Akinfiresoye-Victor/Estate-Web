@@ -71,9 +71,15 @@
       <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
       Estate Web
     </a>
-    <div class="ms-auto">
+    <div class="ms-auto d-flex gap-2">
       <a href="{% url 'company:dashboard' %}" class="btn-outline-dash">
         <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+      <a href="{% url 'logout' %}" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+      <a href="{%url 'company:delete-company'%}" class="btn-danger-outline">
+        <i class="bi bi-trash"></i> Delete Account
       </a>
     </div>
   </div>

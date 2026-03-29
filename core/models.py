@@ -219,6 +219,31 @@ class Appointments(models.Model):
     def __str__(self):
         return f'Appointment: {self.pk}- {self.note}'
 
+    @property
+    def google_calendar_url(self):
+        from urllib.parse import urlencode
+        from datetime import timedelta
+
+        if not self.appointment:
+            return "#"
+        
+        start_date = self.appointment.strftime("%Y%m%d")
+        end_date = (self.appointment + timedelta(days=1)).strftime("%Y%m%d")
+        
+        title = f"Appointment: {self.note}" if self.note and self.note != 'No Note Provided' else "Property Appointment"
+        location = f"{self.property_type} Property #{self.property_id}" if self.property_id else ""
+        
+        params = {
+            'action': 'TEMPLATE',
+            'text': title,
+            'dates': f"{start_date}/{end_date}",
+            'details': f"Type: {self.appointment_type}\nView details on Estate Web system.",
+        }
+        if location:
+            params['location'] = location
+        
+        return "https://calendar.google.com/calendar/render?" + urlencode(params)
+
 
 # 1. New model for Property Types (Residential, Commercial, etc.)
 class PropertyFocus(models.Model):

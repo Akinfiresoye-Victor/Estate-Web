@@ -69,7 +69,7 @@ def feedbacks(request):
         else:
             base_template='estate/base.html'
         if request.method == 'POST':
-            messages.success(request, 'Thanks For your feedback....')
+            messages.success(request, 'Thank you for your feedback!')
             form = FeedbackForm(request.POST)
             if form.is_valid():
                 form.save()
@@ -96,7 +96,7 @@ def submit_feedback(request):
         screenshot = request.FILES.get('screenshot', None)
 
         if not reaction or not category:
-            messages.error(request, 'Reaction and category are required.')
+            messages.error(request, 'Please provide both a reaction and a category.')
             return HttpResponse(status=400)
 
         try:
@@ -104,12 +104,12 @@ def submit_feedback(request):
             if reaction_int not in range(1, 6):
                 raise ValueError
         except ValueError:
-            messages.error(request, 'Invalid reaction value.')
+            messages.error(request, 'The reaction value provided is invalid.')
             return HttpResponse(status=400)
 
         valid_categories = ['bug', 'feature', 'complaint', 'praise']
         if category not in valid_categories:
-            messages.error(request, 'Invalid category.')
+            messages.error(request, 'The selected category is invalid.')
             return HttpResponse(status=400)
 
         valid_roles = ['agent', 'company', 'admin', 'landlord']
@@ -130,11 +130,11 @@ def submit_feedback(request):
 
         feedback_obj.save()
 
-        messages.success(request, 'Thanks for your feedback! We read every submission.')
+        messages.success(request, 'Thank you for your feedback! We value your input.')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
         else:
-            messages.error(request, 'Error Redirecting')
+            messages.error(request, 'Unable to complete the redirection.')
             return redirect('landing')
 
     except Exception:
@@ -144,11 +144,11 @@ def submit_feedback(request):
 
 def sell_property(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login in required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
  
     if request.user.role == 'customer':
-        messages.info(request, 'Landlord Feature Coming Out Soon')
+        messages.info(request, 'The Landlord feature is currently under development.')
         return redirect('landing')
     try:
         user_role = request.user.role
@@ -398,13 +398,13 @@ def toggle_listing(request, property_id, property_type):
     except:
         if is_ajax:
             return JsonResponse({'error':'Not found'}, status=404)
-        messages.error(request, 'Property not found')
+        messages.error(request, 'The requested property could not be found.')
         return redirect('listings')
 
     if prop.is_listed:
         prop.is_listed=False
         prop.save(update_fields=['is_listed'])
-        msg='Property moved back to inventory.'
+        msg='Property moved to inventory.'
         if is_ajax:
             return JsonResponse({'is_lited': False, 'message':msg})
         messages.success(request, msg)
@@ -424,7 +424,7 @@ def toggle_listing(request, property_id, property_type):
             return redirect('listings')
         prop.is_listed=True
         prop.save(update_fields=['is_listed'])
-        msg= 'Property is now live on the platform.'
+        msg= 'Your property is now live!'
         if is_ajax:
             return JsonResponse({'is_listed':True, 'message': msg})
         messages.success(request, msg)
@@ -468,13 +468,12 @@ def articles(request):
 #todo adjust the update forms
 def update_property_rent(request, property_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role == 'customer':
-        messages.info(request, 'Coming out soon')
+        messages.info(request, 'This feature is coming soon!')
         return redirect('landing')
     try:
-        print('here')
         #gets the particular listing that needs to be updated using the property id
         property=PropertyManagementRent.objects.get(pk= property_id)
         user_role=request.user.role
@@ -488,7 +487,7 @@ def update_property_rent(request, property_id):
         if user_role == 'agent':
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             if property.agent_uuid != agent_uuid:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
                     return redirect(request.META['HTTP_REFERER'])  
                 else:
@@ -496,13 +495,13 @@ def update_property_rent(request, property_id):
         elif user_role == 'company':
             company_uuid=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
             if property.company_uuid != company_uuid:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
                     return redirect(request.META['HTTP_REFERER'])  
                 else:
                     return redirect('landing')
         else:
-            messages.info(request, 'Feature Coming Soon')
+            messages.info(request, 'Coming soon!')
             return redirect('landing')
         prop_form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
         image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property)
@@ -510,7 +509,7 @@ def update_property_rent(request, property_id):
         if prop_form.is_valid() and image_form.is_valid():
             prop_form.save()
             image_form.save()
-            messages.success(request, "Property Updated Successfully")
+            messages.success(request, "Property updated successfully.")
             CompanyActivityLog.objects.create(
                 company=company,
                 action= 'Property Listing Updated'
@@ -527,10 +526,10 @@ def update_property_rent(request, property_id):
 #view to update listed property on rent
 def update_property_sale(request, property_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.info(request, 'Coming out soon')
+        messages.info(request, 'This feature is coming soon!')
         return redirect('landing')
     try:
         #updating the particular listing that needs to be updated using the property id
@@ -546,7 +545,7 @@ def update_property_sale(request, property_id):
         if user_role == 'agent':
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             if property.agent_uuid != agent_uuid:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
                     return redirect(request.META['HTTP_REFERER'])  
                 else:
@@ -554,13 +553,13 @@ def update_property_sale(request, property_id):
         elif user_role == 'company':
             company_uuid=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
             if property.company_uuid != company_uuid:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
                     return redirect(request.META['HTTP_REFERER'])  
                 else:
                     return redirect('landing')
         else:
-            messages.info(request, 'Feature Coming Soon')
+            messages.info(request, 'Coming soon!')
             return redirect('landing')
         prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
         image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
@@ -568,7 +567,7 @@ def update_property_sale(request, property_id):
         if prop_form.is_valid() and image_form.is_valid():
             prop_form.save()
             image_form.save()
-            messages.success(request, "Property Updated Successfully")
+            messages.success(request, "Property updated successfully.")
             CompanyActivityLog.objects.create(
                 company=company,
                 action= 'Property Listing Updated'
@@ -584,10 +583,10 @@ def update_property_sale(request, property_id):
 #view to delete listings
 def delete_property_on_lease(request, property_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         if request.user.role == 'company':
@@ -597,17 +596,17 @@ def delete_property_on_lease(request, property_id):
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             company=None
         else:
-            messages.info(request, 'Feature Coming soon')
+            messages.info(request, 'Coming soon!')
             return redirect('landing')
 
         property1= PropertyManagementSale.objects.get(pk=property_id)
         
         #Additional layer of security
         if company and property1.company_uuid != company.unique_company_id:
-            messages.warning(request, 'Access Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         elif agent_uuid and property1.agent_uuid != agent_uuid:
-            messages.warning(request, 'Access Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         
         leads=LeadInfo.objects.filter(property_type='Rent', property_intrested=property1.pk)
@@ -627,14 +626,14 @@ def delete_property_on_lease(request, property_id):
             wishlists.delete()
             property_views.delete()
             property1.delete()
-            messages.success(request, ("Property deleted successfully"))
+            messages.success(request, "Property deleted successfully.")
             CompanyActivityLog.objects.create(
                 company=company,
                 action= 'Property Listing Deleted'
             )
             return redirect('listings')
         except Exception:
-            messages.error(request, 'An error occured.....')
+            messages.error(request, 'An unexpected error occurred. Please try again.')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -642,10 +641,10 @@ def delete_property_on_lease(request, property_id):
 #view to delete listings
 def delete_property_on_sale(request, property_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.warning(request, 'Access Denied')
+        messages.warning(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         if request.user.role == 'company':
@@ -655,17 +654,17 @@ def delete_property_on_sale(request, property_id):
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             company=None
         else:
-            messages.info(request, 'Feature Coming soon')
+            messages.info(request, 'Coming soon!')
             return redirect('landing')
 
         property1= PropertyManagementSale.objects.get(pk=property_id)
         
         #Additional layer of security
         if company and property1.company_uuid != company.unique_company_id:
-            messages.warning(request, 'Access Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         elif agent_uuid and property1.agent_uuid != agent_uuid:
-            messages.warning(request, 'Access Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         
         leads=LeadInfo.objects.filter(property_type='Sale', property_intrested=property1.pk)
@@ -682,7 +681,7 @@ def delete_property_on_sale(request, property_id):
         wishlists.delete()
         property_views.delete()
         property1.delete()
-        messages.success(request, ("Property deleted successfully"))
+        messages.success(request, "Property deleted successfully.")
         if request.user.role == 'company':
             CompanyActivityLog.objects.create(
                 company=company,
@@ -708,25 +707,21 @@ def partner_with_us(request):
         form = PartnershipForm(request.POST)
 
         if form.is_valid():
-            # save() with commit=False gives us the instance without writing
-            # M2M yet — we need to call save_m2m() after saving the instance
             partnership = form.save(commit=False)
             partnership.save()           # writes the main row to the database
-            form.save_m2m()              # now writes the M2M (property_types, partnership_benefits)
+            form.save_m2m()              # now writes the M2M
 
             messages.success(
                 request,
                 "Thank you for applying! Our partnerships team will review your application "
                 "and reach out within 3–5 business days."
             )
-            return redirect('partner-success')   # change this URL name to match your urls.py
+            return redirect('partner-success')
 
         else:
-            # Form has errors — re-render with the same POST data so the user
-            # doesn't have to retype everything
             messages.error(
                 request,
-                "Please correct the errors below and resubmit your application."
+                "Please correct the errors in the form and resubmit your application."
             )
 
     else:
@@ -743,10 +738,10 @@ def partner_success(request):
 
 def appointment_detail(request,appt_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log In required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         user_role=request.user.role
@@ -760,14 +755,14 @@ def appointment_detail(request,appt_uuid):
             company=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
             sample= Appointments.objects.get(appointment_uuid=appt_uuid)
             if company != sample.company_uuid:
-                messages.warning(request, 'Unauthorized Access')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('appointment')
             appointment=sample
         else:
             agent=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             sample= Appointments.objects.get(appointment_uuid=appt_uuid)
             if agent != sample.agent_uuid:
-                messages.warning(request, 'Unauthorized Access')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('appointment')
             appointment=sample
         try:
@@ -783,11 +778,11 @@ def appointment_detail(request,appt_uuid):
 
 def add_schedule(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log In required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     
     try:
@@ -826,12 +821,12 @@ def add_schedule(request):
                             raise ValueError
                         appointment.property_id = property_id
                     except (ValueError, TypeError):
-                        messages.error(request, 'Invalid property ID.')
+                        messages.error(request, 'The property ID provided is invalid.')
                         return render(request, 'core/add_schedule.html', {'form': form, 'base_template': base_template})
                 
                 if property_type:
                     if property_type not in ['Sale', 'Rent']:
-                        messages.error(request, 'Invalid property type.')
+                        messages.error(request, 'The property type provided is invalid.')
                         return render(request, 'core/add_schedule.html', {'form': form, 'base_template': base_template})
                     appointment.property_type = property_type
                 
@@ -849,24 +844,21 @@ def add_schedule(request):
                                 raise PermissionError
                         appointment.lead_uuid = lead_uuid
                     except (LeadInfo.DoesNotExist, PermissionError):
-                        messages.error(request, 'Invalid lead selection.')
+                        messages.error(request, 'The selected lead is invalid.')
                         return render(request, 'core/add_schedule.html', {'form': form, 'base_template': base_template})
                 
                 appointment.save()
                 
-                messages.success(request, 'Appointment scheduled successfully!')
+                messages.success(request, 'Your appointment has been scheduled successfully.')
                 return redirect('appointment') 
             else:
-                messages.error(request, 'Please correct the errors below.')
+                messages.error(request, 'Please correct the errors in the form.')
         else:
             form = AppointmentForm()
         
         context = {
             'form': form,
             'base_template':base_template
-            # Add any additional context like leads, properties, etc.
-            # 'leads': Lead.objects.filter(company_uuid=request.user.uuid),
-            # 'properties': Property.objects.filter(company_uuid=request.user.uuid),
         }
         
         return render(request, 'core/add_schedule.html', context)
@@ -878,10 +870,10 @@ def add_schedule(request):
 
 def appointment(request):
     if not request.user.is_authenticated:
-        messages.info(request, "Login Required")
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         user_role=request.user.role
@@ -892,8 +884,6 @@ def appointment(request):
         else:
             base_template='estate/base.html'
         
-        '''Client Appointment'''
-        #user in question
         try:
             company= CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
             total_appointment= Appointments.objects.filter(company_uuid=company)
@@ -910,7 +900,7 @@ def appointment(request):
 
 def estate_blog(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     try:
         user_role=request.user.role
@@ -928,10 +918,10 @@ def estate_blog(request):
 
 def manage_listings(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'login required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.warning(request, 'Access Restricted')
+        messages.warning(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         user_role=request.user.role
@@ -956,7 +946,7 @@ def manage_listings(request):
             property_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid)
             role='agent'
         else:
-            messages.error(request, 'An error occured')
+            messages.error(request, 'An unexpected error occurred.')
             return redirect('landing')
         inv_used=get_inventory_count(agent, company)
         live_used= get_listing_count(agent,company)
@@ -987,11 +977,11 @@ def manage_listings(request):
 
 def edit_appointment(request, appointment_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Log In required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     
     if request.user.role == 'customer':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     
     try:
@@ -1003,14 +993,13 @@ def edit_appointment(request, appointment_uuid):
         else:
             base_template = 'estate/base.html'
         
-        # Get the appointment based on user role
         if request.user.role == 'company':
             company = CompanyInformation.objects.get(user_id=request.user.id)
             item= Appointments.objects.filter(company_uuid=company.unique_company_id).get(appointment_uuid=appointment_uuid)
             if item.company_uuid == company.unique_company_id:
                 appointment=item
             else:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         else:
             agent = AgentInformation.objects.get(user_id=request.user.id)
@@ -1018,25 +1007,22 @@ def edit_appointment(request, appointment_uuid):
             if item.agent_uuid == agent.agent_uuid:
                 appointment= item
             else:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
             
-        # Get lead information if exists
         lead = None
         
         try:
             if appointment.lead_uuid:
                 lead = LeadInfo.objects.get(lead_id=appointment.lead_uuid)
         except ObjectDoesNotExist:
-            return render(request, 'error/error_page.html', {'e':'Lead Not Found'})
+            return render(request, 'error/error_page.html', {'e':'The requested lead could not be found.'})
         
-        # Handle POST request (form submission)
         if request.method == 'POST':
             try:
-                # Validate and update appointment fields
                 appointment_date = request.POST.get('appointment_date')
                 if not appointment_date:
-                    messages.error(request, 'Appointment date is required.')
+                    messages.error(request, 'Please provide an appointment date.')
                     return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                 
                 try:
@@ -1044,18 +1030,17 @@ def edit_appointment(request, appointment_uuid):
                     datetime.strptime(appointment_date, '%Y-%m-%d')
                     appointment.appointment = appointment_date
                 except ValueError:
-                    messages.error(request, 'Invalid appointment date format.')
+                    messages.error(request, 'The appointment date format is invalid.')
                     return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                 
                 appointment.note = request.POST.get('note', 'No Note Provided')
                 
                 appointment_type = request.POST.get('appointment_type')
                 if appointment_type not in dict(APPOINTMENT_TYPE):
-                    messages.error(request, 'Invalid appointment type.')
+                    messages.error(request, 'The appointment type selected is invalid.')
                     return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                 appointment.appointment_type = appointment_type
                 
-                # Update property fields if provided
                 property_id = request.POST.get('property_id')
                 if property_id:
                     try:
@@ -1064,13 +1049,13 @@ def edit_appointment(request, appointment_uuid):
                             raise ValueError
                         appointment.property_id = property_id
                     except (ValueError, TypeError):
-                        messages.error(request, 'Invalid property ID.')
+                        messages.error(request, 'The property ID provided is invalid.')
                         return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                 
                 property_type = request.POST.get('property_type')
                 if property_type:
                     if property_type not in ['Sale', 'Rent']:
-                        messages.error(request, 'Invalid property type.')
+                        messages.error(request, 'The property type provided is invalid.')
                         return render(request, 'core/edit_appointment.html', {'appointment': appointment, 'lead_data': lead, 'base_template': base_template, 'appointment_types': appointment_types})
                     appointment.property_type = property_type
                 
@@ -1080,13 +1065,12 @@ def edit_appointment(request, appointment_uuid):
                         company=company,
                         action= 'Appointment Updated'
                     )
-                messages.success(request, 'Appointment updated successfully!')
+                messages.success(request, 'Appointment updated successfully.')
                 return redirect('view-schedule', lead_id=appointment_uuid)
                 
             except Exception:
-                messages.error(request, 'Error updating appointment')
+                messages.error(request, 'Unable to update the appointment.')
         
-        # Get appointment types for the dropdown
         appointment_types = dict(APPOINTMENT_TYPE)
         
         context = {
@@ -1099,7 +1083,7 @@ def edit_appointment(request, appointment_uuid):
         return render(request, 'core/edit_appointment.html', context)
         
     except Appointments.DoesNotExist:
-        messages.error(request, 'Appointment not found')
+        messages.error(request, 'The requested appointment could not be found.')
         return redirect('appointment')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1109,10 +1093,10 @@ def edit_appointment(request, appointment_uuid):
 
 def view_client(request, appointment_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     user_role = request.user.role
     if user_role == 'company':
@@ -1128,7 +1112,7 @@ def view_client(request, appointment_uuid):
             if lead_item.company_uuid == company.unique_company_id:
                 leads=LeadInfo.objects.filter(company_uuid=company.unique_company_id)
             else:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         except:
             agent= AgentInformation.objects.get(user_id=request.user.id)
@@ -1136,7 +1120,7 @@ def view_client(request, appointment_uuid):
             if lead_item.agent_id == agent.agent_uuid:
                 leads= LeadInfo.objects.filter(agent_id=agent.agent_uuid)
             else:
-                messages.warning(request, 'Access Denied')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_uuid})
     except Exception:
@@ -1146,10 +1130,10 @@ def view_client(request, appointment_uuid):
 
 def add_client(request, lead_uuid, appointment_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         if request.user.role == 'company':
@@ -1160,7 +1144,7 @@ def add_client(request, lead_uuid, appointment_uuid):
                 appointment_data= raw_data
                 lead_data= raw_lead_data
             else:
-                messages.warning(request, 'Restricted Action')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         elif request.user.role == 'agent':
             agent= AgentInformation.objects.get(user_id=request.user.id)
@@ -1170,14 +1154,14 @@ def add_client(request, lead_uuid, appointment_uuid):
                 appointment_data=raw_data
                 lead_data= raw_lead_data
             else:
-                messages.warning(request, 'Restricted Action')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         else:
             return redirect('landing')
         
         appointment_data.lead_uuid= lead_data.lead_id
         appointment_data.save()
-        messages.success(request, 'Client Added')
+        messages.success(request, 'Client successfully added to appointment.')
         return redirect('view-schedule', raw_data.appointment_uuid)
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1185,10 +1169,10 @@ def add_client(request, lead_uuid, appointment_uuid):
     
 def delete_appointment(request, appointment_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         appointment=Appointments.objects.get(appointment_uuid=appointment_uuid)
@@ -1201,29 +1185,29 @@ def delete_appointment(request, appointment_uuid):
                         company=company,
                         action= 'Appointment Deleted'
                     )
-                    messages.success(request, 'Appointment Deleted')
+                    messages.success(request, 'Appointment deleted successfully.')
                     return redirect('appointment')
                 else:
-                    messages.error(request, 'Access Denied')
+                    messages.error(request, 'Access denied: Unauthorized action.')
                     return redirect('landing')
             except ObjectDoesNotExist:
-                messages.error(request, 'An error occured')
+                messages.error(request, 'An unexpected error occurred.')
                 return redirect('landing')
         elif request.user.role == 'agent':
             try:
                 agent=AgentInformation.objects.get(user_id=request.user.id)
                 if appointment.agent_uuid == agent.agent_uuid:
                     appointment.delete()
-                    messages.success(request, 'Appointment Deleted')
+                    messages.success(request, 'Appointment deleted successfully.')
                     return redirect('appointment')
                 else:
-                    messages.error(request, 'Access Denied')
+                    messages.error(request, 'Access denied: Unauthorized action.')
                     return redirect('landing')
             except ObjectDoesNotExist:
-                messages.error(request, 'An error occured')
+                messages.error(request, 'An unexpected error occurred.')
                 return redirect('landing')
         else:
-            messages.error(request, 'Access Denied')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1232,10 +1216,10 @@ def delete_appointment(request, appointment_uuid):
 
 def delete_client(request, appointment_uuid):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role == 'customer':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         appointment=Appointments.objects.get(appointment_uuid=appointment_uuid)
@@ -1249,13 +1233,13 @@ def delete_client(request, appointment_uuid):
                         company=company,
                         action= 'Client Data Deleted'
                     )
-                    messages.success(request, 'Client Info Removed')
+                    messages.success(request, 'Client information removed from appointment.')
                     return redirect('view-schedule', appointment.appointment_uuid)
                 else:
-                    messages.error(request, 'Access Denied')
+                    messages.error(request, 'Access denied: Unauthorized action.')
                     return redirect('landing')
             except ObjectDoesNotExist:
-                messages.error(request, 'An error occured')
+                messages.error(request, 'An unexpected error occurred.')
                 return redirect('landing')
         elif request.user.role == 'agent':
             try:
@@ -1263,16 +1247,16 @@ def delete_client(request, appointment_uuid):
                 if appointment.agent_uuid == agent.agent_uuid:
                     appointment.lead_uuid = None
                     appointment.save()
-                    messages.success(request, 'Client Info Removed')
+                    messages.success(request, 'Client information removed from appointment.')
                     return redirect('view-schedule', appointment_uuid)
                 else:
-                    messages.error(request, 'Access Denied')
+                    messages.error(request, 'Access denied: Unauthorized action.')
                     return redirect('landing')
             except ObjectDoesNotExist:
-                messages.error(request, 'An error occured')
+                messages.error(request, 'An unexpected error occurred.')
                 return redirect('landing')
         else:
-            messages.error(request, 'Access Denied')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())

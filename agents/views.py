@@ -126,7 +126,7 @@ def dashboard(request):
         })
 
     except AgentInformation.DoesNotExist:
-        messages.info(request, 'Set up your profile to access other pages')
+        messages.info(request, 'Please set up your agent profile to continue.')
         return redirect('agent:agent-form')
 
     except Exception:
@@ -141,16 +141,16 @@ def agent_form(request):
     Compulsory Form all agents must fill before they can access our tools
     """
     if not request.user.is_authenticated:
-        messages.info(request, 'You must be logged in to access this page')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role != 'agent':
-        messages.error(request, 'Agent Account Only')
+        messages.error(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     
     try:
         # Check if agent already has a profile & redirect to Dahboard
         if AgentInformation.objects.filter(user_id=request.user.id).exists():
-            messages.info(request, 'Form has been filled. Go to settings to edit details')
+            messages.info(request, 'Agent profile already exists. You can edit your details in settings.')
             return redirect('agent:dashboard')
         
         #to avoid submissin of form twice
@@ -166,16 +166,6 @@ def agent_form(request):
             form_valid = form.is_valid()
             exp_valid = exp_link.is_valid()
             soc_valid = soc_form.is_valid()
-            
-            # Debug: Print errors if any
-            if not form_valid:
-                messages.error(request, f'Main form errors: {form.errors}')
-            
-            if not exp_valid:
-                messages.error(request, f'Experience errors: {exp_link.errors}')
-            
-            if not soc_valid:
-                messages.error(request, f'Social links errors: {soc_form.errors}')
             
             # If all forms are valid, save them
             if form_valid and exp_valid and soc_valid:
@@ -213,13 +203,20 @@ def agent_form(request):
                         
                         
                         
-                        messages.success(request, 'Profile created successfully!')
+                        messages.success(request, 'Agent profile created successfully.')
                         return HttpResponseRedirect(f"{request.path}?submitted=True")
                         
                 except Exception:
                     print(f"Error saving agent data")
-                    messages.error(request, 'Error saving data')
+                    messages.error(request, 'An error occurred while saving your profile. Please try again.')
                     # Forms will be re-rendered with the POST data below
+            else:
+                if not form_valid:
+                    messages.error(request, 'Please correct the errors in the profile form.')
+                if not exp_valid:
+                    messages.error(request, 'Please correct the errors in the experience section.')
+                if not soc_valid:
+                    messages.error(request, 'Please correct the errors in the social links section.')
         
         else:
             # GET request - initialize empty forms
@@ -249,11 +246,11 @@ def update_agent_profile(request):
     """
     # Authentication checks
     if not request.user.is_authenticated:
-        messages.info(request, 'You have to be logged in to access this page')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     
     if request.user.role != 'agent':
-        messages.error(request, 'Open an agent account to access this page')
+        messages.error(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
         # Get the agent information
@@ -261,7 +258,7 @@ def update_agent_profile(request):
         
         # Authorization check
         if request.user.id != agent_information.user_id:
-            messages.error(request, 'You do not have permission to edit this profile')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('agent:agent-settings')
         
         if request.method == 'POST':
@@ -699,7 +696,7 @@ def analytics(request):
         })
 
     except AgentInformation.DoesNotExist:
-        messages.error(request, 'Agent profile not found.')
+        messages.error(request, 'The agent profile could not be found.')
         return redirect('landing')
 
     except Exception:
@@ -714,10 +711,10 @@ def lead_detail(request, lead_id):
     """
     #TODO enable view passowrd side during login and signup
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return render('login')
     if request.user.role != 'agent':
-        messages.error(request, "Agent's Only")
+        messages.error(request, "Access denied: This page is for agent accounts only.")
         return redirect('landing')
     try:
         agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
@@ -725,7 +722,7 @@ def lead_detail(request, lead_id):
         
         #preventing other agents from stealing another agents lead/data
         if not lead.agent_id in agent_uuid:
-            messages.warning(request, 'Access Denied')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         if lead.property_type == 'Sale':
             property_intrested=PropertyManagementSale.objects.get(pk=lead.property_intrested)
@@ -744,36 +741,36 @@ def agent_update_lead_status(request, lead_id):
     """
     
     if not request.user.is_authenticated:
-        messages.info(request, 'log in to access this page')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role != 'agent':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         try:
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
             lead = LeadInfo.objects.get(pk=lead_id)
             if not lead.agent_id in agent_uuid:
-                messages.warning(request, 'Action Prohibited')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
             new_status = request.POST.get('new_status')
             if not new_status:
-                messages.error(request, 'Status Missing')
+                messages.error(request, 'Please provide a lead status.')
                 return redirect('agent:leads')
             
             from core.choices import LEAD_STATUS
             if new_status not in [choice[0] for choice in LEAD_STATUS]:
-                messages.error(request, 'Invalid status value')
+                messages.error(request, 'The provided status value is invalid.')
                 return redirect('agent:leads')
             
             lead.status = new_status
             lead.date_updated = timezone.now()
             lead.save()
             
-            messages.success(request, 'Status Updated Successfully')
+            messages.success(request, 'Lead status updated successfully.')
             return redirect('agent:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
-            messages.error(request, 'Lead Not found')
+            messages.error(request, 'The requested lead could not be found.')
             return redirect('agent:leads')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -787,61 +784,60 @@ def agent_update_lead_stage(request, lead_id):
     """
     
     if not request.user.is_authenticated:
-        messages.info(request, 'Log in to gain access')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('landing')
     if request.user.role != 'agent':
-        messages.info(request, 'Access Denied')
+        messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
         try:
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
             lead = LeadInfo.objects.get(pk=lead_id)
             if not lead.agent_id in agent_uuid:
-                messages.warning(request, 'Action Prohibited')
+                messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
             new_stage = request.POST.get('new_stage')
             if not new_stage:
-                messages.error(request, 'Stage Missing')
+                messages.error(request, 'Please provide a lead stage.')
                 return redirect('agent:leads')
             
             from core.choices import LEAD_STAGES
             if new_stage not in [choice[0] for choice in LEAD_STAGES]:
-                messages.error(request, 'Invalid stage value')
+                messages.error(request, 'The provided stage value is invalid.')
                 return redirect('agent:leads')
             
             lead.stages = new_stage
             lead.date_updated = timezone.now()
             lead.save()
             
-            messages.success(request, 'Stage Updated Successfully')
+            messages.success(request, 'Lead stage updated successfully.')
             return redirect('agent:lead-detail', lead_id=lead_id)
         except ObjectDoesNotExist:
-            messages.error(request, 'Lead Not found')
+            messages.error(request, 'The requested lead could not be found.')
             return redirect('agent:leads')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-
 def settings(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.error(request, "Agent's Only")
+        messages.error(request, "Access denied: This page is for agent accounts only.")
         return redirect('landing')
     try:
         agent= AgentInformation.objects.get(user_id=request.user.id)
         if agent.user_id != request.user.id:
-            messages.error(request, 'Restricted Access')
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         context={
             'agent':agent
         }
         return render(request, 'agent/settings.html', context)
     except ObjectDoesNotExist:
-        messages.error(request, 'Error Agent Info Missing')
+        messages.error(request, 'Agent information is missing.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -850,19 +846,19 @@ def settings(request):
 
 def delete_lead(request, lead_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.error(request, 'Access Denied')
+        messages.error(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
         agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
         lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
         if not lead_to_delete.agent_id in agent_uuid:
-            messages.error(request, "Access Denied")
+            messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         lead_to_delete.delete()
-        messages.success(request, "Lead Deleted")
+        messages.success(request, "Lead deleted successfully.")
         return redirect('agent:leads')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -872,10 +868,10 @@ def delete_lead(request, lead_id):
 
 def job_listings(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, 'Agents Only')
+        messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     
     try:
@@ -895,13 +891,13 @@ def job_listings(request):
 
 def job_detail(request, job_id):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     try:
         job = JobPost.objects.select_related('company').get(pk=job_id)
         return render(request, 'agent/job_detail.html', {'job': job})
     except ObjectDoesNotExist:
-        messages.info(request, 'Job not found.')
+        messages.info(request, 'The requested job listing could not be found.')
         return redirect('agent:job-listings')   # ← added return so it actually redirects
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -911,16 +907,16 @@ def job_detail(request, job_id):
 
 def delete_agent(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, 'Agents Only')
+        messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     
     try:
         agent_data=AgentInformation.objects.get(user_id=request.user.id)
         if agent_data.user_id != request.user.id:
-            messages.warning(request, 'Unauthorized Access')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         user_id=User.objects.get(pk=request.user.id)
         leads= LeadInfo.objects.filter(agent_id=agent_data.agent_uuid)
@@ -938,12 +934,19 @@ def delete_agent(request):
             ratings.delete()
             user_id.delete()
         except:
-            messages.error(request, 'An error Occured.....')
+            messages.error(request, 'An unexpected error occurred. Please try again.')
             return redirect('landing')
-        messages.success(request, 'If you encoutered any inconvinence please let us know')
+        messages.success(request, 'Agent account and all associated data deleted successfully.')
         return redirect('landing')
     except ObjectDoesNotExist:
-        return render(request, 'estate/error_page.html', {'e':'Agent Doesnt Exist'})
+        try:
+            user_id=User.objects.get(pk=request.user.id)
+            user_id.delete()
+            messages.success(request, 'Agent account and all associated data deleted successfully.')
+            return redirect('landing')
+        except:
+            messages.error(request, 'The agent profile could not be found.')
+            return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -960,15 +963,15 @@ def join_via_invite(request):
     token = request.GET.get('token')
 
     if not token:
-        messages.error(request, 'Invalid invite link — no token provided.')
+        messages.error(request, 'The invite link is invalid. Please provide a valid token.')
         return redirect('landing')
 
     if not request.user.is_authenticated:
-        messages.info(request, 'Please log in to use this invite link.')
+        messages.info(request, 'Please sign in to continue with this invite.')
         return redirect(f"{reverse('login')}?next={request.get_full_path()}")
 
     if request.user.role != 'agent':
-        messages.info(request, 'Only agents can join via invite link.')
+        messages.info(request, 'Access denied: Only agent accounts can join via invite links.')
         return redirect('landing')
 
     try:
@@ -976,17 +979,17 @@ def join_via_invite(request):
     except ObjectDoesNotExist:
         messages.info(
             request,
-            'Please complete your agent profile first before joining a company.'
+            'Please complete your agent profile before joining a company.'
         )
         return redirect('agent:agent-form')
     try:
         invite_link = InviteLink.objects.get(invite_token=token)
     except ObjectDoesNotExist:
-        messages.error(request, 'This invite link is invalid or broken.')
+        messages.error(request, 'This invite link is invalid or has expired.')
         return redirect('landing')
 
     if not invite_link.is_active:
-        messages.info(request, 'This invite link has been deactivated.')
+        messages.info(request, 'This invite link is no longer active.')
         return redirect('landing')
 
     if timezone.now() >= invite_link.expires_at:
@@ -994,15 +997,14 @@ def join_via_invite(request):
         return redirect('landing')
 
     if invite_link.max_uses is not None and invite_link.use_count >= invite_link.max_uses:
-        messages.info(request, 'This invite link has reached its maximum uses.')
+        messages.info(request, 'This invite link has reached its usage limit.')
         return redirect('landing')
 
     # ── Agent must not already be in any company ──────────────
     if agent.company_uuid:
         messages.info(
             request,
-            'You already belong to a company. '
-            'You can only be part of one company at a time.'
+            'You are already associated with a company. You can only be part of one company at a time.'
         )
         return redirect('agent:dashboard')
 
@@ -1010,7 +1012,7 @@ def join_via_invite(request):
     company = invite_link.company
 
     if Employees.objects.filter(agent_uuid=agent.agent_uuid).exists():
-        messages.info(request, f"You've already joined {company.company_name}.")
+        messages.info(request, f"You are already a member of {company.company_name}.")
         return redirect('agent:dashboard')
 
     # ── All checks passed — onboard the agent ─────────────────
@@ -1039,7 +1041,7 @@ def join_via_invite(request):
 
         messages.success(
             request,
-            f"Congrats on your new job at {company.company_name}! 🎉"
+            f"Congratulations! You have successfully joined {company.company_name}."
         )
         return redirect('agent:dashboard')
 
@@ -1050,10 +1052,10 @@ def join_via_invite(request):
 
 def my_company(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, 'Agent Account Only')
+        messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
@@ -1084,7 +1086,7 @@ def my_company(request):
         }
         return render(request, 'agent/agent_companies.html', context)
     except ObjectDoesNotExist:
-        messages.error(request, 'Data Not Found')
+        messages.error(request, 'The requested data could not be found.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1093,22 +1095,22 @@ def my_company(request):
 
 def leave_company(request):
     if not request.user.is_authenticated:
-        messages.info(request, 'Login Required')
+        messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     if request.user.role != 'agent':
-        messages.info(request, 'Agents Only')
+        messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
         agent=AgentInformation.objects.get(user_id=request.user.id)
         if not agent.company_uuid:
-            messages.error(request, 'Join a Company to perform this action')
+            messages.error(request, 'You must be part of a company to perform this action.')
             return redirect('landing')
         
         company=CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
         employee=Employees.objects.get(agent_uuid=agent.agent_uuid)
         
         if not employee.company == company:
-            messages.warning(request, 'Unauthorized Action')
+            messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         
         agent=AgentInformation.objects.get(agent_uuid=agent.agent_uuid)
@@ -1120,15 +1122,14 @@ def leave_company(request):
         agent.company_uuid = None
         agent.save()
         employee.delete()
-        messages.success(request, 'Agent Removed Successfully')
         CompanyActivityLog.objects.create(
             company=company,
             action=f'{agent.first_name} Left Company'
         )
-        messages.success(request, 'Company Left Successfully')
+        messages.success(request, 'You have successfully left the company.')
         return redirect('landing')
     except ObjectDoesNotExist:
-        messages.error(request, 'Data Not Found')
+        messages.error(request, 'The requested data could not be found.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())

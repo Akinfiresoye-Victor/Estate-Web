@@ -242,3 +242,4 @@ else:
 print('Debug Mode>', DEBUG)
 SITE_ID = 1
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_ADAPTER = 'members.adapter.MySocialAccountAdapter'

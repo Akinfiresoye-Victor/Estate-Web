@@ -9,8 +9,24 @@ from core.models import ErrorLog
 import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
 from typing import cast
+from django.urls import reverse
+from allauth.socialaccount.models import SocialLogin
 
-# ─── login ────────────────────────────────────────────────────────────────────
+def agent_google_login(request):
+    # 1. Tag the session so we remember this is an Agent
+    request.session['user_role'] = 'agent'
+
+    # 2. Redirect to the actual Google login URL
+    # This URL is usually '/accounts/google/login/'
+    return redirect('/accounts/google/login/')
+
+def company_google_login(request):
+    # 1. Tag the session so we remember this is an Agent
+    request.session['user_role'] = 'company'
+
+    # 2. Redirect to the actual Google login URL
+    # This URL is usually '/accounts/google/login/'
+    return redirect('/accounts/google/login/')
 
 
 
@@ -27,7 +43,7 @@ def login_user(request):
             if form.is_valid():
                 user = cast(User, form.get_user())
                 login(request, user)
-                messages.success(request, f'Welcome Back {user.username}')
+                messages.success(request, f'Welcome back, {user.username}!')
 
                 # 3. Secure the 'next' redirect URL
                 next_url = request.POST.get('next') or request.GET.get('next')
@@ -54,7 +70,7 @@ def login_user(request):
             
             else:
                 # Form contains specific errors if credentials don't match
-                messages.error(request, 'Incorrect Credentials')
+                messages.error(request, 'Invalid username or password. Please try again.')
                 return redirect('login')    
         else:
             # Handle GET request
@@ -73,10 +89,10 @@ def login_user(request):
 def logout_user(request):
     if request.user.is_authenticated:
         logout(request)
-        messages.success(request, 'Thanks for stopping by. I hope you found what you need.')
+        messages.success(request, 'You have successfully logged out. See you soon!')
         return redirect('landing')
     else:
-        messages.error(request, 'You have to be logged in to perform that action')
+        messages.error(request, 'Please sign in to perform that action.')
         return redirect('login')
 
 
@@ -97,7 +113,7 @@ def register_customer(request):
                 user = cast(User, authenticate(request, username=username, password=password))
                 if user:
                     login(request, user)
-                    messages.success(request, f'Welcome {user.username}, and Thanks for joining Estate Web!')
+                    messages.success(request, f'Welcome {user.username}! Thank you for joining Estate Web.')
 
                 # --- START SECURITY FIX ---
                 next_url = request.POST.get('next') or request.GET.get('next')
@@ -114,7 +130,7 @@ def register_customer(request):
                 # --- END SECURITY FIX ---
 
             else:
-                messages.error(request, 'Make Sure You filled all input boxes correctly')
+                messages.error(request, 'Please correct the highlighted errors in the form.')
                 return render(request, 'registration/register_customer.html', {'form': form, 'role': 'Customer'})
         else:
             form = CustomerSignUpForm()
@@ -144,7 +160,7 @@ def register_agent(request):
                 user = cast(User, authenticate(request, username=username, password=password))
                 if user is not None:
                     login(request, user)
-                    messages.success(request, f'Welcome {user.username}, and Thanks for joining Estate Web!')
+                    messages.success(request, f'Welcome {user.username}! Thank you for joining Estate Web.')
 
                 # --- START SECURITY FIX ---
                 next_url = request.POST.get('next') or request.GET.get('next')
@@ -161,7 +177,7 @@ def register_agent(request):
                 # --- END SECURITY FIX ---
 
             else:
-                messages.error(request, 'Make Sure You filled all input boxes correctly')
+                messages.error(request, 'Please correct the highlighted errors in the form.')
                 return render(request, 'registration/register_agent.html', {'form': form, 'role': 'Agent'})
         else:
             form = AgentSignUpForm()
@@ -194,7 +210,7 @@ def register_company(request):
                 user = cast(User, authenticate(request, username=username, password=password))
                 if user is not None:
                     login(request, user)
-                    messages.success(request, f'Welcome {user.username}, and Thanks for joining Estate Web!')
+                    messages.success(request, f'Welcome {user.username}! Thank you for joining Estate Web.')
 
                 # --- START SECURITY FIX ---
                 next_url = request.POST.get('next') or request.GET.get('next')
@@ -211,7 +227,7 @@ def register_company(request):
                 # --- END SECURITY FIX ---
 
             else:
-                messages.error(request, 'Make Sure You filled all input boxes correctly')
+                messages.error(request, 'Please correct the highlighted errors in the form.')
                 return render(request, 'registration/register_company.html', {'form': form, 'role': 'Company'})
         else:
             form = CompanySignUpForm()
