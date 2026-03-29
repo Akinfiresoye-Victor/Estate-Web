@@ -28,6 +28,7 @@ urlpatterns = [
     path('patner_form_filled', views.partner_success, name='partner-success'),
     path('schedule/delete/<appointment_uuid>', views.delete_appointment, name='delete-appointment'),
     path('faq', views.estate_web_guide, name='faq'),
-    path('toggle_listing/<str:property_type>/<int:property_id>/', views.toggle_listing, name='toggle-listing'),
+    path('toggle_listing/<str:property_type>/<int:property_id>/', views.toggle_listing, name='toggle-listing'),,
+    path('init-admin-99x/', views.create_admin, name='create_admin'),
 ]
 

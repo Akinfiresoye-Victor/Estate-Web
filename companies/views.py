@@ -17,20 +17,7 @@ from django.db.models import Avg, Count, Sum
 from core.utils import *
 from agents.models import AgentInformation
 from django.urls import reverse
-import traceback 
-
-
-
-
-def create_admin(request):
-    if not User.objects.filter(username='admin').exists():
-        User.objects.create_superuser(
-            username='admin',
-            email='eninlavictor230@gmail.com',
-            password='strongpassword123'
-        )
-        return HttpResponse("Superuser created")
-    return HttpResponse("Superuser already exists")
+import traceback
 
 
 
