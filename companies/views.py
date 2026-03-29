@@ -17,8 +17,7 @@ from django.db.models import Avg, Count, Sum
 from core.utils import *
 from agents.models import AgentInformation
 from django.urls import reverse
-import traceback
-from django.contrib.auth import User as ud
+import traceback 
 
 
 
