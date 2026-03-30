@@ -69,13 +69,13 @@ def login_user(request):
                 if is_safe:
                     return redirect(next_url)
                 
-                if user.role == 'customer':
+                if request.user.role == 'customer':
                     return redirect('customer:user-profile')
-                elif user.role == 'agent':
+                elif request.user.role == 'agent':
                     return redirect('agent:dashboard')
-                elif user.role == 'landlord':
+                elif request.user.role == 'landlord':
                     return redirect('landlord:dashboard')
-                elif user.role == 'company':
+                elif request.user.role == 'company':
                     return redirect('company:dashboard')
                 else:
                     return redirect('landing')

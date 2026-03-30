@@ -6,170 +6,222 @@
 {% endblock %}
 
 {% block content %}
-<div class="ll-dashboard">
 
-  {# ── Welcome Banner ──────────────────────────────────────────── #}
-  <div class="ll-welcome">
-    <div class="ll-welcome-text">
-      <h2>Welcome back, {{ landlord.first_name }}!</h2>
-      <p>Manage your properties and connect with buyers or renters directly.</p>
-    </div>
-    {% if landlord.verified %}
-      <div class="ll-welcome-badge">
-        <i class="bi bi-patch-check-fill"></i> Verified Landlord
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="page-wrapper">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside class="sidebar">
+      <div class="sidebar-profile">
+        <div class="profile-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+        <div class="profile-info">
+          <p class="profile-name">{{ user.get_full_name }}</p>
+          <p class="profile-role">Landlord</p>
+        </div>
       </div>
-    {% else %}
-      <a href="#" class="ll-welcome-badge unverified">
-        <i class="bi bi-exclamation-circle-fill"></i> Get Verified
-      </a>
-    {% endif %}
-  </div>
 
-  {# ── Verification nudge (only shown if not verified) ─────────── #}
-  {% if not landlord.verified %}
-    <div class="ll-notice">
-      <i class="bi bi-shield-exclamation"></i>
-      <span>
-        Your account is not yet verified. Verified landlords get more visibility and trust from tenants.
-        <a href="#">Complete verification →</a>
-      </span>
-    </div>
-  {% endif %}
-
-  {# ── Stats ───────────────────────────────────────────────────── #}
-  <p class="ll-section-label">Overview</p>
-  <div class="ll-stats-grid">
-
-    <a href="{% url 'landlord:inventory' %}" class="ll-stat-card">
-      <div class="ll-stat-icon gold">
-        <i class="bi bi-houses-fill"></i>
-      </div>
-      <div class="ll-stat-info">
-        <h3>{{ total_listings|default:"0" }}</h3>
-        <p>Total Listings</p>
-      </div>
-    </a>
-
-    <a href="{% url 'landlord:inventory' %}" class="ll-stat-card">
-      <div class="ll-stat-icon green">
-        <i class="bi bi-house-check-fill"></i>
-      </div>
-      <div class="ll-stat-info">
-        <h3>{{ active_listings|default:"0" }}</h3>
-        <p>Active Listings</p>
-      </div>
-    </a>
-
-    <a href="#" class="ll-stat-card">
-      <div class="ll-stat-icon blue">
-        <i class="bi bi-chat-dots-fill"></i>
-      </div>
-      <div class="ll-stat-info">
-        <h3>—</h3>
-        <p>Inquiries</p>
-      </div>
-    </a>
-
-    <a href="#" class="ll-stat-card">
-      <div class="ll-stat-icon red">
-        <i class="bi bi-eye-fill"></i>
-      </div>
-      <div class="ll-stat-info">
-        <h3>—</h3>
-        <p>Profile Views</p>
-      </div>
-    </a>
-
-  </div>
-
-  {# ── List a Property ─────────────────────────────────────────── #}
-  <p class="ll-section-label">List a Property</p>
-  <div class="ll-actions-grid">
-
-    <div class="ll-action-card">
-      <div class="ll-action-icon">
-        <i class="bi bi-house-add-fill"></i>
-      </div>
-      <h4>Sell a Property</h4>
-      <p>List your property for sale and connect directly with serious buyers.</p>
-      <a href="{% url 'sell-property' %}" class="ll-btn ll-btn-gold">
-        <i class="bi bi-plus-circle"></i> List for Sale
-      </a>
-    </div>
-
-    <div class="ll-action-card">
-      <div class="ll-action-icon">
-        <i class="bi bi-key-fill"></i>
-      </div>
-      <h4>Rent a Property</h4>
-      <p>Find trustworthy tenants quickly through Estate Web's network.</p>
-      <a href="{% url 'lease-property' %}" class="ll-btn ll-btn-outline">
-        <i class="bi bi-plus-circle"></i> List for Rent
-      </a>
-    </div>
-
-  </div>
-
-  {# ── Recent Properties ───────────────────────────────────────── #}
-  <div class="ll-properties-section">
-    <div class="ll-section-header">
-      <p class="ll-section-label" style="margin: 0;">Recent Listings</p>
-      <a href="{% url 'landlord:inventory' %}">View all <i class="bi bi-arrow-right"></i></a>
-    </div>
-
-    {% if recent_listings %}
-      {% for listing in recent_listings %}
-        <a href="#" class="ll-property-card">
-          <div class="ll-property-thumb">
-            <i class="bi bi-house-fill"></i>
-          </div>
-          <div class="ll-property-info">
-            <h4>{{ listing.title|default:"Untitled Property" }}</h4>
-            <p>{{ listing.location|default:"Akure, Ondo State" }}</p>
-          </div>
-          {% if listing.listing_type == 'sale' %}
-            <span class="ll-property-badge sale">For Sale</span>
-          {% else %}
-            <span class="ll-property-badge rent">For Rent</span>
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link active">
+          <span class="sidebar-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>
+          Dashboard
+        </a>
+        <a href="{%url 'landlord:inventory'%}" class="sidebar-link">
+          <span class="sidebar-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </span>
+          My Listings
+        </a>
+        <a href="#" class="sidebar-link">
+          <span class="sidebar-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          Inquiries
+          {% if unread_inquiry_count %}
+            <span class="badge">{{ unread_inquiry_count }}</span>
           {% endif %}
         </a>
-      {% endfor %}
-    {% else %}
-      <div class="ll-empty-state">
-        <i class="bi bi-house-slash"></i>
-        <p>You haven't listed any properties yet.<br>Use the buttons above to get started.</p>
-        <a href="{% url 'sell-property' %}" class="ll-btn ll-btn-gold">
-          <i class="bi bi-plus-circle"></i> Add Your First Property
+        <a href="{%url 'landlord:profile'%}" class="sidebar-link">
+          <span class="sidebar-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          My Profile
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="{% url 'account_logout' %}" class="sidebar-link logout-link">
+          <span class="sidebar-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </span>
+          Logout
         </a>
       </div>
-    {% endif %}
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+      <!-- Welcome Bar -->
+      <div class="welcome-bar">
+        <div>
+          <h1 class="welcome-heading">Good day, {{ user.first_name }}.</h1>
+          <p class="welcome-sub">Here's what's happening with your properties today.</p>
+        </div>
+        <a href="#" class="btn-primary">+ Add Property</a>
+      </div>
+
+      <!-- Quick Stats -->
+      <section class="stats-row">
+        <div class="stat-card">
+          <p class="stat-label">Active Listings</p>
+          <p class="stat-value">{{ active_listings_count }}</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Total Views</p>
+          <p class="stat-value">{{ total_views }}</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">New Inquiries</p>
+          <p class="stat-value">{{ inquiries_count }}</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Saved by Users</p>
+          <p class="stat-value">{{ total_saves }}</p>
+        </div>
+      </section>
+
+      <!-- My Properties -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">My Properties</h2>
+          <a href="{%url 'landlord:inventory' %}" class="section-link">See all</a>
+        </div>
+
+        <div class="listings-grid">
+          {% for property in properties %}
+          <div class="listing-card">
+            <div class="listing-img-wrap">
+              {% if property.base_image %}
+                <img src="{{ property.base_image.url }}" alt="{{ property.property_type }}">
+              {% else %}
+                <div class="listing-img-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+              {% endif %}
+              <span class="listing-badge {% if property.is_listed %}active{% else %}inactive{% endif %}">
+                {% if property.is_listed %}Active{% else %}Inactive{% endif %}
+              </span>
+            </div>
+            <div class="listing-body">
+              {% if property.property_category == 'Residential'%}
+                <p class="listing-title">{{ property.residential }}</p>
+              {%elif property.property_category == 'Commercial'%}
+                <p class="listing-title">{{ property.commercial }}</p>
+              {%else%}
+                <p class="listing-title">{{ property.lands }}</p>
+              {%endif%}
+              <p class="listing-location">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ property.location }}
+              </p>
+              <p class="listing-price">
+                {%if property_type == 'Rent'%}
+                  ₦{{ property.price_range|floatformat:"0" }}
+                  <span class="listing-period">/ month</span>
+                {%else%}
+                  ₦{{ property.price|floatformat:"0" }}
+                {%endif%}
+              </p>
+              <div class="listing-actions">
+                <a href="#" class="btn-outline-sm">Edit</a>
+                {%if property.property_type == 'Sale'%}
+                  <a href="{%url 'customer:view-property-s' property.id%}" class="btn-ghost-sm">View</a>
+                {%else%}
+                  <a href="{%url 'customer:view-property-r' property.id%}" class="btn-ghost-sm">View</a>
+                {%endif%}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="empty-state">
+            <p class="empty-title">No properties yet</p>
+            <p class="empty-text">You haven't added any listings. Add your first property to get started.</p>
+            <a href="#" class="btn-primary" style="margin-top: 14px; display: inline-block;">+ Add Property</a>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Recent Inquiries -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Recent Inquiries</h2>
+          <a href="#" class="section-link">View all</a>
+        </div>
+
+        <div class="inquiries-list">
+          {% for inquiry in recent_inquiries %}
+          <div class="inquiry-item {% if not inquiry.is_read %}unread{% endif %}">
+            <div class="inquiry-avatar">
+              {{ inquiry.sender.first_name|first|upper }}{{ inquiry.sender.last_name|first|upper }}
+            </div>
+            <div class="inquiry-body">
+              <p class="inquiry-name">
+                {{ inquiry.sender.get_full_name }}
+                {% if not inquiry.is_read %}
+                  <span class="inquiry-tag new">New</span>
+                {% endif %}
+              </p>
+              <p class="inquiry-text">{{ inquiry.message }}</p>
+              <p class="inquiry-meta">{{ inquiry.property.title }} &nbsp;·&nbsp; {{ inquiry.created_at|timesince }} ago</p>
+            </div>
+            <a href="#" class="btn-reply">Reply</a>
+          </div>
+          {% empty %}
+          <div class="inquiry-empty">
+            <p>No inquiries yet. When someone messages you about a property, it will appear here.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Help Tip -->
+      <section class="tip-box">
+        <div class="tip-icon">💡</div>
+        <div class="tip-content">
+          <p class="tip-title">Make your listing stand out</p>
+          <p class="tip-text">Properties with clear photos and complete descriptions get up to 3x more inquiries. <a href="#" class="tip-link">Update your listing →</a></p>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  {# ── Account Tools ───────────────────────────────────────────── #}
-  <p class="ll-section-label">Account Tools</p>
-  <div class="ll-tools-grid">
-
-    <a href="#" class="ll-tool-card">
-      <i class="bi bi-person-gear"></i>
-      <span>Profile Settings</span>
+  <!-- ===== BOTTOM MOBILE NAV ===== -->
+  <nav class="mobile-bottom-nav">
+    <a href="#" class="mob-nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
     </a>
-
-    <a href="#" class="ll-tool-card">
-      <i class="bi bi-shield-check"></i>
-      <span>Verification</span>
+    <a href="#" class="mob-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Listings</span>
     </a>
-
-    <a href="#" class="ll-tool-card">
-      <i class="bi bi-bell"></i>
-      <span>Notifications</span>
+    <a href="#" class="mob-nav-item">
+      <div style="position:relative; display:inline-block;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        {% if unread_inquiry_count %}
+          <span class="mob-badge">{{ unread_inquiry_count }}</span>
+        {% endif %}
+      </div>
+      <span>Messages</span>
     </a>
-
-    <a href="/" class="ll-tool-card">
-      <i class="bi bi-globe"></i>
-      <span>View Website</span>
+    <a href="#" class="mob-nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
     </a>
+  </nav>
 
-  </div>
-
-</div>
 {% endblock %}

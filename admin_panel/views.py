@@ -348,3 +348,8 @@ def company_verification(request, company_uuid):
         messages.error(request, 'An Error Occured')
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+def suspend_account(request):
+    pass

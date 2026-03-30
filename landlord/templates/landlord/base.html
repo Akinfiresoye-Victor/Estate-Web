@@ -8,7 +8,6 @@
 
   <!-- Bootstrap and Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <!-- Favicon -->
@@ -17,127 +16,697 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Base Styles -->
   <style>
+    /* ============================================================
+       ESTATE WEB — Landlord Base
+       ============================================================ */
     :root {
-      --ll-primary: #1e3a5f;
-      --ll-secondary: #d19a5a;
-      --ll-accent: #f4ecdf;
-      --ll-text-dark: #2c3e50;
-      --ll-text-light: #6c757d;
-      --ll-bg: #fdfbf9;
-      --ll-white: #ffffff;
+      --ll-gold:        #c19b76;
+      --ll-gold-light:  #f0e6d8;
+      --ll-gold-dark:   #a07d58;
+      --ll-dark:        #1e2329;
+      --ll-mid:         #4a5568;
+      --ll-light:       #8a96a8;
+      --ll-bg:          #f4f6f9;
+      --ll-surface:     #ffffff;
+      --ll-border:      #e4e7ec;
+      --ll-danger:      #e05c5c;
+      --navbar-h:       64px;
+      --font-display:   'Cormorant Garamond', Georgia, serif;
+      --font-body:      'Poppins', sans-serif;
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Poppins', sans-serif;
-      background-color: var(--ll-bg);
-      color: var(--ll-text-dark);
-      padding-top: 76px;
+      font-family: var(--font-body);
+      background: var(--ll-bg);
+      color: var(--ll-dark);
+      padding-top: var(--navbar-h);
+      font-size: 0.92rem;
+      line-height: 1.6;
     }
 
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-    }
+    a { text-decoration: none; color: inherit; }
 
-    /* Navbar */
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
     .ll-navbar {
-      background: var(--ll-white);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      padding: 0.8rem 1.5rem;
       position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1030;
+      top: 0; left: 0; right: 0;
+      height: var(--navbar-h);
+      background: var(--ll-surface);
+      border-bottom: 1px solid var(--ll-border);
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
+      padding: 0 24px;
+      z-index: 1030;
+      gap: 16px;
     }
 
+    /* ---- Brand ---- */
     .ll-brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
       font-weight: 700;
-      color: var(--ll-primary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      color: var(--ll-dark);
+      flex-shrink: 0;
     }
 
-    .ll-brand i {
-      color: var(--ll-secondary);
+    .ll-brand-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--ll-dark);
+      color: var(--ll-gold);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
     }
 
-    .ll-nav-links {
+    .ll-brand-accent { color: var(--ll-gold); }
+
+    /* ---- Center Nav Links (desktop only) ---- */
+    .ll-nav-center {
       display: flex;
-      gap: 1.5rem;
       align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
     }
 
     .ll-nav-link {
-      color: var(--ll-text-dark);
-      text-decoration: none;
+      color: var(--ll-mid);
+      font-size: 0.85rem;
       font-weight: 500;
-      transition: color 0.2s;
+      padding: 6px 13px;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
     }
 
-    .ll-nav-link:hover {
-      color: var(--ll-secondary);
+    .ll-nav-link:hover,
+    .ll-nav-link.active {
+      background: var(--ll-bg);
+      color: var(--ll-dark);
     }
 
-    .ll-btn-primary {
-      background: var(--ll-primary);
-      color: var(--ll-white);
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      text-decoration: none;
+    /* ---- Right side ---- */
+    .ll-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* "+" Add Property dropdown trigger */
+    .ll-btn-add {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ll-dark);
+      color: #fff;
+      font-size: 0.82rem;
       font-weight: 500;
+      padding: 7px 15px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
       transition: background 0.2s;
+      white-space: nowrap;
     }
 
-    .ll-btn-primary:hover {
-      background: #152b47;
-      color: white;
+    .ll-btn-add:hover { background: var(--ll-gold-dark); color: #fff; }
+    .ll-btn-add::after { display: none !important; } /* remove Bootstrap caret */
+
+    .ll-btn-add .bi-chevron-down {
+      font-size: 0.7rem;
+      opacity: 0.7;
     }
 
-    .ll-logout {
-      color: #dc3545;
+    /* Dropdown menu */
+    .ll-add-dropdown {
+      min-width: 170px;
+      border: 1px solid var(--ll-border);
+      border-radius: 9px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+      padding: 6px;
+      margin-top: 6px !important;
+    }
+
+    .ll-add-dropdown .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 9px 12px;
+      border-radius: 6px;
+      color: var(--ll-dark);
+      transition: background 0.15s;
+    }
+
+    .ll-add-dropdown .dropdown-item:hover { background: var(--ll-bg); }
+
+    .ll-add-dropdown .dropdown-item .drop-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .drop-icon.sell  { background: #e8f0fc; color: #3b6fcf; }
+    .drop-icon.rent  { background: var(--ll-gold-light); color: var(--ll-gold-dark); }
+
+    /* User avatar pill */
+    .ll-user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 4px 4px 12px;
+      border: 1px solid var(--ll-border);
+      border-radius: 40px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      background: transparent;
+    }
+
+    .ll-user-pill:hover { border-color: var(--ll-gold); }
+    .ll-user-pill::after { display: none !important; }
+
+    .ll-user-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ll-dark);
+      max-width: 100px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ll-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--ll-gold-light);
+      color: var(--ll-gold-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* User dropdown */
+    .ll-user-dropdown {
+      min-width: 190px;
+      border: 1px solid var(--ll-border);
+      border-radius: 9px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+      padding: 6px;
+      margin-top: 6px !important;
+    }
+
+    .ll-user-dropdown .dropdown-header {
+      padding: 8px 12px 10px;
+      font-size: 0.78rem;
+      color: var(--ll-light);
+      font-weight: 400;
+      border-bottom: 1px solid var(--ll-border);
+      margin-bottom: 4px;
+    }
+
+    .ll-user-dropdown .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 9px 12px;
+      border-radius: 6px;
+      color: var(--ll-dark);
+      transition: background 0.15s;
+    }
+
+    .ll-user-dropdown .dropdown-item:hover { background: var(--ll-bg); }
+
+    .ll-user-dropdown .dropdown-item.danger {
+      color: var(--ll-danger);
+    }
+
+    .ll-user-dropdown .dropdown-item.danger:hover {
+      background: #fff0f0;
+    }
+
+    .ll-user-dropdown .dropdown-divider {
+      border-color: var(--ll-border);
+      margin: 4px 6px;
+    }
+
+    /* ---- Hamburger (mobile) ---- */
+    .ll-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--ll-border);
+      border-radius: 7px;
+      padding: 6px 10px;
+      color: var(--ll-dark);
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    /* ============================================================
+       MOBILE DRAWER
+       ============================================================ */
+    .ll-mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 1040;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .ll-mobile-overlay.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .ll-mobile-drawer {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 270px;
+      background: var(--ll-surface);
+      z-index: 1050;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+    }
+
+    .ll-mobile-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px 18px;
+      border-bottom: 1px solid var(--ll-border);
+      margin-bottom: 8px;
+    }
+
+    .drawer-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .drawer-user-info .d-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ll-dark);
+    }
+
+    .drawer-user-info .d-role {
+      font-size: 0.72rem;
+      color: var(--ll-gold);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--ll-light);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .drawer-nav {
+      flex: 1;
+      padding: 0 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow-y: auto;
+    }
+
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 12px;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--ll-mid);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .drawer-link:hover, .drawer-link.active {
+      background: var(--ll-bg);
+      color: var(--ll-dark);
+    }
+
+    .drawer-link i { font-size: 1rem; }
+
+    .drawer-section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--ll-light);
+      padding: 14px 12px 6px;
+    }
+
+    .drawer-link.sell-link {
+      background: #f0f5ff;
+      color: #3b6fcf;
+    }
+
+    .drawer-link.sell-link:hover { background: #e3edff; }
+
+    .drawer-link.rent-link {
+      background: var(--ll-gold-light);
+      color: var(--ll-gold-dark);
+    }
+
+    .drawer-link.rent-link:hover { background: #e8d5be; }
+
+    .drawer-link.logout-link {
+      color: var(--ll-danger);
+      margin-top: auto;
+    }
+
+    .drawer-link.logout-link:hover { background: #fff0f0; }
+
+    .drawer-footer {
+      padding: 14px 10px 0;
+      border-top: 1px solid var(--ll-border);
+      margin-top: 8px;
+    }
+
+    /* ============================================================
+       RESPONSIVE BREAKPOINTS
+       ============================================================ */
+
+    /* Hide center nav on tablet and below */
+    @media (max-width: 900px) {
+      .ll-nav-center { display: none; }
+      .ll-user-name  { display: none; }
+    }
+
+    /* Switch to hamburger on mobile */
+    @media (max-width: 640px) {
+      .ll-hamburger  { display: flex; align-items: center; }
+      .ll-btn-add    { display: none; }
+      .ll-user-pill  { display: none; }
+      .ll-navbar     { padding: 0 16px; }
+    }
+
+    /* ============================================================
+       DJANGO MESSAGES
+       ============================================================ */
+    .ll-messages {
+      position: fixed;
+      top: calc(var(--navbar-h) + 12px);
+      right: 16px;
+      z-index: 1020;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 340px;
+      width: 90vw;
+    }
+
+    .ll-toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--ll-surface);
+      border: 1px solid var(--ll-border);
+      border-radius: 9px;
+      padding: 12px 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+      font-size: 0.84rem;
+      animation: slideIn 0.25s ease;
+    }
+
+    .ll-toast.success { border-left: 3px solid #3aaa6e; }
+    .ll-toast.error   { border-left: 3px solid var(--ll-danger); }
+    .ll-toast.warning { border-left: 3px solid #e0933a; }
+    .ll-toast.info    { border-left: 3px solid #3b8fcf; }
+
+    .ll-toast-icon { font-size: 1rem; margin-top: 1px; flex-shrink: 0; }
+    .ll-toast.success .ll-toast-icon { color: #3aaa6e; }
+    .ll-toast.error   .ll-toast-icon { color: var(--ll-danger); }
+    .ll-toast.warning .ll-toast-icon { color: #e0933a; }
+    .ll-toast.info    .ll-toast-icon { color: #3b8fcf; }
+
+    .ll-toast-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--ll-light);
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
     }
   </style>
 
   {% block extra_css %}{% endblock %}
-
 </head>
 <body>
 
-  <!-- Navbar -->
+  <!-- ============================================================
+       NAVBAR
+       ============================================================ -->
   <nav class="ll-navbar">
+
+    <!-- Brand -->
     <a href="{% url 'landlord:dashboard' %}" class="ll-brand">
-      <i class="bi bi-house-door-fill"></i> Estate Web
+      <span class="ll-brand-icon"><i class="bi bi-houses"></i></span>
+      Estate<span class="ll-brand-accent">Web</span>
     </a>
-    <div class="ll-nav-links">
-      <a href="{% url 'landlord:dashboard' %}" class="ll-nav-link">Dashboard</a>
-      <a href="{% url 'landlord:inventory' %}" class="ll-nav-link">My Properties</a>
-      <a href="{% url 'sell-property' %}" class="ll-btn-primary"><i class="bi bi-plus-lg"></i> Sell</a>
-      <a href="{% url 'lease-property' %}" class="ll-btn-primary" style="background:var(--ll-secondary)"><i class="bi bi-plus-lg"></i> Rent Out</a>
-      <a href="{% url 'logout' %}" class="ll-nav-link ll-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+
+    <!-- Center nav links — desktop only -->
+    <div class="ll-nav-center">
+      <a href="{% url 'landlord:dashboard' %}" class="ll-nav-link {% block nav_dashboard %}{% endblock %}">
+        <i class="bi bi-grid-1x2 me-1"></i> Dashboard
+      </a>
+      <a href="{% url 'landlord:inventory' %}" class="ll-nav-link {% block nav_inventory %}{% endblock %}">
+        <i class="bi bi-building me-1"></i> My Properties
+      </a>
+    </div>
+
+    <!-- Right side -->
+    <div class="ll-nav-right">
+
+      <!-- Add Property dropdown -->
+      <div class="dropdown">
+        <button class="ll-btn-add dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-plus-lg"></i> Add Property
+          <i class="bi bi-chevron-down"></i>
+        </button>
+        <ul class="dropdown-menu ll-add-dropdown">
+          <li>
+            <a href="{% url 'sell-property' %}" class="dropdown-item">
+              <span class="drop-icon sell"><i class="bi bi-tag"></i></span>
+              List for Sale
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'lease-property' %}" class="dropdown-item">
+              <span class="drop-icon rent"><i class="bi bi-key"></i></span>
+              Rent Out
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- User pill dropdown -->
+      <div class="dropdown">
+        <button class="ll-user-pill dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <span class="ll-user-name">{{ user.first_name }}</span>
+          <div class="ll-avatar">
+            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+          </div>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end ll-user-dropdown">
+          <li>
+            <div class="dropdown-header">
+              Signed in as <strong>{{ user.get_full_name }}</strong>
+            </div>
+          </li>
+          <li>
+            <a href="#" class="dropdown-item">
+              <i class="bi bi-person"></i> My Profile
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'landlord:inventory' %}" class="dropdown-item">
+              <i class="bi bi-building"></i> My Properties
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a href="{% url 'logout' %}" class="dropdown-item danger">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Hamburger — mobile only -->
+      <button class="ll-hamburger" id="drawerToggle" aria-label="Open menu">
+        <i class="bi bi-list"></i>
+      </button>
+
     </div>
   </nav>
 
-  <!-- Messages -->
-  {% include 'estate/includes/messages.html' %}
+  <!-- ============================================================
+       MOBILE DRAWER
+       ============================================================ -->
+  <div class="ll-mobile-overlay" id="drawerOverlay"></div>
 
-  <!-- Main Content -->
+  <div class="ll-mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <div class="drawer-user">
+        <div class="ll-avatar" style="width:40px;height:40px;font-size:0.85rem;">
+          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+        </div>
+        <div class="drawer-user-info">
+          <p class="d-name">{{ user.get_full_name }}</p>
+          <p class="d-role">Landlord</p>
+        </div>
+      </div>
+      <button class="drawer-close" id="drawerClose">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <nav class="drawer-nav">
+      <a href="{% url 'landlord:dashboard' %}" class="drawer-link">
+        <i class="bi bi-grid-1x2"></i> Dashboard
+      </a>
+      <a href="{% url 'landlord:inventory' %}" class="drawer-link">
+        <i class="bi bi-building"></i> My Properties
+      </a>
+      <a href="#" class="drawer-link">
+        <i class="bi bi-chat-dots"></i> Inquiries
+      </a>
+      <a href="#" class="drawer-link">
+        <i class="bi bi-person"></i> My Profile
+      </a>
+
+      <p class="drawer-section-label">Add Property</p>
+      <a href="{% url 'sell-property' %}" class="drawer-link sell-link">
+        <i class="bi bi-tag"></i> List for Sale
+      </a>
+      <a href="{% url 'lease-property' %}" class="drawer-link rent-link">
+        <i class="bi bi-key"></i> Rent Out
+      </a>
+    </nav>
+
+    <div class="drawer-footer">
+      <a href="{% url 'logout' %}" class="drawer-link logout-link">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DJANGO MESSAGES
+       ============================================================ -->
+  {% if messages %}
+  <div class="ll-messages" id="toastContainer">
+    {% for message in messages %}
+    <div class="ll-toast {% if message.tags %}{{ message.tags }}{% endif %}">
+      <span class="ll-toast-icon">
+        {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+        {% elif message.tags == 'error' %}<i class="bi bi-x-circle-fill"></i>
+        {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill"></i>
+        {% else %}<i class="bi bi-info-circle-fill"></i>{% endif %}
+      </span>
+      <span>{{ message }}</span>
+      <button class="ll-toast-close" onclick="this.parentElement.remove()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
   <main class="container py-4">
     {% block content %}
     {% endblock %}
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ---- Mobile Drawer ----
+    const drawer        = document.getElementById('mobileDrawer');
+    const overlay       = document.getElementById('drawerOverlay');
+    const drawerToggle  = document.getElementById('drawerToggle');
+    const drawerClose   = document.getElementById('drawerClose');
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    drawerToggle.addEventListener('click', openDrawer);
+    drawerClose.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+
+    // ---- Auto-dismiss toasts after 5s ----
+    setTimeout(() => {
+      document.querySelectorAll('.ll-toast').forEach(t => {
+        t.style.transition = 'opacity 0.4s';
+        t.style.opacity = '0';
+        setTimeout(() => t.remove(), 400);
+      });
+    }, 5000);
+  </script>
+
   {% block extra_js %}{% endblock %}
 </body>
 </html>

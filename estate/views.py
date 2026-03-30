@@ -20,6 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from core.utils import refresh_activity_score
 from django.urls import reverse
 import traceback
+from landlord.models import LandlordInformation
 
 '''Algorithms Start👇'''
 
@@ -158,11 +159,22 @@ def view_property_on_sale(request, property_id):
         base_template = {
             'company': 'company/base.html',
             'agent':   'agent/base.html',
+            'landlord': 'landlord:base.html',
         }.get(request.user.role, 'estate/base.html')
 
         prop = PropertyManagementSale.objects.get(pk=property_id)
 
         # ── Resolve who listed the property ──────────────────
+        if request.user.role == 'landlord':
+            try:
+                landlord_in_charge = LandlordInformation.objects.get(user_id=prop.user_id)
+                view_id = landlord_in_charge.landlord_uuid
+                msg = (
+                    f'Listed by {landlord_in_charge.first_name} [Landlord]'
+                )
+            except LandlordInformation.DoesNotExist:
+                messages.error(request, 'Landlord profile not found.')
+                return redirect('landing')
         try:
             company_in_charge = CompanyInformation.objects.get(user_id=prop.user_id)
             agent_in_charge   = (
@@ -219,10 +231,20 @@ def view_property_on_lease(request, property_id):
         base_template = {
             'company': 'company/base.html',
             'agent':   'agent/base.html',
+            'landlord': 'landlord/base.html',
         }.get(request.user.role, 'estate/base.html')
 
         property_to_be_viewed = PropertyManagementRent.objects.get(pk=property_id)
-
+        if request.user.role == 'landlord':
+            try:
+                landlord_in_charge = LandlordInformation.objects.get(user_id=property_to_be_viewed.user_id)
+                view_id = landlord_in_charge.landlord_uuid
+                msg = (
+                    f'Listed by {landlord_in_charge.first_name} [Landlord]'
+                )
+            except LandlordInformation.DoesNotExist:
+                messages.error(request, 'Landlord profile not found.')
+                return redirect('landing')
         try:
             company_in_charge = CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
             agent_in_charge   = (

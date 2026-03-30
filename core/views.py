@@ -48,6 +48,9 @@ def landing_page(request):
         
     elif request.user.role == 'customer':
         return redirect(next_url if is_safe else 'customer:user-profile')
+    
+    elif request.user.role == 'landlord':
+        return redirect(next_url if is_safe else 'landlord:dashboard')
         
     else:
         return render(request, 'core/landing.html')
