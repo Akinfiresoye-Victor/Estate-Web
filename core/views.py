@@ -14,18 +14,6 @@ from core.utils import *
 from .models import ErrorLog
 import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
-from members.models import User
-
-def create_admin(request):
-    if not User.objects.filter(username='admin1').exists():
-        User.objects.create_superuser(
-            username='admin1',
-            email='admin111@gmail.com',
-            password='EW@Secure99!',
-            role='customer'
-        )
-        return HttpResponse("Superuser created successfully.")
-    return HttpResponse("Superuser already exists.")
 # from django.core.mail import send_mail
 
 # send_mail(
