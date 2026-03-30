@@ -1273,4 +1273,3 @@ def partnership_terms(request):
 
 def estate_web_guide(request):
     return render(request, 'core/faq.html')
-

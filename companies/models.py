@@ -211,7 +211,9 @@ class InviteLink(models.Model):
     company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='invite_link')
     invite_token=models.CharField('Link UUID', max_length=36, default=uuid.uuid4, editable=False, unique=True)
     created_at=models.DateTimeField(auto_now_add=True)
-    expires_at=models.DateTimeField('Date To expire', default=timezone.now() + timedelta(hours=24))#default of 24 hours
+    def default_expiry():
+        return timezone.now() + timedelta(hours=24)
+    expires_at=models.DateTimeField('Date To expire', default=default_expiry)
     max_uses=models.IntegerField('Usage Possibility', default=200, null=True, blank=True)
     use_count=models.IntegerField('Use Count', default=0, null=False, blank=False)
     is_active= models.BooleanField('Is Link Active?',default=True )

@@ -8,6 +8,6 @@ def notify_admin_login(sender, request, user, **kwargs):
         send_mail(
             subject="⚠️ Security Alert: Admin Login",
             message=f"Admin user {user.username} has logged into the estate portal.",
-            from_email="noreply@estatewebng.com",
+            from_email="contact@estatewebng.com",
             recipient_list=["contact@estatewebng.com"],
         )

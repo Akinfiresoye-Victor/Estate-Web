@@ -116,6 +116,10 @@ ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
 ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com' 
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'optional'  # or 'mandatory' if you verify emails on signup
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -143,7 +147,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'members.backends.EmailOrUsernameModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 

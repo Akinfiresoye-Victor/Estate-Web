@@ -1081,7 +1081,7 @@ def delete_company(request):
     except ObjectDoesNotExist:
         user_id=User.objects.get(pk=request.user.id)
         user_id.delete()
-        messages.error(request, 'The company profile could not be found.')
+        messages.error(request, 'The company profile could not be found User Data Deleted.')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())

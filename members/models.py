@@ -13,5 +13,6 @@ class User(AbstractUser):
     unique_user_id = models.CharField('uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
 
 
+
 # Set this in settings.py: AUTH_USER_MODEL = 'users.CustomUser'
 

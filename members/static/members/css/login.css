@@ -651,3 +651,31 @@ body {
   object-fit: contain;
   flex-shrink: 0;
 }
+
+/* ══════════════════════════════════════════════════
+   SECURITY NOTICE
+   ══════════════════════════════════════════════════ */
+.security-notice {
+  background: rgba(193, 155, 118, 0.08);
+  border: 1px solid rgba(193, 155, 118, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+.security-notice i {
+  color: var(--gold);
+  font-size: 1.1rem;
+  margin-top: 1px;
+}
+
+.security-notice strong {
+  color: var(--gold);
+  font-weight: 600;
+}

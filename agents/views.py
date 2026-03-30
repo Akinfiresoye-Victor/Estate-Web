@@ -944,7 +944,8 @@ def delete_agent(request):
             user_id.delete()
             messages.success(request, 'Agent account and all associated data deleted successfully.')
             return redirect('landing')
-        except:
+        except Exception as e:
+            print(e) 
             messages.error(request, 'The agent profile could not be found.')
             return redirect('landing')
     except Exception:

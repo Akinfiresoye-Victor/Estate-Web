@@ -22,10 +22,13 @@ class CustomerSignUpForm(UserCreationForm):
     
     password2= forms.CharField(max_length=50, widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),help_text='', label='')
+
+    email= forms.EmailField(max_length=75, widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder':'Enter Personal Email'}), help_text='', label='')
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'password1', 'password2') 
+        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
 
 
 class AgentSignUpForm(UserCreationForm):
@@ -43,10 +46,13 @@ class AgentSignUpForm(UserCreationForm):
     
     password2= forms.CharField(max_length=50, widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),help_text='', label='')
+
+    email= forms.EmailField(max_length=75, widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder':'Enter Personal Email'}), help_text='', label='')
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'password1', 'password2') 
+        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
 
 
 class CompanySignUpForm(UserCreationForm):
@@ -64,10 +70,13 @@ class CompanySignUpForm(UserCreationForm):
     
     password2= forms.CharField(max_length=50, widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),help_text='', label='')
+
+    email= forms.EmailField(max_length=75, widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder':'Enter Personal Email'}), help_text='', label='')
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'password1', 'password2') 
+        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
 
 
 #form for updating users profile and info

@@ -146,26 +146,38 @@
 
   /* ── Toggle password visibility ──────────────────── */
   function addToggle(input) {
-    const wrap = input.parentElement;
-    const origStyle = getComputedStyle(wrap).position;
-    if (origStyle === 'static') wrap.style.position = 'relative';
+    if (!input) return;
+    
+    // Create a dedicated relative wrapper so the eye icon is perfectly centered
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'relative';
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.width = '100%';
+    
+    // Insert the wrapper in the DOM tree right before the input, then move input inside it
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
 
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.setAttribute('aria-label', 'Toggle password visibility');
     btn.style.cssText = [
       'position:absolute',
-      'right:10px',
-      'top:50%',
-      'transform:translateY(-50%)',
+      'right:0',
+      'top:0',
+      'height:100%',
+      'width:44px',
       'background:none',
       'border:none',
       'cursor:pointer',
-      'color:rgba(255,255,255,.35)',
-      'font-size:.95rem',
-      'padding:4px',
-      'transition:color .2s',
-      'line-height:1',
+      'color:rgba(255,255,255,.5)',
+      'font-size:1.15rem',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'transition:all .2s',
+      'z-index: 10'
     ].join(';');
     btn.innerHTML = '<i class="bi bi-eye"></i>';
 
@@ -173,104 +185,116 @@
       const isHidden = input.type === 'password';
       input.type = isHidden ? 'text' : 'password';
       btn.querySelector('i').className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
-      btn.style.color = isHidden ? 'rgba(193,155,118,.8)' : 'rgba(255,255,255,.35)';
+      btn.style.color = isHidden ? 'rgba(193,155,118,.9)' : 'rgba(255,255,255,.5)';
     });
 
-    btn.addEventListener('mouseenter', function () { this.style.color = 'rgba(193,155,118,.8)'; });
+    btn.addEventListener('mouseenter', function () { 
+      this.style.color = 'rgba(193,155,118, 1)'; 
+      this.style.transform = 'scale(1.1)';
+    });
     btn.addEventListener('mouseleave', function () {
-      if (input.type === 'password') this.style.color = 'rgba(255,255,255,.35)';
+      this.style.transform = 'scale(1)';
+      if (input.type === 'password') this.style.color = 'rgba(255,255,255,.5)';
+      else this.style.color = 'rgba(193,155,118,.9)';
     });
 
     // Add padding so text doesn't hide behind the eye button
-    input.style.paddingRight = '2.5rem';
-    wrap.appendChild(btn);
+    input.style.paddingRight = '3rem';
+    
+    wrapper.appendChild(btn);
   }
 
   /* ── Inject keyframe animation ───────────────────── */
   if (!document.getElementById('pw-rules-style')) {
     const style = document.createElement('style');
     style.id = 'pw-rules-style';
-    style.textContent = '@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}';
+    style.textContent = `
+      @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+      input::-ms-reveal, input::-ms-clear { display: none; }
+    `;
     document.head.appendChild(style);
   }
 
   /* ── Init on DOMContentLoaded ────────────────────── */
   document.addEventListener('DOMContentLoaded', function () {
 
-    // Django renders password fields with id_password1 and id_password2
-    const pw1 = document.getElementById('id_password1');
-    const pw2 = document.getElementById('id_password2');
+    // django-allauth and traditional Django forms use these common IDs
+    const loginPw = document.getElementById('id_password');
+    const registerPw1 = document.getElementById('id_password1');
+    const registerPw2 = document.getElementById('id_password2');
 
-    if (!pw1) return; // Not a register page — do nothing
+    // 1. Apply eye toggle to ANY password input found
+    if (loginPw) addToggle(loginPw);
+    if (registerPw1) addToggle(registerPw1);
+    if (registerPw2) addToggle(registerPw2);
 
-    /* -- Build and insert the requirements panel after pw1's wrapper -- */
-    const panel       = buildPanel();
+    // 2. Only proceed with registration rules if id_password1 is present
+    if (!registerPw1) return;
+
+    /* -- Build and insert the requirements panel after registerPw1's wrapper -- */
+    const panel = buildPanel();
     const strengthWrap = buildStrengthBar();
 
-    // Insert after pw1's form-group wrapper
-    const pw1Group = pw1.closest('.form-group') || pw1.parentElement;
+    // Insert after registerPw1's form-group wrapper
+    const pw1Group = registerPw1.closest('.form-group') || registerPw1.parentElement;
     pw1Group.appendChild(strengthWrap);
     pw1Group.appendChild(panel);
 
-    /* -- Build and insert match indicator after pw2's wrapper -- */
+    /* -- Build and insert match indicator after registerPw2's wrapper -- */
     const matchIndicator = buildMatchIndicator();
-    if (pw2) {
-      const pw2Group = pw2.closest('.form-group') || pw2.parentElement;
+    if (registerPw2) {
+      const pw2Group = registerPw2.closest('.form-group') || registerPw2.parentElement;
       pw2Group.appendChild(matchIndicator);
     }
 
-    /* -- Add eye toggle buttons -- */
-    addToggle(pw1);
-    if (pw2) addToggle(pw2);
-
-    /* -- Show panel when pw1 is focused -- */
-    pw1.addEventListener('focus', function () {
+    /* -- Show panel when registerPw1 is focused -- */
+    registerPw1.addEventListener('focus', function () {
       panel.style.display = 'block';
       strengthWrap.style.display = 'block';
     });
 
-    /* -- Live update rules and strength on pw1 input -- */
-    pw1.addEventListener('input', function () {
+    /* -- Live update rules and strength on registerPw1 input -- */
+    registerPw1.addEventListener('input', function () {
       updateRules(this.value);
       updateStrength(this.value);
-      if (pw2) updateMatch(this.value, pw2.value);
+      if (registerPw2) updateMatch(this.value, registerPw2.value);
     });
 
-    /* -- Live match check on pw2 input -- */
-    if (pw2) {
-      pw2.addEventListener('input', function () {
-        updateMatch(pw1.value, this.value);
+    /* -- Live match check on registerPw2 input -- */
+    if (registerPw2) {
+      registerPw2.addEventListener('input', function () {
+        updateMatch(registerPw1.value, this.value);
       });
     }
 
     /* -- Prevent form submit if requirements not met -- */
-    const form = pw1.closest('form');
+    const form = registerPw1.closest('form');
     if (form) {
       form.addEventListener('submit', function (e) {
-        const allPassed = RULES.every(r => r.test(pw1.value));
+        const allPassed = RULES.every(r => r.test(registerPw1.value));
         if (!allPassed) {
           e.preventDefault();
           panel.style.display = 'block';
-          pw1.style.borderColor = '#fca5a5';
-          pw1.style.boxShadow   = '0 0 0 3px rgba(252,165,165,.18)';
-          pw1.focus();
+          registerPw1.style.borderColor = '#fca5a5';
+          registerPw1.style.boxShadow = '0 0 0 3px rgba(252,165,165,.18)';
+          registerPw1.focus();
           // Reset border after user starts typing again
-          pw1.addEventListener('input', function reset() {
-            pw1.style.borderColor = '';
-            pw1.style.boxShadow   = '';
-            pw1.removeEventListener('input', reset);
+          registerPw1.addEventListener('input', function reset() {
+            registerPw1.style.borderColor = '';
+            registerPw1.style.boxShadow = '';
+            registerPw1.removeEventListener('input', reset);
           });
           return;
         }
-        if (pw2 && pw1.value !== pw2.value) {
+        if (registerPw2 && registerPw1.value !== registerPw2.value) {
           e.preventDefault();
-          pw2.style.borderColor = '#fca5a5';
-          pw2.style.boxShadow   = '0 0 0 3px rgba(252,165,165,.18)';
-          pw2.focus();
-          pw2.addEventListener('input', function reset() {
-            pw2.style.borderColor = '';
-            pw2.style.boxShadow   = '';
-            pw2.removeEventListener('input', reset);
+          registerPw2.style.borderColor = '#fca5a5';
+          registerPw2.style.boxShadow = '0 0 0 3px rgba(252,165,165,.18)';
+          registerPw2.focus();
+          registerPw2.addEventListener('input', function reset() {
+            registerPw2.style.borderColor = '';
+            registerPw2.style.boxShadow = '';
+            registerPw2.removeEventListener('input', reset);
           });
         }
       });

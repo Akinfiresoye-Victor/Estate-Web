@@ -11,6 +11,9 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from typing import cast
 from django.urls import reverse
 from allauth.socialaccount.models import SocialLogin
+from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress
+from allauth.account.models import EmailConfirmationHMAC
 
 def agent_google_login(request):
     # 1. Tag the session so we remember this is an Agent
@@ -150,43 +153,26 @@ def register_agent(request):
         if request.method == 'POST':
             form = AgentSignUpForm(request.POST)
             if form.is_valid():
-                # Save the new agent and assign the role
                 agent = form.save(commit=False)
                 agent.role = 'agent'
                 agent.save()
-                
-                username = form.cleaned_data['username']
-                password = form.cleaned_data.get('password1')
-                
-                # Authenticate and Login the new agent
-                user = cast(User, authenticate(request, username=username, password=password))
-                if user is not None:
-                    login(request, user)
-                    messages.success(request, f'Welcome {user.username}! Thank you for joining Estate Web.')
-
-                # --- START SECURITY FIX ---
-                next_url = request.POST.get('next') or request.GET.get('next')
-                
-                # Check if the URL is safe and belongs to your site (Lagos/Estate Web domain)
-                is_safe = url_has_allowed_host_and_scheme(
-                    url=next_url,
-                    allowed_hosts={request.get_host()},
-                    require_https=request.is_secure(),
-                ) if next_url else False
-
-                # Redirect to the 'next' page only if it's safe; otherwise, go to agent dashboard
-                return redirect(next_url if is_safe else 'agent:dashboard')
-                # --- END SECURITY FIX ---
-
+                email_address = EmailAddress.objects.create(
+                    user=agent,
+                    email=agent.email,
+                    primary=True,
+                    verified=False
+                )
+                confirmation = EmailConfirmationHMAC(email_address)
+                get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+                messages.success(request, 'Account created! Please check your email to verify your account.')
+                return redirect('account_email_verification_sent')
             else:
                 messages.error(request, 'Please correct the highlighted errors in the form.')
                 return render(request, 'registration/register_agent.html', {'form': form, 'role': 'Agent'})
         else:
             form = AgentSignUpForm()
             return render(request, 'registration/register_agent.html', {'form': form, 'role': 'Agent'})
-            
     except Exception:
-        # Using your existing ErrorLog model for tracking
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
@@ -200,42 +186,25 @@ def register_company(request):
         if request.method == 'POST':
             form = CompanySignUpForm(request.POST)
             if form.is_valid():
-                # Save the user and set role to company
                 company = form.save(commit=False)
                 company.role = 'company'
                 company.save()
-                
-                username = form.cleaned_data['username']
-                password = form.cleaned_data.get('password1')
-                
-                # Log the new company user in immediately
-                user = cast(User, authenticate(request, username=username, password=password))
-                if user is not None:
-                    login(request, user)
-                    messages.success(request, f'Welcome {user.username}! Thank you for joining Estate Web.')
-
-                # --- START SECURITY FIX ---
-                next_url = request.POST.get('next') or request.GET.get('next')
-                
-                # Check if the URL is safe and belongs to your domain
-                is_safe = url_has_allowed_host_and_scheme(
-                    url=next_url,
-                    allowed_hosts={request.get_host()},
-                    require_https=request.is_secure(),
-                ) if next_url else False
-
-                # Redirect to the 'next' URL if safe, otherwise to company dashboard
-                return redirect(next_url if is_safe else 'company:dashboard')
-                # --- END SECURITY FIX ---
-
+                email_address = EmailAddress.objects.create(
+                    user=company,
+                    email=company.email,
+                    primary=True,
+                    verified=False
+                )
+                confirmation = EmailConfirmationHMAC(email_address)
+                get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+                messages.success(request, 'Account created! Please check your email to verify your account.')
+                return redirect('account_email_verification_sent')
             else:
                 messages.error(request, 'Please correct the highlighted errors in the form.')
                 return render(request, 'registration/register_company.html', {'form': form, 'role': 'Company'})
         else:
             form = CompanySignUpForm()
             return render(request, 'registration/register_company.html', {'form': form, 'role': 'Company'})
-            
     except Exception:
-        # Log any system crashes using your ErrorLog model
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
