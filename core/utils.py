@@ -276,7 +276,7 @@ def _get_description(property_obj, property_type):
 
 def _is_verified_lister(property_obj):
     """
-    Returns True if the lister (agent or company) is verified.
+    Returns True if the lister (agent, company, landlord) is verified.
     Imported inside the function to avoid circular imports.
     """
     try:
@@ -293,6 +293,13 @@ def _is_verified_lister(property_obj):
                 unique_company_id=property_obj.company_uuid
             ).first()
             return bool(company and company.verified)
+
+        if property_obj.landlord_uuid and property_obj.landlord_uuid != 'None':
+            from landlord.models import LandlordInformation
+            landlord = LandlordInformation.objects.filter(
+                landlord_uuid=property_obj.landlord_uuid
+            ).first()
+            return bool(landlord and landlord.verified)
 
     except Exception:
         pass
@@ -467,9 +474,9 @@ def refresh_activity_score(property_obj, property_type):
 
 
 
-def get_inventory_count(agent, company=None):
+def get_inventory_count(agent, company=None, landlord=None):
     """
-    Getting how many properties an agent have stored
+    Getting how many properties an agent/landlord have stored
     either listed/unlisted
     """
     if company:
@@ -479,8 +486,11 @@ def get_inventory_count(agent, company=None):
         #Solo agent - only their own properties
         return(PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count()+
                 PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count())
-
-def get_listing_count(agent, company=None):
+    elif landlord:
+        return(PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid).count()+
+                PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid).count())
+    return 0
+def get_listing_count(agent, company=None, landlord=None):
     """
     How many properties are Currently LIVE
     """
@@ -494,36 +504,47 @@ def get_listing_count(agent, company=None):
             PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid,is_listed=True).count() + 
             PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid,is_listed=True).count()
         )
-
-def can_add_to_inventory(agent, company=None):
+    elif landlord:
+        return(
+            PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid,is_listed=True).count() + 
+            PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid,is_listed=True).count()
+        )
+    return 0
+def can_add_to_inventory(agent, company=None, landlord=None):
     """
-    Can this agent/company store one more property?
+    Can this agent/company/landlord store one more property?
     """
     
     if company and company.company_tier =='enterprise':
         return True, 'ok'
     
-    limit=company.inventory_slots if company else agent.inventory_slots
-    used=get_inventory_count(agent,company)
+    if landlord:
+        limit = landlord.inventory_slots
+        used = get_inventory_count(None, None, landlord)
+    else:
+        limit=company.inventory_slots if company else agent.inventory_slots
+        used=get_inventory_count(agent, company)
     
     if used >= limit:
         return False, f'Inventory full {used}/{limit} slots used. Upgrade to add more'
     return True,'ok'
-
-def can_go_live(agent, company=None):
+def can_go_live(agent, company=None, landlord=None):
     """
-    Can this agent/company make one more property live?
+    Can this agent/company/landlord make one more property live?
     """
     if company and company.company_tier == 'enterprise':
         return True, 'ok'
     
-    limit= company.listing_slots if company else agent.listing_slots
-    used= get_listing_count(agent, company)
+    if landlord:
+        limit = landlord.listing_slots
+        used = get_listing_count(None, None, landlord)
+    else:
+        limit= company.listing_slots if company else agent.listing_slots
+        used= get_listing_count(agent, company)
     
     if used >= limit:
         return False, f'Listing limit reached ({used}/{limit} live) Unlist another property first or upgrade'
     return True, 'ok'
-
 
 def get_agent_company(agent):
     """

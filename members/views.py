@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from .forms import CustomerSignUpForm, CompanySignUpForm, AgentSignUpForm
+from .forms import CustomerSignUpForm, CompanySignUpForm, AgentSignUpForm, LandlordSignUpForm
 from .models import User
 from core.models import ErrorLog
 import traceback
@@ -29,6 +29,13 @@ def company_google_login(request):
 
     # 2. Redirect to the actual Google login URL
     # This URL is usually '/accounts/google/login/'
+    return redirect('/accounts/google/login/')
+
+def landlord_google_login(request):
+    # 1. Tag the session so we remember this is a Landlord
+    request.session['user_role'] = 'landlord'
+
+    # 2. Redirect to the actual Google login URL
     return redirect('/accounts/google/login/')
 
 
@@ -66,6 +73,8 @@ def login_user(request):
                     return redirect('customer:user-profile')
                 elif user.role == 'agent':
                     return redirect('agent:dashboard')
+                elif user.role == 'landlord':
+                    return redirect('landlord:dashboard')
                 elif user.role == 'company':
                     return redirect('company:dashboard')
                 else:
@@ -205,6 +214,39 @@ def register_company(request):
         else:
             form = CompanySignUpForm()
             return render(request, 'registration/register_company.html', {'form': form, 'role': 'Company'})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+# ─── register_landlord ────────────────────────────────────────────────────────
+
+def register_landlord(request):
+    if request.user.is_authenticated:
+        return redirect('landing')
+    try:
+        if request.method == 'POST':
+            form = LandlordSignUpForm(request.POST)
+            if form.is_valid():
+                landlord = form.save(commit=False)
+                landlord.role = 'landlord'
+                landlord.save()
+                email_address = EmailAddress.objects.create(
+                    user=landlord,
+                    email=landlord.email,
+                    primary=True,
+                    verified=False
+                )
+                confirmation = EmailConfirmationHMAC(email_address)
+                get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+                messages.success(request, 'Account created! Please check your email to verify your account.')
+                return redirect('account_email_verification_sent')
+            else:
+                messages.error(request, 'Please correct the highlighted errors in the form.')
+                return render(request, 'registration/register_landlord.html', {'form': form, 'role': 'Landlord'})
+        else:
+            form = LandlordSignUpForm()
+            return render(request, 'registration/register_landlord.html', {'form': form, 'role': 'Landlord'})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

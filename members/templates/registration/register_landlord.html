@@ -1,0 +1,172 @@
+<!doctype html>
+{% load static %}
+{% load socialaccount %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Register as Landlord — Estate Web</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+  <link rel="stylesheet" href="{% static 'members/css/register.css' %}">
+</head>
+<body>
+
+{% include 'estate/includes/messages.html' %}
+
+<div class="register-wrapper">
+  <div class="register-container">
+
+    <div class="register-card">
+
+      <div class="register-header">
+        <div class="brand-logo"><i class="bi bi-house-door"></i></div>
+        <h1 class="brand-name">Estate Web</h1>
+        <h2 class="register-title">Create Account</h2>
+        <p class="register-subtitle">Own a property? List it directly — no agent needed.</p>
+      </div>
+
+      <div class="role-switcher">
+        <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span class="role-tab-label">Sign In</span>
+        </a>
+        <a href="{% url 'register-customer' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
+          <i class="bi bi-person"></i>
+          <span class="role-tab-label">Customer</span>
+        </a>
+        <a href="{% url 'register-agent' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
+          <i class="bi bi-award"></i>
+          <span class="role-tab-label">Agent</span>
+        </a>
+        <a href="{% url 'register-company' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="role-tab">
+          <i class="bi bi-building"></i>
+          <span class="role-tab-label">Company</span>
+        </a>
+        <span class="role-tab active">
+          <i class="bi bi-house-door-fill"></i>
+          <span class="role-tab-label">Landlord</span>
+        </span>
+      </div>
+
+      {% if form.errors %}
+        <div class="error-alert">
+          <div class="error-header">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Registration Error!</span>
+          </div>
+          <ul class="error-list">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'register-landlord' %}" class="register-form">
+        {% csrf_token %}
+
+        <div class="security-notice">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span><strong>Security Measure:</strong> Strong passwords are required. Accounts are locked for 1 hour after 5 failed login attempts to protect your data.</span>
+        </div>
+
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.first_name.id_for_label }}" class="form-label">
+              <i class="bi bi-person-fill"></i> First Name
+            </label>
+            {{ form.first_name }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.last_name.id_for_label }}" class="form-label">
+              <i class="bi bi-person-fill"></i> Last Name
+            </label>
+            {{ form.last_name }}
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="form-group">
+            <label for="{{ form.email.id_for_label }}" class="form-label">
+              <i class="bi bi-at"></i> Email
+            </label>
+            {{ form.email }}
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="form-group">
+            <label for="{{ form.username.id_for_label }}" class="form-label">
+              <i class="bi bi-at"></i> Username
+            </label>
+            {{ form.username }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}" class="form-label">
+              <i class="bi bi-lock-fill"></i> Password
+            </label>
+            {{ form.password1 }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}" class="form-label">
+              <i class="bi bi-shield-lock-fill"></i> Confirm Password
+            </label>
+            {{ form.password2 }}
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <span>Create Landlord Account</span>
+          <i class="bi bi-arrow-right-circle-fill"></i>
+        </button>
+
+<div class="gc-or-divider">
+  <span>or</span>
+</div>
+
+        <a href="{% url 'landlord_google_login' %}"class="gc-google-btn">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+          Landlord Google Signup
+        </a>
+        <div class="login-section">
+          <p class="login-text">Already have an account?</p>
+          <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="btn-login">Sign In</a>
+        </div>
+      </form>
+
+    </div>
+
+    <div class="side-panel side-panel-agent" style="background: linear-gradient(160deg, #9a7655 0%, #c19b76 60%, #d4b896 100%);">
+      <div class="side-content" style="color: #0d1117;">
+        <i class="bi bi-house-door-fill"></i>
+        <h3>List Your Property</h3>
+        <p>Skip the middleman. List your property directly to our network of thousands of prospective buyers and renters.</p>
+        <div class="features">
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Direct listings, no wait</span></div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Easy to manage dashboard</span></div>
+          <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Get inquiries directly</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'members/js/password_rules.js' %}?v=1.2"></script>
+</body>
+</html>

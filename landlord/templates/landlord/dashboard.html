@@ -1,0 +1,175 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'landlord/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ll-dashboard">
+
+  {# ── Welcome Banner ──────────────────────────────────────────── #}
+  <div class="ll-welcome">
+    <div class="ll-welcome-text">
+      <h2>Welcome back, {{ landlord.first_name }}!</h2>
+      <p>Manage your properties and connect with buyers or renters directly.</p>
+    </div>
+    {% if landlord.verified %}
+      <div class="ll-welcome-badge">
+        <i class="bi bi-patch-check-fill"></i> Verified Landlord
+      </div>
+    {% else %}
+      <a href="#" class="ll-welcome-badge unverified">
+        <i class="bi bi-exclamation-circle-fill"></i> Get Verified
+      </a>
+    {% endif %}
+  </div>
+
+  {# ── Verification nudge (only shown if not verified) ─────────── #}
+  {% if not landlord.verified %}
+    <div class="ll-notice">
+      <i class="bi bi-shield-exclamation"></i>
+      <span>
+        Your account is not yet verified. Verified landlords get more visibility and trust from tenants.
+        <a href="#">Complete verification →</a>
+      </span>
+    </div>
+  {% endif %}
+
+  {# ── Stats ───────────────────────────────────────────────────── #}
+  <p class="ll-section-label">Overview</p>
+  <div class="ll-stats-grid">
+
+    <a href="{% url 'landlord:inventory' %}" class="ll-stat-card">
+      <div class="ll-stat-icon gold">
+        <i class="bi bi-houses-fill"></i>
+      </div>
+      <div class="ll-stat-info">
+        <h3>{{ total_listings|default:"0" }}</h3>
+        <p>Total Listings</p>
+      </div>
+    </a>
+
+    <a href="{% url 'landlord:inventory' %}" class="ll-stat-card">
+      <div class="ll-stat-icon green">
+        <i class="bi bi-house-check-fill"></i>
+      </div>
+      <div class="ll-stat-info">
+        <h3>{{ active_listings|default:"0" }}</h3>
+        <p>Active Listings</p>
+      </div>
+    </a>
+
+    <a href="#" class="ll-stat-card">
+      <div class="ll-stat-icon blue">
+        <i class="bi bi-chat-dots-fill"></i>
+      </div>
+      <div class="ll-stat-info">
+        <h3>—</h3>
+        <p>Inquiries</p>
+      </div>
+    </a>
+
+    <a href="#" class="ll-stat-card">
+      <div class="ll-stat-icon red">
+        <i class="bi bi-eye-fill"></i>
+      </div>
+      <div class="ll-stat-info">
+        <h3>—</h3>
+        <p>Profile Views</p>
+      </div>
+    </a>
+
+  </div>
+
+  {# ── List a Property ─────────────────────────────────────────── #}
+  <p class="ll-section-label">List a Property</p>
+  <div class="ll-actions-grid">
+
+    <div class="ll-action-card">
+      <div class="ll-action-icon">
+        <i class="bi bi-house-add-fill"></i>
+      </div>
+      <h4>Sell a Property</h4>
+      <p>List your property for sale and connect directly with serious buyers.</p>
+      <a href="{% url 'sell-property' %}" class="ll-btn ll-btn-gold">
+        <i class="bi bi-plus-circle"></i> List for Sale
+      </a>
+    </div>
+
+    <div class="ll-action-card">
+      <div class="ll-action-icon">
+        <i class="bi bi-key-fill"></i>
+      </div>
+      <h4>Rent a Property</h4>
+      <p>Find trustworthy tenants quickly through Estate Web's network.</p>
+      <a href="{% url 'lease-property' %}" class="ll-btn ll-btn-outline">
+        <i class="bi bi-plus-circle"></i> List for Rent
+      </a>
+    </div>
+
+  </div>
+
+  {# ── Recent Properties ───────────────────────────────────────── #}
+  <div class="ll-properties-section">
+    <div class="ll-section-header">
+      <p class="ll-section-label" style="margin: 0;">Recent Listings</p>
+      <a href="{% url 'landlord:inventory' %}">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    {% if recent_listings %}
+      {% for listing in recent_listings %}
+        <a href="#" class="ll-property-card">
+          <div class="ll-property-thumb">
+            <i class="bi bi-house-fill"></i>
+          </div>
+          <div class="ll-property-info">
+            <h4>{{ listing.title|default:"Untitled Property" }}</h4>
+            <p>{{ listing.location|default:"Akure, Ondo State" }}</p>
+          </div>
+          {% if listing.listing_type == 'sale' %}
+            <span class="ll-property-badge sale">For Sale</span>
+          {% else %}
+            <span class="ll-property-badge rent">For Rent</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="ll-empty-state">
+        <i class="bi bi-house-slash"></i>
+        <p>You haven't listed any properties yet.<br>Use the buttons above to get started.</p>
+        <a href="{% url 'sell-property' %}" class="ll-btn ll-btn-gold">
+          <i class="bi bi-plus-circle"></i> Add Your First Property
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  {# ── Account Tools ───────────────────────────────────────────── #}
+  <p class="ll-section-label">Account Tools</p>
+  <div class="ll-tools-grid">
+
+    <a href="#" class="ll-tool-card">
+      <i class="bi bi-person-gear"></i>
+      <span>Profile Settings</span>
+    </a>
+
+    <a href="#" class="ll-tool-card">
+      <i class="bi bi-shield-check"></i>
+      <span>Verification</span>
+    </a>
+
+    <a href="#" class="ll-tool-card">
+      <i class="bi bi-bell"></i>
+      <span>Notifications</span>
+    </a>
+
+    <a href="/" class="ll-tool-card">
+      <i class="bi bi-globe"></i>
+      <span>View Website</span>
+    </a>
+
+  </div>
+
+</div>
+{% endblock %}

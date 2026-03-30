@@ -15,6 +15,7 @@ urlpatterns = [
     path('executive/',include('admin_panel.urls')),
     path('agent/', include('agents.urls', namespace='agent')),
     path('company/', include('companies.urls', namespace='company')),
+    path('landlord/', include('landlord.urls', namespace='landlord')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

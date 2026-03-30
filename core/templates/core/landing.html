@@ -370,6 +370,14 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
                 <div><strong>Company</strong><small class="d-block">Corporate solutions</small></div>
               </a>
             </li>
+            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
+
+            <li>
+              <a class="dropdown-item" href="{% url 'register-landlord' %}">
+                <i class="bi bi-shield-shaded text-success"></i>
+                <div><strong>Landlord</strong><small class="d-block">Secure your asset and find elite tenants</small></div>
+              </a>
+            </li>
           </ul>
         </li>
         <li class="nav-item"><a href="{% url 'login' %}" class="btn-nav">Sign In</a></li>
@@ -453,6 +461,13 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
             <div class="account-card-icon">🏢</div>
             <h3>Company</h3>
             <p>Corporate real estate tools</p>
+            <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
+          </a>
+
+          <a href="{% url 'register-landlord' %}" class="account-card">
+            <div class="account-card-icon">🤵</div>
+            <h3>Landlord</h3>
+            <p>Secure asset and find elite tenants</p>
             <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
           </a>
 

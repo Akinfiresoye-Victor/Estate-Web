@@ -1,0 +1,108 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block title %}Complete Your Profile — Estate Web{% endblock %}
+
+{% block extra_css %}
+<style>
+    .setup-container {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+    .setup-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border-top: 6px solid var(--ll-secondary);
+    }
+    .setup-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .setup-header h2 {
+        font-family: 'Poppins', sans-serif;
+        color: var(--ll-primary);
+        font-weight: 700;
+    }
+    .form-label {
+        font-weight: 600;
+        color: var(--ll-text-dark);
+        margin-bottom: 0.5rem;
+    }
+    .btn-setup {
+        background: var(--ll-primary);
+        color: white;
+        padding: 0.8rem;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s;
+        border: none;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .btn-setup:hover {
+        background: #152b47;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .help-text {
+        font-size: 0.85rem;
+        color: var(--ll-text-light);
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <div class="setup-header">
+            <h2>Welcome, {{ request.user.first_name }}!</h2>
+            <p class="text-muted">Just a few more details to get your account ready.</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="form-label">Phone Number</label>
+                {{ form.phone_number }}
+                {% if form.phone_number.errors %}
+                <div class="text-danger mt-1 small">{{ form.phone_number.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Location (State)</label>
+                {{ form.location }}
+                {% if form.location.errors %}
+                <div class="text-danger mt-1 small">{{ form.location.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Profile Picture (Optional)</label>
+                {{ form.profile_picture }}
+                <div class="help-text">A professional photo helps build trust with tenants/buyers.</div>
+                {% if form.profile_picture.errors %}
+                <div class="text-danger mt-1 small">{{ form.profile_picture.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Government ID (Optional)</label>
+                {{ form.government_id }}
+                <div class="help-text">{{ form.government_id.help_text }}</div>
+                {% if form.government_id.errors %}
+                <div class="text-danger mt-1 small">{{ form.government_id.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-setup">
+                Finish Setup & Go to Dashboard
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

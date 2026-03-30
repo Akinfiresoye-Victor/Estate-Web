@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'admin_panel',
     'agents',
     'companies',
+    'landlord',
     'core',
     'widget_tweaks',
     'django_filters',

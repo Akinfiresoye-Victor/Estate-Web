@@ -1,0 +1,437 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'landlord/css/inventory.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ── Page Header ── #}
+<div class="li-page-header">
+  <div>
+    <h1 class="li-page-title">My Inventory</h1>
+    <p class="li-page-subtitle">Manage your properties — toggle them live or keep them stored.</p>
+  </div>
+
+  {# Quick Add buttons only show if there are already properties #}
+  {% if sales or rentals %}
+  <div class="li-cta-row">
+    <a href="{% url 'sell-property' %}" class="li-btn li-btn--sell">
+      <i class="bi bi-plus-lg"></i> Add Sale
+    </a>
+    <a href="{% url 'lease-property' %}" class="li-btn li-btn--rent">
+      <i class="bi bi-plus-lg"></i> Add Rental
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+{# ── Slot Stats Bar ── #}
+<div class="li-stats-bar">
+
+  <div class="li-stat-chip li-stat-chip--accent">
+    <span class="li-stat-chip__label">Slots Used</span>
+    <span class="li-stat-chip__value">{{ used_slots }} / {{ total_limit }}</span>
+    {# Slot progress bar — width is calculated as a percentage #}
+    {% with pct=used_slots|default:0 %}
+    <div class="li-slot-bar">
+      <div class="li-slot-bar__fill
+        {% if pct >= total_limit %}li-slot-bar__fill--full
+        {% elif pct >= total_limit|add:"-5" %}li-slot-bar__fill--warn
+        {% endif %}"
+        style="width: {% widthratio used_slots total_limit 100 %}%">
+      </div>
+    </div>
+    {% endwith %}
+  </div>
+
+  <div class="li-stat-chip">
+    <span class="li-stat-chip__label">For Sale</span>
+    <span class="li-stat-chip__value">{{ sales.count|default:"0" }}</span>
+  </div>
+
+  <div class="li-stat-chip">
+    <span class="li-stat-chip__label">For Rent</span>
+    <span class="li-stat-chip__value">{{ rentals.count|default:"0" }}</span>
+  </div>
+
+  <div class="li-stat-chip">
+    <span class="li-stat-chip__label">Live Now</span>
+    <span class="li-stat-chip__value" id="li-live-count">
+      {# Count how many are currently listed #}
+      {% with live_count=0 %}
+        {% for p in sales %}{% if p.is_listed %}{% with live_count=live_count|add:1 %}{% endwith %}{% endif %}{% endfor %}
+        {% for p in rentals %}{% if p.is_listed %}{% with live_count=live_count|add:1 %}{% endwith %}{% endif %}{% endfor %}
+      {% endwith %}
+      {{ sales|length|add:rentals|length }}/{{ live_limit }}
+    </span>
+  </div>
+
+</div>
+
+{# ── Toolbar: Filter tabs ── #}
+{% if sales or rentals %}
+<div class="li-toolbar">
+  <div class="li-filter-tabs">
+    <button class="li-tab-btn active" data-filter="all">All</button>
+    <button class="li-tab-btn" data-filter="sale">For Sale</button>
+    <button class="li-tab-btn" data-filter="rent">For Rent</button>
+    <button class="li-tab-btn" data-filter="live">Live</button>
+    <button class="li-tab-btn" data-filter="inventory">Inventory</button>
+  </div>
+</div>
+{% endif %}
+
+{# ── Empty State ── #}
+{% if not sales and not rentals %}
+<div class="li-empty">
+  <div class="li-empty__icon"><i class="bi bi-house-slash"></i></div>
+  <h4 class="li-empty__title">No Properties Yet</h4>
+  <p class="li-empty__text">
+    You haven't added any properties. Start by listing one for sale or rent
+    — it goes into your inventory first, and you can publish it when ready.
+  </p>
+  <div class="li-empty__actions">
+    <a href="{% url 'sell-property' %}" class="li-btn li-btn--sell">
+      <i class="bi bi-tag"></i> List for Sale
+    </a>
+    <a href="{% url 'lease-property' %}" class="li-btn li-btn--rent">
+      <i class="bi bi-key"></i> List for Rent
+    </a>
+  </div>
+</div>
+
+{% else %}
+
+{# ── Property Grid ── #}
+<div class="li-grid" id="li-property-grid">
+
+  {# ---- Sale Properties ---- #}
+  {% for p in sales %}
+  <div class="li-card"
+       data-type="sale"
+       data-status="{% if p.is_listed %}live{% else %}inventory{% endif %}">
+
+    <div class="li-card__img-wrap">
+      {% if p.base_image %}
+        <img src="{{ p.base_image.url }}" class="li-card__img" alt="{{ p.property_name }}" loading="lazy">
+      {% else %}
+        <div class="li-card__img" style="background:#e9ecef;display:flex;align-items:center;justify-content:center;">
+          <i class="bi bi-image" style="font-size:2.5rem;color:#adb5bd;"></i>
+        </div>
+      {% endif %}
+
+      <span class="li-card__type-badge li-card__type-badge--sale">For Sale</span>
+
+      <span class="li-card__status-badge {% if p.is_listed %}li-card__status-badge--live{% else %}li-card__status-badge--inventory{% endif %}"
+            id="status-badge-sale-{{ p.pk }}">
+        {% if p.is_listed %}
+          <i class="bi bi-broadcast"></i> Live
+        {% else %}
+          <i class="bi bi-archive"></i> Stored
+        {% endif %}
+      </span>
+    </div>
+
+    <div class="li-card__body">
+      <h3 class="li-card__name" title="{{ p.property_name }}">
+        {# property_name depends on category #}
+        {% if p.property_category == 'Residential' %}{{ p.residential }}
+        {% elif p.property_category == 'Commercial' %}{{ p.commercial }}
+        {% else %}{{ p.lands }}
+        {% endif %}
+      </h3>
+
+      {% if p.location %}
+      <p class="li-card__location">
+        <i class="bi bi-geo-alt-fill"></i> {{ p.location }}{% if p.state %}, {{ p.state }}{% endif %}
+      </p>
+      {% endif %}
+
+      <div class="li-card__price">
+        ₦{{ p.price|floatformat:"0g" }}
+        {% if p.price_range %}<span class="li-card__price-suffix">{{ p.price_range }}</span>{% endif %}
+      </div>
+
+      <div class="li-card__stats">
+        <span class="li-card__stat">
+          <i class="bi bi-eye"></i> {{ p.views.count|default:"0" }}
+        </span>
+        {% if p.bedrooms %}
+        <span class="li-card__stat">
+          <i class="bi bi-door-closed"></i> {{ p.bedrooms }} bed
+        </span>
+        {% endif %}
+        {% if p.bathrooms %}
+        <span class="li-card__stat">
+          <i class="bi bi-droplet"></i> {{ p.bathrooms }} bath
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="li-card__actions">
+        <button
+          class="li-card__action-btn li-card__action-btn--toggle {% if p.is_listed %}is-live{% endif %}"
+          id="toggle-btn-sale-{{ p.pk }}"
+          onclick="toggleListing('{{ p.pk }}', 'sale', this)"
+          title="{% if p.is_listed %}Hide from public listings{% else %}Make this listing public{% endif %}">
+          {% if p.is_listed %}
+            <i class="bi bi-eye-slash"></i> Unlist
+          {% else %}
+            <i class="bi bi-broadcast"></i> Publish
+          {% endif %}
+        </button>
+
+        <a href="{% url 'update-property-s' p.pk %}" class="li-card__action-btn" title="Edit property">
+          <i class="bi bi-pencil"></i> Edit
+        </a>
+
+        <a href="{% url 'customer:view-property-s' p.pk %}" class="li-card__action-btn" target="_blank" title="Preview public listing">
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+
+  {# ---- Rental Properties ---- #}
+  {% for p in rentals %}
+  <div class="li-card"
+       data-type="rent"
+       data-status="{% if p.is_listed %}live{% else %}inventory{% endif %}">
+
+    <div class="li-card__img-wrap">
+      {% if p.base_image %}
+        <img src="{{ p.base_image.url }}" class="li-card__img" alt="{{ p.property_name }}" loading="lazy">
+      {% else %}
+        <div class="li-card__img" style="background:#e9ecef;display:flex;align-items:center;justify-content:center;">
+          <i class="bi bi-image" style="font-size:2.5rem;color:#adb5bd;"></i>
+        </div>
+      {% endif %}
+
+      <span class="li-card__type-badge li-card__type-badge--rent">For Rent</span>
+
+      <span class="li-card__status-badge {% if p.is_listed %}li-card__status-badge--live{% else %}li-card__status-badge--inventory{% endif %}"
+            id="status-badge-rent-{{ p.pk }}">
+        {% if p.is_listed %}
+          <i class="bi bi-broadcast"></i> Live
+        {% else %}
+          <i class="bi bi-archive"></i> Stored
+        {% endif %}
+      </span>
+    </div>
+
+    <div class="li-card__body">
+      <h3 class="li-card__name" title="{{ p.property_name }}">
+        {% if p.property_category == 'Residential' %}{{ p.residential }}
+        {% elif p.property_category == 'Commercial' %}{{ p.commercial }}
+        {% else %}{{ p.lands }}
+        {% endif %}
+      </h3>
+
+      {% if p.location %}
+      <p class="li-card__location">
+        <i class="bi bi-geo-alt-fill"></i> {{ p.location }}{% if p.state %}, {{ p.state }}{% endif %}
+      </p>
+      {% endif %}
+
+      <div class="li-card__price">
+        ₦{{ p.price|floatformat:"0g" }}
+        <span class="li-card__price-suffix">/yr</span>
+      </div>
+
+      <div class="li-card__stats">
+        <span class="li-card__stat">
+          <i class="bi bi-eye"></i> {{ p.views.count|default:"0" }}
+        </span>
+        {% if p.bedrooms %}
+        <span class="li-card__stat">
+          <i class="bi bi-door-closed"></i> {{ p.bedrooms }} bed
+        </span>
+        {% endif %}
+        {% if p.bathrooms %}
+        <span class="li-card__stat">
+          <i class="bi bi-droplet"></i> {{ p.bathrooms }} bath
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="li-card__actions">
+        <button
+          class="li-card__action-btn li-card__action-btn--toggle {% if p.is_listed %}is-live{% endif %}"
+          id="toggle-btn-rent-{{ p.pk }}"
+          onclick="toggleListing('{{ p.pk }}', 'rent', this)"
+          title="{% if p.is_listed %}Hide from public listings{% else %}Make this listing public{% endif %}">
+          {% if p.is_listed %}
+            <i class="bi bi-eye-slash"></i> Unlist
+          {% else %}
+            <i class="bi bi-broadcast"></i> Publish
+          {% endif %}
+        </button>
+
+        <a href="{% url 'update-property' p.pk %}" class="li-card__action-btn" title="Edit property">
+          <i class="bi bi-pencil"></i> Edit
+        </a>
+
+        <a href="{% url 'customer:view-property-r' p.pk %}" class="li-card__action-btn" target="_blank" title="Preview public listing">
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+
+</div>
+{% endif %}
+
+{# ── Toast ── #}
+<div class="li-toast" id="li-toast"></div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ─────────────────────────────────────────
+   Inventory — Toggle Listing (Publish / Unlist)
+   ───────────────────────────────────────── */
+
+const csrfToken = '{{ csrf_token }}';
+
+/**
+ * toggleListing(id, type, btn)
+ *
+ * id   — the property primary key (e.g. 42)
+ * type — 'sale' or 'rent'
+ * btn  — the button element that was clicked
+ *
+ * POSTs to /toggle_listing/<type>/<id>/
+ * On success: updates the card's status badge + button text without reloading the page.
+ */
+function toggleListing(id, type, btn) {
+  // Disable button while the request is in flight so user can't double-click
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+  const url = `/toggle_listing/${type}/${id}/`;
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrfToken,
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'same-origin'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Server error');
+    return res.json();
+  })
+  .then(data => {
+    if (data.error) {
+      showToast(data.error, 'error');
+      // Reset button to previous state on error
+      btn.disabled = false;
+      // Figure out current status from card's data-status
+      const card = btn.closest('.li-card');
+      const isLive = card.dataset.status === 'live';
+      restoreToggleBtn(btn, isLive);
+      return;
+    }
+
+    // Server returned the new is_listed state
+    const isNowLive = data.is_listed;
+
+    // 1. Update card's data-status attribute (used by filters)
+    const card = btn.closest('.li-card');
+    card.dataset.status = isNowLive ? 'live' : 'inventory';
+
+    // 2. Update the status badge (top-right of image)
+    const badge = document.getElementById(`status-badge-${type}-${id}`);
+    if (badge) {
+      badge.className = `li-card__status-badge ${isNowLive ? 'li-card__status-badge--live' : 'li-card__status-badge--inventory'}`;
+      badge.innerHTML = isNowLive
+        ? '<i class="bi bi-broadcast"></i> Live'
+        : '<i class="bi bi-archive"></i> Stored';
+    }
+
+    // 3. Update the toggle button itself
+    btn.disabled = false;
+    restoreToggleBtn(btn, isNowLive);
+
+    // 4. Show a friendly toast message
+    showToast(data.message || (isNowLive ? 'Listing is now live!' : 'Property moved to inventory.'), 'success');
+  })
+  .catch(() => {
+    showToast('Something went wrong. Please try again.', 'error');
+    btn.disabled = false;
+    const card = btn.closest('.li-card');
+    const isLive = card.dataset.status === 'live';
+    restoreToggleBtn(btn, isLive);
+  });
+}
+
+/**
+ * Resets the toggle button appearance based on whether the property is currently live.
+ */
+function restoreToggleBtn(btn, isLive) {
+  if (isLive) {
+    btn.classList.add('is-live');
+    btn.innerHTML = '<i class="bi bi-eye-slash"></i> Unlist';
+    btn.title = 'Hide from public listings';
+  } else {
+    btn.classList.remove('is-live');
+    btn.innerHTML = '<i class="bi bi-broadcast"></i> Publish';
+    btn.title = 'Make this listing public';
+  }
+}
+
+/* ─────────────────────────────────────────
+   Filter Tabs
+   ───────────────────────────────────────── */
+document.querySelectorAll('.li-tab-btn').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    // Mark this tab as active, remove from others
+    document.querySelectorAll('.li-tab-btn').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+
+    const filter = this.dataset.filter; // 'all' | 'sale' | 'rent' | 'live' | 'inventory'
+    const cards = document.querySelectorAll('#li-property-grid .li-card');
+
+    cards.forEach(function(card) {
+      const type   = card.dataset.type;    // 'sale' or 'rent'
+      const status = card.dataset.status;  // 'live' or 'inventory'
+
+      let show = false;
+      if (filter === 'all')       show = true;
+      else if (filter === 'sale') show = (type === 'sale');
+      else if (filter === 'rent') show = (type === 'rent');
+      else if (filter === 'live') show = (status === 'live');
+      else if (filter === 'inventory') show = (status === 'inventory');
+
+      card.style.display = show ? '' : 'none';
+    });
+  });
+});
+
+/* ─────────────────────────────────────────
+   Toast Helper
+   ───────────────────────────────────────── */
+let toastTimer = null;
+
+function showToast(message, type) {
+  const toast = document.getElementById('li-toast');
+  toast.textContent = message;
+  toast.className = `li-toast li-toast--${type || 'success'} show`;
+
+  // Auto-hide after 3 seconds
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 3000);
+}
+</script>
+{% endblock %}

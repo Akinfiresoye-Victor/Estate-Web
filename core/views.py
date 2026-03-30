@@ -148,7 +148,7 @@ def sell_property(request):
         return redirect('login')
  
     if request.user.role == 'customer':
-        messages.info(request, 'The Landlord feature is currently under development.')
+        messages.info(request, 'You cannot list properties as a customer. Please log in as a Landlord or Agent.')
         return redirect('landing')
     try:
         user_role = request.user.role
@@ -156,6 +156,8 @@ def sell_property(request):
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
         else:
             base_template = 'estate/base.html'
             
@@ -177,6 +179,13 @@ def sell_property(request):
             if not allowed:
                 messages.error(request, reason)
                 return redirect('listings')
+        elif request.user.role == 'landlord':
+            from landlord.models import LandlordInformation
+            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+            allowed, reason = can_add_to_inventory(agent=None, company=None, landlord=landlord_info)
+            if not allowed:
+                messages.error(request, reason)
+                return redirect('landlord:inventory')
         submitted = False
  
         if request.method == 'POST':
@@ -219,20 +228,33 @@ def sell_property(request):
                         )
  
                     except CompanyInformation.DoesNotExist:
-                        agent = AgentInformation.objects.get(user_id=request.user.id)
-                        landlord.agent_uuid   = str(agent.agent_uuid)
-                        if agent.company_uuid:
-                            landlord.company_uuid = agent.company_uuid
-                        landlord.user_id= request.user.id
-                        landlord.time_stamp= timezone.now()
-                        landlord.is_listed=False
-                        landlord.save()
- 
-                        image_form.instance = landlord
-                        image_form.save()
- 
-                        # ── Initial scoring ──────────────────────────
-                        score_new_listing(landlord, 'Sale')
+                        try:
+                            agent = AgentInformation.objects.get(user_id=request.user.id)
+                            landlord.agent_uuid   = str(agent.agent_uuid)
+                            if agent.company_uuid:
+                                landlord.company_uuid = agent.company_uuid
+                            landlord.user_id= request.user.id
+                            landlord.time_stamp= timezone.now()
+                            landlord.is_listed=False
+                            landlord.save()
+    
+                            image_form.instance = landlord
+                            image_form.save()
+    
+                            # ── Initial scoring ──────────────────────────
+                            score_new_listing(landlord, 'Sale')
+                        except AgentInformation.DoesNotExist:
+                            from landlord.models import LandlordInformation
+                            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+                            landlord.landlord_uuid = str(landlord_info.landlord_uuid)
+                            landlord.user_id = request.user.id
+                            landlord.time_stamp = timezone.now()
+                            landlord.is_listed = False
+                            landlord.save()
+                            
+                            image_form.instance = landlord
+                            image_form.save()
+                            score_new_listing(landlord, 'Sale')
  
                 return HttpResponseRedirect('?submitted=True')
  
@@ -268,7 +290,7 @@ def lease_property(request):
         return redirect('login')
  
     if request.user.role == 'customer':
-        messages.info(request, 'Coming out soon')
+        messages.info(request, 'You cannot list properties as a customer. Please log in as a Landlord or Agent.')
         return redirect('landing')
  
     try:
@@ -278,6 +300,8 @@ def lease_property(request):
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
         else:
             base_template = 'estate/base.html'
         if request.user.role == 'agent':
@@ -298,6 +322,13 @@ def lease_property(request):
             if not allowed:
                 messages.error(request, reason)
                 return redirect('listings')
+        elif request.user.role == 'landlord':
+            from landlord.models import LandlordInformation
+            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+            allowed, reason = can_add_to_inventory(agent=None, company=None, landlord=landlord_info)
+            if not allowed:
+                messages.error(request, reason)
+                return redirect('landlord:inventory')
         submitted=False
         if request.method == 'POST':
             prop_form  = LeaseForm(request.POST or None, request.FILES or None)
@@ -339,20 +370,33 @@ def lease_property(request):
                         )
  
                     except CompanyInformation.DoesNotExist:
-                        agent = AgentInformation.objects.get(user_id=request.user.id)
-                        landlord.agent_uuid = agent.agent_uuid
-                        if agent.company_uuid is not None:
-                            landlord.company_uuid = agent.company_uuid
-                        landlord.user_id      = request.user.id
-                        landlord.time_stamp   = timezone.now()
-                        landlord.is_listed=False
-                        landlord.save()
- 
-                        image_form.instance = landlord
-                        image_form.save()
- 
-                        # ── Initial scoring ──────────────────────────
-                        score_new_listing(landlord, 'Rent')
+                        try:
+                            agent = AgentInformation.objects.get(user_id=request.user.id)
+                            landlord.agent_uuid = agent.agent_uuid
+                            if agent.company_uuid is not None:
+                                landlord.company_uuid = agent.company_uuid
+                            landlord.user_id      = request.user.id
+                            landlord.time_stamp   = timezone.now()
+                            landlord.is_listed=False
+                            landlord.save()
+     
+                            image_form.instance = landlord
+                            image_form.save()
+     
+                            # ── Initial scoring ──────────────────────────
+                            score_new_listing(landlord, 'Rent')
+                        except AgentInformation.DoesNotExist:
+                            from landlord.models import LandlordInformation
+                            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+                            landlord.landlord_uuid = str(landlord_info.landlord_uuid)
+                            landlord.user_id = request.user.id
+                            landlord.time_stamp = timezone.now()
+                            landlord.is_listed = False
+                            landlord.save()
+                            
+                            image_form.instance = landlord
+                            image_form.save()
+                            score_new_listing(landlord, 'Rent')
  
                 return HttpResponseRedirect('?submitted=True')
  
@@ -392,6 +436,10 @@ def toggle_listing(request, property_id, property_type):
         if request.user.role == 'company':
             company=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
             prop=Model.objects.get(pk=property_id, company_uuid=company)
+        elif request.user.role == 'landlord':
+            from landlord.models import LandlordInformation
+            landlord=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            prop=Model.objects.get(pk=property_id, landlord_uuid=landlord)
         else:
             agent=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             prop=Model.objects.get(pk=property_id, agent_uuid=agent)
@@ -412,11 +460,18 @@ def toggle_listing(request, property_id, property_type):
         if request.user.role == 'agent':
             agent=AgentInformation.objects.get(user_id=request.user.id)
             company=get_agent_company(agent)
+            landlord=None
         elif request.user.role == 'company':
             agent=None
+            landlord=None
             company=CompanyInformation.objects.get(user_id=request.user.id)
+        elif request.user.role == 'landlord':
+            agent=None
+            company=None
+            from landlord.models import LandlordInformation
+            landlord=LandlordInformation.objects.get(user_id=request.user.id)
         
-        allowed,reason= can_go_live(agent, company)
+        allowed,reason= can_go_live(agent=agent, company=company, landlord=landlord)
         if not allowed:
             if is_ajax:
                 return JsonResponse({'error': reason}, status=403)
