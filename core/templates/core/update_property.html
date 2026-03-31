@@ -389,12 +389,10 @@
 </div>{# end wizard-wrapper #}
 
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* ═══════════════════════════════════════════════
-     STEP WIZARD
-  ═══════════════════════════════════════════════ */
   var currentStep = 1;
   var totalSteps  = 3;
 
@@ -435,7 +433,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (wrapper) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /* ── If server returned errors, open on first step that has errors ── */
   {% if form.errors or images.errors %}
     var hasStep2Errors = document.querySelector('#step-2 .field-error, #step-2 .error-alert');
     var hasStep3Errors = document.querySelector('#step-3 .field-error');
@@ -444,15 +441,15 @@ document.addEventListener('DOMContentLoaded', function () {
   {% endif %}
 
   /* ═══════════════════════════════════════════════
-     STEP 1 — VALIDATION & CATEGORY TOGGLE
+     STEP 1 — FIX: querySelector by name instead of getElementById
   ═══════════════════════════════════════════════ */
-  var catSelect = document.getElementById('id_property_category');
+  var catSelect = document.querySelector('[name="property_category"]');  // ← FIXED
   var resGroup  = document.getElementById('residential-group');
   var comGroup  = document.getElementById('commercial-group');
   var lanGroup  = document.getElementById('lands-group');
-  var resSelect = document.getElementById('id_residential');
-  var comSelect = document.getElementById('id_commercial');
-  var lanSelect = document.getElementById('id_lands');
+  var resSelect = document.querySelector('[name="residential"]');        // ← FIXED
+  var comSelect = document.querySelector('[name="commercial"]');         // ← FIXED
+  var lanSelect = document.querySelector('[name="lands"]');              // ← FIXED
   var hint1     = document.getElementById('hint-1');
   var hint1Msg  = document.getElementById('hint-1-msg');
 
@@ -463,17 +460,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (comGroup) comGroup.style.display = 'none';
     if (lanGroup) lanGroup.style.display = 'none';
 
-    if (resSelect) { resSelect.disabled = true; }
-    if (comSelect) { comSelect.disabled = true; }
-    if (lanSelect) { lanSelect.disabled = true; }
+    if (resSelect) { resSelect.value = ''; resSelect.disabled = true; }
+    if (comSelect) { comSelect.value = ''; comSelect.disabled = true; }
+    if (lanSelect) { lanSelect.value = ''; lanSelect.disabled = true; }
 
-    if (cat === 'Residential' && resGroup) {
+    if (cat === 'Residential') {
       resGroup.style.display = 'block';
       if (resSelect) resSelect.disabled = false;
-    } else if (cat === 'Commercial' && comGroup) {
+    } else if (cat === 'Commercial') {
       comGroup.style.display = 'block';
       if (comSelect) comSelect.disabled = false;
-    } else if (cat === 'Land' && lanGroup) {
+    } else if (cat === 'Land') {
       lanGroup.style.display = 'block';
       if (lanSelect) lanSelect.disabled = false;
     }
@@ -483,33 +480,33 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTypeFields();
     catSelect.addEventListener('change', function () {
       updateTypeFields();
-      if (hint1) hint1.classList.remove('show');
+      hint1.classList.remove('show');
     });
   }
 
   function validateStep1() {
     if (!catSelect || !catSelect.value) {
-      if (hint1Msg) hint1Msg.textContent = 'Please select a property category to continue.';
-      if (hint1) hint1.classList.add('show');
+      hint1Msg.textContent = 'Please select a property category to continue.';
+      hint1.classList.add('show');
       return false;
     }
     var cat = catSelect.value;
     if (cat === 'Residential' && resSelect && !resSelect.value) {
-      if (hint1Msg) hint1Msg.textContent = 'Please select a residential property type.';
-      if (hint1) hint1.classList.add('show');
+      hint1Msg.textContent = 'Please select a residential property type.';
+      hint1.classList.add('show');
       return false;
     }
     if (cat === 'Commercial' && comSelect && !comSelect.value) {
-      if (hint1Msg) hint1Msg.textContent = 'Please select a commercial property type.';
-      if (hint1) hint1.classList.add('show');
+      hint1Msg.textContent = 'Please select a commercial property type.';
+      hint1.classList.add('show');
       return false;
     }
     if (cat === 'Land' && lanSelect && !lanSelect.value) {
-      if (hint1Msg) hint1Msg.textContent = 'Please select a land type.';
-      if (hint1) hint1.classList.add('show');
+      hint1Msg.textContent = 'Please select a land type.';
+      hint1.classList.add('show');
       return false;
     }
-    if (hint1) hint1.classList.remove('show');
+    hint1.classList.remove('show');
     return true;
   }
 
@@ -595,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var back3 = document.getElementById('back-3');
   if (back3) back3.addEventListener('click', function () { goToStep(2); });
 
-  var wizardForm   = document.getElementById('wizardForm');
+  var wizardForm    = document.getElementById('wizardForm');
   var formSubmitted = false;
   window.onbeforeunload = function () { if (!formSubmitted) return undefined; };
   if (wizardForm) wizardForm.addEventListener('submit', function () { formSubmitted = true; });
@@ -680,5 +677,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
-
 {% endblock %}

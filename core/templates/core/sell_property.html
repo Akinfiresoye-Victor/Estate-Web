@@ -418,14 +418,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ═══════════════════════════════════════════════
      STEP 1 — CATEGORY TOGGLE & VALIDATION
+     FIX: use querySelector('[name="..."]') instead of
+     getElementById('id_...') — more reliable when
+     Django renders with a form prefix or custom widget id
   ═══════════════════════════════════════════════ */
-  var catSelect = document.getElementById('id_property_category');
+  var catSelect = document.querySelector('[name="property_category"]');  // ← FIXED
   var resGroup  = document.getElementById('residential-group');
   var comGroup  = document.getElementById('commercial-group');
   var lanGroup  = document.getElementById('lands-group');
-  var resSelect = document.getElementById('id_residential');
-  var comSelect = document.getElementById('id_commercial');
-  var lanSelect = document.getElementById('id_lands');
+  var resSelect = document.querySelector('[name="residential"]');        // ← FIXED
+  var comSelect = document.querySelector('[name="commercial"]');         // ← FIXED
+  var lanSelect = document.querySelector('[name="lands"]');              // ← FIXED
   var hint1     = document.getElementById('hint-1');
   var hint1Msg  = document.getElementById('hint-1-msg');
 
@@ -493,17 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ═══════════════════════════════════════════════
      STEP 2 — VALIDATION & NAVIGATION
-
-     Required fields from SellForm.Meta.fields.
-     Optional: parking_spaces (min:0), size,
-     available (has a default Select choice).
   ═══════════════════════════════════════════════ */
-
-  /*
-   * Same structure as the lease form.
-   * Note: SellForm uses 'property_description' (not 'description')
-   * and 'price' (not 'price_range') — Django IDs match fieldnames.
-   */
   var REQUIRED_STEP2 = [
     { id: 'id_property_description', label: 'Property Description' },
     { id: 'id_state',                label: 'State'                },
@@ -515,10 +508,6 @@ document.addEventListener('DOMContentLoaded', function () {
     { id: 'id_base_image',           label: 'Overview Image', isFile: true },
   ];
 
-  /*
-   * Persistent "clear error on interaction" listeners —
-   * run once at load, survive multiple validation clicks.
-   */
   REQUIRED_STEP2.forEach(function (field) {
     var el = document.getElementById(field.id);
     if (!el) return;
@@ -530,12 +519,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /*
-   * validateStep2()
-   * Marks each empty required field with a red border and
-   * an inline error message. Scrolls to the first one.
-   * Returns true only when all required fields have values.
-   */
   function validateStep2() {
     var hasError   = false;
     var firstErrEl = null;
@@ -673,5 +656,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
-
 {% endblock %}

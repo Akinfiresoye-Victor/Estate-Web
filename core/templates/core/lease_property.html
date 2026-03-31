@@ -367,9 +367,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* ═══════════════════════════════════════════════
-     STEP WIZARD
-  ═══════════════════════════════════════════════ */
   var currentStep = 1;
   var totalSteps  = 3;
 
@@ -385,38 +382,31 @@ document.addEventListener('DOMContentLoaded', function () {
   var counterEl   = document.getElementById('stepCounter');
 
   function goToStep(n) {
-    // hide all
     for (var i = 1; i <= totalSteps; i++) {
       var s = document.getElementById('step-' + i);
       if (s) s.classList.remove('active');
     }
-    // show target
     var target = document.getElementById('step-' + n);
     if (target) target.classList.add('active');
 
-    // update indicators
     indicators.forEach(function (ind, idx) {
       var stepNum = idx + 1;
       ind.classList.remove('active', 'completed');
       if (stepNum === n)      ind.classList.add('active');
       else if (stepNum < n)   ind.classList.add('completed');
     });
-    // update connectors
     connectors.forEach(function (con, idx) {
       con.classList.toggle('completed', idx < n - 1);
     });
-    // update counter
     if (counterEl) {
       counterEl.innerHTML = 'Step <strong>' + n + '</strong> of ' + totalSteps;
     }
 
     currentStep = n;
-    // smooth scroll to top of wrapper
     var wrapper = document.querySelector('.wizard-wrapper');
     if (wrapper) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /* ── If server returned errors, open on first step that has errors ── */
   {% if form.errors or image_form.errors %}
     var hasStep2Errors = document.querySelector('#step-2 .field-error, #step-2 .error-alert');
     var hasStep3Errors = document.querySelector('#step-3 .field-error');
@@ -425,17 +415,17 @@ document.addEventListener('DOMContentLoaded', function () {
   {% endif %}
 
   /* ═══════════════════════════════════════════════
-     STEP 1 — VALIDATION & CATEGORY TOGGLE
+     STEP 1 — FIX: querySelector by name
   ═══════════════════════════════════════════════ */
-  var catSelect       = document.getElementById('id_property_category');
-  var resGroup        = document.getElementById('residential-group');
-  var comGroup        = document.getElementById('commercial-group');
-  var lanGroup        = document.getElementById('lands-group');
-  var resSelect       = document.getElementById('id_residential');
-  var comSelect       = document.getElementById('id_commercial');
-  var lanSelect       = document.getElementById('id_lands');
-  var hint1           = document.getElementById('hint-1');
-  var hint1Msg        = document.getElementById('hint-1-msg');
+  var catSelect = document.querySelector('[name="property_category"]');  // ← FIXED
+  var resGroup  = document.getElementById('residential-group');
+  var comGroup  = document.getElementById('commercial-group');
+  var lanGroup  = document.getElementById('lands-group');
+  var resSelect = document.querySelector('[name="residential"]');        // ← FIXED
+  var comSelect = document.querySelector('[name="commercial"]');         // ← FIXED
+  var lanSelect = document.querySelector('[name="lands"]');              // ← FIXED
+  var hint1     = document.getElementById('hint-1');
+  var hint1Msg  = document.getElementById('hint-1-msg');
 
   function updateTypeFields() {
     var cat = catSelect ? catSelect.value : '';
@@ -501,20 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ═══════════════════════════════════════════════
      STEP 2 — VALIDATION & NAVIGATION
-
-     Required fields are determined from the Django
-     LeaseForm.Meta.fields list. Optional ones are
-     parking_spaces (min:0 = legitimately zero) and
-     size. base_image is required on new listings.
   ═══════════════════════════════════════════════ */
-
-  /*
-   * REQUIRED_STEP2 is a list of objects. Each object has:
-   *   id     — the HTML id Django gives the field (always "id_<fieldname>")
-   *   label  — human-readable name shown in the error message
-   *   isFile — true for <input type="file"> fields so we check .files
-   *            instead of .value (file inputs have no .value you can read)
-   */
   var REQUIRED_STEP2 = [
     { id: 'id_description',  label: 'Property Description' },
     { id: 'id_state',        label: 'State'                },
@@ -522,16 +499,10 @@ document.addEventListener('DOMContentLoaded', function () {
     { id: 'id_bedrooms',     label: 'Bedrooms'             },
     { id: 'id_bathrooms',    label: 'Bathrooms'            },
     { id: 'id_phone_number', label: 'Phone Number'         },
-    { id: 'id_price_range',  label: 'Price (per year)'      },
+    { id: 'id_price_range',  label: 'Price (per year)'     },
     { id: 'id_base_image',   label: 'Overview Image', isFile: true },
   ];
 
-  /*
-   * Setup persistent "clear error on interaction" listeners.
-   * We do this ONCE at page load so they survive multiple
-   * validation attempts. When the user fixes a field, the
-   * red border + error message disappear immediately.
-   */
   REQUIRED_STEP2.forEach(function (field) {
     var el = document.getElementById(field.id);
     if (!el) return;
@@ -543,40 +514,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  /*
-   * validateStep2()
-   * Loops over every required field. For each empty one it:
-   *   1. Adds the .input-error class (red border via CSS)
-   *   2. Injects a <div class="field-error js-field-error"> right
-   *      after the input so the message appears inline under it
-   *   3. Scrolls the page to the first empty field
-   * Returns true only when every required field is filled.
-   */
   function validateStep2() {
-    var hasError    = false;
-    var firstErrEl  = null;
+    var hasError   = false;
+    var firstErrEl = null;
 
     REQUIRED_STEP2.forEach(function (field) {
       var el = document.getElementById(field.id);
-      if (!el) return; // field not in this form — skip safely
+      if (!el) return;
 
-      /* Clear any previous JS-injected error for this field */
       el.classList.remove('input-error');
       var old = el.parentNode.querySelector('.js-field-error');
       if (old) old.remove();
 
-      /*
-       * Emptiness check:
-       * - File inputs: .value is always "" for security reasons in browsers,
-       *   so we check .files.length instead. If no file is chosen AND there
-       *   is no Django-rendered "Currently: <file>" link beside it, it's empty.
-       * - Everything else: trim whitespace then check length.
-       */
       var isEmpty;
       if (field.isFile) {
-        /* Django's ClearableFileInput renders an <a> tag with the current
-           file when one already exists (edit mode). We check for that so
-           we don't block editing when no new file is chosen. */
         var hasCurrentFile = !!el.parentNode.querySelector('a[href]');
         isEmpty = (!el.files || el.files.length === 0) && !hasCurrentFile;
       } else {
@@ -589,15 +540,12 @@ document.addEventListener('DOMContentLoaded', function () {
         errDiv.className = 'field-error js-field-error';
         errDiv.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i> '
                          + field.label + ' is required.';
-        /* insertAdjacentElement('afterend') puts the div directly
-           after the input, inside the same .form-group parent */
         el.insertAdjacentElement('afterend', errDiv);
         if (!firstErrEl) firstErrEl = el;
         hasError = true;
       }
     });
 
-    /* Scroll to the first problem field so the user sees it */
     if (firstErrEl) {
       firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -618,7 +566,6 @@ document.addEventListener('DOMContentLoaded', function () {
   var back3 = document.getElementById('back-3');
   if (back3) back3.addEventListener('click', function () { goToStep(2); });
 
-  /* mark form submitted so beforeunload doesn't fire */
   var wizardForm = document.getElementById('wizardForm');
   var formSubmitted = false;
   window.onbeforeunload = function () { if (!formSubmitted) return undefined; };
@@ -704,5 +651,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
-
 {% endblock %}
