@@ -73,7 +73,7 @@
         <a href="tel:{{ lead.phone_no }}" class="action-btn">
           <i class="bi bi-telephone"></i> Call
         </a>
-        <a href="https://wa.me/{{ lead.phone_no }}" target="_blank" class="action-btn whatsapp">
+        <a href="https://wa.me/{{ lead.phone_no|cut:' ' }}?text=Hi%20{{ lead.name|urlencode }}%2C%20I'm%20contacting%20you%20from%20Estate%20Web%20regarding%20your%20inquiry%20for%20{{ property.residential|default:property.commercial|default:property.lands|urlencode }}%2E" target="_blank" class="action-btn whatsapp">
           <i class="bi bi-whatsapp"></i> WhatsApp
         </a>
       </div>
@@ -86,10 +86,16 @@
 <div class="container-fluid content-wrapper">
   <div class="content-grid">
 
-    {# ── Left: Main Column ────────────────────────────────────────── #}
-    <main class="main-column">
+    {# ── Main column ────────────────────────────────────────────────── #}
+    <div class="main-column">
 
-      {# Contact Information #}
+      {# Contact Preference Notice #}
+      <div class="contact-preference-notice">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>Client's preferred mode of contact: <strong>{{ lead.contact_type }}</strong></span>
+      </div>
+
+      {# Basic Information #}
       <div class="detail-card">
         <div class="card-header">
           <h3><i class="bi bi-person-circle"></i> Contact Information</h3>
@@ -116,11 +122,11 @@
               </a>
             </div>
 
-            <div class="info-item">
+            <div class="info-item {% if lead.contact_type == 'Whatsapp' or lead.contact_type == 'Email' or lead.contact_type == 'Phone Call' %}preferred-item{% endif %}">
               <span class="info-label"><i class="bi bi-chat-dots"></i> Preferred Contact</span>
               <span class="info-value">
                 <span class="contact-badge">
-                  <i class="bi bi-{{ lead.contact_type|lower }}"></i>
+                  <i class="bi bi-{% if lead.contact_type == 'Whatsapp' %}whatsapp{% elif lead.contact_type == 'Email' %}envelope{% elif lead.contact_type == 'Phone Call' %}telephone{% else %}chat-dots{% endif %}"></i>
                   {{ lead.contact_type }}
                 </span>
               </span>
@@ -169,8 +175,8 @@
 
               <div class="property-price">
                 {% if property.price_range %}
-                  ₦{{ property.price_range|floatformat:2|intcomma|default:"N/A" }}
-                  <span class="price-period">/month</span>
+                  ₦{{ property.price_range|floatformat:0|intcomma|default:"N/A" }}
+                  <span class="price-period">/yr</span>
                 {% else %}
                   ₦{{ property.price|floatformat:2|intcomma|default:"N/A" }}
                 {% endif %}

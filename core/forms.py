@@ -50,81 +50,86 @@ class FeedbackForm(ModelForm):
 
 #Form for putting properties up for sale
 class LeaseForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add CSS classes to fields
+        self.fields['property_category'].widget.attrs.update({
+            'class': 'form-input',
+            'id': 'property_category'
+        })
+        self.fields['residential'].widget.attrs.update({
+            'class': 'form-input property-type-field',
+            'id': 'residential'
+        })
+        self.fields['commercial'].widget.attrs.update({
+            'class': 'form-input property-type-field',
+            'id': 'commercial'
+        })
+        self.fields['lands'].widget.attrs.update({
+            'class': 'form-input property-type-field',
+            'id': 'lands'
+        })
+
     class Meta:
         model=PropertyManagementRent
         fields=(
                 'property_category','residential','commercial','lands','description', 'state','location', 'bedrooms','bathrooms','parking_spaces','size' ,
                 'phone_number','price_range','base_image'
                 )
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            
-            # Add CSS classes to fields
-            self.fields['property_category'].widget.attrs.update({
-                'class': 'form-input',
-                'id': 'property_category'
-            })
-            self.fields['residential'].widget.attrs.update({
-                'class': 'form-input property-type-field',
-                'id': 'residential'
-            })
-            self.fields['commercial'].widget.attrs.update({
-                'class': 'form-input property-type-field',
-                'id': 'commercial'
-            })
-            self.fields['lands'].widget.attrs.update({
-                'class': 'form-input property-type-field',
-                'id': 'lands'
-            })
         labels={
                 'property_category': 'Property Category',
                 'residential':'House Type',
                 'description': 'Property Description',
                 'location': 'Precise Location',
-                'price_range': 'Price',
+                'price_range': 'Price (per year)',
                 'phone_number': 'Phone Number',
                 'state': 'State',
                 'base_image': 'Add Overview image Of Property ',
-}
+        }
+        help_texts = {
+            'price_range': 'Please enter the annual (yearly) rent amount. Tenants will see this as a yearly cost.',
+        }
         widgets= {
                     'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Property Description'}),
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Oda Road, Kagola, Plot2,3'}),
-                    'price_range': forms.TextInput(attrs={'class': 'form-control'}),
+                    'price_range': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 1,500,000'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
                     'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
-}
+        }
 
 
 
 #Form for putting properties up for sale
 class SellForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add CSS classes to fields
+        self.fields['property_category'].widget.attrs.update({
+            'class': 'form-input',
+            'id': 'property_category'
+        })
+        self.fields['residential'].widget.attrs.update({
+            'class': 'form-input property-type-field',
+            'id': 'residential'
+        })
+        self.fields['commercial'].widget.attrs.update({
+            'class': 'form-input property-type-field',
+            'id': 'commercial'
+        })
+        self.fields['lands'].widget.attrs.update({
+            'class': 'form-input property-type-field',
+            'id': 'lands'
+        })
+
     class Meta:
         model=PropertyManagementSale
         fields=('property_category','residential','commercial','lands','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
                 'phone_number','size', 'price', 'base_image')
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            
-            # Add CSS classes to fields
-            self.fields['property_category'].widget.attrs.update({
-                'class': 'form-input',
-                'id': 'property_category'
-            })
-            self.fields['residential'].widget.attrs.update({
-                'class': 'form-input property-type-field',
-                'id': 'residential'
-            })
-            self.fields['commercial'].widget.attrs.update({
-                'class': 'form-input property-type-field',
-                'id': 'commercial'
-            })
-            self.fields['lands'].widget.attrs.update({
-                'class': 'form-input property-type-field',
-                'id': 'lands'
-            })
         labels={
                 'property_category': 'Property Category',
                 'residential':'House Type',
@@ -134,7 +139,7 @@ class SellForm(ModelForm):
                 'price': 'Price',
                 'state': 'State',
                 'base_image': 'Add Overview image Of Property ',
-}
+        }
         widgets= {
                     'property_description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'E.g Spacious Family home with modern amenities'}),
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Akure,Oda road'}),
@@ -144,7 +149,7 @@ class SellForm(ModelForm):
                     'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
-}
+        }
 
 
 

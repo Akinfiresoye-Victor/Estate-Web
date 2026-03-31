@@ -4,105 +4,269 @@
 {% block title %}Complete Your Profile — Estate Web{% endblock %}
 
 {% block extra_css %}
-<style>
-    .setup-container {
-        max-width: 600px;
-        margin: 2rem auto;
-    }
-    .setup-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        border-top: 6px solid var(--ll-secondary);
-    }
-    .setup-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .setup-header h2 {
-        font-family: 'Poppins', sans-serif;
-        color: var(--ll-primary);
-        font-weight: 700;
-    }
-    .form-label {
-        font-weight: 600;
-        color: var(--ll-text-dark);
-        margin-bottom: 0.5rem;
-    }
-    .btn-setup {
-        background: var(--ll-primary);
-        color: white;
-        padding: 0.8rem;
-        font-weight: 600;
-        border-radius: 10px;
-        transition: all 0.3s;
-        border: none;
-        width: 100%;
-        margin-top: 1rem;
-    }
-    .btn-setup:hover {
-        background: #152b47;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .help-text {
-        font-size: 0.85rem;
-        color: var(--ll-text-light);
-        margin-top: 0.25rem;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'landlord/css/setup.css' %}">
+{% endblock %}
+
+{% block setup_nav_actions %}
+  <a href="{% url 'login' %}" class="setup-nav-login">
+    <i class="bi bi-box-arrow-in-right"></i> Log in
+  </a>
+  <button
+    class="setup-nav-delete"
+    data-bs-toggle="modal"
+    data-bs-target="#cancelSetupModal"
+    title="Cancel and delete account">
+    <i class="bi bi-trash3"></i>
+    <span>Delete Account</span>
+  </button>
 {% endblock %}
 
 {% block content %}
-<div class="setup-container">
-    <div class="setup-card">
-        <div class="setup-header">
-            <h2>Welcome, {{ request.user.first_name }}!</h2>
-            <p class="text-muted">Just a few more details to get your account ready.</p>
+
+<div class="setup-page">
+
+  <!-- ===== TWO-COLUMN CARD ===== -->
+  <div class="setup-card">
+
+    <!-- LEFT — branding / welcome panel -->
+    <div class="setup-left">
+      <div class="setup-left-inner">
+
+        <div class="setup-brand">
+          <span class="setup-brand-icon"><i class="bi bi-houses"></i></span>
+          <span class="setup-brand-name">Estate<span class="setup-brand-accent">Web</span></span>
         </div>
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <div class="mb-4">
-                <label class="form-label">Phone Number</label>
-                {{ form.phone_number }}
-                {% if form.phone_number.errors %}
-                <div class="text-danger mt-1 small">{{ form.phone_number.errors }}</div>
-                {% endif %}
-            </div>
+        <h1 class="setup-welcome-heading">
+          Welcome,<br>{{ request.user.first_name }}.
+        </h1>
+        <p class="setup-welcome-sub">
+          Just a few more details and you'll be ready to list your properties.
+        </p>
 
-            <div class="mb-4">
-                <label class="form-label">Location (State)</label>
-                {{ form.location }}
-                {% if form.location.errors %}
-                <div class="text-danger mt-1 small">{{ form.location.errors }}</div>
-                {% endif %}
-            </div>
+        <div class="setup-trust-list">
+          <div class="setup-trust-item">
+            <span class="trust-icon"><i class="bi bi-shield-check"></i></span>
+            <span>Your data is secure and private.</span>
+          </div>
+          <div class="setup-trust-item">
+            <span class="trust-icon"><i class="bi bi-eye-slash"></i></span>
+            <span>Your ID is only used for verification.</span>
+          </div>
+          <div class="setup-trust-item">
+            <span class="trust-icon"><i class="bi bi-clock"></i></span>
+            <span>Takes less than 2 minutes to complete.</span>
+          </div>
+        </div>
 
-            <div class="mb-4">
-                <label class="form-label">Profile Picture (Optional)</label>
-                {{ form.profile_picture }}
-                <div class="help-text">A professional photo helps build trust with tenants/buyers.</div>
-                {% if form.profile_picture.errors %}
-                <div class="text-danger mt-1 small">{{ form.profile_picture.errors }}</div>
-                {% endif %}
-            </div>
+        <!-- decorative ring -->
+        <div class="setup-deco-ring"></div>
 
-            <div class="mb-4">
-                <label class="form-label">Government ID (Optional)</label>
-                {{ form.government_id }}
-                <div class="help-text">{{ form.government_id.help_text }}</div>
-                {% if form.government_id.errors %}
-                <div class="text-danger mt-1 small">{{ form.government_id.errors }}</div>
-                {% endif %}
-            </div>
-
-            <button type="submit" class="btn-setup">
-                Finish Setup & Go to Dashboard
-            </button>
-        </form>
+      </div>
     </div>
+
+    <!-- RIGHT — form -->
+    <div class="setup-right">
+
+      <div class="setup-form-header">
+        <p class="setup-step-label">Account Setup</p>
+        <h2 class="setup-form-title">Complete your profile</h2>
+        <p class="setup-form-sub">Fill in the details below to activate your landlord account.</p>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data" class="setup-form" id="setupForm">
+        {% csrf_token %}
+
+        <!-- Profile Picture — custom upload zone -->
+        <div class="form-group">
+          <label class="form-label">
+            Profile Picture
+            <span class="label-optional">optional</span>
+          </label>
+
+          <div class="avatar-upload-zone" id="avatarZone">
+            <div class="avatar-preview-wrap" id="avatarPreviewWrap">
+              <div class="avatar-placeholder" id="avatarPlaceholder">
+                <i class="bi bi-person"></i>
+              </div>
+              <img id="avatarPreview" src="" alt="Preview" class="avatar-preview-img" style="display:none;">
+            </div>
+            <div class="avatar-upload-info">
+              <p class="avatar-upload-title">Upload a photo</p>
+              <p class="avatar-upload-hint">JPG or PNG, max 5MB</p>
+              <label for="{{ form.profile_picture.id_for_label }}" class="btn-upload-photo">
+                <i class="bi bi-upload"></i> Choose Photo
+              </label>
+            </div>
+          </div>
+
+          <!-- The actual Django file input — visually hidden -->
+          <div class="hidden-file-input">
+            {{ form.profile_picture }}
+          </div>
+
+          {% if form.profile_picture.errors %}
+            <p class="field-error">{{ form.profile_picture.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.phone_number.id_for_label }}">
+            Phone Number
+          </label>
+          <div class="input-with-icon">
+            <i class="bi bi-phone input-icon"></i>
+            {{ form.phone_number }}
+          </div>
+          {% if form.phone_number.errors %}
+            <p class="field-error">{{ form.phone_number.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label class="form-label" for="{{ form.location.id_for_label }}">
+            State / Location
+          </label>
+          <div class="input-with-icon">
+            <i class="bi bi-geo-alt input-icon"></i>
+            {{ form.location }}
+          </div>
+          {% if form.location.errors %}
+            <p class="field-error">{{ form.location.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Government ID -->
+        <div class="form-group">
+          <label class="form-label">
+            Government ID
+            <span class="label-optional">optional</span>
+          </label>
+
+          <label for="{{ form.government_id.id_for_label }}" class="gov-id-zone" id="govIdZone">
+            <i class="bi bi-card-text gov-id-icon"></i>
+            <div class="gov-id-text">
+              <p class="gov-id-title" id="govIdTitle">Click to upload ID</p>
+              <p class="gov-id-hint">NIN slip, Driver's License, or International Passport</p>
+            </div>
+            <i class="bi bi-upload gov-id-upload-icon"></i>
+          </label>
+
+          <!-- Django file input hidden -->
+          <div class="hidden-file-input">
+            {{ form.government_id }}
+          </div>
+
+          <p class="input-hint">{{ form.government_id.help_text }}</p>
+
+          {% if form.government_id.errors %}
+            <p class="field-error">{{ form.government_id.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-finish" id="btnFinish">
+          <span class="btn-finish-text">
+            <i class="bi bi-check2-circle"></i>
+            Finish Setup &amp; Go to Dashboard
+          </span>
+          <span class="btn-finish-loading" style="display:none;">
+            <span class="spinner"></span> Setting up your account...
+          </span>
+        </button>
+
+      </form>
+
+    </div><!-- /setup-right -->
+  </div><!-- /setup-card -->
+
+</div><!-- /setup-page -->
+
+
+<!-- ===== CANCEL / DELETE MODAL ===== -->
+<div class="modal fade" id="cancelSetupModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content ll-modal">
+      <div class="modal-header ll-modal-header">
+        <h5 class="ll-modal-title">
+          <i class="bi bi-exclamation-triangle text-danger me-2"></i>Delete Account
+        </h5>
+        <button type="button" class="ll-modal-close" data-bs-dismiss="modal">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="modal-body ll-modal-body">
+        <p>This will <strong>permanently delete</strong> your account. You'll need to sign up again if you change your mind.</p>
+        <p class="mt-2" style="font-size:0.8rem; color:#8a96a8;">Alternatively, you can just log out and come back later to finish setup.</p>
+      </div>
+      <div class="modal-footer ll-modal-footer">
+        <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <form method="POST" action="#">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_account">
+          <button type="submit" class="btn-danger-solid">
+            Yes, Delete
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ---- Profile picture preview ----
+  const profileInput    = document.getElementById('{{ form.profile_picture.id_for_label }}');
+  const avatarPreview   = document.getElementById('avatarPreview');
+  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+
+  if (profileInput) {
+    profileInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        avatarPreview.src = e.target.result;
+        avatarPreview.style.display = 'block';
+        avatarPlaceholder.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---- Government ID file name display ----
+  const govIdInput = document.getElementById('{{ form.government_id.id_for_label }}');
+  const govIdTitle = document.getElementById('govIdTitle');
+  const govIdZone  = document.getElementById('govIdZone');
+
+  if (govIdInput) {
+    govIdInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        govIdTitle.textContent = file.name;
+        govIdZone.classList.add('selected');
+      } else {
+        govIdTitle.textContent = 'Click to upload ID';
+        govIdZone.classList.remove('selected');
+      }
+    });
+  }
+
+  // ---- Loading state on submit ----
+  document.getElementById('setupForm').addEventListener('submit', function () {
+    const btn       = document.getElementById('btnFinish');
+    const textSpan  = btn.querySelector('.btn-finish-text');
+    const loadSpan  = btn.querySelector('.btn-finish-loading');
+    textSpan.style.display = 'none';
+    loadSpan.style.display = 'flex';
+    btn.disabled = true;
+  });
+</script>
 {% endblock %}

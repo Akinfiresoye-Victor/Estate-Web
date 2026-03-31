@@ -1,0 +1,732 @@
+/* ============================================================
+   ESTATE WEB — Landlord Profile Setup Page
+   File: landlord/css/setup.css
+   Design system: Light theme
+   Palette: #f4f6f9 bg | #1e2329 dark | #c19b76 gold
+   Breakpoints: 580px | 768px | 1024px
+   ============================================================ */
+
+:root {
+    --su-gold: #c19b76;
+    --su-gold-light: #f0e6d8;
+    --su-gold-dark: #a07d58;
+    --su-dark: #1e2329;
+    --su-mid: #4a5568;
+    --su-light: #8a96a8;
+    --su-bg: #f4f6f9;
+    --su-surface: #ffffff;
+    --su-border: #e4e7ec;
+    --su-danger: #e05c5c;
+    --su-danger-bg: #fff5f5;
+    --su-danger-bdr: #fad5d5;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.10);
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Poppins', sans-serif;
+}
+
+
+/* ============================================================
+   NAVBAR ADDITIONS — login + delete buttons
+   These sit inside .ll-nav-right via {% block setup_nav_actions %}
+   ============================================================ */
+.setup-nav-login {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--su-mid);
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--su-border);
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.setup-nav-login:hover {
+    border-color: var(--su-gold);
+    color: var(--su-dark);
+}
+
+.setup-nav-delete {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--su-danger);
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--su-danger-bdr);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.setup-nav-delete:hover {
+    background: var(--su-danger-bg);
+}
+
+/* Hide "Delete Account" text label on small screens, keep icon */
+@media (max-width: 580px) {
+    .setup-nav-delete span {
+        display: none;
+    }
+
+    .setup-nav-login span {
+        display: none;
+    }
+}
+
+
+/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+.setup-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px 48px;
+}
+
+
+/* ============================================================
+   SETUP CARD — two-column layout
+   ============================================================ */
+.setup-card {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    width: 100%;
+    max-width: 860px;
+    background: var(--su-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: 1px solid var(--su-border);
+}
+
+@media (max-width: 860px) {
+    .setup-card {
+        grid-template-columns: 1fr;
+        max-width: 520px;
+        border-radius: var(--radius-lg);
+    }
+}
+
+
+/* ============================================================
+   LEFT PANEL — branding + trust signals
+   ============================================================ */
+.setup-left {
+    background: var(--su-dark);
+    position: relative;
+    overflow: hidden;
+    padding: 48px 36px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hide left panel on mobile — save space for the form */
+@media (max-width: 860px) {
+    .setup-left {
+        display: none;
+    }
+}
+
+.setup-left-inner {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Brand mark */
+.setup-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 52px;
+}
+
+.setup-brand-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--su-gold);
+    font-size: 1rem;
+}
+
+.setup-brand-name {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.setup-brand-accent {
+    color: var(--su-gold);
+}
+
+/* Welcome heading */
+.setup-welcome-heading {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 14px;
+}
+
+.setup-welcome-sub {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.65;
+    margin-bottom: 40px;
+}
+
+/* Trust list */
+.setup-trust-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: auto;
+}
+
+.setup-trust-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+}
+
+.trust-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(193, 155, 118, 0.15);
+    color: var(--su-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+/* Decorative background ring */
+.setup-deco-ring {
+    position: absolute;
+    bottom: -80px;
+    right: -80px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    border: 40px solid rgba(193, 155, 118, 0.07);
+    z-index: 1;
+}
+
+
+/* ============================================================
+   RIGHT PANEL — form
+   ============================================================ */
+.setup-right {
+    padding: 44px 40px;
+    overflow-y: auto;
+}
+
+@media (max-width: 580px) {
+    .setup-right {
+        padding: 28px 20px;
+    }
+}
+
+/* Form header */
+.setup-step-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--su-gold);
+    margin-bottom: 6px;
+}
+
+.setup-form-title {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--su-dark);
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.setup-form-sub {
+    font-size: 0.83rem;
+    color: var(--su-light);
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+/* Mobile-only: show welcome heading above form */
+.setup-mobile-greeting {
+    display: none;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 860px) {
+    .setup-mobile-greeting {
+        display: block;
+    }
+
+    .setup-mobile-greeting h2 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--su-dark);
+        margin-bottom: 4px;
+    }
+
+    .setup-mobile-greeting p {
+        font-size: 0.83rem;
+        color: var(--su-light);
+    }
+}
+
+
+/* ============================================================
+   FORM GROUPS & INPUTS
+   ============================================================ */
+.setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-label {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--su-dark);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.label-optional {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--su-light);
+    background: var(--su-bg);
+    border: 1px solid var(--su-border);
+    padding: 1px 7px;
+    border-radius: 10px;
+}
+
+/* Fix Django-rendered inputs */
+.setup-form .form-control,
+.setup-form .form-select,
+.setup-form input[type="text"],
+.setup-form input[type="tel"],
+.setup-form select {
+    width: 100%;
+    background: var(--su-bg);
+    border: 1px solid var(--su-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-family: var(--font-body);
+    font-size: 0.87rem;
+    color: var(--su-dark);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.setup-form .form-control:focus,
+.setup-form .form-select:focus,
+.setup-form input[type="text"]:focus,
+.setup-form input[type="tel"]:focus,
+.setup-form select:focus {
+    border-color: var(--su-gold);
+    box-shadow: 0 0 0 3px rgba(193, 155, 118, 0.15);
+    background: var(--su-surface);
+}
+
+/* Input with icon wrapper */
+.input-with-icon {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--su-light);
+    font-size: 0.88rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Nudge Django's input to the right when icon present */
+.input-with-icon .form-control,
+.input-with-icon .form-select,
+.input-with-icon input[type="text"],
+.input-with-icon input[type="tel"],
+.input-with-icon select {
+    padding-left: 36px;
+}
+
+/* Custom select arrow */
+.input-with-icon select,
+.setup-form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a96a8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    padding-right: 34px;
+}
+
+/* Error text */
+.field-error {
+    font-size: 0.78rem;
+    color: var(--su-danger);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.field-error::before {
+    content: '\F33A';
+    /* bi-exclamation-circle */
+    font-family: 'bootstrap-icons';
+}
+
+/* General hint */
+.input-hint {
+    font-size: 0.75rem;
+    color: var(--su-light);
+    line-height: 1.5;
+}
+
+/* Hidden Django file inputs (replaced by custom zones) */
+.hidden-file-input {
+    display: none;
+}
+
+
+/* ============================================================
+   AVATAR UPLOAD ZONE
+   ============================================================ */
+.avatar-upload-zone {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px;
+    background: var(--su-bg);
+    border: 1px dashed var(--su-border);
+    border-radius: var(--radius-md);
+    transition: border-color 0.18s;
+}
+
+.avatar-upload-zone:hover {
+    border-color: var(--su-gold);
+}
+
+.avatar-preview-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--su-surface);
+    border: 2px solid var(--su-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.avatar-placeholder {
+    font-size: 1.8rem;
+    color: var(--su-border);
+}
+
+.avatar-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-upload-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.avatar-upload-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--su-dark);
+}
+
+.avatar-upload-hint {
+    font-size: 0.75rem;
+    color: var(--su-light);
+    margin-bottom: 6px;
+}
+
+.btn-upload-photo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--su-dark);
+    border: 1px solid var(--su-border);
+    background: var(--su-surface);
+    padding: 5px 13px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-upload-photo:hover {
+    border-color: var(--su-gold);
+    color: var(--su-gold-dark);
+}
+
+
+/* ============================================================
+   GOVERNMENT ID UPLOAD ZONE
+   ============================================================ */
+.gov-id-zone {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--su-bg);
+    border: 1px dashed var(--su-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+}
+
+.gov-id-zone:hover {
+    border-color: var(--su-gold);
+    background: var(--su-surface);
+}
+
+.gov-id-zone.selected {
+    border-color: var(--su-gold);
+    border-style: solid;
+    background: var(--su-gold-light);
+}
+
+.gov-id-icon {
+    font-size: 1.6rem;
+    color: var(--su-light);
+    flex-shrink: 0;
+}
+
+.gov-id-zone.selected .gov-id-icon {
+    color: var(--su-gold-dark);
+}
+
+.gov-id-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.gov-id-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--su-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gov-id-hint {
+    font-size: 0.73rem;
+    color: var(--su-light);
+    margin-top: 2px;
+}
+
+.gov-id-upload-icon {
+    color: var(--su-light);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
+.btn-finish {
+    width: 100%;
+    background: var(--su-dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 13px 24px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-finish:hover:not(:disabled) {
+    background: var(--su-gold-dark);
+}
+
+.btn-finish:active:not(:disabled) {
+    transform: scale(0.99);
+}
+
+.btn-finish:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-finish-text,
+.btn-finish-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Loading spinner */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.ll-modal {
+    border: 1px solid var(--su-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+    font-family: var(--font-body);
+}
+
+.ll-modal-header {
+    border-bottom: 1px solid var(--su-border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ll-modal-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--su-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.ll-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--su-light);
+    cursor: pointer;
+    transition: color 0.15s;
+    padding: 4px;
+}
+
+.ll-modal-close:hover {
+    color: var(--su-dark);
+}
+
+.ll-modal-body {
+    padding: 20px;
+    font-size: 0.85rem;
+    color: var(--su-mid);
+    line-height: 1.65;
+}
+
+.ll-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--su-border);
+}
+
+.btn-modal-cancel {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--su-border);
+    background: transparent;
+    color: var(--su-mid);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-modal-cancel:hover {
+    background: var(--su-bg);
+    color: var(--su-dark);
+}
+
+.btn-danger-solid {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--su-danger);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+
+.btn-danger-solid:hover {
+    background: #c0392b;
+}

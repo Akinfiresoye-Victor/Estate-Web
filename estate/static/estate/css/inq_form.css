@@ -287,7 +287,9 @@ body {
   color: var(--text-dark); background: var(--bg);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm); outline: none;
-  -webkit-appearance: none; cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
   transition: var(--ease);
 }
 .iq-select-wrap select:focus {
@@ -323,6 +325,34 @@ body {
   font-size: 0.78rem; color: var(--text-mid); line-height: 1.6;
 }
 .iq-privacy i { color: var(--primary); font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+.iq-security-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.1rem 1.25rem;
+  background: #fff8eb;
+  border: 1.5px solid #ffe4b5;
+  border-radius: var(--radius-sm);
+  margin: 1.25rem;
+  font-size: 0.82rem;
+  color: #855b1d;
+  line-height: 1.6;
+}
+.iq-security-alert i {
+  color: #d97706;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.iq-security-alert strong {
+  display: block;
+  font-weight: 800;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #7b4e0d;
+}
 
 .iq-actions {
   display: flex; gap: 0.75rem; padding: 1rem 1.25rem;

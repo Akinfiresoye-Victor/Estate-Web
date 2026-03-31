@@ -157,9 +157,7 @@
               <input type="email" id="email" name="email"
                      class="form-input iconed" value="{{ user.email }}" placeholder="you@example.com">
             </div>
-            {% if not user.email_verified %}
-              <p class="input-warning"><i class="bi bi-exclamation-circle"></i> Email not verified. <a href="#" class="warning-link">Resend verification</a></p>
-            {% endif %}
+            <p class="email-verified-status"><i class="bi bi-check-circle-fill"></i> Email Verified</p>
           </div>
 
           <div class="form-group">

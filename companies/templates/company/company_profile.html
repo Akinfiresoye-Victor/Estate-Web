@@ -277,8 +277,8 @@
                   </div>
                   <div class="cp-prop-footer">
                     <div class="cp-prop-price">
-                      <span class="cp-price">₦{{ property.price_range|floatformat:2|intcomma }}</span>
-                      <span class="cp-price-period">/mo</span>
+                      <span class="cp-price">₦{{ property.price_range|floatformat:0|intcomma }}</span>
+                      <span class="cp-price-period">/yr</span>
                     </div>
                     <a href="{% url 'customer:view-property-r' property.id %}" class="cp-btn-view">
                       View <i class="bi bi-arrow-right"></i>

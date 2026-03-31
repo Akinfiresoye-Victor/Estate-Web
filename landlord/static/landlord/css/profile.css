@@ -384,6 +384,7 @@
     transition: border-color 0.18s, box-shadow 0.18s;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .form-input:focus,
@@ -478,6 +479,16 @@
     color: var(--p-warning);
     font-weight: 600;
     text-decoration: underline;
+}
+
+.email-verified-status {
+    font-size: 0.75rem;
+    color: var(--p-success);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.4;
+    font-weight: 600;
 }
 
 /* Radio group for contact preference */

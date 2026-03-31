@@ -709,7 +709,6 @@ def lead_detail(request, lead_id):
     """
     Specific Lead/Client Details based on the informtion the client provided
     """
-    #TODO enable view passowrd side during login and signup
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to continue.')
         return render('login')
@@ -857,8 +856,11 @@ def delete_lead(request, lead_id):
         if not lead_to_delete.agent_id in agent_uuid:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
+        if lead_to_delete.schedule_tour:
+            appointment=Appointments.objects.filter(lead_id=lead_to_delete.lead_id)
+            appointment.delete()
         lead_to_delete.delete()
-        messages.success(request, "Lead deleted successfully.")
+        messages.success(request, "Lead and other Related data deleted successfully.")
         return redirect('agent:leads')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())

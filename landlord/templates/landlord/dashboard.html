@@ -1,6 +1,6 @@
 {% extends 'landlord/base.html' %}
 {% load static %}
-
+{%load static humanize%}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'landlord/css/dashboard.css' %}">
 {% endblock %}
@@ -33,7 +33,7 @@
           </span>
           My Listings
         </a>
-        <a href="#" class="sidebar-link">
+        <a href="{%url 'landlord:inquiries'%}" class="sidebar-link">
           <span class="sidebar-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </span>
@@ -69,7 +69,6 @@
           <h1 class="welcome-heading">Good day, {{ user.first_name }}.</h1>
           <p class="welcome-sub">Here's what's happening with your properties today.</p>
         </div>
-        <a href="#" class="btn-primary">+ Add Property</a>
       </div>
 
       <!-- Quick Stats -->
@@ -127,18 +126,20 @@
                 {{ property.location }}
               </p>
               <p class="listing-price">
-                {%if property_type == 'Rent'%}
-                  ₦{{ property.price_range|floatformat:"0" }}
-                  <span class="listing-period">/ month</span>
+                {%if property.property_type == 'Rent'%}
+                  ₦{{ property.price_range|floatformat:"0"|intcomma }}
+                  <span class="listing-period">/year (On Lease)</span>
                 {%else%}
-                  ₦{{ property.price|floatformat:"0" }}
+                  ₦{{ property.price|floatformat:"0"|intcomma }}
+                  <span class="listing-period">(On Sale)</span>
                 {%endif%}
               </p>
               <div class="listing-actions">
-                <a href="#" class="btn-outline-sm">Edit</a>
                 {%if property.property_type == 'Sale'%}
+                <a href="{%url 'update-property-s' property.id%}" class="btn-outline-sm">Edit</a>
                   <a href="{%url 'customer:view-property-s' property.id%}" class="btn-ghost-sm">View</a>
                 {%else%}
+                  <a href="{%url 'update-property' property.id%}" class="btn-outline-sm">Edit</a>
                   <a href="{%url 'customer:view-property-r' property.id%}" class="btn-ghost-sm">View</a>
                 {%endif%}
               </div>
@@ -148,51 +149,62 @@
           <div class="empty-state">
             <p class="empty-title">No properties yet</p>
             <p class="empty-text">You haven't added any listings. Add your first property to get started.</p>
-            <a href="#" class="btn-primary" style="margin-top: 14px; display: inline-block;">+ Add Property</a>
+            <div class="dropdown" style="margin-top: 14px;">
+              <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-plus-lg"></i> Add Property
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="{% url 'sell-property' %}" class="dropdown-item">
+                    <i class="bi bi-tag me-2"></i>List for Sale
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'lease-property' %}" class="dropdown-item">
+                    <i class="bi bi-key me-2"></i>Rent Out
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
           {% endfor %}
         </div>
       </section>
 
-      <!-- Recent Inquiries -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Recent Inquiries</h2>
-          <a href="#" class="section-link">View all</a>
-        </div>
+    <!-- Recent Inquiries -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Inquiries</h2>
+        <a href="{% url 'landlord:inquiries' %}" class="section-link">View all</a>
+      </div>
 
-        <div class="inquiries-list">
-          {% for inquiry in recent_inquiries %}
-          <div class="inquiry-item {% if not inquiry.is_read %}unread{% endif %}">
-            <div class="inquiry-avatar">
-              {{ inquiry.sender.first_name|first|upper }}{{ inquiry.sender.last_name|first|upper }}
-            </div>
-            <div class="inquiry-body">
-              <p class="inquiry-name">
-                {{ inquiry.sender.get_full_name }}
-                {% if not inquiry.is_read %}
-                  <span class="inquiry-tag new">New</span>
-                {% endif %}
-              </p>
-              <p class="inquiry-text">{{ inquiry.message }}</p>
-              <p class="inquiry-meta">{{ inquiry.property.title }} &nbsp;·&nbsp; {{ inquiry.created_at|timesince }} ago</p>
-            </div>
-            <a href="#" class="btn-reply">Reply</a>
+      <div class="inquiries-list">
+        {% for inquiry in recent_inquiries %}
+        <div class="inquiry-item">
+          <div class="inquiry-avatar">
+            {{ inquiry.name|first|upper }}
           </div>
-          {% empty %}
-          <div class="inquiry-empty">
-            <p>No inquiries yet. When someone messages you about a property, it will appear here.</p>
+          <div class="inquiry-body">
+            <p class="inquiry-name">{{ inquiry.name }}</p>
+            <p class="inquiry-text">{{ inquiry.inquiry_message }}</p>
+            <p class="inquiry-meta">
+              {{ inquiry.property_name }} &nbsp;·&nbsp; {{ inquiry.date_created|timesince }} ago
+            </p>
           </div>
-          {% endfor %}
         </div>
-      </section>
-
+        {% empty %}
+        <div class="inquiry-empty">
+          <p>No inquiries yet. When someone messages you about a property, it will appear here.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
       <!-- Help Tip -->
       <section class="tip-box">
         <div class="tip-icon">💡</div>
         <div class="tip-content">
           <p class="tip-title">Make your listing stand out</p>
-          <p class="tip-text">Properties with clear photos and complete descriptions get up to 3x more inquiries. <a href="#" class="tip-link">Update your listing →</a></p>
+          <p class="tip-text">Properties with clear photos and complete descriptions get up to 3x more inquiries. <a href="{%url 'landlord:dashboard'%}" class="tip-link">Update your listing →</a></p>
         </div>
       </section>
 

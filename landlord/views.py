@@ -10,19 +10,9 @@ import itertools
 from estate.models import LeadInfo
 from datetime import datetime, date
 from django.db.models import Sum
+from core.models import Appointments
 
 
-
-"""
-context = {
-    'properties': Property.objects.filter(owner=request.user, is_active=True)[:4],
-    'recent_inquiries': Inquiry.objects.filter(property__owner=request.user).order_by('-created_at')[:5],
-    'active_listings_count': Property.objects.filter(owner=request.user, is_active=True).count(),
-    'total_views': ...,  # aggregate sum of views across landlord's properties
-    'total_saves': ...,  # aggregate sum of wishlist saves
-    'unread_inquiry_count': Inquiry.objects.filter(property__owner=request.user, is_read=False).count(),
-}
-"""
 def dashboard(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
@@ -95,6 +85,7 @@ def inventory(request):
             'sales': sales,
             'rentals': rentals,
             'total_limit': landlord.inventory_slots,
+            'live_count': sales.filter(is_listed=True).count() + rentals.filter(is_listed=True).count(),
             'live_limit': landlord.listing_slots,
             'used_slots': sales.count() + rentals.count()
         }
@@ -158,6 +149,78 @@ def lanlord_profile(request):
     except LandlordInformation.DoesNotExist:
         messages.error(request, 'Landlord profile not found.')
         return redirect('landing')
-    except Exception as e:
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def landlord_inquiries(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'landlord':
+        messages.info(request, 'Landlord Account Only')
+        return redirect('landing')
+    try:
+        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        inquiries = LeadInfo.objects.filter(landlord_id=landlord.landlord_uuid)
+        return render(request, 'landlord/inquiries.html', {'inquiries': inquiries, 'landlord':landlord})
+    except LandlordInformation.DoesNotExist:
+        messages.error(request, 'Landlord profile not found.')
+        return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+    
+
+def delete_lead(request, lead_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'landlord':
+        messages.info(request, 'Landlord Account Only')
+        return redirect('landing')
+    try:
+        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        lead = LeadInfo.objects.get(lead_id=lead_id)
+        if lead.landlord_id != landlord.landlord_uuid:
+            messages.error(request, 'You are not authorized to delete this lead.')
+            return redirect('landlord:inquiries')
+        if lead.schedule_tour:
+            appointment=Appointments.objects.filter(lead_uuid=lead_id)
+            appointment.delete()
+        lead.delete()
+        messages.success(request, 'Lead and other Related data deleted successfully!')
+        return redirect('landlord:inquiries')
+    except LandlordInformation.DoesNotExist:
+        messages.error(request, 'Landlord profile not found.')
+        return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+def update_profile(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'landlord':
+        messages.info(request, 'Landlord Account Only')
+        return redirect('landing')
+    try:
+        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        if request.method == 'POST':
+            form = LandlordInformationForm(request.POST, request.FILES, instance=landlord)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('landlord:profile')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+        else:
+            form = LandlordInformationForm(instance=landlord)
+        return render(request, 'landlord/profile.html', {'form': form, 'landlord': landlord})
+    except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

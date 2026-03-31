@@ -47,6 +47,9 @@
         <a href="{% url 'register-company' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-nav-btn">
           <i class="bi bi-building"></i> Company
         </a>
+        <a href="{% url 'register-landlord' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="auth-nav-btn">
+          <i class="bi bi-house-door-fill"></i> Landlord
+        </a>
       </div>
 
       {# Login Form #}

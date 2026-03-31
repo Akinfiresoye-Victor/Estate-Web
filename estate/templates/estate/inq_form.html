@@ -92,6 +92,15 @@
     <form method="POST" id="inquiryForm" novalidate class="iq-form">
       {% csrf_token %}
 
+      <!-- Security Alert -->
+      <div class="iq-security-alert">
+        <i class="bi bi-shield-exclamation-fill"></i>
+        <div>
+          <strong>Protect Yourself</strong>
+          Before any transaction or payment, please inspect the property in person or send a trusted agent to verify everything. This helps you avoid potential scams.
+        </div>
+      </div>
+
       <!-- Section 1 — Your Details -->
       <div class="iq-section">
         <div class="iq-section-title">
@@ -328,7 +337,7 @@
           <i class="bi bi-chevron-down"></i>
         </div>
         <div class="iq-faq-a">
-          <p>No. Estate Web is a listing platform only. All payments, agreements, and viewings happen directly between you and the agent or property owner. Always verify ownership and documents before making any payment.</p>
+          <p>No. Estate Web is a listing platform only. All payments, agreements, and viewings happen directly between you and the agent or property owner. <strong>To avoid scams, always inspect the property in person or send a trusted agent to verify it before making any payments.</strong></p>
         </div>
       </div>
 

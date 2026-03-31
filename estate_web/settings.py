@@ -152,7 +152,6 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-#TODO set up password warning and forget password functinality
 AXES_FAILURE_LIMIT = 5        # lock after 5 failed attempts
 AXES_COOLOFF_TIME  = 1        # lock for 1 hour
 AXES_LOCKOUT_PARAMETERS = ['ip_address', 'username']  # lock by IP and username

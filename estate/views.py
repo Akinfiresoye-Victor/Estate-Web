@@ -159,58 +159,71 @@ def view_property_on_sale(request, property_id):
         base_template = {
             'company': 'company/base.html',
             'agent':   'agent/base.html',
-            'landlord': 'landlord:base.html',
+            'landlord': 'landlord/base.html',
         }.get(request.user.role, 'estate/base.html')
 
         prop = PropertyManagementSale.objects.get(pk=property_id)
 
         # ── Resolve who listed the property ──────────────────
-        if request.user.role == 'landlord':
+        if prop.landlord_uuid:
             try:
                 landlord_in_charge = LandlordInformation.objects.get(user_id=prop.user_id)
                 view_id = landlord_in_charge.landlord_uuid
                 msg = (
                     f'Listed by {landlord_in_charge.first_name} [Landlord]'
                 )
+                agent_in_charge=None
+                company_in_charge=None
             except LandlordInformation.DoesNotExist:
                 messages.error(request, 'Landlord profile not found.')
                 return redirect('landing')
-        try:
-            company_in_charge = CompanyInformation.objects.get(user_id=prop.user_id)
-            agent_in_charge   = (
-                AgentInformation.objects.get(agent_uuid=prop.agent_uuid)
-                if prop.agent_uuid != 'None' else None
-            )
-            view_id = company_in_charge.unique_company_id
-            msg = (
-                f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
-                if agent_in_charge
-                else f'Listed by {company_in_charge.company_name}'
-            )
+        else:
+            try:
+                company_in_charge = CompanyInformation.objects.get(user_id=prop.user_id)
+                agent_in_charge   = (
+                    AgentInformation.objects.get(agent_uuid=prop.agent_uuid)
+                    if prop.agent_uuid != 'None' else None
+                )
+                view_id = company_in_charge.unique_company_id
+                msg = (
+                    f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
+                    if agent_in_charge
+                    else f'Listed by {company_in_charge.company_name}'
+                )
 
-        except CompanyInformation.DoesNotExist:
-            agent_in_charge   = AgentInformation.objects.get(user_id=prop.user_id)
-            company_in_charge = (
-                CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
-                if agent_in_charge.company_uuid else None
-            )
-            view_id = agent_in_charge.agent_uuid
-            msg = (
-                f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
-                if company_in_charge
-                else f'Listed by {agent_in_charge.first_name} (Independent)'
-            )
+            except CompanyInformation.DoesNotExist:
+                agent_in_charge   = AgentInformation.objects.get(user_id=prop.user_id)
+                company_in_charge = (
+                    CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
+                    if agent_in_charge.company_uuid else None
+                )
+                view_id = agent_in_charge.agent_uuid
+                msg = (
+                    f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
+                    if company_in_charge
+                    else f'Listed by {agent_in_charge.first_name} (Independent)'
+                )
 
         messages.info(request, msg)
         property_view_count(property_id, "Sale", request.user.id, view_id)
         refresh_activity_score(prop, 'Sale')
 
+        # Check if this property is in the user's wishlist
+        in_wishlist = WishlistStorageUnit.objects.filter(
+            user_id=request.user.id,
+            property_id=property_id,
+            property_type="Sale"
+        ).exists()
+
         return render(request, 'estate/view_property_s.html', {
             'property':      prop,
             'agent_info':    agent_in_charge,
             'company_info':  company_in_charge,
+            'info':          landlord_in_charge if prop.landlord_uuid else None,
+            'landlord_info':          landlord_in_charge if prop.landlord_uuid else None,
             'base_template': base_template,
             'role':          request.user.role,
+            'in_wishlist':   in_wishlist,
         })
 
     except ObjectDoesNotExist:
@@ -235,52 +248,65 @@ def view_property_on_lease(request, property_id):
         }.get(request.user.role, 'estate/base.html')
 
         property_to_be_viewed = PropertyManagementRent.objects.get(pk=property_id)
-        if request.user.role == 'landlord':
+        if property_to_be_viewed.landlord_uuid:
             try:
                 landlord_in_charge = LandlordInformation.objects.get(user_id=property_to_be_viewed.user_id)
                 view_id = landlord_in_charge.landlord_uuid
                 msg = (
                     f'Listed by {landlord_in_charge.first_name} [Landlord]'
                 )
+                agent_in_charge=None
+                company_in_charge=None
             except LandlordInformation.DoesNotExist:
                 messages.error(request, 'Landlord profile not found.')
                 return redirect('landing')
-        try:
-            company_in_charge = CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            agent_in_charge   = (
-                AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
-                if property_to_be_viewed.agent_uuid != 'None' else None
-            )
-            view_id = company_in_charge.unique_company_id
-            msg = (
-                f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
-                if agent_in_charge
-                else f'Listed by {company_in_charge.company_name}'
-            )
+        else:
+            try:
+                company_in_charge = CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
+                agent_in_charge   = (
+                    AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
+                    if property_to_be_viewed.agent_uuid != 'None' else None
+                )
+                view_id = company_in_charge.unique_company_id
+                msg = (
+                    f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
+                    if agent_in_charge
+                    else f'Listed by {company_in_charge.company_name}'
+                )
 
-        except CompanyInformation.DoesNotExist:
-            agent_in_charge   = AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
-            company_in_charge = (
-                CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
-                if agent_in_charge.company_uuid else None
-            )
-            view_id = agent_in_charge.agent_uuid
-            msg = (
-                f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
-                if company_in_charge
-                else f'Listed by {agent_in_charge.first_name} (Independent)'
-            )
+            except CompanyInformation.DoesNotExist:
+                agent_in_charge   = AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
+                company_in_charge = (
+                    CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
+                    if agent_in_charge.company_uuid else None
+                )
+                view_id = agent_in_charge.agent_uuid
+                msg = (
+                    f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
+                    if company_in_charge
+                    else f'Listed by {agent_in_charge.first_name} (Independent)'
+                )
 
         messages.info(request, msg)
         property_view_count(property_id, "Rent", request.user.id, view_id)
         refresh_activity_score(property_to_be_viewed, 'Rent')
 
+        # Check if this property is in the user's wishlist
+        in_wishlist = WishlistStorageUnit.objects.filter(
+            user_id=request.user.id,
+            property_id=property_id,
+            property_type="Rent"
+        ).exists()
+
         return render(request, 'estate/view_property_r.html', {
             'property':      property_to_be_viewed,
             'agent_info':    agent_in_charge,
             'company_info':  company_in_charge,
+            'info':          landlord_in_charge if property_to_be_viewed.landlord_uuid else None,
+            'landlord_info':          landlord_in_charge if property_to_be_viewed.landlord_uuid else None,
             'base_template': base_template,
             'role':          request.user.role,
+            'in_wishlist':   in_wishlist,
         })
 
     except ObjectDoesNotExist:
@@ -768,8 +794,21 @@ def inquiry_form(request, property_type, property_id):
                             lead_uuid=inq_form.lead_id
                         )
                         appointment.save()
+                elif asset.landlord_uuid:
+                    inq_form.landlord_id= asset.landlord_uuid
+                    if inq_form.schedule_tour:
+                        appointment= Appointments.objects.create(
+                            landlord_uuid= asset.landlord_uuid,
+                            appointment=inq_form.schedule_tour,
+                            note="Reaching Client",
+                            appointment_type='Buisness',
+                            property_id=property_id,
+                            property_type=asset.property_type,
+                            lead_uuid=inq_form.lead_id
+                        )
+                        appointment.save()
                 else:
-                    inq_form.company_uuid= asset.agent_uuid
+                    inq_form.agent_id= asset.agent_uuid
                     if inq_form.schedule_tour:
                         appointment= Appointments.objects.create(
                             agent_uuid= asset.agent_uuid,
@@ -921,5 +960,3 @@ def clear_compare(request):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
-
-#FIXME Customers cant see the error page due to the name of the folder being estate and not customer

@@ -14,6 +14,7 @@ from core.utils import *
 from .models import ErrorLog
 import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
+from landlord.models import LandlordInformation
 # from django.core.mail import send_mail
 
 # send_mail(
@@ -165,7 +166,11 @@ def sell_property(request):
             base_template = 'estate/base.html'
             
         if request.user.role == 'agent':
-            agent=AgentInformation.objects.get(user_id=request.user.id)
+            try:
+                agent=AgentInformation.objects.get(user_id=request.user.id)
+            except ObjectDoesNotExist:
+                messages.info(request, 'Please complete your profile setup.')
+                return redirect('agent:agent-form')
             company=get_agent_company(agent)
             
             allowed, reason= can_add_to_inventory(agent, company)
@@ -176,7 +181,11 @@ def sell_property(request):
             """
             Company listed themselves
             """
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            try:
+                company=CompanyInformation.objects.get(user_id=request.user.id)
+            except ObjectDoesNotExist:
+                messages.info(request, 'Please complete your profile setup.')
+                return redirect('company:company_form')
             agent=None
             allowed, reason= can_add_to_inventory(agent, company)
             if not allowed:
@@ -184,11 +193,18 @@ def sell_property(request):
                 return redirect('listings')
         elif request.user.role == 'landlord':
             from landlord.models import LandlordInformation
-            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+            try:
+                landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+            except ObjectDoesNotExist:
+                messages.info(request, 'Please complete your profile setup.')
+                return redirect('landlord:profile-setup')
             allowed, reason = can_add_to_inventory(agent=None, company=None, landlord=landlord_info)
             if not allowed:
                 messages.error(request, reason)
                 return redirect('landlord:inventory')
+        else:
+            messages.info(request, 'An error occured')
+            return redirect('landing')
         submitted = False
  
         if request.method == 'POST':
@@ -308,7 +324,11 @@ def lease_property(request):
         else:
             base_template = 'estate/base.html'
         if request.user.role == 'agent':
-            agent=AgentInformation.objects.get(user_id=request.user.id)
+            try:
+                agent=AgentInformation.objects.get(user_id=request.user.id)
+            except ObjectDoesNotExist:
+                messages.info(request, 'Please complete your profile setup.')
+                return redirect('agent:agent-form')
             company=get_agent_company(agent)
             
             allowed, reason= can_add_to_inventory(agent, company)
@@ -319,7 +339,11 @@ def lease_property(request):
             """
             Company listed themselves
             """
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            try:
+                company=CompanyInformation.objects.get(user_id=request.user.id)
+            except ObjectDoesNotExist:
+                messages.info(request, 'Please complete your profile setup.')
+                return redirect('company:company_form')
             agent=None
             allowed, reason= can_add_to_inventory(agent, company)
             if not allowed:
@@ -327,7 +351,11 @@ def lease_property(request):
                 return redirect('listings')
         elif request.user.role == 'landlord':
             from landlord.models import LandlordInformation
-            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+            try:
+                landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+            except ObjectDoesNotExist:
+                messages.info(request, 'Please complete your profile setup.')
+                return redirect('landlord:profile-setup')
             allowed, reason = can_add_to_inventory(agent=None, company=None, landlord=landlord_info)
             if not allowed:
                 messages.error(request, reason)
@@ -433,7 +461,6 @@ def toggle_listing(request, property_id, property_type):
     is_ajax=request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     Model=PropertyManagementSale if property_type == 'sale' else PropertyManagementRent
-    #FIXME you can only toggle listings the company account listed  
     try:
         #making the user who posted have access to the property
         if request.user.role == 'company':
@@ -453,38 +480,54 @@ def toggle_listing(request, property_id, property_type):
         return redirect('listings')
 
     if prop.is_listed:
-        prop.is_listed=False
+        prop.is_listed = False
         prop.save(update_fields=['is_listed'])
-        msg='Property moved to inventory.'
+        msg = 'Property moved to inventory.'
         if is_ajax:
-            return JsonResponse({'is_lited': False, 'message':msg})
+            # Calculate new live count based on user role
+            try:
+                if request.user.role == 'landlord':
+                    from landlord.models import LandlordInformation
+                    landlord_obj = LandlordInformation.objects.get(user_id=request.user.id)
+                    live_count = get_listing_count(None, None, landlord_obj)
+                elif request.user.role == 'company':
+                    company_obj = CompanyInformation.objects.get(user_id=request.user.id)
+                    live_count = get_listing_count(None, company_obj)
+                else: # agent
+                    agent_obj = AgentInformation.objects.get(user_id=request.user.id)
+                    live_count = get_listing_count(agent_obj)
+            except Exception:
+                live_count = 0  # Fallback
+            return JsonResponse({'is_listed': False, 'message': msg, 'live_count': live_count})
         messages.success(request, msg)
     else:
+        # Determine roles for can_go_live check
+        agent_obj = None
+        company_obj = None
+        landlord_obj = None
+
         if request.user.role == 'agent':
-            agent=AgentInformation.objects.get(user_id=request.user.id)
-            company=get_agent_company(agent)
-            landlord=None
+            agent_obj = AgentInformation.objects.get(user_id=request.user.id)
+            company_obj = get_agent_company(agent_obj)
         elif request.user.role == 'company':
-            agent=None
-            landlord=None
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            company_obj = CompanyInformation.objects.get(user_id=request.user.id)
         elif request.user.role == 'landlord':
-            agent=None
-            company=None
             from landlord.models import LandlordInformation
-            landlord=LandlordInformation.objects.get(user_id=request.user.id)
+            landlord_obj = LandlordInformation.objects.get(user_id=request.user.id)
         
-        allowed,reason= can_go_live(agent=agent, company=company, landlord=landlord)
+        allowed, reason = can_go_live(agent=agent_obj, company=company_obj, landlord=landlord_obj)
         if not allowed:
             if is_ajax:
                 return JsonResponse({'error': reason}, status=403)
             messages.error(request, reason)
             return redirect('listings')
-        prop.is_listed=True
+
+        prop.is_listed = True
         prop.save(update_fields=['is_listed'])
-        msg= 'Your property is now live!'
+        msg = 'Your property is now live!'
         if is_ajax:
-            return JsonResponse({'is_listed':True, 'message': msg})
+            live_count = get_listing_count(agent_obj, company_obj, landlord_obj)
+            return JsonResponse({'is_listed': True, 'message': msg, 'live_count': live_count})
         messages.success(request, msg)
     return redirect('listings')
 
@@ -539,6 +582,8 @@ def update_property_rent(request, property_id):
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template= 'landlord/base.html'
         else:
             base_template='estate/base.html'
         #limiting update property acess to the owner of listing
@@ -551,27 +596,34 @@ def update_property_rent(request, property_id):
                 else:
                     return redirect('landing')
         elif user_role == 'company':
-            company_uuid=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
-            if property.company_uuid != company_uuid:
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+            if property.company_uuid != company.unique_company_id:
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
                     return redirect(request.META['HTTP_REFERER'])  
                 else:
                     return redirect('landing')
-        else:
-            messages.info(request, 'Coming soon!')
-            return redirect('landing')
-        prop_form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
-        image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property)
-        company=CompanyInformation.objects.get(user_id=request.user.id)
-        if prop_form.is_valid() and image_form.is_valid():
-            prop_form.save()
-            image_form.save()
-            messages.success(request, "Property updated successfully.")
             CompanyActivityLog.objects.create(
                 company=company,
                 action= 'Property Listing Updated'
             )
+        elif user_role == 'landlord':
+            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            if property.landlord_uuid != landlord_uuid:
+                messages.warning(request, 'Access Denied: Unauthorized action.')
+                if 'HTTP_REFERER' in request.META:
+                    return redirect(request.META['HTTP_REFERER'])
+                else:
+                    return redirect('landing')
+        else:
+            messages.info(request, 'An Error Occured')
+            return redirect('landing')
+        prop_form= LeaseForm(request.POST or None,request.FILES or None, instance=property)
+        image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property)
+        if prop_form.is_valid() and image_form.is_valid():
+            prop_form.save()
+            image_form.save()
+            messages.success(request, "Property updated successfully.")
             return redirect('listings')
         return render(request, 'core/update_property.html', {'property': property, 'form': prop_form, 'images': image_form, 'base_template':base_template})
         
@@ -597,6 +649,8 @@ def update_property_sale(request, property_id):
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
         else:
             base_template='estate/base.html'
         #limiting update access to owner of listings
@@ -609,8 +663,20 @@ def update_property_sale(request, property_id):
                 else:
                     return redirect('landing')
         elif user_role == 'company':
-            company_uuid=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
-            if property.company_uuid != company_uuid:
+            company=CompanyInformation.objects.get(user_id=request.user.id)
+            if property.company_uuid != company.unique_company_id:
+                messages.warning(request, 'Access denied: Unauthorized action.')
+                if 'HTTP_REFERER' in request.META:
+                    return redirect(request.META['HTTP_REFERER'])  
+                else:
+                    return redirect('landing')
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Property Listing Updated'
+            )
+        elif user_role == 'landlord':
+            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            if property.landlord_uuid !=landlord_uuid :
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
                     return redirect(request.META['HTTP_REFERER'])  
@@ -621,15 +687,10 @@ def update_property_sale(request, property_id):
             return redirect('landing')
         prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
         image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
-        company=CompanyInformation.objects.get(user_id=request.user.id)
         if prop_form.is_valid() and image_form.is_valid():
             prop_form.save()
             image_form.save()
             messages.success(request, "Property updated successfully.")
-            CompanyActivityLog.objects.create(
-                company=company,
-                action= 'Property Listing Updated'
-            )
             return redirect('listings')
         return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
         
@@ -650,9 +711,15 @@ def delete_property_on_lease(request, property_id):
         if request.user.role == 'company':
             company=CompanyInformation.objects.get(user_id=request.user.id)
             agent_uuid=None
+            landlord_uuid=None
         elif request.user.role == 'agent':
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             company=None
+            landlord_uuid=None
+        elif request.user.role == 'landlord':
+            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            company=None
+            agent_uuid=None
         else:
             messages.info(request, 'Coming soon!')
             return redirect('landing')
@@ -664,6 +731,9 @@ def delete_property_on_lease(request, property_id):
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         elif agent_uuid and property1.agent_uuid != agent_uuid:
+            messages.warning(request, 'Access denied: Unauthorized action.')
+            return redirect('landing')
+        elif landlord_uuid and property1.landlord_uuid != landlord_uuid:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         
@@ -685,10 +755,11 @@ def delete_property_on_lease(request, property_id):
             property_views.delete()
             property1.delete()
             messages.success(request, "Property deleted successfully.")
-            CompanyActivityLog.objects.create(
-                company=company,
-                action= 'Property Listing Deleted'
-            )
+            if request.user.role == 'company':
+                CompanyActivityLog.objects.create(
+                    company=company,
+                    action= 'Property Listing Deleted'
+                )
             return redirect('listings')
         except Exception:
             messages.error(request, 'An unexpected error occurred. Please try again.')
@@ -708,9 +779,15 @@ def delete_property_on_sale(request, property_id):
         if request.user.role == 'company':
             company=CompanyInformation.objects.get(user_id=request.user.id)
             agent_uuid=None
+            landlord_uuid=None
         elif request.user.role == 'agent':
             agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
             company=None
+            landlord_uuid=None
+        elif request.user.role == 'landlord':
+            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            company=None
+            agent_uuid=None
         else:
             messages.info(request, 'Coming soon!')
             return redirect('landing')
@@ -724,7 +801,9 @@ def delete_property_on_sale(request, property_id):
         elif agent_uuid and property1.agent_uuid != agent_uuid:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
-        
+        elif landlord_uuid and property1.landlord_uuid != landlord_uuid:
+            messages.warning(request, 'Access denied: Unauthorized action.')
+            return redirect('landing')
         leads=LeadInfo.objects.filter(property_type='Sale', property_intrested=property1.pk)
         appointments=Appointments.objects.filter(property_type='Sale', property_id=property1.pk)
         property_views=PropertyViews.objects.filter(property_type='Sale', property_id=property1.pk)

@@ -1,6 +1,6 @@
 {% extends 'landlord/base.html' %}
 {% load static %}
-
+{%load static humanize%}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'landlord/css/inventory.css' %}">
 {% endblock %}
@@ -58,14 +58,10 @@
 
   <div class="li-stat-chip">
     <span class="li-stat-chip__label">Live Now</span>
-    <span class="li-stat-chip__value" id="li-live-count">
-      {# Count how many are currently listed #}
-      {% with live_count=0 %}
-        {% for p in sales %}{% if p.is_listed %}{% with live_count=live_count|add:1 %}{% endwith %}{% endif %}{% endfor %}
-        {% for p in rentals %}{% if p.is_listed %}{% with live_count=live_count|add:1 %}{% endwith %}{% endif %}{% endfor %}
-      {% endwith %}
-      {{ sales|length|add:rentals|length }}/{{ live_limit }}
-    </span>
+      <span class="li-stat-chip__value" id="li-live-count">
+        {# Using the pre-calculated count from the backend #}
+        {{ live_count }}/{{ live_limit }}
+      </span>
   </div>
 
 </div>
@@ -148,12 +144,15 @@
         <i class="bi bi-geo-alt-fill"></i> {{ p.location }}{% if p.state %}, {{ p.state }}{% endif %}
       </p>
       {% endif %}
-
-      <div class="li-card__price">
-        ₦{{ p.price|floatformat:"0g" }}
-        {% if p.price_range %}<span class="li-card__price-suffix">{{ p.price_range }}</span>{% endif %}
-      </div>
-
+      {%if p.property_type == 'Sale'%}
+        <div class="li-card__price">
+          ₦{{ p.price|floatformat:"0g"|intcomma }}
+        </div>
+      {%else%}
+        <div class="li-card__price">
+          ₦{{ p.price_range|floatformat:"0g"|intcomma }}
+        </div>
+      {%endif%}
       <div class="li-card__stats">
         <span class="li-card__stat">
           <i class="bi bi-eye"></i> {{ p.views.count|default:"0" }}
@@ -236,12 +235,17 @@
         <i class="bi bi-geo-alt-fill"></i> {{ p.location }}{% if p.state %}, {{ p.state }}{% endif %}
       </p>
       {% endif %}
-
+    {%if p.property_type == 'Rent'%}
       <div class="li-card__price">
-        ₦{{ p.price|floatformat:"0g" }}
+        ₦{{ p.price_range|floatformat:"0g"|intcomma }}
         <span class="li-card__price-suffix">/yr</span>
       </div>
-
+    {%else%}
+      <div class="li-card__price">
+        ₦{{ p.price|floatformat:"0g"|intcomma }}
+        <span class="li-card__price-suffix">/yr</span>
+      </div>
+    {%endif%}
       <div class="li-card__stats">
         <span class="li-card__stat">
           <i class="bi bi-eye"></i> {{ p.views.count|default:"0" }}
@@ -361,8 +365,16 @@ function toggleListing(id, type, btn) {
     // 3. Update the toggle button itself
     btn.disabled = false;
     restoreToggleBtn(btn, isNowLive);
+// 4. Update the Live Now counter
+    if (data.live_count !== undefined) {
+      const liveCountEl = document.getElementById('li-live-count');
+      if (liveCountEl) {
+        const limit = liveCountEl.textContent.trim().split('/')[1];
+        liveCountEl.textContent = `${data.live_count}/${limit}`;
+      }
+    }
 
-    // 4. Show a friendly toast message
+    // 5. Show a friendly toast message
     showToast(data.message || (isNowLive ? 'Listing is now live!' : 'Property moved to inventory.'), 'success');
   })
   .catch(() => {

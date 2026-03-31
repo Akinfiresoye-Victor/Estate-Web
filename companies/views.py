@@ -712,6 +712,9 @@ def delete_lead(request, lead_id):
         if company.unique_company_id != lead_to_delete.company_uuid:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
+        if lead_to_delete.schedule_tour:
+            appointment=Appointments.objects.filter(lead_id=lead_to_delete.lead_id)
+            appointment.delete()
         lead_to_delete.delete()
         messages.success(request, "Lead deleted successfully.")
         CompanyActivityLog.objects.create(

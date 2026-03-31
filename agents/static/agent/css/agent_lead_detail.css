@@ -28,6 +28,34 @@
   --ease:       all 0.24s ease;
 }
 
+/* Contact preference notice banner */
+.contact-preference-notice {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .9rem 1.1rem;
+  background: rgba(193,155,118,.11);
+  border: 1.5px solid rgba(193,155,118,0.22);
+  border-radius: var(--radius-sm);
+  color: var(--secondary);
+  font-weight: 600;
+  font-size: .88rem;
+  margin-bottom: .85rem;
+  animation: slideIn .4s ease-out;
+}
+.contact-preference-notice i { font-size: 1.1rem; }
+.contact-preference-notice strong { color: var(--primary); }
+
+.detail-item.preferred-item {
+  border: 1.5px solid rgba(193,155,118,0.3);
+  background: rgba(193,155,118,0.04);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 

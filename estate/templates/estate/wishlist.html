@@ -143,8 +143,8 @@
             </div>
 
             <div class="wl-price lease">
-              <span class="wl-price-amount">₦{{ property.price_range|floatformat:2|intcomma }}</span>
-              <span class="wl-price-period">/month</span>
+              <span class="wl-price-amount">₦{{ property.price_range|floatformat:0|intcomma }}</span>
+              <span class="wl-price-period">/year</span>
             </div>
 
             <p class="wl-desc">{{ property.description|truncatewords:18 }}</p>

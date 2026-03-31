@@ -1,460 +1,684 @@
 {% extends base_template %}
 {% load static %}
 {% load widget_tweaks %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'estate/css/update_rent.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css">
+<link rel="stylesheet" href="{% static 'estate/css/update_rent.css' %}">
 {% endblock %}
+
 {% block content %}
+
+{# ── Back button ── #}
 <a href="javascript:history.back()" class="attractive-back-button">
-    &larr; Go back
+  <i class="bi bi-arrow-left-circle-fill"></i>
+  <span>Go Back</span>
 </a>
 
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
+<div class="wizard-wrapper">
 
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
+  {% if submitted %}
+  {# ══ SUCCESS ══════════════════════════════════════════════════════════ #}
+  <div class="success-card">
+    <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+    <h2 class="success-title">Property Updated Successfully!</h2>
+    <p class="success-message">
+      Your rental property listing has been updated. Changes are live immediately if the property was already published.
+    </p>
+    <div class="success-actions">
+      <a href="{% url 'listings' %}" class="btn-dashboard">
+        <i class="bi bi-toggles"></i> View My Listings
+      </a>
+      <a href="{% url 'customer:user-dashboard' %}" class="btn-dashboard-outline">
+        <i class="bi bi-speedometer2"></i> Dashboard
+      </a>
+    </div>
+  </div>
 
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
+  {% elif not user.is_authenticated %}
+  {# ══ ACCESS DENIED ════════════════════════════════════════════════════ #}
+  <div class="success-card">
+    <div class="success-icon" style="background: linear-gradient(135deg,#dc3545,#e57373);">
+      <i class="bi bi-lock-fill"></i>
+    </div>
+    <h2 class="success-title" style="color:#dc3545;">Access Denied</h2>
+    <p class="success-message">You need to be logged in to update rental properties.</p>
+    <div class="success-actions">
+      <a href="{% url 'login' %}" class="btn-dashboard">
+        <i class="bi bi-box-arrow-in-right"></i> Log In
+      </a>
+    </div>
+  </div>
 
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
+  {% else %}
+  {# ══ STEP INDICATOR ═══════════════════════════════════════════════════ #}
+  <div class="step-indicator" id="stepIndicator">
+    <div class="step-track">
+      <div class="step-item active" id="ind-1">
+        <div class="step-circle">1</div>
+        <span class="step-label">Category</span>
+      </div>
+      <div class="step-connector" id="con-1"></div>
+      <div class="step-item" id="ind-2">
+        <div class="step-circle">2</div>
+        <span class="step-label">Details</span>
+      </div>
+      <div class="step-connector" id="con-2"></div>
+      <div class="step-item" id="ind-3">
+        <div class="step-circle">3</div>
+        <span class="step-label">Photos</span>
+      </div>
+    </div>
+  </div>
+  <p class="step-counter" id="stepCounter">Step <strong>1</strong> of 3</p>
 
-{% if user.is_authenticated %}
+  {# ══ WIZARD CARD ══════════════════════════════════════════════════════ #}
+  <div class="wizard-card">
+    <form method="post" enctype="multipart/form-data" id="wizardForm" action="" novalidate>
+      {% csrf_token %}
 
-<div class="update-wrapper">
-    <div class="update-container">
-        <div class="update-card">
-            
-            <!-- Header Section -->
-            <div class="update-header">
-                <div class="header-icon">
-                    <i class="bi bi-building"></i>
-                </div>
-                <h2 class="update-title">Update Rent Property</h2>
-                <p class="update-subtitle">Modify your rental listing details</p>
-            </div>
 
-            {% if submitted %}
-                <!-- Success State -->
-                <div class="success-container">
-                    <div class="success-icon">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <h3 class="success-title">Successfully Updated!</h3>
-                    <p class="success-message">Your rental property details have been updated successfully.</p>
-                    
-                    <div class="success-actions">
-                        <a href="{% url 'customer:user-dashboard' %}" class="btn-secondary-outline">
-                            <i class="bi bi-speedometer2 me-2"></i>
-                            Go to Dashboard
-                        </a>
-                    </div>
-                </div>
-            {% else %}
-                <!-- Form Section -->
-                <form action="" method="POST" enctype="multipart/form-data" novalidate class="update-form">
-                    {% csrf_token %}
+      {# ══ STEP 1 — CATEGORY & TYPE ═════════════════════════════════════ #}
+      <div class="wizard-step active" id="step-1">
 
-                    {% if form.non_field_errors %}
-                        <div class="error-alert">
-                            <div class="error-header">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                                <span>Form Errors</span>
-                            </div>
-                            <ul class="error-list">
-                                {% for error in form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
+        <div class="step-head">
+          <div class="step-head-icon"><i class="bi bi-buildings"></i></div>
+          <div class="step-head-text">
+            <h2>Property Category &amp; Type</h2>
+            <p>Update the category and type for this rental listing.</p>
+          </div>
+        </div>
 
-                    {% for field in form %}
-                        {% if field.is_hidden %}
-                            {{ field }}
-                        {% else %}
-                            <div class="form-group">
-                                <label for="{{ field.id_for_label }}" class="form-label">
-                                    {% if 'residential' in field.name %}
-                                        <i class="bi bi-card-heading me-2"></i>
-                                    {% elif 'price_range' in field.name or 'price' in field.name %}
-                                        <i class="bi bi-currency-dollar me-2"></i>
-                                    {% elif 'location' in field.name or 'address' in field.name %}
-                                        <i class="bi bi-geo-alt-fill me-2"></i>
-                                    {% elif 'image' in field.name or 'photo' in field.name %}
-                                        <i class="bi bi-image-fill me-2"></i>
-                                    {% elif 'description' in field.name %}
-                                        <i class="bi bi-text-paragraph me-2"></i>
-                                    {% elif 'bedroom' in field.name %}
-                                        <i class="bi bi-door-closed-fill me-2"></i>
-                                    {% elif 'bathroom' in field.name %}
-                                        <i class="bi bi-droplet-fill me-2"></i>
-                                    {% elif 'parking' in field.name %}
-                                        <i class="bi bi-car-front-fill me-2"></i>
-                                    {% elif 'size' in field.name or 'area' in field.name %}
-                                        <i class="bi bi-rulers me-2"></i>
-                                    {% elif 'type' in field.name or 'category' in field.name %}
-                                        <i class="bi bi-tags-fill me-2"></i>
-                                    {% else %}
-                                        <i class="bi bi-pencil-fill me-2"></i>
-                                    {% endif %}
-                                    {{ field.label }}
-                                </label>
+        <div class="step-body">
 
-                                {% if field.name == 'is_featured' or field.name == 'is_listed' or field.name == 'furnished' %}
-                                    <div class="form-check-wrapper">
-                                        {% render_field field class="form-check-input" %}
-                                        <label class="form-check-label" for="{{ field.id_for_label }}">
-                                            {{ field.label }}
-                                        </label>
-                                    </div>
-                                {% elif field.name == 'description' %}
-                                    {% render_field field class="form-textarea" rows="5" %}
-                                {% else %}
-                                    {% render_field field class="form-input" %}
-                                {% endif %}
-
-                                {% if field.help_text %}
-                                    <div class="form-help-text">{{ field.help_text }}</div>
-                                {% endif %}
-
-                                {% if field.errors %}
-                                    <div class="field-error">
-                                        {% for error in field.errors %}
-                                            <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-
-                    <!-- Image Upload Section -->
-                    <div class="image-section">
-                        <h3 class="section-title">
-                            <i class="bi bi-images me-2"></i>
-                            Property Images
-                        </h3>
-
-                        {{ images.management_form }}
-
-                        <div class="image-grid">
-                            {% for img_form in images %}
-                                <div class="image-item">
-                                    {% if img_form.instance.more_images %}
-                                        <img src="{{ img_form.instance.more_images.url }}" 
-                                             alt="Property Image" 
-                                             class="preview-img"
-                                             onerror="this.style.display='none'">
-                                    {% endif %}
-                                    
-                                    <div class="form-group">
-                                        {{ img_form.id }}
-                                        {{ img_form.more_images }}
-                                        
-                                        {% if img_form.more_images.errors %}
-                                            <div class="field-error mt-2">
-                                                {% for error in img_form.more_images.errors %}
-                                                    <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    {% if img_form.DELETE %}
-                                        <label class="delete-label">
-                                            {{ img_form.DELETE }}
-                                            <span>Delete this image</span>
-                                        </label>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-submit">
-                            <span>Save Changes</span>
-                            <i class="bi bi-check-circle-fill"></i>
-                        </button>
-                    </div>
-                </form>
+          {# Category select #}
+          <div class="form-group">
+            <label for="{{ form.property_category.id_for_label }}" class="form-label">
+              <i class="bi bi-building"></i>{{ form.property_category.label }}
+            </label>
+            {{ form.property_category|add_class:"form-input" }}
+            {% if form.property_category.help_text %}
+              <div class="form-help-text">{{ form.property_category.help_text }}</div>
             {% endif %}
-        </div>
-    </div>
-</div>
+            {% if form.property_category.errors %}
+              <div class="field-error">
+                {% for e in form.property_category.errors %}
+                  <i class="bi bi-exclamation-circle-fill"></i>{{ e }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
 
-{% else %}
-    <!-- Access Denied Section -->
-    <div class="access-denied">
-        <div class="denied-content">
-            <div class="denied-icon">
-                <i class="bi bi-lock-fill"></i>
+          {# Residential (hidden by default) #}
+          <div class="form-group property-type-group" id="residential-group" style="display:none;">
+            <label for="{{ form.residential.id_for_label }}" class="form-label">
+              <i class="bi bi-house-door"></i>{{ form.residential.label }}
+            </label>
+            {{ form.residential|add_class:"form-input" }}
+            {% if form.residential.errors %}
+              <div class="field-error">
+                {% for e in form.residential.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          {# Commercial (hidden by default) #}
+          <div class="form-group property-type-group" id="commercial-group" style="display:none;">
+            <label for="{{ form.commercial.id_for_label }}" class="form-label">
+              <i class="bi bi-briefcase"></i>{{ form.commercial.label }}
+            </label>
+            {{ form.commercial|add_class:"form-input" }}
+            {% if form.commercial.errors %}
+              <div class="field-error">
+                {% for e in form.commercial.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          {# Land (hidden by default) #}
+          <div class="form-group property-type-group" id="lands-group" style="display:none;">
+            <label for="{{ form.lands.id_for_label }}" class="form-label">
+              <i class="bi bi-map"></i>{{ form.lands.label }}
+            </label>
+            {{ form.lands|add_class:"form-input" }}
+            {% if form.lands.errors %}
+              <div class="field-error">
+                {% for e in form.lands.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          {# Step validation hint #}
+          <div class="step-validate-hint" id="hint-1">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="hint-1-msg">Please select a category and property type to continue.</span>
+          </div>
+
+        </div>{# end step-body #}
+
+        <div class="step-footer">
+          <div></div>{# spacer #}
+          <button type="button" class="btn-next" id="next-1">
+            Next <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>{# end step-1 #}
+
+
+      {# ══ STEP 2 — DETAILS ═════════════════════════════════════════════ #}
+      <div class="wizard-step" id="step-2">
+
+        <div class="step-head">
+          <div class="step-head-icon"><i class="bi bi-card-text"></i></div>
+          <div class="step-head-text">
+            <h2>Property Details</h2>
+            <p>Update the details so tenants can find the right fit.</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          {% if form.non_field_errors %}
+            <div class="error-alert">
+              <div class="error-header">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Please fix these errors</span>
+              </div>
+              <ul class="error-list">
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
             </div>
-            <h1 class="denied-title">Access Denied</h1>
-            <p class="denied-message">You need to be logged in to update rental properties.</p>
-            <a href="{% url 'login' %}" class="btn-login">
-                <i class="bi bi-box-arrow-in-right me-2"></i>
-                Log In Here
-            </a>
+          {% endif %}
+
+          {% for field in form %}
+            {% if field.is_hidden %}
+              {{ field }}
+            {% elif field.name != 'property_category' and field.name != 'residential' and field.name != 'commercial' and field.name != 'lands' %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}" class="form-label">
+                {% if 'price' in field.name or 'price_range' in field.name %}
+                  <i class="bi bi-cash-coin"></i>
+                {% elif 'location' in field.name or 'address' in field.name %}
+                  <i class="bi bi-geo-alt-fill"></i>
+                {% elif 'state' in field.name %}
+                  <i class="bi bi-map"></i>
+                {% elif 'description' in field.name %}
+                  <i class="bi bi-text-paragraph"></i>
+                {% elif 'phone' in field.name or 'contact' in field.name %}
+                  <i class="bi bi-telephone-fill"></i>
+                {% elif 'bedroom' in field.name %}
+                  <i class="bi bi-door-closed-fill"></i>
+                {% elif 'bathroom' in field.name %}
+                  <i class="bi bi-droplet-fill"></i>
+                {% elif 'parking' in field.name %}
+                  <i class="bi bi-car-front-fill"></i>
+                {% elif 'size' in field.name or 'area' in field.name %}
+                  <i class="bi bi-rulers"></i>
+                {% elif 'base_image' in field.name or 'image' in field.name %}
+                  <i class="bi bi-image"></i>
+                {% elif 'furnished' in field.name or 'listed' in field.name or 'featured' in field.name %}
+                  <i class="bi bi-toggles"></i>
+                {% else %}
+                  <i class="bi bi-pencil-fill"></i>
+                {% endif %}
+                {{ field.label }}
+              </label>
+
+              {% if field.name == 'is_featured' or field.name == 'is_listed' or field.name == 'furnished' %}
+                <div class="form-check-wrapper">
+                  {{ field|add_class:"form-check-input" }}
+                  <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                </div>
+              {% elif field.name == 'description' or field.name == 'property_description' %}
+                {{ field|add_class:"form-textarea" }}
+              {% else %}
+                {{ field|add_class:"form-input" }}
+              {% endif %}
+
+              {% if field.help_text %}
+                <div class="form-help-text">{{ field.help_text }}</div>
+              {% endif %}
+              {% if field.errors %}
+                <div class="field-error">
+                  {% for e in field.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+
+        </div>{# end step-body #}
+
+        <div class="step-footer">
+          <button type="button" class="btn-back" id="back-2">
+            <i class="bi bi-arrow-left"></i> Back
+          </button>
+          <button type="button" class="btn-next" id="next-2">
+            Next <i class="bi bi-arrow-right"></i>
+          </button>
         </div>
-    </div>
-{% endif %}
 
-<!-- Include Bootstrap Icons if not already in base.html -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+      </div>{# end step-2 #}
 
 
-<!-- Cropper.js (CDN) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css">
-<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+      {# ══ STEP 3 — PHOTOS ══════════════════════════════════════════════ #}
+      <div class="wizard-step" id="step-3">
 
-<!-- Crop Modal -->
-<div id="cropContainer" class="crop-modal-overlay" style="display:none;">
-    <div class="crop-modal-container">
-        <!-- Modal Header -->
-        <div class="crop-modal-header">
+        <div class="step-head">
+          <div class="step-head-icon"><i class="bi bi-images"></i></div>
+          <div class="step-head-text">
+            <h2>Property Photos</h2>
+            <p>Replace or keep existing photos. Quality images attract more interest.</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+
+          <div class="image-formset-container">
+            {{ images.management_form }}
+            {% for img_form in images %}
+              <div class="image-form-row">
+                {{ img_form.id }}
+
+                <div class="image-upload-box">
+                  <label for="{{ img_form.more_images.id_for_label }}" class="image-label">
+                    <i class="bi bi-camera-fill"></i>
+                    <span>Photo {{ forloop.counter }}</span>
+                  </label>
+                  {{ img_form.more_images|add_class:"form-input-file" }}
+                  {% if img_form.more_images.errors %}
+                    <div class="field-error">
+                      {% for e in img_form.more_images.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+                    </div>
+                  {% endif %}
+                  {% if img_form.instance.more_images %}
+                    <div class="current-image-preview">
+                      <p class="preview-label">Current:</p>
+                      <img src="{{ img_form.instance.more_images.url }}" alt="Current image"
+                           onerror="this.parentElement.style.display='none'">
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="caption-field">
+                  <label for="{{ img_form.caption.id_for_label }}" class="caption-label">
+                    <i class="bi bi-chat-left-text"></i> Caption (Optional)
+                  </label>
+                  {{ img_form.caption|add_class:"form-input" }}
+                  {% if img_form.caption.errors %}
+                    <div class="field-error">
+                      {% for e in img_form.caption.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+
+                {% if images.can_delete %}
+                  <div class="delete-checkbox">
+                    {{ img_form.DELETE|add_class:"form-check-input" }}
+                    <label for="{{ img_form.DELETE.id_for_label }}">Remove this photo</label>
+                  </div>
+                {% endif %}
+
+                {% if img_form.non_field_errors %}
+                  <div class="field-error">
+                    {% for e in img_form.non_field_errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+        </div>{# end step-body #}
+
+        <div class="step-footer">
+          <button type="button" class="btn-back" id="back-3">
+            <i class="bi bi-arrow-left"></i> Back
+          </button>
+          <button type="submit" class="btn-submit">
+            <i class="bi bi-check-circle-fill"></i>
+            Save Changes
+          </button>
+        </div>
+
+      </div>{# end step-3 #}
+
+
+      {# ── Crop Modal (outside steps, inside form) ── #}
+      <div id="cropContainer" class="crop-modal-overlay" style="display:none;">
+        <div class="crop-modal-container">
+          <div class="crop-modal-header">
             <h3 class="crop-modal-title">
-                <i class="bi bi-crop"></i>
-                Crop Your Image
+              <i class="bi bi-crop"></i> Crop Your Image
             </h3>
             <button id="cropCancelTop" type="button" class="crop-close-btn">
-                <i class="bi bi-x-lg"></i>
+              <i class="bi bi-x-lg"></i>
             </button>
-        </div>
-
-        <!-- Modal Body -->
-        <div class="crop-modal-body">
+          </div>
+          <div class="crop-modal-body">
             <div class="crop-info-banner">
-                <i class="bi bi-info-circle-fill"></i>
-                <p class="crop-info-text">
-                    Drag to reposition and use the corners to resize your image. The image will be optimized to 1200×900 pixels for best display quality.
-                </p>
+              <i class="bi bi-info-circle-fill"></i>
+              <p class="crop-info-text">
+                Drag to reposition and use corners to resize. Images are optimised to 1200×900 px for best display quality.
+              </p>
             </div>
-            
             <div class="crop-preview-container">
-                <img id="cropPreview" alt="Image to crop">
+              <img id="cropPreview" alt="Image to crop">
             </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="crop-modal-footer">
+          </div>
+          <div class="crop-modal-footer">
             <button id="cropCancel" type="button" class="crop-btn crop-btn-secondary">
-                <i class="bi bi-x-circle"></i>
-                Cancel
+              <i class="bi bi-x-circle"></i> Cancel
             </button>
             <button id="cropConfirm" type="button" class="crop-btn crop-btn-primary">
-                <i class="bi bi-check-circle"></i>
-                Crop & Continue
+              <i class="bi bi-check-circle"></i> Crop &amp; Continue
             </button>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
+    </form>
+  </div>{# end wizard-card #}
+
+  {% endif %}{# end submitted / auth check #}
+
+</div>{# end wizard-wrapper #}
+
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    const maxMB = 5;
-    const cropContainer = document.getElementById('cropContainer');
-    const cropPreview = document.getElementById('cropPreview');
-    const cropConfirm = document.getElementById('cropConfirm');
-    const cropCancel = document.getElementById('cropCancel');
-    const cropCancelTop = document.getElementById('cropCancelTop');
-    let cropper;
-    let currentInput;
-    let formSubmitted = false;
+document.addEventListener('DOMContentLoaded', function () {
 
-    window.onbeforeunload = function() {
-        if (!formSubmitted) {
-            return undefined;
-        }
-    };
+  /* ═══════════════════════════════════════════════
+     STEP WIZARD
+  ═══════════════════════════════════════════════ */
+  var currentStep = 1;
+  var totalSteps  = 3;
 
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function() {
-            formSubmitted = true;
-        });
+  var indicators = [
+    document.getElementById('ind-1'),
+    document.getElementById('ind-2'),
+    document.getElementById('ind-3'),
+  ];
+  var connectors = [
+    document.getElementById('con-1'),
+    document.getElementById('con-2'),
+  ];
+  var counterEl = document.getElementById('stepCounter');
+
+  function goToStep(n) {
+    for (var i = 1; i <= totalSteps; i++) {
+      var s = document.getElementById('step-' + i);
+      if (s) s.classList.remove('active');
+    }
+    var target = document.getElementById('step-' + n);
+    if (target) target.classList.add('active');
+
+    indicators.forEach(function (ind, idx) {
+      var stepNum = idx + 1;
+      ind.classList.remove('active', 'completed');
+      if (stepNum === n)     ind.classList.add('active');
+      else if (stepNum < n)  ind.classList.add('completed');
+    });
+    connectors.forEach(function (con, idx) {
+      con.classList.toggle('completed', idx < n - 1);
+    });
+    if (counterEl) {
+      counterEl.innerHTML = 'Step <strong>' + n + '</strong> of ' + totalSteps;
     }
 
-    fileInputs.forEach(input => {
-        input.addEventListener('change', function(e) {
-            if (!input.files.length) return;
+    currentStep = n;
+    var wrapper = document.querySelector('.wizard-wrapper');
+    if (wrapper) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
-            const file = input.files[0];
-            
-            if (file.size > maxMB * 1024 * 1024) {
-                alert(`File "${file.name}" is too large! Max size is ${maxMB} MB.`);
-                input.value = "";
-                return;
-            }
-            
-            if (!file.type.startsWith('image/')) {
-                alert(`File "${file.name}" is not an image.`);
-                input.value = "";
-                return;
-            }
+  /* ── If server returned errors, open on first step that has errors ── */
+  {% if form.errors or images.errors %}
+    var hasStep2Errors = document.querySelector('#step-2 .field-error, #step-2 .error-alert');
+    var hasStep3Errors = document.querySelector('#step-3 .field-error');
+    if (hasStep2Errors) goToStep(2);
+    else if (hasStep3Errors) goToStep(3);
+  {% endif %}
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                cropPreview.src = e.target.result;
-                cropContainer.style.display = 'flex';
-                
-                if (cropper) {
-                    cropper.destroy();
-                }
-                
-                cropper = new Cropper(cropPreview, {
-                    aspectRatio: 1200 / 900,
-                    viewMode: 2,
-                    autoCropArea: 1,
-                    responsive: true,
-                    dragMode: 'move',
-                    guides: true,
-                    background: true,
-                    center: true,
-                    highlight: true,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false,
-                });
+  /* ═══════════════════════════════════════════════
+     STEP 1 — VALIDATION & CATEGORY TOGGLE
+  ═══════════════════════════════════════════════ */
+  var catSelect = document.getElementById('id_property_category');
+  var resGroup  = document.getElementById('residential-group');
+  var comGroup  = document.getElementById('commercial-group');
+  var lanGroup  = document.getElementById('lands-group');
+  var resSelect = document.getElementById('id_residential');
+  var comSelect = document.getElementById('id_commercial');
+  var lanSelect = document.getElementById('id_lands');
+  var hint1     = document.getElementById('hint-1');
+  var hint1Msg  = document.getElementById('hint-1-msg');
 
-                currentInput = input;
-            };
-            reader.readAsDataURL(file);
-        });
+  function updateTypeFields() {
+    var cat = catSelect ? catSelect.value : '';
+
+    if (resGroup) resGroup.style.display = 'none';
+    if (comGroup) comGroup.style.display = 'none';
+    if (lanGroup) lanGroup.style.display = 'none';
+
+    if (resSelect) { resSelect.disabled = true; }
+    if (comSelect) { comSelect.disabled = true; }
+    if (lanSelect) { lanSelect.disabled = true; }
+
+    if (cat === 'Residential' && resGroup) {
+      resGroup.style.display = 'block';
+      if (resSelect) resSelect.disabled = false;
+    } else if (cat === 'Commercial' && comGroup) {
+      comGroup.style.display = 'block';
+      if (comSelect) comSelect.disabled = false;
+    } else if (cat === 'Land' && lanGroup) {
+      lanGroup.style.display = 'block';
+      if (lanSelect) lanSelect.disabled = false;
+    }
+  }
+
+  if (catSelect) {
+    updateTypeFields();
+    catSelect.addEventListener('change', function () {
+      updateTypeFields();
+      if (hint1) hint1.classList.remove('show');
+    });
+  }
+
+  function validateStep1() {
+    if (!catSelect || !catSelect.value) {
+      if (hint1Msg) hint1Msg.textContent = 'Please select a property category to continue.';
+      if (hint1) hint1.classList.add('show');
+      return false;
+    }
+    var cat = catSelect.value;
+    if (cat === 'Residential' && resSelect && !resSelect.value) {
+      if (hint1Msg) hint1Msg.textContent = 'Please select a residential property type.';
+      if (hint1) hint1.classList.add('show');
+      return false;
+    }
+    if (cat === 'Commercial' && comSelect && !comSelect.value) {
+      if (hint1Msg) hint1Msg.textContent = 'Please select a commercial property type.';
+      if (hint1) hint1.classList.add('show');
+      return false;
+    }
+    if (cat === 'Land' && lanSelect && !lanSelect.value) {
+      if (hint1Msg) hint1Msg.textContent = 'Please select a land type.';
+      if (hint1) hint1.classList.add('show');
+      return false;
+    }
+    if (hint1) hint1.classList.remove('show');
+    return true;
+  }
+
+  var btn1 = document.getElementById('next-1');
+  if (btn1) btn1.addEventListener('click', function () {
+    if (validateStep1()) goToStep(2);
+  });
+
+  /* ═══════════════════════════════════════════════
+     STEP 2 — VALIDATION & NAVIGATION
+  ═══════════════════════════════════════════════ */
+  var REQUIRED_STEP2 = [
+    { id: 'id_description',  label: 'Property Description' },
+    { id: 'id_state',        label: 'State'                },
+    { id: 'id_location',     label: 'Location'             },
+    { id: 'id_bedrooms',     label: 'Bedrooms'             },
+    { id: 'id_bathrooms',    label: 'Bathrooms'            },
+    { id: 'id_phone_number', label: 'Phone Number'         },
+    { id: 'id_price_range',  label: 'Price (per year)'     },
+    { id: 'id_base_image',   label: 'Overview Image', isFile: true },
+  ];
+
+  REQUIRED_STEP2.forEach(function (field) {
+    var el = document.getElementById(field.id);
+    if (!el) return;
+    var evt = field.isFile ? 'change' : 'input';
+    el.addEventListener(evt, function () {
+      el.classList.remove('input-error');
+      var err = el.parentNode.querySelector('.js-field-error');
+      if (err) err.remove();
+    });
+  });
+
+  function validateStep2() {
+    var hasError   = false;
+    var firstErrEl = null;
+
+    REQUIRED_STEP2.forEach(function (field) {
+      var el = document.getElementById(field.id);
+      if (!el) return;
+
+      el.classList.remove('input-error');
+      var old = el.parentNode.querySelector('.js-field-error');
+      if (old) old.remove();
+
+      var isEmpty;
+      if (field.isFile) {
+        var hasCurrentFile = !!el.parentNode.querySelector('a[href]');
+        isEmpty = (!el.files || el.files.length === 0) && !hasCurrentFile;
+      } else {
+        isEmpty = !el.value || el.value.trim() === '';
+      }
+
+      if (isEmpty) {
+        el.classList.add('input-error');
+        var errDiv = document.createElement('div');
+        errDiv.className = 'field-error js-field-error';
+        errDiv.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i> '
+                         + field.label + ' is required.';
+        el.insertAdjacentElement('afterend', errDiv);
+        if (!firstErrEl) firstErrEl = el;
+        hasError = true;
+      }
     });
 
-    cropConfirm.addEventListener('click', function() {
-        if (!cropper || !currentInput) return;
-        
-        const canvas = cropper.getCroppedCanvas({ 
-            width: 1200, 
-            height: 900,
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high'
-        });
-        
-        canvas.toBlob(function(blob) {
-            const newFile = new File([blob], currentInput.files[0].name, { 
-                type: 'image/jpeg',
-                lastModified: Date.now()
-            });
-            
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(newFile);
-            currentInput.files = dataTransfer.files;
-
-            cropContainer.style.display = 'none';
-            cropper.destroy();
-            cropper = null;
-            currentInput = null;
-        }, 'image/jpeg', 0.9);
-    });
-
-    cropCancel.addEventListener('click', function() {
-        if (cropper) {
-            cropper.destroy();
-            cropper = null;
-        }
-        cropContainer.style.display = 'none';
-        if (currentInput) {
-            currentInput.value = "";
-            currentInput = null;
-        }
-    });
-
-    if (cropCancelTop) {
-        cropCancelTop.addEventListener('click', function() {
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
-            }
-            cropContainer.style.display = 'none';
-            if (currentInput) {
-                currentInput.value = "";
-                currentInput = null;
-            }
-        });
+    if (firstErrEl) {
+      firstErrEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    cropContainer.addEventListener('click', function(e) {
-        if (e.target === cropContainer) {
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
-            }
-            cropContainer.style.display = 'none';
-            if (currentInput) {
-                currentInput.value = "";
-                currentInput = null;
-            }
-        }
-    });
-});
-// Add this script to both update_rent.html and update_sale.html templates
-// Place it inside the existing <script> tag or create a new one
+    return !hasError;
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Get the property category field
-    const categoryField = document.querySelector('[name="property_category"]');
-    
-    if (!categoryField) return;
-    
-    // Get all property type field groups
-    const residentialGroup = document.querySelector('[name="residential"]')?.closest('.form-group');
-    const commercialGroup = document.querySelector('[name="commercial"]')?.closest('.form-group');
-    const landsGroup = document.querySelector('[name="lands"]')?.closest('.form-group');
-    
-    function updatePropertyTypeFields() {
-        const selectedCategory = categoryField.value;
-        
-        // Hide all property type fields first
-        if (residentialGroup) residentialGroup.style.display = 'none';
-        if (commercialGroup) commercialGroup.style.display = 'none';
-        if (landsGroup) landsGroup.style.display = 'none';
-        
-        // Show only the relevant field based on selected category
-        if (selectedCategory === 'Residential' && residentialGroup) {
-            residentialGroup.style.display = 'block';
-        } else if (selectedCategory === 'Commercial' && commercialGroup) {
-            commercialGroup.style.display = 'block';
-        } else if (selectedCategory === 'Land' && landsGroup) {
-            landsGroup.style.display = 'block';
-        }
-    }
-    
-    // Run on page load
-    updatePropertyTypeFields();
-    
-    // Run whenever the category changes
-    categoryField.addEventListener('change', updatePropertyTypeFields);
+  var back2 = document.getElementById('back-2');
+  var next2 = document.getElementById('next-2');
+  if (back2) back2.addEventListener('click', function () { goToStep(1); });
+  if (next2) next2.addEventListener('click', function () {
+    if (validateStep2()) goToStep(3);
+  });
+
+  /* ═══════════════════════════════════════════════
+     STEP 3 — NAVIGATION
+  ═══════════════════════════════════════════════ */
+  var back3 = document.getElementById('back-3');
+  if (back3) back3.addEventListener('click', function () { goToStep(2); });
+
+  var wizardForm   = document.getElementById('wizardForm');
+  var formSubmitted = false;
+  window.onbeforeunload = function () { if (!formSubmitted) return undefined; };
+  if (wizardForm) wizardForm.addEventListener('submit', function () { formSubmitted = true; });
+
+  /* ═══════════════════════════════════════════════
+     IMAGE CROPPING
+  ═══════════════════════════════════════════════ */
+  var fileInputs    = document.querySelectorAll('input[type="file"]');
+  var maxMB         = 5;
+  var cropContainer = document.getElementById('cropContainer');
+  var cropPreview   = document.getElementById('cropPreview');
+  var cropConfirm   = document.getElementById('cropConfirm');
+  var cropCancel    = document.getElementById('cropCancel');
+  var cropCancelTop = document.getElementById('cropCancelTop');
+  var cropper, currentInput;
+
+  fileInputs.forEach(function (input) {
+    input.addEventListener('change', function () {
+      if (!input.files.length) return;
+      var file = input.files[0];
+
+      if (file.size > maxMB * 1024 * 1024) {
+        alert('File "' + file.name + '" is too large. Max size is ' + maxMB + ' MB.');
+        input.value = ''; return;
+      }
+      if (!file.type.startsWith('image/')) {
+        alert('File "' + file.name + '" is not an image.');
+        input.value = ''; return;
+      }
+
+      var isBase  = input.name.includes('base_image');
+      var ratio   = isBase ? 1600 / 833 : 1200 / 900;
+      var reader  = new FileReader();
+      reader.onload = function (e) {
+        cropPreview.src = e.target.result;
+        cropContainer.style.display = 'flex';
+        if (cropper) { cropper.destroy(); }
+        cropper = new Cropper(cropPreview, {
+          aspectRatio: ratio, viewMode: 2, autoCropArea: 1,
+          responsive: true, dragMode: 'move',
+          guides: true, background: true, center: true,
+          highlight: true, cropBoxMovable: true, cropBoxResizable: true,
+          toggleDragModeOnDblclick: false,
+        });
+        currentInput = input;
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  function closeCrop(clear) {
+    if (cropper) { cropper.destroy(); cropper = null; }
+    cropContainer.style.display = 'none';
+    if (clear && currentInput) { currentInput.value = ''; }
+    currentInput = null;
+  }
+
+  cropConfirm.addEventListener('click', function () {
+    if (!cropper || !currentInput) return;
+    var isBase = currentInput.name.includes('base_image');
+    var w = isBase ? 1600 : 1200;
+    var h = isBase ? 833  : 900;
+    cropper.getCroppedCanvas({
+      width: w, height: h,
+      imageSmoothingEnabled: true, imageSmoothingQuality: 'high',
+    }).toBlob(function (blob) {
+      var newFile = new File([blob], currentInput.files[0].name, {
+        type: 'image/jpeg', lastModified: Date.now(),
+      });
+      var dt = new DataTransfer();
+      dt.items.add(newFile);
+      currentInput.files = dt.files;
+      closeCrop(false);
+    }, 'image/jpeg', 0.9);
+  });
+
+  cropCancel.addEventListener('click',    function () { closeCrop(true); });
+  cropCancelTop.addEventListener('click', function () { closeCrop(true); });
+  cropContainer.addEventListener('click', function (e) {
+    if (e.target === cropContainer) closeCrop(true);
+  });
+
 });
 </script>
-
 
 {% endblock %}

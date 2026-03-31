@@ -272,8 +272,8 @@
             <div class="property-price-section">
               <span class="price-label">Rent</span>
               <span class="property-price">
-                ₦{{ property.price_range|floatformat:2|intcomma }}
-                <span class="price-period">/month</span>
+                ₦{{ property.price_range|floatformat:0|intcomma }}
+                <span class="price-period">/yr</span>
               </span>
             </div>
             <a href="{% url 'customer:view-property-r' property.id %}" class="btn-view-details">

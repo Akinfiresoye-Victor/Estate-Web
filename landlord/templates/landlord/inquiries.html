@@ -1,0 +1,369 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block title %}Inquiries — Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'landlord/css/inquiries.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Pass inquiry data to JS as JSON -->
+<script id="inquiriesJson" type="application/json">
+[{% for inq in inquiries %}{
+  "id": {{ forloop.counter }},
+  "lead_id": "{{ inq.lead_id }}",
+  "name": "{{ inq.name|escapejs }}",
+  "email": "{{ inq.email|escapejs }}",
+  "phone_no": "{{ inq.phone_no|escapejs }}",
+  "property_name": "{{ inq.property_name|escapejs }}",
+  "property_type": "{{ inq.property_type|escapejs }}",
+  "inquiry_message": "{{ inq.inquiry_message|escapejs }}",
+  "contact_type": "{{ inq.contact_type|escapejs }}",
+  "date_created": "{{ inq.date_created|date:'N j, Y' }}",
+  "schedule_tour": "{% if inq.schedule_tour %}{{ inq.schedule_tour|date:'l, N j, Y' }}{% endif %}",
+  "status": "{{ inq.status|escapejs }}",
+  "stages": "{{ inq.stages|escapejs }}"
+}{% if not forloop.last %},{% endif %}{% endfor %}]
+</script>
+
+<div class="inq-page">
+
+  <!-- ===== PAGE HEADER ===== -->
+  <div class="inq-page-header">
+    <div>
+      <h1 class="inq-page-title">Inquiries</h1>
+      <p class="inq-page-sub">Messages from people interested in your properties.</p>
+    </div>
+    <div class="header-badges">
+      <span class="hb-tag total">{{ inquiries.count }} Total</span>
+    </div>
+  </div>
+
+  <!-- ===== MAIN INBOX LAYOUT ===== -->
+  <div class="inbox-layout" id="inboxLayout">
+
+    <!-- ============================
+         LEFT — INQUIRY LIST PANEL
+         ============================ -->
+    <div class="inbox-list-panel" id="listPanel">
+
+      <!-- Search -->
+      <div class="inq-search-wrap">
+        <i class="bi bi-search inq-search-icon"></i>
+        <input type="text" class="inq-search-input" id="inqSearch" placeholder="Search inquiries...">
+      </div>
+
+      <!-- Inquiry list -->
+      <div class="inq-list" id="inqList">
+
+        {% for inq in inquiries %}
+        <div class="inq-item" data-id="{{ forloop.counter }}">
+          <div class="inq-item-avatar">{{ inq.name|slice:":1"|upper }}{{ inq.name|cut:" "|slice:"1:2"|upper }}</div>
+          <div class="inq-item-body">
+            <div class="inq-item-top">
+              <p class="inq-item-name">{{ inq.name }}</p>
+              <span class="inq-item-time">{{ inq.date_created|date:"N j" }}</span>
+            </div>
+            <p class="inq-item-prop">{{ inq.property_name }}</p>
+            <p class="inq-item-preview">{{ inq.inquiry_message|truncatechars:80 }}</p>
+          </div>
+        </div>
+        {% empty %}
+        <div style="padding:2rem;text-align:center;color:var(--ll-muted);">
+          <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+          No inquiries yet.
+        </div>
+        {% endfor %}
+
+      </div><!-- /inq-list -->
+    </div><!-- /inbox-list-panel -->
+
+
+    <!-- ============================
+         RIGHT — DETAIL PANEL
+         ============================ -->
+    <div class="inbox-detail-panel" id="detailPanel">
+
+      <!-- Empty state (shown when nothing selected on desktop) -->
+      <div class="detail-empty" id="detailEmpty">
+        <div class="empty-icon"><i class="bi bi-chat-dots"></i></div>
+        <p class="empty-title">Select an inquiry</p>
+        <p class="empty-sub">Click any message on the left to view details.</p>
+      </div>
+
+      <!-- Inquiry detail (hidden by default, shown on selection) -->
+      <div class="detail-content" id="detailContent" style="display:none;">
+
+        <!-- Detail header -->
+        <div class="detail-header">
+          <button class="detail-back-btn" id="detailBack">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <div class="detail-sender-wrap">
+            <div class="detail-avatar" id="detailAvatar"></div>
+            <div class="detail-sender-info">
+              <p class="detail-sender-name" id="detailName"></p>
+              <p class="detail-sender-meta" id="detailMeta"></p>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="detail-action-btn danger" title="Delete inquiry" data-bs-toggle="modal" data-bs-target="#deleteInqModal">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Property context pill -->
+        <div class="detail-prop-pill">
+          <i class="bi bi-building"></i>
+          <span id="detailPropPill"></span>
+          <span id="detailPropType" style="color:var(--iq-light);font-size:.8rem;margin-left:.35rem;"></span>
+        </div>
+
+        <!-- Message thread -->
+        <div class="message-thread" id="messageThread">
+
+          <!-- Received message -->
+          <div class="msg-bubble received">
+            <p class="msg-text" id="detailMessage"></p>
+            <span class="msg-time" id="detailMsgTime"></span>
+          </div>
+
+          <!-- Viewing schedule card (shown only when schedule_tour is set) -->
+          <div class="msg-bubble info" id="viewingCard" style="display:none;">
+            <div style="display:flex;align-items:center;gap:.6rem;">
+              <i class="bi bi-calendar-event" style="font-size:1.1rem;color:var(--iq-gold);"></i>
+              <div>
+                <p style="margin:0;font-weight:600;font-size:.85rem;">Viewing Requested</p>
+                <p style="margin:0;font-size:.8rem;color:var(--iq-light);" id="viewingDate"></p>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /message-thread -->
+
+        <!-- Contact info & preferred channel -->
+        <div class="reply-box">
+          <div class="reply-box-inner" style="flex-direction:column;gap:.75rem;">
+
+            <!-- Preferred contact notice -->
+            <div id="contactNotice" class="inq-contact-notice">
+              <i class="bi bi-info-circle"></i>
+              <span id="contactNoticeText"></span>
+            </div>
+
+            <!-- Contact action button -->
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+              <a id="contactActionBtn" href="#" target="_blank" class="btn-send" style="text-decoration:none;">
+                <i id="contactActionIcon" class="bi bi-whatsapp"></i>
+                <span id="contactActionLabel">Reply on WhatsApp</span>
+              </a>
+            </div>
+
+            <!-- In-app messaging coming soon -->
+            <div class="inq-coming-soon">
+              <i class="bi bi-clock-history"></i>
+              <span>In-App Messaging — <strong>Coming Soon</strong></span>
+            </div>
+
+          </div>
+        </div><!-- /reply-box -->
+
+      </div><!-- /detail-content -->
+
+    </div><!-- /inbox-detail-panel -->
+
+  </div><!-- /inbox-layout -->
+</div><!-- /inq-page -->
+
+
+<!-- ===== DELETE INQUIRY MODAL ===== -->
+<div class="modal fade" id="deleteInqModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content ll-modal">
+      <div class="modal-header ll-modal-header">
+        <h5 class="ll-modal-title"><i class="bi bi-trash3 text-danger me-2"></i>Delete Inquiry</h5>
+        <button type="button" class="ll-modal-close" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
+      </div>
+      <div class="modal-body ll-modal-body">
+        <p>This will permanently delete this inquiry. This cannot be undone.</p>
+      </div>
+      <div class="modal-footer ll-modal-footer">
+        <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" id="deleteInqBtn" data-url-template="{% url 'landlord:delete-lead' 'LEAD_ID' %}" class="btn-danger-solid">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+// =============================================================
+//  INQUIRY PAGE — JAVASCRIPT (real data from Django)
+// =============================================================
+
+const listPanel    = document.getElementById('listPanel');
+const detailPanel  = document.getElementById('detailPanel');
+const detailEmpty  = document.getElementById('detailEmpty');
+const detailContent= document.getElementById('detailContent');
+const detailBack   = document.getElementById('detailBack');
+const inboxLayout  = document.getElementById('inboxLayout');
+const deleteInqBtn = document.getElementById('deleteInqBtn');
+
+// Load inquiry data injected by Django
+const inquiryData = JSON.parse(document.getElementById('inquiriesJson').textContent);
+
+let activeId = null;
+let isMobile = () => window.innerWidth < 768;
+
+// Build a lookup: counter-id → inquiry object
+const dataMap = {};
+inquiryData.forEach(inq => { dataMap[inq.id] = inq; });
+
+// ---- Helper: get initials from a full name ----
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+// ---- Helper: build WhatsApp URL ----
+function buildWhatsappUrl(phone, propertyName) {
+  // Strip all non-numeric chars; if Nigerian and doesn't start with country code, add +234
+  let raw = phone.replace(/\D/g, '');
+  if (raw.startsWith('0')) raw = '234' + raw.slice(1);
+  const msg = encodeURIComponent(
+    `Hi ${propertyName ? 'regarding the ' + propertyName + ' property' : 'there'}, I saw your inquiry on Estate Web and I'd like to follow up with you.`
+  );
+  return `https://wa.me/${raw}?text=${msg}`;
+}
+
+// ---- Helper: build email mailto ----
+function buildEmailUrl(email, propertyName) {
+  const subject = encodeURIComponent(`Your Inquiry on Estate Web — ${propertyName || 'Property'}`);
+  const body = encodeURIComponent(
+    `Hello,\n\nThank you for your interest in ${propertyName || 'our property'} on Estate Web. We'd like to follow up with you regarding your inquiry.\n\nKind regards`
+  );
+  return `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+// ---- Open an inquiry ----
+function openInquiry(id) {
+  const data = dataMap[id];
+  if (!data) return;
+
+  activeId = id;
+
+  // Highlight active item
+  document.querySelectorAll('.inq-item').forEach(el => el.classList.remove('active'));
+  const selectedItem = document.querySelector(`.inq-item[data-id="${id}"]`);
+  if (selectedItem) selectedItem.classList.add('active');
+
+  // Populate header
+  const initials = getInitials(data.name);
+  document.getElementById('detailAvatar').textContent = initials;
+  document.getElementById('detailName').textContent   = data.name;
+  document.getElementById('detailMeta').textContent   = `Inquiry about: ${data.property_name}  ·  ${data.date_created}`;
+
+  // Property pill
+  document.getElementById('detailPropPill').textContent = data.property_name;
+  document.getElementById('detailPropType').textContent = data.property_type ? `(${data.property_type})` : '';
+
+  // Message
+  document.getElementById('detailMessage').textContent = data.inquiry_message;
+  document.getElementById('detailMsgTime').textContent = data.date_created;
+
+  // Viewing schedule
+  const viewingCard = document.getElementById('viewingCard');
+  const viewingDate = document.getElementById('viewingDate');
+  if (data.schedule_tour) {
+    viewingDate.textContent = `Requested viewing date: ${data.schedule_tour}`;
+    viewingCard.style.display = '';
+  } else {
+    viewingCard.style.display = 'none';
+  }
+
+  // Contact action button
+  const contactBtn   = document.getElementById('contactActionBtn');
+  const contactIcon  = document.getElementById('contactActionIcon');
+  const contactLabel = document.getElementById('contactActionLabel');
+  const contactNotice= document.getElementById('contactNoticeText');
+
+  const ct = data.contact_type;
+
+  if (ct === 'Whatsapp') {
+    contactBtn.href = buildWhatsappUrl(data.phone_no, data.property_name);
+    contactIcon.className  = 'bi bi-whatsapp';
+    contactLabel.textContent = 'Reply on WhatsApp';
+    contactNotice.textContent = `${data.name} prefers to be contacted via WhatsApp (${data.phone_no}).`;
+  } else if (ct === 'Email') {
+    contactBtn.href = buildEmailUrl(data.email, data.property_name);
+    contactIcon.className  = 'bi bi-envelope';
+    contactLabel.textContent = 'Reply via Email';
+    contactNotice.textContent = `${data.name} prefers to be contacted via Email (${data.email}).`;
+  } else if (ct === 'Phone Call') {
+    // For phone call we just open the tel: protocol
+    let raw = data.phone_no.replace(/\D/g, '');
+    if (raw.startsWith('0')) raw = '+234' + raw.slice(1);
+    contactBtn.href = `tel:${raw}`;
+    contactIcon.className  = 'bi bi-telephone';
+    contactLabel.textContent = 'Call Client';
+    contactNotice.textContent = `${data.name} prefers to be contacted via Phone Call (${data.phone_no}).`;
+  } else {
+    // Fallback — same as WhatsApp
+    contactBtn.href = buildWhatsappUrl(data.phone_no, data.property_name);
+    contactIcon.className  = 'bi bi-whatsapp';
+    contactLabel.textContent = 'Reply on WhatsApp';
+    contactNotice.textContent = `Preferred contact for ${data.name}: ${ct || 'Not specified'} (${data.phone_no}).`;
+  }
+
+  // Update Delete Modal Button Link
+  if (deleteInqBtn) {
+    const template = deleteInqBtn.getAttribute('data-url-template');
+    deleteInqBtn.href = template.replace('LEAD_ID', data.lead_id);
+  }
+
+  // Show/hide panels
+  detailEmpty.style.display   = 'none';
+  detailContent.style.display = 'flex';
+
+  // On mobile: hide list panel, show detail
+  if (isMobile()) {
+    listPanel.classList.add('hidden');
+    detailPanel.classList.add('mobile-open');
+  }
+}
+
+// ---- Back button (mobile) ----
+detailBack.addEventListener('click', () => {
+  listPanel.classList.remove('hidden');
+  detailPanel.classList.remove('mobile-open');
+  document.querySelectorAll('.inq-item').forEach(el => el.classList.remove('active'));
+  activeId = null;
+});
+
+// ---- Search ----
+document.getElementById('inqSearch').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.inq-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? '' : 'none';
+  });
+});
+
+// ---- Click on inquiry items ----
+document.querySelectorAll('.inq-item').forEach(item => {
+  item.addEventListener('click', () => openInquiry(parseInt(item.dataset.id)));
+});
+
+// ---- Auto open first item on desktop ----
+if (!isMobile() && inquiryData.length > 0) {
+  openInquiry(1);
+}
+</script>
+{% endblock %}

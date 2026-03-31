@@ -211,6 +211,7 @@ class PropertyViews(models.Model):
 class Appointments(models.Model):
     company_uuid=models.CharField('Company UUID', default=None, blank=True, null=True)
     agent_uuid=models.CharField('Agents UUID', default=None, blank=True, null=True)
+    landlord_uuid=models.CharField('Landlord UUID', default=None, blank=True, null=True)
     lead_uuid=models.CharField('Lead UUID', default=None, blank=True, null=True)
     appointment=models.DateField('Appointment', default=timezone.now)
     note= models.CharField('Appointment Note', default='No Note Provided', blank=True, null=True)

@@ -81,7 +81,7 @@
         {% if prop.price %}
           ₦{{ prop.price|floatformat:0|intcomma }}
         {% else %}
-          ₦{{ prop.price_range|floatformat:0|intcomma }}<span>/mo</span>
+          ₦{{ prop.price_range|floatformat:0|intcomma }}<span>/yr</span>
         {% endif %}
       </div>
     </div>
@@ -248,7 +248,7 @@
       {% for prop in properties %}
       <td class="cmp-price-cell">
         {% if prop.price %}₦{{ prop.price|floatformat:0|intcomma }}
-        {% else %}₦{{ prop.price_range|floatformat:0|intcomma }}<span class="cmp-per">/mo</span>{% endif %}
+        {% else %}₦{{ prop.price_range|floatformat:0|intcomma }}<span class="cmp-per">/yr</span>{% endif %}
       </td>
       {% endfor %}
       {% for i in "123" %}{% if forloop.counter > properties|length %}<td class="cmp-empty-col">—</td>{% endif %}{% endfor %}

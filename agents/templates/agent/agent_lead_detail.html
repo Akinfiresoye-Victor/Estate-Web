@@ -77,7 +77,7 @@
       <a href="mailto:{{ lead.email }}" class="quick-btn email">
         <i class="bi bi-envelope-fill"></i> Email
       </a>
-      <a href="https://wa.me/{{ lead.phone_no }}" target="_blank" class="quick-btn whatsapp">
+      <a href="https://wa.me/{{ lead.phone_no|cut:' ' }}?text=Hi%20{{ lead.name|urlencode }}%2C%20I'm%20contacting%20you%20from%20Estate%20Web%20regarding%20your%20inquiry%20for%20{{ property.residential|default:property.commercial|default:property.lands|urlencode }}%2E" target="_blank" class="quick-btn whatsapp">
         <i class="bi bi-whatsapp"></i> WhatsApp
       </a>
     </div>
@@ -92,6 +92,12 @@
 
     {# ── Primary column ───────────────────────────────────────────── #}
     <section class="primary-section">
+
+      {# Preferred mode of contact notice #}
+      <div class="contact-preference-notice">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>Client's preferred mode of contact: <strong>{{ lead.contact_type }}</strong></span>
+      </div>
 
       {# Contact Information #}
       <div class="info-card">
@@ -132,13 +138,13 @@
               </div>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-item {% if lead.contact_type == 'Whatsapp' or lead.contact_type == 'Email' or lead.contact_type == 'Phone Call' %}preferred-item{% endif %}">
               <div class="detail-icon"><i class="bi bi-chat-dots-fill"></i></div>
               <div class="detail-content">
                 <span class="detail-label">Preferred Contact</span>
                 <span class="detail-value">
                   <span class="method-badge">
-                    <i class="bi bi-{{ lead.contact_type|lower }}"></i>
+                    <i class="bi bi-{% if lead.contact_type == 'Whatsapp' %}whatsapp{% elif lead.contact_type == 'Email' %}envelope-fill{% elif lead.contact_type == 'Phone Call' %}telephone-fill{% else %}chat-dots-fill{% endif %}"></i>
                     {{ lead.contact_type }}
                   </span>
                 </span>
@@ -199,8 +205,8 @@
               <div class="property-pricing">
                 <div class="price-tag">
                   {% if property.price_range %}
-                    ₦{{ property.price_range|floatformat:2|intcomma }}
-                    <span class="price-unit">/month</span>
+                    ₦{{ property.price_range|floatformat:0|intcomma }}
+                    <span class="price-unit">/yr</span>
                   {% else %}
                     ₦{{ property.price|floatformat:2|intcomma }}
                   {% endif %}

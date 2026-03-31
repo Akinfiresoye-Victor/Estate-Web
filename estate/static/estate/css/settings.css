@@ -282,6 +282,22 @@ body {
   background: var(--bg);
 }
 
+.email-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--success);
+  margin-top: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.email-verified-badge i {
+  font-size: 0.9rem;
+}
+
 
 /* ═══════════════════════════════════════════════════
    INFO BOX

@@ -255,7 +255,7 @@
                   {% else %}{{ prop.lands }}{% endif %}
                 </h4>
                 <span><i class="bi bi-geo-alt-fill"></i> {{ prop.location }}, {{ prop.state }}</span>
-                <span class="mc-prop-price">₦{{ prop.price_range|floatformat:0|intcomma }}<small>/mo</small></span>
+                <span class="mc-prop-price">₦{{ prop.price_range|floatformat:0|intcomma }}<small>/yr</small></span>
               </div>
               <div class="mc-prop-actions">
                 <span class="mc-live-badge {% if prop.is_listed %}live{% else %}stored{% endif %}">
