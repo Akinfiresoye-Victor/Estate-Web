@@ -11,6 +11,7 @@ from estate.models import LeadInfo
 from datetime import datetime, date
 from django.db.models import Sum
 from core.models import Appointments
+from members.models import User
 
 
 def dashboard(request):
@@ -145,7 +146,11 @@ def lanlord_profile(request):
         return redirect('landing')
     try:
         landlord = LandlordInformation.objects.get(user_id=request.user.id)
-        return render(request, 'landlord/profile.html', {'landlord': landlord})
+        total_properties=PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid).count() + \
+            PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid).count()
+        inquiry_count=LeadInfo.objects.filter(landlord_id=landlord.landlord_uuid).count()
+        return render(request, 'landlord/profile.html', {'landlord': landlord, 'prop_count':total_properties,
+        'total_inquiries':inquiry_count})   
     except LandlordInformation.DoesNotExist:
         messages.error(request, 'Landlord profile not found.')
         return redirect('landing')
@@ -220,7 +225,37 @@ def update_profile(request):
                 messages.error(request, 'Please correct the errors below.')
         else:
             form = LandlordInformationForm(instance=landlord)
-        return render(request, 'landlord/profile.html', {'form': form, 'landlord': landlord})
+        return render(request, 'landlord/update_profile.html', {'form': form, 'landlord': landlord})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def delete_account(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role != 'landlord':
+        messages.info(request, 'Landlord Account Only')
+        return redirect('landing')
+    try:
+        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        if request.method == 'POST':
+            user = User.objects.get(id=request.user.id)
+            property_sale = PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid)
+            property_rent = PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid)
+            leads = LeadInfo.objects.filter(landlord_id=landlord.landlord_uuid)
+            appointments = Appointments.objects.filter(landlord_uuid=landlord.landlord_uuid)
+            property_sale.delete()
+            property_rent.delete()
+            leads.delete()
+            appointments.delete()
+            user.delete()
+            landlord.delete()
+            messages.success(request, 'Account deleted successfully!')
+            return redirect('landing')
+        return render(request, 'landlord/delete_account.html', {'landlord': landlord})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+

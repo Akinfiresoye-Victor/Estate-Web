@@ -583,6 +583,51 @@ body {
 
 
 /* ══════════════════════════════════════════════════
+   Mobile (< 640px) — handle 5 tabs in role switcher
+   ══════════════════════════════════════════════════ */
+@media (max-width: 639px) {
+  .role-switcher {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px;
+  }
+
+  .role-tab {
+    flex: 0 1 calc(33.333% - 3px);
+    min-width: fit-content;
+    padding: 0.5rem 0.35rem;
+    font-size: 0.65rem;
+  }
+
+  .role-tab i {
+    font-size: 0.95rem;
+    margin-bottom: 1px;
+  }
+
+  .role-tab-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* Very small screens — icons only, no text */
+@media (max-width: 380px) {
+  .role-tab {
+    flex: 0 1 auto;
+    padding: 0.45rem 0.3rem;
+  }
+
+  .role-tab-label {
+    display: none;
+  }
+
+  .role-tab i {
+    margin-bottom: 0;
+  }
+}
+
+
+/* ══════════════════════════════════════════════════
    640px+ — desktop layout with side panel
    ══════════════════════════════════════════════════ */
 @media (min-width: 640px) {

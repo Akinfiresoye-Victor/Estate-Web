@@ -11,9 +11,10 @@ from django.core.paginator import Paginator
 from .filters import *
 from members.models import User
 from datetime import date
-from agents.models import AgentInformation, AgentRating
+from agents.models import AgentInformation, AgentRating, AgentAnalytics
 from core.models import *
-from companies.models import CompanyInformation, CompanyRating
+from companies.models import CompanyInformation, CompanyRating, SessionId, CompanyAnalytics
+from agents.models import SessionId as sd
 import uuid
 from django.db.models import Avg, Count
 from django.core.exceptions import ObjectDoesNotExist
@@ -550,13 +551,15 @@ def change_password(request):
         messages.info(request, 'Please sign in to change your password.')
         return redirect('login')
     try:
-        user_role=request.user.role
+        user_role = request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
         else:
-            base_template='estate/base.html'
+            base_template = 'estate/base.html'
         if request.method == 'POST':
             form= PasswordChangeForm(request.user, request.POST)
             if form.is_valid():
@@ -587,13 +590,15 @@ def change_password_success(request):
         messages.info(request, 'Please sign in to continue.')
         return redirect('login')
     try:
-        user_role=request.user.role
+        user_role = request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
         else:
-            base_template='estate/base.html'
+            base_template = 'estate/base.html'
         return render(request, 'estate/succ_pass.html', {'base_template': base_template})
     
     except Exception:
@@ -957,6 +962,230 @@ def clear_compare(request):
         request.session.pop('compare_sale', None)
         request.session.pop('compare_rent', None)
         return JsonResponse({'success': True})
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+def agent_profile(request, agent_uuid):
+    """Display agent profile with reviews"""
+    try:
+        user_role=request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template='estate/base.html'
+        agent = AgentInformation.objects.get(agent_uuid=agent_uuid)
+        
+        # Get reviews
+        reviews = AgentRating.objects.filter(agent_uuid=agent_uuid).select_related('user').order_by('-created_at')[:10]  # Latest 10 reviews
+        
+        # Calculate rating statistics
+        rating_data = AgentRating.objects.filter(
+            agent_uuid=agent_uuid
+        ).aggregate(
+            average=Avg('rating'),
+            total=Count('id')
+        )
+        
+        # get analytics for the profile views incrementations
+        analytics_data, _ = AgentAnalytics.objects.get_or_create(
+            agent=agent,
+            defaults={
+                'profile_views':         0,
+                'property_views_l':      0,
+                'property_views_s':      0,
+                'average_profile_views': 0,
+                'average_lease_views':   0,
+                'average_sale_views':    0,
+                'monthly_leads':         0,
+                'monthly_reviews':       0,
+                'average_leads':         0,
+                'average_reviews':       0,
+                'ratings':               0.0,
+                'reviews':               0,
+                'competition':           0.0,
+            }
+        )
+        
+        
+        average_rating = rating_data['average'] or 0.0
+        total_reviews = rating_data['total'] or 0
+        
+        # Check if current user has reviewed
+        user_has_reviewed = False
+        if request.user.is_authenticated:
+            user_has_reviewed = AgentRating.objects.filter(agent_uuid=agent_uuid,user=request.user).exists()
+            
+            #Ensuring the user doesnt view the profile more than one
+            try:
+                prop_analytics=agent.session_id.get(session_id=request.user.id)
+            except ObjectDoesNotExist:
+                prop_analytics=sd.objects.create(
+                    agent=agent,
+                    session_id=request.user.id,
+                    inquires_check=0
+                )
+                analytics_data.profile_views += 1
+                analytics_data.save()
+        
+        # Get agent's other data (adjust based on your models)
+        house_count = agent.properties.count() if hasattr(agent, 'properties') else 0
+        lead_count = agent.leads.count() if hasattr(agent, 'leads') else 0
+        new_lead_count = agent.leads.filter(status='new').count() if hasattr(agent, 'leads') else 0
+        
+        context = {
+            'agent': agent,
+            'name': f'{agent.first_name} {agent.last_name}' if hasattr(agent, 'first_name') else agent.user.get_full_name(),
+            'work_type': agent.work_type if hasattr(agent, 'work_type') else 'Real Estate Agent',
+            'email': agent.email if hasattr(agent, 'email') else agent.user.email,
+            'phone': agent.phone_number if hasattr(agent, 'phone_number') else '',
+            'location': agent.location if hasattr(agent, 'location') else '',
+            'house_count': house_count,
+            'lead_count': lead_count,
+            'new_lead_count': new_lead_count,
+            'base_template': base_template,
+            
+            # Review context
+            'reviews': reviews,
+            'average_rating': average_rating,
+            'total_reviews': total_reviews,
+            'user_has_reviewed': user_has_reviewed,
+        }
+        
+        return render(request, 'estate/agent_profile.html', context)
+        
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def company_profile(request, company_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Please sign in to continue.')
+        return redirect('landing')
+    if request.user.role == 'company':
+        messages.info(request, 'Access denied: Unauthorized action.')
+        return redirect('landing')
+    role=request.user.role
+    if role=='company':
+        base_template='company/base.html'
+    elif role == 'agent':
+        base_template='agent/base.html'
+    else:
+        base_template='estate/base.html'
+    try:
+        company = CompanyInformation.objects.get(unique_company_id=company_uuid)
+        
+        # Count properties
+        total_property_on_lease = PropertyManagementRent.objects.filter(company_uuid=company_uuid).count()
+        total_property_on_sale = PropertyManagementSale.objects.filter(company_uuid=company_uuid).count()
+        total_properties = total_property_on_lease + total_property_on_sale
+        
+        # Get social links
+        social_links = company.social.all()
+        
+        # Property querysets
+        on_sale_qs = PropertyManagementSale.objects.filter(company_uuid=company_uuid)
+        on_lease_qs = PropertyManagementRent.objects.filter(company_uuid=company_uuid)
+        
+        # Pagination (2 items per page)
+        p_sale = Paginator(on_sale_qs, 2)
+        p_lease = Paginator(on_lease_qs, 2)
+        
+        page_sale = request.GET.get('page_sale', 1)
+        page_rent = request.GET.get('page_rent', 1)
+        
+        properties_on_sale = p_sale.get_page(page_sale)
+        properties_on_lease = p_lease.get_page(page_rent)
+        
+        # Get reviews and calculate average rating
+        reviews = CompanyRating.objects.filter(company_uuid=company_uuid).select_related('user')
+        rating_data = reviews.aggregate(
+            avg_rating=Avg('rating'),
+            total_reviews=Count('id')
+        )
+        analytics_data, _ = CompanyAnalytics.objects.get_or_create(
+            company=company,
+            defaults={
+                'profile_views':         0,
+                'property_views_l':      0,
+                'property_views_s':      0,
+                'average_profile_views': 0,
+                'average_lease_views':   0,
+                'average_sale_views':    0,
+                'monthly_leads':         0,
+                'monthly_reviews':       0,
+                'average_leads':         0,
+                'average_reviews':       0,
+            }
+        )
+        average_rating = rating_data['avg_rating'] or 0.0
+        total_reviews = rating_data['total_reviews']
+        
+        # Check if user has already reviewed (if authenticated)
+        user_has_reviewed = False
+        if request.user.is_authenticated:
+            user_has_reviewed = reviews.filter(user=request.user).exists()
+            
+            # Track profile view
+            try:
+                prop_analytics = company.session_id.get(session_id=request.user.id)
+            except ObjectDoesNotExist:
+                prop_analytics = SessionId.objects.create(
+                    company=company,
+                    session_id=request.user.id,
+                    inquires_check=0
+                )
+                analytics_data.profile_views += 1
+                analytics_data.save()
+        
+        # Generate page numbers for pagination
+        nums_sale = "x" * properties_on_sale.paginator.num_pages
+        nums_rent = "x" * properties_on_lease.paginator.num_pages
+        
+        context = {
+            'company': company,
+            'total_properties': total_properties,
+            'properties_for_sale': total_property_on_sale,
+            'properties_for_rent': total_property_on_lease,
+            'social_links': social_links,
+            'on_lease': properties_on_lease,
+            'on_sale': properties_on_sale,
+            'nums_s': nums_sale,
+            'nums_r': nums_rent,
+            'reviews': reviews[:5],  # Show only 5 most recent
+            'average_rating': average_rating,
+            'total_reviews': total_reviews,
+            'user_has_reviewed': user_has_reviewed,
+            'base_template':base_template
+        }
+        
+        return render(request, 'estate/company_profile.html', context)
+    except ObjectDoesNotExist:
+        messages.error(request, 'The requested company could not be found.')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def view_landlord_profile(request, landlord_uuid):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if request.user.role == 'landlord':
+        messages.info(request, 'You cannot view your own profile.')
+        return redirect('landing')
+    try:
+        landlord = LandlordInformation.objects.get(landlord_uuid=landlord_uuid)
+        return render(request, 'estate/landlord_profile.html', {'landlord': landlord})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

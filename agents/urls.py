@@ -7,7 +7,6 @@ app_name = 'agent'
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('form/',views.agent_form, name='agent-form'),
-    path('profile/<agent_uuid>', views.agent_profile, name='agent-profile'),
     path('profile_update',views.update_agent_profile, name='update-agent' ),
     path('lead/management', views.lead_management, name='leads'),
     path('analytics', views.analytics, name='analytics'),

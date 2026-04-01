@@ -1,0 +1,807 @@
+/* ============================================================
+   ESTATE WEB — Landlord Update Profile Page
+   File: landlord/css/update_profile.css
+   Design system: Light theme
+   Palette: #f4f6f9 bg | #1e2329 dark | #c19b76 gold
+   Breakpoints: 580px | 768px | 1100px
+   ============================================================ */
+
+:root {
+    --up-gold: #c19b76;
+    --up-gold-light: #f0e6d8;
+    --up-gold-dark: #a07d58;
+    --up-dark: #1e2329;
+    --up-mid: #4a5568;
+    --up-light: #8a96a8;
+    --up-bg: #f4f6f9;
+    --up-surface: #ffffff;
+    --up-border: #e4e7ec;
+    --up-danger: #e05c5c;
+    --up-danger-bg: #fff5f5;
+    --up-success: #3aaa6e;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Poppins', sans-serif;
+}
+
+
+/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+.up-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+    /* Extra breathing room for iOS home bar and Android nav bar */
+    padding-bottom: max(60px, calc(60px + env(safe-area-inset-bottom)));
+}
+
+/* ---- Back link + heading row ---- */
+.up-page-header {
+    margin-bottom: 24px;
+}
+
+.up-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--up-light);
+    margin-bottom: 10px;
+    transition: color 0.15s;
+}
+
+.up-back-link:hover {
+    color: var(--up-gold-dark);
+}
+
+.up-page-title {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--up-dark);
+    line-height: 1.2;
+}
+
+.up-page-sub {
+    font-size: 0.85rem;
+    color: var(--up-light);
+    margin-top: 3px;
+}
+
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.up-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .up-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+
+/* ============================================================
+   LEFT — CURRENT INFO CARD
+   ============================================================ */
+.up-info-card {
+    background: var(--up-surface);
+    border: 1px solid var(--up-border);
+    border-radius: var(--radius-lg);
+    padding: 24px 18px 18px;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 84px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .up-info-card {
+        position: static;
+        padding: 16px;
+        /* Switch to horizontal layout on mobile — saves vertical space */
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto;
+        gap: 0 16px;
+        text-align: left;
+    }
+
+    /* Avatar sits in a single column spanning all rows */
+    .up-current-avatar-wrap {
+        grid-column: 1;
+        grid-row: 1 / 4;
+        margin: 0;
+        align-self: center;
+    }
+
+    /* Name, role, divider, fields, hint all in column 2 */
+    .up-card-name {
+        grid-column: 2;
+        margin-bottom: 1px;
+    }
+
+    .up-card-role {
+        grid-column: 2;
+    }
+
+    .up-card-divider {
+        grid-column: 1 / -1;
+        margin: 12px 0;
+    }
+
+    .up-current-fields {
+        grid-column: 1 / -1;
+    }
+
+    .up-card-hint {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Avatar */
+.up-current-avatar-wrap {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 12px;
+}
+
+.up-current-avatar-img {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--up-border);
+    display: block;
+}
+
+.up-current-avatar-initials {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--up-gold-light);
+    color: var(--up-gold-dark);
+    font-size: 1.35rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--up-border);
+}
+
+/* Verified badge on avatar */
+.up-verified-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--up-surface);
+    background: var(--up-success);
+    color: #fff;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.up-verified-badge.unverified {
+    background: var(--up-gold);
+}
+
+/* Card text */
+.up-card-name {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--up-dark);
+    margin-bottom: 2px;
+}
+
+.up-card-role {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--up-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.up-card-divider {
+    height: 1px;
+    background: var(--up-border);
+    margin: 14px 0;
+}
+
+/* Current field rows */
+.up-current-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+
+.up-current-field {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ucf-label {
+    font-size: 0.73rem;
+    color: var(--up-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ucf-value {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--up-mid);
+    text-align: right;
+    word-break: break-word;
+}
+
+.ucf-value.has-file,
+.ucf-value.verified {
+    color: var(--up-success);
+}
+
+.ucf-value.not-verified {
+    color: var(--up-gold);
+}
+
+/* Card hint */
+.up-card-hint {
+    font-size: 0.73rem;
+    color: var(--up-light);
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    text-align: left;
+}
+
+.up-card-hint i {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+
+/* ============================================================
+   RIGHT — FORM SECTION
+   ============================================================ */
+.up-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Error banner */
+.up-error-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--up-danger-bg);
+    border: 1px solid #fad5d5;
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    color: var(--up-danger);
+}
+
+/* Each form block is its own card */
+.up-form-block {
+    background: var(--up-surface);
+    border: 1px solid var(--up-border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+@media (max-width: 580px) {
+    .up-form-block {
+        padding: 18px 16px;
+    }
+}
+
+/* Block header */
+.up-block-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--up-border);
+    flex-wrap: wrap;
+    /* lets optional tag drop to next line if needed */
+}
+
+/* On small screens, optional tag moves below the title/sub text */
+@media (max-width: 420px) {
+    .up-block-head {
+        gap: 10px;
+    }
+
+    .up-optional-tag {
+        margin-left: 48px;
+        /* indent to align under text, past icon */
+    }
+}
+
+.up-block-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--up-gold-light);
+    color: var(--up-gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.up-block-head-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.up-block-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--up-dark);
+    margin-bottom: 2px;
+}
+
+.up-block-sub {
+    font-size: 0.78rem;
+    color: var(--up-light);
+    line-height: 1.5;
+}
+
+.up-optional-tag {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--up-light);
+    background: var(--up-bg);
+    border: 1px solid var(--up-border);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+
+/* ============================================================
+   INPUT STYLING
+   Targets Django's rendered inputs — by class or type
+   ============================================================ */
+.up-input-wrap {
+    position: relative;
+}
+
+.up-input-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--up-light);
+    font-size: 0.88rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* All inputs & selects from Django form widgets */
+.up-form .form-control,
+.up-form .form-select,
+.up-form input[type="text"],
+.up-form input[type="tel"],
+.up-form select {
+    width: 100%;
+    background: var(--up-bg);
+    border: 1px solid var(--up-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px 10px 36px;
+    min-height: 44px;
+    /* comfortable tap target on mobile */
+    font-family: var(--font-body);
+    font-size: 0.87rem;
+    color: var(--up-dark);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Slightly larger tap target on small screens */
+@media (max-width: 580px) {
+
+    .up-form .form-control,
+    .up-form .form-select,
+    .up-form input[type="text"],
+    .up-form input[type="tel"],
+    .up-form select {
+        min-height: 48px;
+        font-size: 1rem;
+        /* prevents iOS auto-zoom on focus (must be >= 16px) */
+    }
+}
+
+.up-form .form-control:focus,
+.up-form .form-select:focus,
+.up-form input[type="text"]:focus,
+.up-form input[type="tel"]:focus,
+.up-form select:focus {
+    border-color: var(--up-gold);
+    box-shadow: 0 0 0 3px rgba(193, 155, 118, 0.15);
+    background: var(--up-surface);
+}
+
+/* Custom select caret */
+.up-form select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%238a96a8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-color: var(--up-bg);
+    padding-right: 34px;
+}
+
+/* Field error */
+.up-field-error {
+    font-size: 0.78rem;
+    color: var(--up-danger);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Hidden Django file inputs */
+.up-hidden-input {
+    display: none;
+}
+
+
+/* ============================================================
+   PHOTO UPLOAD ZONE
+   ============================================================ */
+.up-photo-zone {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px;
+    background: var(--up-bg);
+    border: 1px dashed var(--up-border);
+    border-radius: var(--radius-md);
+    transition: border-color 0.18s;
+}
+
+.up-photo-zone:hover {
+    border-color: var(--up-gold);
+}
+
+.up-photo-preview-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--up-surface);
+    border: 2px solid var(--up-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.up-photo-placeholder {
+    font-size: 1.8rem;
+    color: var(--up-border);
+}
+
+.up-photo-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.up-photo-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.up-photo-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--up-success);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.up-photo-status.none {
+    color: var(--up-light);
+}
+
+.up-photo-hint {
+    font-size: 0.74rem;
+    color: var(--up-light);
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.btn-choose-photo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--up-dark);
+    border: 1px solid var(--up-border);
+    background: var(--up-surface);
+    padding: 7px 14px;
+    min-height: 36px;
+    /* decent tap target */
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-choose-photo:hover {
+    border-color: var(--up-gold);
+    color: var(--up-gold-dark);
+}
+
+@media (max-width: 480px) {
+    .up-photo-zone {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+
+/* ============================================================
+   EXISTING FILE ROW (Government ID already uploaded)
+   ============================================================ */
+.up-existing-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    background: #edf7f2;
+    border: 1px solid #c3e6d4;
+    border-radius: var(--radius-sm);
+    flex-wrap: wrap;
+    /* prevents View button getting squeezed off */
+}
+
+@media (max-width: 420px) {
+    .up-existing-file {
+        gap: 8px;
+    }
+
+    .btn-view-file {
+        margin-left: auto;
+        /* push View to the right even when wrapped */
+    }
+}
+
+.up-existing-file-icon {
+    font-size: 1.3rem;
+    color: var(--up-success);
+    flex-shrink: 0;
+}
+
+.up-existing-file-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.up-existing-file-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--up-dark);
+}
+
+.up-existing-file-hint {
+    font-size: 0.74rem;
+    color: var(--up-mid);
+    margin-top: 1px;
+}
+
+.btn-view-file {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--up-success);
+    border: 1px solid #c3e6d4;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.btn-view-file:hover {
+    background: #d6f0e4;
+}
+
+
+/* ============================================================
+   GOVERNMENT ID DROP ZONE
+   ============================================================ */
+.up-id-drop-zone {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--up-bg);
+    border: 1px dashed var(--up-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+}
+
+.up-id-drop-zone:hover {
+    border-color: var(--up-gold);
+    background: var(--up-surface);
+}
+
+.up-id-drop-zone.selected {
+    border-style: solid;
+    border-color: var(--up-gold);
+    background: var(--up-gold-light);
+}
+
+.up-id-zone-icon {
+    font-size: 1.5rem;
+    color: var(--up-light);
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+
+.up-id-drop-zone.selected .up-id-zone-icon {
+    color: var(--up-gold-dark);
+}
+
+.up-id-zone-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--up-dark);
+    /* allow wrapping on mobile — long filenames will overflow with nowrap */
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    transition: color 0.15s;
+}
+
+.up-id-drop-zone.selected .up-id-zone-title {
+    color: var(--up-gold-dark);
+}
+
+.up-id-zone-hint {
+    font-size: 0.73rem;
+    color: var(--up-light);
+    margin-top: 2px;
+}
+
+
+/* ============================================================
+   FORM ACTIONS — cancel + save
+   ============================================================ */
+.up-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+@media (max-width: 580px) {
+    .up-form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-cancel-update,
+    .btn-save-update {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+.btn-cancel-update {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--up-mid);
+    border: 1px solid var(--up-border);
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cancel-update:hover {
+    background: var(--up-bg);
+    color: var(--up-dark);
+}
+
+.btn-save-update {
+    font-family: var(--font-body);
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--up-dark);
+    border: none;
+    padding: 10px 26px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-save-update:hover:not(:disabled) {
+    background: var(--up-gold-dark);
+}
+
+.btn-save-update:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.btn-save-text,
+.btn-save-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Loading spinner */
+.up-spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: up-spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes up-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

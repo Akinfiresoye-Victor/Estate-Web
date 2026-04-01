@@ -1,546 +1,583 @@
-/* ============================================
-   MODERN CHANGE PASSWORD STYLES
-   ============================================ */
+/* ============================================================
+   ESTATE WEB — Change Password Page
+   File: estate/css/change_pass.css
+   Design system: Light theme
+   Palette: #f4f6f9 bg | #1e2329 dark | #c19b76 gold
+   Breakpoints: 580px | 768px | 1024px
+   ============================================================ */
 
 :root {
-  --primary: #1a3c4e;
-  --secondary: #c19b76;
-  --accent: #8b7355;
-  --success: #10b981;
-  --success-dark: #059669;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --info: #3b82f6;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --bg-light: #f9fafb;
-  --bg-white: #ffffff;
-  --border: #e5e7eb;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --radius: 16px;
+  --cp-gold: #c19b76;
+  --cp-gold-light: #f0e6d8;
+  --cp-gold-dark: #a07d58;
+  --cp-dark: #1e2329;
+  --cp-mid: #4a5568;
+  --cp-light: #8a96a8;
+  --cp-bg: #f4f6f9;
+  --cp-surface: #ffffff;
+  --cp-border: #e4e7ec;
+  --cp-danger: #e05c5c;
+  --cp-danger-bg: #fff5f5;
+  --cp-danger-bdr: #fad5d5;
+  --cp-success: #3aaa6e;
+  --cp-success-bg: #f0faf5;
+  --cp-success-bdr: #c3e6d4;
+  --cp-warning: #e0933a;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Poppins', sans-serif;
 }
 
-body {
-  background: var(--bg-light);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+.cp-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: max(60px, calc(60px + env(safe-area-inset-bottom)));
 }
 
-/* ============================================
-   BACK BUTTON
-   ============================================ */
-.modern-back-btn {
+.cp-page-header {
+  margin-bottom: 24px;
+}
+
+.cp-back-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: var(--bg-white);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  color: var(--text-primary);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 2rem;
-}
-
-.modern-back-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-  transform: translateX(-4px);
-}
-
-/* ============================================
-   HERO HEADER
-   ============================================ */
-.password-hero {
-  position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 4rem 0 3rem;
-  margin-bottom: -4rem;
-  overflow: hidden;
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
-}
-
-.hero-content {
-  position: relative;
-  text-align: center;
-  color: white;
-}
-
-.hero-icon {
-  width: 80px;
-  height: 80px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
-  font-size: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.hero-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.5px;
-}
-
-.hero-subtitle {
-  font-size: 1.125rem;
-  opacity: 0.95;
-  margin: 0;
-}
-
-/* ============================================
-   PASSWORD CONTAINER
-   ============================================ */
-.password-container {
-  padding: 6rem 1rem 4rem;
-}
-
-.password-wrapper {
-  background: var(--bg-white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  padding: 2.5rem;
-  position: relative;
-  margin-top: -2rem;
-}
-
-/* ============================================
-   SECURITY BADGE
-   ============================================ */
-.security-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
-  color: white;
-  border-radius: 50px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.security-badge i {
-  font-size: 1rem;
-}
-
-/* ============================================
-   MESSAGE ALERTS
-   ============================================ */
-.message-alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.message-alert.success {
-  background: rgba(16, 185, 129, 0.1);
-  border-left: 4px solid var(--success);
-}
-
-.message-alert.error {
-  background: rgba(239, 68, 68, 0.1);
-  border-left: 4px solid var(--danger);
-}
-
-.alert-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.message-alert.success .alert-icon {
-  background: var(--success);
-  color: white;
-}
-
-.message-alert.error .alert-icon {
-  background: var(--danger);
-  color: white;
-}
-
-.alert-content p {
-  margin: 0;
-  color: var(--text-primary);
+  gap: 6px;
+  font-size: 0.82rem;
   font-weight: 500;
-  line-height: 1.6;
+  color: var(--cp-light);
+  margin-bottom: 10px;
+  transition: color 0.15s;
+  font-family: var(--font-body);
 }
 
-/* ============================================
-   PASSWORD FORM
-   ============================================ */
-.password-form {
-  margin-top: 1rem;
+.cp-back-link:hover {
+  color: var(--cp-gold-dark);
 }
 
-.input-wrapper {
-  margin-bottom: 1.75rem;
-}
-
-.input-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.625rem;
-  font-size: 0.9375rem;
-}
-
-.input-label i {
-  color: var(--secondary);
-  font-size: 1rem;
-}
-
-.required {
-  color: var(--danger);
-  margin-left: 0.125rem;
-}
-
-.password-field {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-input[type="password"],
-input[type="text"] {
-  width: 100%;
-  padding: 1rem 3rem 1rem 1.25rem;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  font-size: 1rem;
-  font-family: inherit;
-  color: var(--text-primary);
-  background: var(--bg-light);
-  transition: all 0.3s ease;
-}
-
-input[type="password"]:focus,
-input[type="text"]:focus {
-  outline: none;
-  border-color: #667eea;
-  background: var(--bg-white);
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-}
-
-.toggle-visibility {
-  position: absolute;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.5rem;
-  font-size: 1.125rem;
-  transition: color 0.2s ease;
-}
-
-.toggle-visibility:hover {
-  color: var(--text-primary);
-}
-
-.field-error {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.625rem;
-  padding: 0.75rem;
-  background: rgba(239, 68, 68, 0.05);
-  border-left: 3px solid var(--danger);
-  border-radius: 8px;
-  color: var(--danger);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.field-error i {
-  flex-shrink: 0;
-}
-
-/* ============================================
-   PASSWORD STRENGTH METER
-   ============================================ */
-.strength-meter {
-  margin-top: 0.75rem;
-}
-
-.strength-bar {
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
-}
-
-.strength-fill {
-  height: 100%;
-  width: 0;
-  background: var(--border);
-  transition: all 0.3s ease;
-  border-radius: 3px;
-}
-
-.strength-fill.weak {
-  width: 33%;
-  background: var(--danger);
-}
-
-.strength-fill.medium {
-  width: 66%;
-  background: var(--warning);
-}
-
-.strength-fill.strong {
-  width: 100%;
-  background: var(--success);
-}
-
-.strength-text {
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-/* ============================================
-   REQUIREMENTS BOX
-   ============================================ */
-.requirements-box {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.requirements-title {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 1rem;
+.cp-page-title {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 1rem;
+  color: var(--cp-dark);
+  line-height: 1.2;
 }
 
-.requirements-title i {
-  color: #667eea;
-  font-size: 1.125rem;
+.cp-page-sub {
+  font-size: 0.85rem;
+  color: var(--cp-light);
+  margin-top: 3px;
+  font-family: var(--font-body);
 }
 
-.requirements-list {
+
+/* ============================================================
+   LAYOUT — info panel + form
+   ============================================================ */
+.cp-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .cp-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+
+/* ============================================================
+   LEFT — SECURITY INFO PANEL
+   ============================================================ */
+.cp-info-panel {
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border);
+  border-radius: var(--radius-lg);
+  padding: 24px 18px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 84px;
+  font-family: var(--font-body);
+}
+
+/* Hide the sidebar panel on mobile — replaced by inline requirements in form */
+@media (max-width: 768px) {
+  .cp-info-panel {
+    display: none;
+  }
+}
+
+.cp-panel-icon-wrap {
+  width: 48px;
+  height: 48px;
+  background: var(--cp-gold-light);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.cp-panel-icon {
+  font-size: 1.35rem;
+  color: var(--cp-gold-dark);
+}
+
+.cp-panel-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cp-dark);
+  margin-bottom: 14px;
+  line-height: 1.3;
+}
+
+/* Requirements list — shared by sidebar and mobile inline */
+.cp-req-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
 
-.requirement-item {
+.cp-req-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
+  gap: 9px;
+  font-size: 0.78rem;
+  color: var(--cp-light);
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
-.requirement-item i {
-  color: var(--success);
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-/* ============================================
-   FORM BUTTONS
-   ============================================ */
-.form-buttons {
-  display: grid;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 2px solid var(--border);
-}
-
-.submit-btn,
-.cancel-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  padding: 1.125rem 2rem;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1rem;
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  border: none;
-}
-
-.submit-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-
-.cancel-btn {
-  background: transparent;
-  border: 2px solid var(--border);
-  color: var(--text-primary);
-}
-
-.cancel-btn:hover {
-  background: var(--bg-light);
-  border-color: var(--text-secondary);
-}
-
-/* ============================================
-   SECURITY TIPS
-   ============================================ */
-.security-tips {
-  display: flex;
-  gap: 1.25rem;
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: rgba(59, 130, 246, 0.05);
-  border-left: 4px solid var(--info);
-  border-radius: 12px;
-}
-
-.tip-icon {
-  width: 48px;
-  height: 48px;
-  background: var(--info);
+.cp-req-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  background: var(--cp-border);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+/* Met requirement — turns green */
+.cp-req-item.met {
+  color: var(--cp-success);
+}
+
+.cp-req-item.met .cp-req-dot {
+  background: var(--cp-success);
+}
+
+/* Unmet after typing — turns red */
+.cp-req-item.unmet {
+  color: var(--cp-danger);
+}
+
+.cp-req-item.unmet .cp-req-dot {
+  background: var(--cp-danger);
+}
+
+/* Divider */
+.cp-panel-divider {
+  height: 1px;
+  background: var(--cp-border);
+  margin: 18px 0;
+}
+
+/* Tips section */
+.cp-tip-label {
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cp-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.cp-tip-list {
+  padding-left: 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cp-tip-list li {
+  font-size: 0.76rem;
+  color: var(--cp-light);
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   RIGHT — FORM SECTION
+   ============================================================ */
+.cp-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Alert banners (Django messages) */
+.cp-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.84rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.cp-alert.success {
+  background: var(--cp-success-bg);
+  border: 1px solid var(--cp-success-bdr);
+  color: var(--cp-success);
+}
+
+.cp-alert.error {
+  background: var(--cp-danger-bg);
+  border: 1px solid var(--cp-danger-bdr);
+  color: var(--cp-danger);
+}
+
+.cp-alert.info {
+  background: #f0f5ff;
+  border: 1px solid #c7d9fb;
+  color: #3b6fcf;
+}
+
+/* Form card */
+.cp-form-card {
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 580px) {
+  .cp-form-card {
+    padding: 20px 16px;
+  }
+}
+
+/* Form groups */
+.cp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: var(--font-body);
+}
+
+.cp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cp-label {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--cp-dark);
+}
+
+.cp-required {
+  color: var(--cp-danger);
+  margin-left: 2px;
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+.cp-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cp-input-icon {
+  position: absolute;
+  left: 13px;
+  color: var(--cp-light);
+  font-size: 0.88rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Target Django's rendered password inputs */
+.cp-form input[type="password"],
+.cp-form input[type="text"] {
+  width: 100%;
+  background: var(--cp-bg);
+  border: 1px solid var(--cp-border);
+  border-radius: var(--radius-sm);
+  padding: 11px 44px 11px 36px;
+  /* left for icon, right for toggle */
+  min-height: 46px;
+  font-family: var(--font-body);
+  font-size: 0.87rem;
+  color: var(--cp-dark);
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cp-form input[type="password"]:focus,
+.cp-form input[type="text"]:focus {
+  border-color: var(--cp-gold);
+  box-shadow: 0 0 0 3px rgba(193, 155, 118, 0.15);
+  background: var(--cp-surface);
+}
+
+/* Prevent iOS auto-zoom on focus */
+@media (max-width: 580px) {
+
+  .cp-form input[type="password"],
+  .cp-form input[type="text"] {
+    font-size: 1rem;
+    /* must be >= 16px to stop iOS zoom */
+    min-height: 48px;
+  }
+}
+
+/* Eye toggle button */
+.cp-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--cp-light);
+  font-size: 0.92rem;
+  cursor: pointer;
+  padding: 6px;
+  min-width: 32px;
+  min-height: 32px;
+  /* decent tap target */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 1.5rem;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+}
+
+.cp-toggle-btn:hover {
+  color: var(--cp-dark);
+  background: var(--cp-bg);
+}
+
+/* Field error */
+.cp-field-error {
+  font-size: 0.78rem;
+  color: var(--cp-danger);
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  line-height: 1.4;
+}
+
+.cp-field-error i {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+
+/* ============================================================
+   STRENGTH BAR
+   ============================================================ */
+.cp-strength-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.cp-strength-track {
+  flex: 1;
+  height: 4px;
+  background: var(--cp-border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cp-strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.cp-strength-label {
+  font-size: 0.73rem;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+  transition: color 0.3s;
+}
+
+
+/* ============================================================
+   MATCH HINT
+   ============================================================ */
+.cp-match-hint {
+  font-size: 0.78rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cp-match-hint.match {
+  color: var(--cp-success);
+}
+
+.cp-match-hint.no-match {
+  color: var(--cp-danger);
+}
+
+
+/* ============================================================
+   MOBILE-ONLY INLINE REQUIREMENTS
+   Only visible on screens where sidebar is hidden
+   ============================================================ */
+.cp-mobile-reqs {
+  display: none;
+  /* hidden on desktop — sidebar handles it */
+  background: var(--cp-bg);
+  border: 1px solid var(--cp-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.cp-mobile-reqs-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cp-light);
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .cp-mobile-reqs {
+    display: block;
+  }
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+.cp-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--cp-border);
+}
+
+@media (max-width: 580px) {
+  .cp-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cp-btn-cancel,
+  .cp-btn-submit {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.cp-btn-cancel {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--cp-mid);
+  border: 1px solid var(--cp-border);
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+}
+
+.cp-btn-cancel:hover {
+  background: var(--cp-bg);
+  color: var(--cp-dark);
+}
+
+.cp-btn-submit {
+  font-family: var(--font-body);
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--cp-dark);
+  border: none;
+  padding: 10px 26px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+}
+
+.cp-btn-submit:hover:not(:disabled) {
+  background: var(--cp-gold-dark);
+}
+
+.cp-btn-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Button inner spans */
+.cp-btn-text,
+.cp-btn-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Loading spinner */
+.cp-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: cp-spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
-.tip-content h5 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.75rem;
-}
-
-.tip-content ul {
-  margin: 0;
-  padding-left: 1.25rem;
-}
-
-.tip-content li {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
-}
-
-.tip-content li:last-child {
-  margin-bottom: 0;
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-
-  .password-wrapper {
-    padding: 2rem 1.5rem;
-  }
-
-  .password-container {
-    padding: 5rem 1rem 3rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .hero-icon {
-    width: 64px;
-    height: 64px;
-    font-size: 1.75rem;
-  }
-
-  .hero-title {
-    font-size: 1.75rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1rem;
-  }
-
-  .password-wrapper {
-    padding: 1.5rem 1.25rem;
-  }
-
-  input[type="password"],
-  input[type="text"] {
-    padding: 0.875rem 3rem 0.875rem 1rem;
-    font-size: 0.9375rem;
-  }
-
-  .submit-btn,
-  .cancel-btn {
-    padding: 1rem 1.5rem;
-    font-size: 0.9375rem;
-  }
-
-  .security-tips {
-    flex-direction: column;
+@keyframes cp-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

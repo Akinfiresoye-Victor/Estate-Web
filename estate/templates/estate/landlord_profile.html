@@ -1,0 +1,434 @@
+{% extends base_template %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'landlord/css/landlord_profile.css' %}">
+<link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ── Back ─────────────────────────────────────────────────────────── #}
+<div class="lp-back-wrap">
+  <a href="javascript:history.back()" class="lp-back-btn">
+    <i class="bi bi-arrow-left-circle-fill"></i> Go Back
+  </a>
+</div>
+
+
+{# ── HERO ─────────────────────────────────────────────────────────── #}
+<div class="lp-hero">
+  <div class="lp-hero-bg" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="lp-hero-inner">
+
+      {# Avatar #}
+      <div class="lp-avatar-wrap">
+        {% if landlord.profile_picture %}
+          <img src="{{ landlord.profile_picture.url }}"
+               alt="{{ landlord.first_name }} {{ landlord.last_name }}"
+               class="lp-avatar-img">
+        {% else %}
+          <div class="lp-avatar-placeholder">
+            {{ landlord.first_name|first|upper }}
+          </div>
+        {% endif %}
+
+        {% if landlord.verified %}
+          <div class="lp-avatar-dot" title="Verified Landlord">
+            <i class="bi bi-check-lg"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      {# Info #}
+      <div class="lp-hero-info">
+        <div class="lp-hero-top">
+          <h1 class="lp-hero-name">
+            {{ landlord.first_name }} {{ landlord.last_name }}
+          </h1>
+
+          {% if landlord.verified %}
+            <span class="lp-verified-badge">
+              <i class="bi bi-patch-check-fill"></i> Verified Landlord
+            </span>
+          {% else %}
+            <span class="lp-unverified-badge">
+              <i class="bi bi-person"></i> Unverified
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="lp-hero-meta">
+          <span class="lp-meta-item">
+            <i class="bi bi-geo-alt-fill"></i> {{ landlord.location }}
+          </span>
+          <span class="lp-meta-item">
+            <i class="bi bi-calendar3"></i> Member since {{ landlord.date_joined|date:"Y" }}
+          </span>
+          <span class="lp-meta-item">
+            <i class="bi bi-houses-fill"></i> {{ total_properties }} Propert{{ total_properties|pluralize:"y,ies" }}
+          </span>
+        </div>
+
+        <div class="lp-hero-actions">
+          <button class="lp-btn-contact"
+                  data-bs-toggle="modal"
+                  data-bs-target="#contactModal">
+            <i class="bi bi-envelope-fill"></i> Contact Landlord
+          </button>
+          <a href="tel:{{ landlord.phone_number }}" class="lp-btn-call">
+            <i class="bi bi-telephone-fill"></i> Call Now
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{# ── STATS STRIP ──────────────────────────────────────────────────── #}
+<div class="lp-stats-strip">
+  <div class="container">
+    <div class="lp-stats-row">
+
+      <div class="lp-stat">
+        <span class="lp-stat-num">{{ total_properties }}</span>
+        <span class="lp-stat-label">Total Listings</span>
+      </div>
+
+      <div class="lp-stat-divider" aria-hidden="true"></div>
+
+      <div class="lp-stat">
+        <span class="lp-stat-num">{{ properties_for_sale }}</span>
+        <span class="lp-stat-label">For Sale</span>
+      </div>
+
+      <div class="lp-stat-divider" aria-hidden="true"></div>
+
+      <div class="lp-stat">
+        <span class="lp-stat-num">{{ properties_for_rent }}</span>
+        <span class="lp-stat-label">For Rent</span>
+      </div>
+
+      <div class="lp-stat-divider" aria-hidden="true"></div>
+
+      <div class="lp-stat">
+        <span class="lp-stat-num">
+          {% if landlord.verified %}
+            <i class="bi bi-patch-check-fill" style="color:#16a34a;font-size:1.4rem;"></i>
+          {% else %}
+            <i class="bi bi-patch-question" style="color:#94a3b8;font-size:1.4rem;"></i>
+          {% endif %}
+        </span>
+        <span class="lp-stat-label">
+          {% if landlord.verified %}Verified{% else %}Unverified{% endif %}
+        </span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{# ── BODY ─────────────────────────────────────────────────────────── #}
+<div class="lp-body">
+  <div class="container">
+    <div class="lp-layout">
+
+
+      {# ═══ SIDEBAR ═══ #}
+      <aside class="lp-sidebar">
+
+        {# Contact #}
+        <div class="lp-card">
+          <div class="lp-card-hd">
+            <i class="bi bi-telephone-fill"></i>
+            <h3>Contact</h3>
+          </div>
+          <div class="lp-card-bd">
+
+            <a href="tel:{{ landlord.phone_number }}" class="lp-contact-row">
+              <div class="lp-contact-icon"><i class="bi bi-phone"></i></div>
+              <div>
+                <span class="lp-info-label">Phone</span>
+                <span class="lp-info-val">{{ landlord.phone_number }}</span>
+              </div>
+            </a>
+
+            {% if landlord.email %}
+            <a href="mailto:{{ landlord.email }}" class="lp-contact-row">
+              <div class="lp-contact-icon"><i class="bi bi-envelope"></i></div>
+              <div>
+                <span class="lp-info-label">Email</span>
+                <span class="lp-info-val">{{ landlord.email }}</span>
+              </div>
+            </a>
+            {% endif %}
+
+            <div class="lp-contact-row no-link">
+              <div class="lp-contact-icon"><i class="bi bi-geo-alt"></i></div>
+              <div>
+                <span class="lp-info-label">Location</span>
+                <span class="lp-info-val">{{ landlord.location }}</span>
+              </div>
+            </div>
+
+            <button class="lp-btn-msg"
+                    data-bs-toggle="modal"
+                    data-bs-target="#contactModal">
+              <i class="bi bi-send-fill"></i> Send Message
+            </button>
+
+          </div>
+        </div>
+
+        {# Trust Signals #}
+        <div class="lp-card">
+          <div class="lp-card-hd">
+            <i class="bi bi-shield-check-fill"></i>
+            <h3>Trust & Info</h3>
+          </div>
+          <div class="lp-card-bd">
+            <div class="lp-trust-grid">
+
+              <div class="lp-trust-item">
+                <div class="lp-trust-icon {% if landlord.verified %}lp-trust-icon--green{% else %}lp-trust-icon--grey{% endif %}">
+                  <i class="bi bi-{% if landlord.verified %}patch-check-fill{% else %}patch-question{% endif %}"></i>
+                </div>
+                <span class="lp-trust-label">Status</span>
+                <span class="lp-trust-val">{% if landlord.verified %}Verified{% else %}Unverified{% endif %}</span>
+              </div>
+
+              <div class="lp-trust-item">
+                <div class="lp-trust-icon lp-trust-icon--gold">
+                  <i class="bi bi-houses"></i>
+                </div>
+                <span class="lp-trust-label">Listings</span>
+                <span class="lp-trust-val">{{ total_properties }}</span>
+              </div>
+
+              <div class="lp-trust-item">
+                <div class="lp-trust-icon lp-trust-icon--gold">
+                  <i class="bi bi-calendar-check"></i>
+                </div>
+                <span class="lp-trust-label">Joined</span>
+                <span class="lp-trust-val">{{ landlord.date_joined|date:"M Y" }}</span>
+              </div>
+
+              <div class="lp-trust-item">
+                <div class="lp-trust-icon {% if landlord.government_id %}lp-trust-icon--green{% else %}lp-trust-icon--grey{% endif %}">
+                  <i class="bi bi-{% if landlord.government_id %}card-checklist{% else %}card-text{% endif %}"></i>
+                </div>
+                <span class="lp-trust-label">Gov. ID</span>
+                <span class="lp-trust-val">{% if landlord.government_id %}On File{% else %}Not Filed{% endif %}</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+
+      {# ═══ MAIN ═══ #}
+      <main>
+
+        {# For Sale #}
+        {% if on_sale %}
+        <section class="lp-section" style="margin-bottom:1.1rem;">
+          <div class="lp-section-hd">
+            <h2 class="lp-section-title">
+              <i class="bi bi-tag-fill"></i> Properties For Sale
+            </h2>
+          </div>
+          <div class="lp-props-list">
+            {% for property in on_sale %}
+            <div class="lp-prop-item">
+              <div class="lp-prop-img-wrap">
+                {% if property.base_image %}
+                  <img src="{{ property.base_image.url }}" alt="Property" class="lp-prop-img" loading="lazy">
+                {% else %}
+                  <img src="https://placehold.co/180x150/eff6ff/2563eb?text=No+Image"
+                       alt="Property" class="lp-prop-img" loading="lazy">
+                {% endif %}
+                <span class="lp-prop-badge lp-badge-sale">Sale</span>
+              </div>
+              <div class="lp-prop-body">
+                <h3 class="lp-prop-title">
+                  {% if property.property_category == 'Residential' %}{{ property.residential }}
+                  {% elif property.property_category == 'Commercial' %}{{ property.commercial }}
+                  {% else %}{{ property.lands }}{% endif %}
+                </h3>
+                <p class="lp-prop-loc">
+                  <i class="bi bi-geo-alt"></i>
+                  {{ property.location }}{% if property.state %}, {{ property.state }}{% endif %}
+                </p>
+                <div class="lp-prop-price">
+                  ₦{{ property.price|floatformat:0|intcomma }}
+                </div>
+                <div class="lp-prop-feats">
+                  {% if property.bedrooms %}
+                    <span class="lp-feat"><i class="bi bi-door-closed"></i> {{ property.bedrooms }} bed</span>
+                  {% endif %}
+                  {% if property.bathrooms %}
+                    <span class="lp-feat"><i class="bi bi-droplet"></i> {{ property.bathrooms }} bath</span>
+                  {% endif %}
+                </div>
+                <a href="{% url 'customer:view-property-s' property.id %}" class="lp-btn-view">
+                  View <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        {# For Rent #}
+        {% if on_lease %}
+        <section class="lp-section" style="margin-bottom:1.1rem;">
+          <div class="lp-section-hd">
+            <h2 class="lp-section-title">
+              <i class="bi bi-key-fill"></i> Properties For Rent
+            </h2>
+          </div>
+          <div class="lp-props-list">
+            {% for property in on_lease %}
+            <div class="lp-prop-item">
+              <div class="lp-prop-img-wrap">
+                {% if property.base_image %}
+                  <img src="{{ property.base_image.url }}" alt="Property" class="lp-prop-img" loading="lazy">
+                {% else %}
+                  <img src="https://placehold.co/180x150/f0fdf4/16a34a?text=No+Image"
+                       alt="Property" class="lp-prop-img" loading="lazy">
+                {% endif %}
+                <span class="lp-prop-badge lp-badge-rent">Rent</span>
+              </div>
+              <div class="lp-prop-body">
+                <h3 class="lp-prop-title">
+                  {% if property.property_category == 'Residential' %}{{ property.residential }}
+                  {% elif property.property_category == 'Commercial' %}{{ property.commercial }}
+                  {% else %}{{ property.lands }}{% endif %}
+                </h3>
+                <p class="lp-prop-loc">
+                  <i class="bi bi-geo-alt"></i>
+                  {{ property.location }}{% if property.state %}, {{ property.state }}{% endif %}
+                </p>
+                <div class="lp-prop-price">
+                  ₦{{ property.price_range|floatformat:0|intcomma }}
+                  <small>/yr</small>
+                </div>
+                <div class="lp-prop-feats">
+                  {% if property.bedrooms %}
+                    <span class="lp-feat"><i class="bi bi-door-closed"></i> {{ property.bedrooms }} bed</span>
+                  {% endif %}
+                  {% if property.bathrooms %}
+                    <span class="lp-feat"><i class="bi bi-droplet"></i> {{ property.bathrooms }} bath</span>
+                  {% endif %}
+                </div>
+                <a href="{% url 'customer:view-property-r' property.id %}" class="lp-btn-view">
+                  View <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        {# Empty #}
+        {% if not on_sale and not on_lease %}
+        <section class="lp-section">
+          <div class="lp-section-hd">
+            <h2 class="lp-section-title">
+              <i class="bi bi-houses-fill"></i> Properties
+            </h2>
+          </div>
+          <div class="lp-empty">
+            <i class="bi bi-house-x"></i>
+            <h4>No Active Listings</h4>
+            <p>{{ landlord.first_name }} hasn't published any properties yet.</p>
+          </div>
+        </section>
+        {% endif %}
+
+      </main>
+
+    </div>
+  </div>
+</div>
+
+
+{# ── Mobile Sticky CTA ────────────────────────────────────────────── #}
+<div class="lp-sticky-cta" id="lpStickyCta">
+  <button class="lp-sticky-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#contactModal">
+    <i class="bi bi-envelope-fill"></i> Contact {{ landlord.first_name }}
+  </button>
+</div>
+
+
+{# ── CONTACT MODAL ─────────────────────────────────────────────────── #}
+<div class="modal fade" id="contactModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content lp-modal-content">
+      <div class="modal-header lp-modal-hd">
+        <h5 class="modal-title">
+          <i class="bi bi-envelope-fill"></i>
+          Contact {{ landlord.first_name }} {{ landlord.last_name }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body lp-modal-bd">
+        <form method="post" action="#">
+          {% csrf_token %}
+          <div class="lp-form-group">
+            <label class="lp-form-label">Your Name</label>
+            <input type="text" name="name" class="lp-form-input" placeholder="Full name" required>
+          </div>
+          <div class="lp-form-group">
+            <label class="lp-form-label">Phone Number</label>
+            <input type="tel" name="phone" class="lp-form-input" placeholder="08XX XXX XXXX" required>
+          </div>
+          <div class="lp-form-group">
+            <label class="lp-form-label">Email Address</label>
+            <input type="email" name="email" class="lp-form-input" placeholder="your@email.com">
+          </div>
+          <div class="lp-form-group">
+            <label class="lp-form-label">Message</label>
+            <textarea name="message" class="lp-form-input lp-form-textarea" rows="4"
+                      placeholder="Tell {{ landlord.first_name }} what you're looking for..."
+                      required></textarea>
+          </div>
+          <button type="submit" class="lp-form-submit">
+            <i class="bi bi-send-fill"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+  var stickyCta = document.getElementById('lpStickyCta');
+  var heroBtn   = document.querySelector('.lp-btn-contact');
+  if (stickyCta && heroBtn) {
+    var obs = new IntersectionObserver(function (entries) {
+      stickyCta.classList.toggle('lp-sticky-cta--hidden', entries[0].isIntersecting);
+    }, { threshold: 0.5 });
+    obs.observe(heroBtn);
+  }
+}());
+</script>
+{% endblock %}

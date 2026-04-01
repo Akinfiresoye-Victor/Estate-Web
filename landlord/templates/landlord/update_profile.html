@@ -1,0 +1,351 @@
+{% extends 'landlord/base.html' %}
+{% load static %}
+
+{% block title %}Update Profile — Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'landlord/css/update_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="up-page">
+
+  <!-- ===== PAGE HEADER ===== -->
+  <div class="up-page-header">
+    <a href="{% url 'landlord:profile' %}" class="up-back-link">
+      <i class="bi bi-arrow-left"></i> Back to Profile
+    </a>
+    <div class="up-header-text">
+      <h1 class="up-page-title">Update Profile</h1>
+      <p class="up-page-sub">Edit your account information below and save when done.</p>
+    </div>
+  </div>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="up-layout">
+
+    <!-- LEFT — current info summary card -->
+    <aside class="up-info-card">
+
+      <div class="up-current-avatar-wrap">
+        {% if landlord.profile_picture %}
+          <img
+            src="{{ landlord.profile_picture.url }}"
+            alt="{{ landlord.first_name }}"
+            class="up-current-avatar-img"
+            id="avatarPreviewImg">
+        {% else %}
+          <div class="up-current-avatar-initials" id="avatarInitials">
+            {{ landlord.first_name|first|upper }}{{ landlord.last_name|first|upper }}
+          </div>
+          <img
+            src=""
+            alt="Preview"
+            class="up-current-avatar-img"
+            id="avatarPreviewImg"
+            style="display:none;">
+        {% endif %}
+
+        <span
+          class="up-verified-badge {% if not landlord.verified %}unverified{% endif %}"
+          title="{% if landlord.verified %}Verified landlord{% else %}Not yet verified{% endif %}">
+          <i class="bi bi-{% if landlord.verified %}patch-check-fill{% else %}patch-exclamation{% endif %}"></i>
+        </span>
+      </div>
+
+      <p class="up-card-name">{{ landlord.first_name }} {{ landlord.last_name }}</p>
+      <p class="up-card-role">Landlord</p>
+
+      <div class="up-card-divider"></div>
+
+      <div class="up-current-fields">
+        <div class="up-current-field">
+          <span class="ucf-label"><i class="bi bi-telephone"></i> Phone</span>
+          <span class="ucf-value">{{ landlord.phone_number|default:"Not set" }}</span>
+        </div>
+        <div class="up-current-field">
+          <span class="ucf-label"><i class="bi bi-geo-alt"></i> Location</span>
+          <span class="ucf-value">{{ landlord.location|default:"Not set" }}</span>
+        </div>
+        <div class="up-current-field">
+          <span class="ucf-label"><i class="bi bi-card-text"></i> Gov. ID</span>
+          <span class="ucf-value {% if landlord.government_id %}has-file{% endif %}">
+            {% if landlord.government_id %}
+              <i class="bi bi-check-circle-fill"></i> Uploaded
+            {% else %}
+              Not uploaded
+            {% endif %}
+          </span>
+        </div>
+        <div class="up-current-field">
+          <span class="ucf-label"><i class="bi bi-shield-check"></i> Verified</span>
+          <span class="ucf-value {% if landlord.verified %}verified{% else %}not-verified{% endif %}">
+            {% if landlord.verified %}
+              <i class="bi bi-check-circle-fill"></i> Yes
+            {% else %}
+              <i class="bi bi-x-circle"></i> Pending
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="up-card-divider"></div>
+
+      <p class="up-card-hint">
+        <i class="bi bi-info-circle"></i>
+        Changes take effect immediately after saving.
+      </p>
+
+    </aside>
+
+    <!-- RIGHT — the edit form -->
+    <div class="up-form-section">
+
+      {% if form.non_field_errors %}
+        <div class="up-error-banner">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ form.non_field_errors|join:" " }}</span>
+        </div>
+      {% endif %}
+
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="up-form"
+        id="updateProfileForm">
+        {% csrf_token %}
+
+        <!-- ---- Profile Picture ---- -->
+        <div class="up-form-block">
+          <div class="up-block-head">
+            <span class="up-block-icon"><i class="bi bi-person-bounding-box"></i></span>
+            <div class="up-block-head-text">
+              <p class="up-block-title">Profile Picture</p>
+              <p class="up-block-sub">Shown on your public listings. JPG or PNG, max 5 MB.</p>
+            </div>
+            <span class="up-optional-tag">optional</span>
+          </div>
+
+          <div class="up-photo-zone">
+            <div class="up-photo-preview-wrap">
+              {% if landlord.profile_picture %}
+                <img
+                  src="{{ landlord.profile_picture.url }}"
+                  alt="Current photo"
+                  class="up-photo-preview-img"
+                  id="photoPreview">
+              {% else %}
+                <div class="up-photo-placeholder" id="photoPlaceholder">
+                  <i class="bi bi-person"></i>
+                </div>
+                <img
+                  src=""
+                  alt="Preview"
+                  class="up-photo-preview-img"
+                  id="photoPreview"
+                  style="display:none;">
+              {% endif %}
+            </div>
+
+            <div class="up-photo-meta">
+              <p class="up-photo-status {% if not landlord.profile_picture %}none{% endif %}">
+                {% if landlord.profile_picture %}
+                  <i class="bi bi-check-circle-fill"></i> Photo uploaded
+                {% else %}
+                  No photo uploaded yet
+                {% endif %}
+              </p>
+              <p class="up-photo-hint">Select a new image to replace your current one.</p>
+              <label for="{{ form.profile_picture.id_for_label }}" class="btn-choose-photo">
+                <i class="bi bi-upload"></i>
+                {% if landlord.profile_picture %}Change Photo{% else %}Upload Photo{% endif %}
+              </label>
+            </div>
+          </div>
+
+          <div class="up-hidden-input">{{ form.profile_picture }}</div>
+
+          {% if form.profile_picture.errors %}
+            <p class="up-field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {{ form.profile_picture.errors|join:", " }}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- ---- Phone Number ---- -->
+        <div class="up-form-block">
+          <div class="up-block-head">
+            <span class="up-block-icon"><i class="bi bi-telephone-fill"></i></span>
+            <div class="up-block-head-text">
+              <p class="up-block-title">Phone Number</p>
+              <p class="up-block-sub">Used for tenant contact and account verification.</p>
+            </div>
+          </div>
+
+          <div class="up-input-wrap">
+            <i class="bi bi-phone up-input-icon"></i>
+            {{ form.phone_number }}
+          </div>
+
+          {% if form.phone_number.errors %}
+            <p class="up-field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {{ form.phone_number.errors|join:", " }}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- ---- Location ---- -->
+        <div class="up-form-block">
+          <div class="up-block-head">
+            <span class="up-block-icon"><i class="bi bi-geo-alt-fill"></i></span>
+            <div class="up-block-head-text">
+              <p class="up-block-title">State / Location</p>
+              <p class="up-block-sub">Where your properties are primarily located.</p>
+            </div>
+          </div>
+
+          <div class="up-input-wrap">
+            <i class="bi bi-geo-alt up-input-icon"></i>
+            {{ form.location }}
+          </div>
+
+          {% if form.location.errors %}
+            <p class="up-field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {{ form.location.errors|join:", " }}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- ---- Government ID ---- -->
+        <div class="up-form-block">
+          <div class="up-block-head">
+            <span class="up-block-icon"><i class="bi bi-card-text"></i></span>
+            <div class="up-block-head-text">
+              <p class="up-block-title">Government ID</p>
+              <p class="up-block-sub">{{ form.government_id.help_text }}</p>
+            </div>
+            <span class="up-optional-tag">optional</span>
+          </div>
+
+          {% if landlord.government_id %}
+            <div class="up-existing-file">
+              <i class="bi bi-file-earmark-check-fill up-existing-file-icon"></i>
+              <div class="up-existing-file-body">
+                <p class="up-existing-file-label">ID already uploaded</p>
+                <p class="up-existing-file-hint">Upload a new file below to replace it.</p>
+              </div>
+              <a href="{{ landlord.government_id.url }}"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="btn-view-file">
+                <i class="bi bi-eye"></i> View
+              </a>
+            </div>
+          {% endif %}
+
+          <label for="{{ form.government_id.id_for_label }}"
+                 class="up-id-drop-zone"
+                 id="idDropZone">
+            <i class="bi bi-cloud-upload up-id-zone-icon"></i>
+            <p class="up-id-zone-title" id="idZoneTitle">
+              {% if landlord.government_id %}Click to replace ID{% else %}Click to upload ID{% endif %}
+            </p>
+            <p class="up-id-zone-hint">NIN slip, Driver's License, or International Passport</p>
+          </label>
+
+          <div class="up-hidden-input">{{ form.government_id }}</div>
+
+          {% if form.government_id.errors %}
+            <p class="up-field-error">
+              <i class="bi bi-exclamation-circle"></i>
+              {{ form.government_id.errors|join:", " }}
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- ---- Actions ---- -->
+        <div class="up-form-actions">
+          <a href="{% url 'landlord:profile' %}" class="btn-cancel-update">
+            Cancel
+          </a>
+          <button type="submit" class="btn-save-update" id="btnSaveUpdate">
+            <span class="btn-save-text">
+              <i class="bi bi-check2-circle"></i> Save Changes
+            </span>
+            <span class="btn-save-loading" style="display:none;">
+              <span class="up-spinner"></span> Saving...
+            </span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ---- Profile picture live preview + sidebar avatar sync ----
+  const photoInput       = document.getElementById('{{ form.profile_picture.id_for_label }}');
+  const photoPreview     = document.getElementById('photoPreview');
+  const photoPlaceholder = document.getElementById('photoPlaceholder');
+  const avatarPreviewImg = document.getElementById('avatarPreviewImg');
+  const avatarInitials   = document.getElementById('avatarInitials');
+
+  if (photoInput) {
+    photoInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        if (photoPlaceholder) photoPlaceholder.style.display = 'none';
+        photoPreview.src = e.target.result;
+        photoPreview.style.display = 'block';
+
+        // Sync to the left sidebar card avatar
+        if (avatarInitials)   avatarInitials.style.display   = 'none';
+        if (avatarPreviewImg) {
+          avatarPreviewImg.src          = e.target.result;
+          avatarPreviewImg.style.display = 'block';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---- Government ID — show filename in drop zone ----
+  const idInput     = document.getElementById('{{ form.government_id.id_for_label }}');
+  const idZoneTitle = document.getElementById('idZoneTitle');
+  const idDropZone  = document.getElementById('idDropZone');
+
+  if (idInput) {
+    idInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        idZoneTitle.textContent = file.name;
+        idDropZone.classList.add('selected');
+      } else {
+        idZoneTitle.textContent = '{% if landlord.government_id %}Click to replace ID{% else %}Click to upload ID{% endif %}';
+        idDropZone.classList.remove('selected');
+      }
+    });
+  }
+
+  // ---- Loading state on submit ----
+  document.getElementById('updateProfileForm').addEventListener('submit', function () {
+    const btn      = document.getElementById('btnSaveUpdate');
+    const textSpan = btn.querySelector('.btn-save-text');
+    const loadSpan = btn.querySelector('.btn-save-loading');
+    textSpan.style.display = 'none';
+    loadSpan.style.display = 'flex';
+    btn.disabled = true;
+  });
+</script>
+{% endblock %}

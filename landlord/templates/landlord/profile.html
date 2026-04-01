@@ -27,8 +27,8 @@
     <aside class="profile-card">
 
       <div class="avatar-wrap">
-        {% if user.profile_photo %}
-          <img src="{{ user.profile_photo.url }}" alt="{{ user.get_full_name }}" class="avatar-img">
+        {% if landlord.profile_picture %}
+          <img src="{{ landlord.profile_picture.url }}" alt="{{ user.get_full_name }}" class="avatar-img">
         {% else %}
           <div class="avatar-initials">
             {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
@@ -50,7 +50,7 @@
 
       <div class="card-stats">
         <div class="c-stat">
-          <p class="c-stat-val">{{ active_listings_count|default:"0" }}</p>
+          <p class="c-stat-val">{{ prop_count|default:"0" }}</p>
           <p class="c-stat-label">Properties</p>
         </div>
         <div class="c-stat-divider"></div>
@@ -60,7 +60,7 @@
         </div>
         <div class="c-stat-divider"></div>
         <div class="c-stat">
-          <p class="c-stat-val">{{ member_since|default:"2025" }}</p>
+          <p class="c-stat-val">{{ landlord.date_joined|date:"Y"|default:"2025" }}</p>
           <p class="c-stat-label">Member Since</p>
         </div>
       </div>
@@ -97,43 +97,27 @@
           </div>
         </div>
 
-        <form method="POST" action="#" class="profile-form">
-          {% csrf_token %}
-          <input type="hidden" name="form_type" value="personal">
-
+        <div class="profile-form">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="firstName">First Name</label>
-              <input type="text" id="firstName" name="first_name"
-                     class="form-input" value="{{ user.first_name }}" placeholder="Enter first name">
+              <label class="form-label">First Name</label>
+              <p class="form-value">{{ user.first_name|default:'-' }}</p>
             </div>
             <div class="form-group">
-              <label class="form-label" for="lastName">Last Name</label>
-              <input type="text" id="lastName" name="last_name"
-                     class="form-input" value="{{ user.last_name }}" placeholder="Enter last name">
+              <label class="form-label">Last Name</label>
+              <p class="form-value">{{ user.last_name|default:'-' }}</p>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="username">Username</label>
-            <div class="input-with-prefix">
-              <span class="input-prefix">@</span>
-              <input type="text" id="username" name="username"
-                     class="form-input prefixed" value="{{ user.username }}" placeholder="your_username">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="bio">Short Bio <span class="label-optional">(optional)</span></label>
-            <textarea id="bio" name="bio" class="form-textarea" rows="3"
-                      placeholder="Tell potential tenants a little about yourself...">{{ user.bio|default:'' }}</textarea>
-            <p class="input-hint">This appears on your public listing profile.</p>
+            <label class="form-label">Username</label>
+            <p class="form-value">@{{ user.username|default:'-' }}</p>
           </div>
 
           <div class="form-footer">
-            <button type="submit" class="btn-save">Save Changes</button>
+            <a href="{%url 'landlord:update-profile' %}" class="btn-save">Update Profile</a>
           </div>
-        </form>
+        </div>
       </section>
 
       <!-- Contact Details -->
@@ -146,69 +130,32 @@
           </div>
         </div>
 
-        <form method="POST" action="#" class="profile-form">
-          {% csrf_token %}
-          <input type="hidden" name="form_type" value="contact">
-
+        <div class="profile-form">
           <div class="form-group">
-            <label class="form-label" for="email">Email Address</label>
-            <div class="input-with-icon">
-              <i class="bi bi-envelope input-icon"></i>
-              <input type="email" id="email" name="email"
-                     class="form-input iconed" value="{{ user.email }}" placeholder="you@example.com">
-            </div>
+            <label class="form-label">Email Address</label>
+            <p class="form-value">{{ user.email|default:'-' }}</p>
             <p class="email-verified-status"><i class="bi bi-check-circle-fill"></i> Email Verified</p>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="phone">Phone Number</label>
-            <div class="input-with-icon">
-              <i class="bi bi-phone input-icon"></i>
-              <input type="tel" id="phone" name="phone"
-                     class="form-input iconed" value="{{ user.phone|default:'' }}" placeholder="+234 800 000 0000">
-            </div>
+            <label class="form-label">Phone Number</label>
+            <p class="form-value">{{ landlord.phone_number|default:'-' }}</p>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="location">Location</label>
-            <div class="input-with-icon">
-              <i class="bi bi-geo-alt input-icon"></i>
-              <input type="text" id="location" name="location"
-                     class="form-input iconed" value="{{ user.location|default:'' }}" placeholder="e.g. Akure, Ondo State">
-            </div>
+            <label class="form-label">Location</label>
+            <p class="form-value">{{ landlord.location|default:'-' }}</p>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Contact Preference</label>
-            <div class="radio-group">
-              <label class="radio-option">
-                <input type="radio" name="contact_pref" value="email"
-                  {% if user.contact_pref == 'email' or not user.contact_pref %}checked{% endif %}>
-                <span class="radio-box">
-                  <i class="bi bi-envelope"></i> Email
-                </span>
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="contact_pref" value="phone"
-                  {% if user.contact_pref == 'phone' %}checked{% endif %}>
-                <span class="radio-box">
-                  <i class="bi bi-phone"></i> Phone
-                </span>
-              </label>
-              <label class="radio-option">
-                <input type="radio" name="contact_pref" value="both"
-                  {% if user.contact_pref == 'both' %}checked{% endif %}>
-                <span class="radio-box">
-                  <i class="bi bi-layers"></i> Both
-                </span>
-              </label>
-            </div>
+            <label class="form-label">Contact Preference (Coming Soon)</label>
+            <p class="form-value">{{ user.contact_pref|default:'-' }}</p>
           </div>
 
           <div class="form-footer">
-            <button type="submit" class="btn-save">Save Changes</button>
+            <a href="{%url 'landlord:update-profile' %}" class="btn-save">Update Profile</a>
           </div>
-        </form>
+        </div>
       </section>
 
       <!-- Change Password -->
@@ -221,57 +168,11 @@
           </div>
         </div>
 
-        <form method="POST" action="#" class="profile-form">
-          {% csrf_token %}
-          <input type="hidden" name="form_type" value="password">
-
-          <div class="form-group">
-            <label class="form-label" for="currentPass">Current Password</label>
-            <div class="input-with-icon toggle-pass-wrap">
-              <i class="bi bi-lock input-icon"></i>
-              <input type="password" id="currentPass" name="current_password"
-                     class="form-input iconed" placeholder="Enter current password">
-              <button type="button" class="toggle-pass" data-target="currentPass">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="newPass">New Password</label>
-            <div class="input-with-icon toggle-pass-wrap">
-              <i class="bi bi-lock input-icon"></i>
-              <input type="password" id="newPass" name="new_password"
-                     class="form-input iconed" placeholder="At least 8 characters">
-              <button type="button" class="toggle-pass" data-target="newPass">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-            <!-- Password strength bar -->
-            <div class="strength-bar-wrap" id="strengthBar" style="display:none">
-              <div class="strength-bar">
-                <div class="strength-fill" id="strengthFill"></div>
-              </div>
-              <span class="strength-label" id="strengthLabel">Weak</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="confirmPass">Confirm New Password</label>
-            <div class="input-with-icon toggle-pass-wrap">
-              <i class="bi bi-lock input-icon"></i>
-              <input type="password" id="confirmPass" name="confirm_password"
-                     class="form-input iconed" placeholder="Repeat new password">
-              <button type="button" class="toggle-pass" data-target="confirmPass">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-
+        <div class="profile-form">
           <div class="form-footer">
-            <button type="submit" class="btn-save">Update Password</button>
+            <a href="{%url 'customer:change-password'%}" class="btn-save">Change Password</a>
           </div>
-        </form>
+        </div>
       </section>
 
       <!-- Danger Zone -->
@@ -283,20 +184,6 @@
             <p class="section-sub">Irreversible actions. Please read carefully before proceeding.</p>
           </div>
         </div>
-
-        <div class="danger-actions">
-          <div class="danger-row">
-            <div class="danger-info">
-              <p class="danger-title">Deactivate Account</p>
-              <p class="danger-desc">Temporarily hides your listings and profile. You can reactivate anytime by logging back in.</p>
-            </div>
-            <button type="button" class="btn-danger-outline" data-bs-toggle="modal" data-bs-target="#deactivateModal">
-              Deactivate
-            </button>
-          </div>
-
-          <div class="danger-divider"></div>
-
           <div class="danger-row">
             <div class="danger-info">
               <p class="danger-title">Delete Account</p>
@@ -312,30 +199,6 @@
     </div><!-- /profile-forms -->
   </div><!-- /profile-layout -->
 </div><!-- /profile-page -->
-
-
-<!-- ===== DEACTIVATE MODAL ===== -->
-<div class="modal fade" id="deactivateModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content ll-modal">
-      <div class="modal-header ll-modal-header">
-        <h5 class="ll-modal-title"><i class="bi bi-pause-circle text-warning me-2"></i>Deactivate Account</h5>
-        <button type="button" class="ll-modal-close" data-bs-dismiss="modal"><i class="bi bi-x"></i></button>
-      </div>
-      <div class="modal-body ll-modal-body">
-        <p>Your account and listings will be hidden until you log back in. Are you sure?</p>
-      </div>
-      <div class="modal-footer ll-modal-footer">
-        <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
-        <form method="POST" action="#">
-          {% csrf_token %}
-          <input type="hidden" name="form_type" value="deactivate">
-          <button type="submit" class="btn-danger-outline">Yes, Deactivate</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ===== DELETE MODAL ===== -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
@@ -354,7 +217,7 @@
       </div>
       <div class="modal-footer ll-modal-footer">
         <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Cancel</button>
-        <form method="POST" action="#">
+        <form method="POST" action="{% url 'landlord:delete-account' %}">
           {% csrf_token %}
           <input type="hidden" name="form_type" value="delete">
           <button type="submit" class="btn-danger-solid" id="deleteSubmitBtn" disabled>
@@ -371,48 +234,58 @@
 
 {% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+
   // ---- Password visibility toggle ----
+  // (querySelectorAll is naturally safe; if it finds nothing, it just skips the loop)
   document.querySelectorAll('.toggle-pass').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = document.getElementById(btn.dataset.target);
-      const isPass = input.type === 'password';
-      input.type = isPass ? 'text' : 'password';
-      btn.querySelector('i').className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+      if (input) {
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        btn.querySelector('i').className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+      }
     });
   });
 
   // ---- Password strength indicator ----
   const newPassInput  = document.getElementById('newPass');
-  const strengthBar   = document.getElementById('strengthBar');
-  const strengthFill  = document.getElementById('strengthFill');
-  const strengthLabel = document.getElementById('strengthLabel');
+  if (newPassInput) { // <-- Safety check prevents crash!
+    const strengthBar   = document.getElementById('strengthBar');
+    const strengthFill  = document.getElementById('strengthFill');
+    const strengthLabel = document.getElementById('strengthLabel');
 
-  newPassInput.addEventListener('input', () => {
-    const val = newPassInput.value;
-    strengthBar.style.display = val.length ? 'flex' : 'none';
-    let score = 0;
-    if (val.length >= 8)             score++;
-    if (/[A-Z]/.test(val))           score++;
-    if (/[0-9]/.test(val))           score++;
-    if (/[^A-Za-z0-9]/.test(val))   score++;
+    newPassInput.addEventListener('input', () => {
+      const val = newPassInput.value;
+      strengthBar.style.display = val.length ? 'flex' : 'none';
+      let score = 0;
+      if (val.length >= 8)             score++;
+      if (/[A-Z]/.test(val))           score++;
+      if (/[0-9]/.test(val))           score++;
+      if (/[^A-Za-z0-9]/.test(val))    score++;
 
-    const levels = [
-      { w: '25%',  color: '#e05c5c', label: 'Weak' },
-      { w: '50%',  color: '#e0933a', label: 'Fair' },
-      { w: '75%',  color: '#c19b76', label: 'Good' },
-      { w: '100%', color: '#3aaa6e', label: 'Strong' },
-    ];
-    const lvl = levels[Math.max(score - 1, 0)];
-    strengthFill.style.width = lvl.w;
-    strengthFill.style.background = lvl.color;
-    strengthLabel.textContent = lvl.label;
-    strengthLabel.style.color = lvl.color;
-  });
+      const levels = [
+        { w: '25%',  color: '#e05c5c', label: 'Weak' },
+        { w: '50%',  color: '#e0933a', label: 'Fair' },
+        { w: '75%',  color: '#c19b76', label: 'Good' },
+        { w: '100%', color: '#3aaa6e', label: 'Strong' },
+      ];
+      const lvl = levels[Math.max(score - 1, 0)];
+      if (strengthFill && strengthLabel) {
+        strengthFill.style.width = lvl.w;
+        strengthFill.style.background = lvl.color;
+        strengthLabel.textContent = lvl.label;
+        strengthLabel.style.color = lvl.color;
+      }
+    });
+  }
 
   // ---- Delete confirmation gate ----
   const deleteConfirm   = document.getElementById('deleteConfirm');
   const deleteSubmitBtn = document.getElementById('deleteSubmitBtn');
-  if (deleteConfirm) {
+  
+  if (deleteConfirm && deleteSubmitBtn) {
     deleteConfirm.addEventListener('input', () => {
       deleteSubmitBtn.disabled = deleteConfirm.value.trim() !== 'DELETE';
     });
@@ -430,24 +303,31 @@
   });
 
   // ---- Avatar preview ----
-  document.getElementById('avatarInput').addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const wrap = document.querySelector('.avatar-wrap');
-      let img = wrap.querySelector('.avatar-img');
-      if (!img) {
-        const initials = wrap.querySelector('.avatar-initials');
-        if (initials) initials.remove();
-        img = document.createElement('img');
-        img.className = 'avatar-img';
-        img.alt = 'Profile photo';
-        wrap.insertBefore(img, wrap.querySelector('.avatar-upload-btn'));
-      }
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
+  const avatarInput = document.getElementById('avatarInput');
+  if (avatarInput) { // <-- Safety check prevents crash!
+    avatarInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const wrap = document.querySelector('.avatar-wrap');
+        if (wrap) {
+            let img = wrap.querySelector('.avatar-img');
+            if (!img) {
+              const initials = wrap.querySelector('.avatar-initials');
+              if (initials) initials.remove();
+              img = document.createElement('img');
+              img.className = 'avatar-img';
+              img.alt = 'Profile photo';
+              wrap.insertBefore(img, wrap.querySelector('.avatar-upload-btn'));
+            }
+            img.src = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+});
 </script>
 {% endblock %}

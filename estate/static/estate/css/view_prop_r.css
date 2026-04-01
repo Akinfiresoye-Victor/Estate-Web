@@ -724,6 +724,79 @@ body {
 
 
 /* ═══════════════════════════════════════════════════
+   SCAM WARNING / SAFETY TIPS BOX
+   ═══════════════════════════════════════════════════ */
+.scam-warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1.5px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #92400e;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed #d97706;
+}
+
+.warning-header i {
+  font-size: 1.1rem;
+}
+
+.warning-tips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warning-tips li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+.warning-tips li i {
+  color: #059669;
+  font-size: 0.9rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.warning-tips li strong {
+  font-weight: 600;
+  color: #166534;
+}
+
+/* Desktop - larger padding */
+@media (min-width: 900px) {
+  .scam-warning {
+    padding: 1.25rem;
+  }
+
+  .warning-header {
+    font-size: 0.95rem;
+  }
+
+  .warning-tips li {
+    font-size: 0.85rem;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════
    WISHLIST BUTTON — Property Detail Page
    ═══════════════════════════════════════════════════ */
 .detail-wishlist-btn {

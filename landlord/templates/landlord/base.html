@@ -441,7 +441,40 @@
       .ll-user-pill  { display: none; }
       .ll-navbar     { padding: 0 16px; }
     }
+    /* Feedback button */
+    .ll-btn-feedback {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--ll-mid);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 7px;
+      border: 1px solid var(--ll-border);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      text-decoration: none;
+    }
 
+    .ll-btn-feedback:hover {
+      background: var(--ll-gold-light);
+      color: var(--ll-gold-dark);
+      border-color: var(--ll-gold);
+    }
+
+    /* Hide feedback text label on tablet, keep icon only */
+    @media (max-width: 900px) {
+      .ll-btn-feedback span { display: none; }
+      .ll-btn-feedback { padding: 7px 10px; }
+    }
+
+    /* Hide entirely on mobile — covered by drawer */
+    @media (max-width: 640px) {
+      .ll-btn-feedback { display: none; }
+    }
     /* ============================================================
        DJANGO MESSAGES
        ============================================================ */
@@ -548,7 +581,11 @@
           </li>
         </ul>
       </div>
-
+      <!-- Feedback button — desktop -->
+      <a href="{% url 'feedback' %}" class="ll-btn-feedback" title="Send Feedback">
+        <i class="bi bi-chat-square-text"></i>
+        <span>Feedback</span>
+      </a>
       <!-- User pill dropdown -->
       <div class="dropdown">
         <button class="ll-user-pill dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -564,7 +601,7 @@
             </div>
           </li>
           <li>
-            <a href="#" class="dropdown-item">
+            <a href="{%url 'landlord:profile'%}" class="dropdown-item">
               <i class="bi bi-person"></i> My Profile
             </a>
           </li>
@@ -620,6 +657,9 @@
       </a>
       <a href="#" class="drawer-link">
         <i class="bi bi-chat-dots"></i> Inquiries
+      </a>
+      <a href="{% url 'feedback' %}" class="drawer-link">
+        <i class="bi bi-chat-square-text"></i> Feedback
       </a>
       <a href="#" class="drawer-link">
         <i class="bi bi-person"></i> My Profile

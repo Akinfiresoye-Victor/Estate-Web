@@ -70,6 +70,8 @@ def feedbacks(request):
             base_template = 'company/base.html'
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
         else:
             base_template='estate/base.html'
         if request.method == 'POST':

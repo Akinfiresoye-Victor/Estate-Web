@@ -10,4 +10,6 @@ urlpatterns = [
     path('profile/', views.lanlord_profile, name='profile'),
     path('inquiries/', views.landlord_inquiries, name='inquiries'),
     path('inquiries/delete/<str:lead_id>/', views.delete_lead, name='delete-lead'),
+    path('update_profile', views.update_profile, name='update-profile'),
+    path('delete_account', views.delete_account, name='delete-account'),
 ]

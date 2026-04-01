@@ -33,8 +33,8 @@
       <a href="{% url 'listings' %}" class="btn-dashboard">
         <i class="bi bi-toggles"></i> View My Listings
       </a>
-      <a href="{% url 'sell-property' %}" class="btn-dashboard-outline">
-        <i class="bi bi-plus-circle"></i> Add Another
+      <a href="{% url 'agent:dashboard' %}" class="btn-dashboard-outline">
+        <i class="bi bi-speedometer2"></i> Dashboard
       </a>
     </div>
   </div>
@@ -81,7 +81,6 @@
     <form method="post" enctype="multipart/form-data" id="wizardForm" action="" novalidate>
       {% csrf_token %}
 
-
       {# ══ STEP 1 — CATEGORY & TYPE ═════════════════════════════════════ #}
       <div class="wizard-step active" id="step-1">
 
@@ -95,7 +94,6 @@
 
         <div class="step-body">
 
-          {# Category select #}
           <div class="form-group">
             <label for="{{ form.property_category.id_for_label }}" class="form-label">
               <i class="bi bi-building"></i>{{ form.property_category.label }}
@@ -106,14 +104,11 @@
             {% endif %}
             {% if form.property_category.errors %}
               <div class="field-error">
-                {% for e in form.property_category.errors %}
-                  <i class="bi bi-exclamation-circle-fill"></i>{{ e }}
-                {% endfor %}
+                {% for e in form.property_category.errors %}<i class="bi bi-exclamation-circle-fill"></i>{{ e }}{% endfor %}
               </div>
             {% endif %}
           </div>
 
-          {# Residential (hidden by default) #}
           <div class="form-group property-type-group" id="residential-group" style="display:none;">
             <label for="{{ form.residential.id_for_label }}" class="form-label">
               <i class="bi bi-house-door"></i>{{ form.residential.label }}
@@ -126,7 +121,6 @@
             {% endif %}
           </div>
 
-          {# Commercial (hidden by default) #}
           <div class="form-group property-type-group" id="commercial-group" style="display:none;">
             <label for="{{ form.commercial.id_for_label }}" class="form-label">
               <i class="bi bi-briefcase"></i>{{ form.commercial.label }}
@@ -139,7 +133,6 @@
             {% endif %}
           </div>
 
-          {# Land (hidden by default) #}
           <div class="form-group property-type-group" id="lands-group" style="display:none;">
             <label for="{{ form.lands.id_for_label }}" class="form-label">
               <i class="bi bi-map"></i>{{ form.lands.label }}
@@ -152,16 +145,15 @@
             {% endif %}
           </div>
 
-          {# Step validation hint #}
           <div class="step-validate-hint" id="hint-1">
             <i class="bi bi-exclamation-circle-fill"></i>
             <span id="hint-1-msg">Please select a category and property type to continue.</span>
           </div>
 
-        </div>{# end step-body #}
+        </div>
 
         <div class="step-footer">
-          <div></div>{# spacer #}
+          <div></div>
           <button type="button" class="btn-next" id="next-1">
             Next <i class="bi bi-arrow-right"></i>
           </button>
@@ -201,7 +193,7 @@
             {% elif field.name != 'property_category' and field.name != 'residential' and field.name != 'commercial' and field.name != 'lands' %}
             <div class="form-group">
               <label for="{{ field.id_for_label }}" class="form-label">
-                {% if 'price' in field.name or 'cost' in field.name %}
+                {% if 'price' in field.name %}
                   <i class="bi bi-cash-coin"></i>
                 {% elif 'location' in field.name or 'address' in field.name %}
                   <i class="bi bi-geo-alt-fill"></i>
@@ -221,7 +213,7 @@
                   <i class="bi bi-rulers"></i>
                 {% elif 'base_image' in field.name or 'image' in field.name %}
                   <i class="bi bi-image"></i>
-                {% elif 'furnished' in field.name or 'listed' in field.name or 'featured' in field.name %}
+                {% elif 'featured' in field.name or 'listed' in field.name %}
                   <i class="bi bi-toggles"></i>
                 {% else %}
                   <i class="bi bi-pencil-fill"></i>
@@ -229,12 +221,12 @@
                 {{ field.label }}
               </label>
 
-              {% if field.name == 'is_featured' or field.name == 'is_listed' or field.name == 'furnished' %}
+              {% if field.name == 'is_featured' or field.name == 'is_listed' %}
                 <div class="form-check-wrapper">
                   {{ field|add_class:"form-check-input" }}
                   <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 </div>
-              {% elif field.name == 'description' or field.name == 'property_description' %}
+              {% elif field.name == 'property_description' %}
                 {{ field|add_class:"form-textarea" }}
               {% else %}
                 {{ field|add_class:"form-input" }}
@@ -252,7 +244,7 @@
             {% endif %}
           {% endfor %}
 
-        </div>{# end step-body #}
+        </div>
 
         <div class="step-footer">
           <button type="button" class="btn-back" id="back-2">
@@ -273,7 +265,7 @@
           <div class="step-head-icon"><i class="bi bi-images"></i></div>
           <div class="step-head-text">
             <h2>Property Photos</h2>
-            <p>Replace or keep existing photos. Quality images attract more buyers.</p>
+            <p>Replace or keep existing photos. Quality images attract more interest.</p>
           </div>
         </div>
 
@@ -333,7 +325,7 @@
             {% endfor %}
           </div>
 
-        </div>{# end step-body #}
+        </div>
 
         <div class="step-footer">
           <button type="button" class="btn-back" id="back-3">
@@ -392,9 +384,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* ═══════════════════════════════════════════════
-     STEP WIZARD
-  ═══════════════════════════════════════════════ */
   var currentStep = 1;
   var totalSteps  = 3;
 
@@ -435,7 +424,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (wrapper) wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /* ── Open on correct step after server-side errors ── */
   {% if form.errors or images.errors %}
     var hasStep2Errors = document.querySelector('#step-2 .field-error, #step-2 .error-alert');
     var hasStep3Errors = document.querySelector('#step-3 .field-error');
@@ -463,18 +451,18 @@ document.addEventListener('DOMContentLoaded', function () {
     if (comGroup) comGroup.style.display = 'none';
     if (lanGroup) lanGroup.style.display = 'none';
 
-    if (resSelect) { resSelect.disabled = true; }
-    if (comSelect) { comSelect.disabled = true; }
-    if (lanSelect) { lanSelect.disabled = true; }
+    if (resSelect) resSelect.disabled = true;
+    if (comSelect) comSelect.disabled = true;
+    if (lanSelect) lanSelect.disabled = true;
 
     if (cat === 'Residential') {
-      resGroup.style.display = 'block';
+      if (resGroup) resGroup.style.display = 'block';
       if (resSelect) resSelect.disabled = false;
     } else if (cat === 'Commercial') {
-      comGroup.style.display = 'block';
+      if (comGroup) comGroup.style.display = 'block';
       if (comSelect) comSelect.disabled = false;
     } else if (cat === 'Land') {
-      lanGroup.style.display = 'block';
+      if (lanGroup) lanGroup.style.display = 'block';
       if (lanSelect) lanSelect.disabled = false;
     }
   }
@@ -520,8 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ═══════════════════════════════════════════════
      STEP 2 — VALIDATION & NAVIGATION
-     Note: sale form uses 'property_description' and
-     'price' (not 'description' / 'price_range')
+     Sale model: 'property_description' + 'price'
   ═══════════════════════════════════════════════ */
   var REQUIRED_STEP2 = [
     { id: 'id_property_description', label: 'Property Description' },
@@ -559,10 +546,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       var isEmpty;
       if (field.isFile) {
-        /* On update forms, if a current image already exists Django renders
-           an <a> tag showing the file. If that exists, don't require a new upload. */
-        var hasCurrentFile = !!el.parentNode.querySelector('a[href]')
-                          || !!el.closest('.form-group').querySelector('.current-image-preview img');
+        var hasCurrentFile = !!el.parentNode.querySelector('a[href]');
         isEmpty = (!el.files || el.files.length === 0) && !hasCurrentFile;
       } else {
         isEmpty = !el.value || el.value.trim() === '';

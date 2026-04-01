@@ -370,6 +370,19 @@
     font-size: 0.75rem;
 }
 
+/* Read-only form values */
+.form-value {
+    font-size: 0.87rem;
+    color: var(--p-dark);
+    padding: 10px 13px;
+    background: var(--p-bg);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    min-height: 41px;
+    display: flex;
+    align-items: center;
+}
+
 /* Inputs */
 .form-input,
 .form-textarea {

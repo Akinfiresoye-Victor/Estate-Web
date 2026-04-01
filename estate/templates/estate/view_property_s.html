@@ -227,6 +227,28 @@
         </div>
       </div>
 
+      {# ── Scam Warning ────────────────────────────────────────────── #}
+      <div class="scam-warning">
+        <div class="warning-header">
+          <i class="bi bi-shield-exclamation"></i>
+          <span>Safety Tips</span>
+        </div>
+        <ul class="warning-tips">
+          <li>
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Check the lister's profile and verify their identity is <strong>Verified</strong></span>
+          </li>
+          <li>
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Visit the property in person or send a trusted agent to inspect</span>
+          </li>
+          <li>
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Never send payment without meeting the lister or verifying in person</span>
+          </li>
+        </ul>
+      </div>
+
       {# Agent / Company / Landlord Details #}
       <div class="section-card">
         <div class="section-head">
@@ -289,16 +311,23 @@
 
           <div class="contact-action-btns">
             {% if agent_info %}
-              <a href="{% url 'agent:agent-profile' agent_uuid=property.agent_uuid %}"
+              <a href="{% url 'customer:agent-profile' agent_uuid=property.agent_uuid %}"
                 class="btn-contact secondary">
-                <i class="bi bi-person-circle"></i> View Agent Profile
+                <i class="bi bi-person-circle"></i> View Agent's Profile
               </a>
             {% endif %}
 
             {% if company_info %}
-              <a href="{% url 'company:company-profile' company_uuid=company_info.unique_company_id %}"
+              <a href="{% url 'customer:company-profile' company_uuid=property.company_uuid %}"
                 class="btn-contact secondary">
-                <i class="bi bi-building"></i> View Company Profile
+                <i class="bi bi-building"></i> View Company's Profile
+              </a>
+            {% endif %}
+
+            {% if landlord_info %}
+              <a href="{% url 'customer:landlord-profile' landlord_uuid=property.landlord_uuid %}"
+                class="btn-contact secondary">
+                <i class="bi bi-building"></i> View Landlord's Profile
               </a>
             {% endif %}
 

@@ -1,271 +1,310 @@
 {% extends base_template %}
-{% load static%}
+{% load static %}
+
+{% block title %}Change Password — Estate Web{% endblock %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'estate/css/change_pass.css' %}">
+<link rel="stylesheet" href="{% static 'estate/css/change_pass.css' %}">
 {% endblock %}
+
 {% block content %}
 
-<!-- Back Button -->
-<div class="container">
-  <a href="javascript:history.back()" class="modern-back-btn">
-    <i class="fas fa-arrow-left"></i>
-    <span>Back</span>
-  </a>
-</div>
+<div class="cp-page">
 
-<!-- Hero Header -->
-<div class="password-hero">
-  <div class="hero-overlay"></div>
-  <div class="container">
-    <div class="hero-content">
-      <div class="hero-icon">
-        <i class="fas fa-shield-halved"></i>
-      </div>
-      <h1 class="hero-title">Change Password</h1>
-      <p class="hero-subtitle">Keep your account secure with a strong password</p>
+  <!-- ===== PAGE HEADER ===== -->
+  <div class="cp-page-header">
+    <a href="javascript:history.back()" class="cp-back-link">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <div>
+      <h1 class="cp-page-title">Change Password</h1>
+      <p class="cp-page-sub">Update your password to keep your account secure.</p>
     </div>
   </div>
-</div>
 
-<!-- Main Content -->
-<div class="container password-container">
-  <div class="row justify-content-center">
-    <div class="col-xl-6 col-lg-7 col-md-9">
-      
-      <div class="password-wrapper">
-        
-        <!-- Security Badge -->
-        <div class="security-badge">
-          <i class="fas fa-lock"></i>
-          <span>Secure Connection</span>
-        </div>
+  <!-- ===== LAYOUT ===== -->
+  <div class="cp-layout">
 
-        <!-- Messages -->
-        {% if messages %}
-          {% for message in messages %}
-            <div class="message-alert {{ message.tags }}">
-              <div class="alert-icon">
-                {% if message.tags == 'success' %}
-                  <i class="fas fa-check-circle"></i>
-                {% elif message.tags == 'error' %}
-                  <i class="fas fa-exclamation-circle"></i>
-                {% else %}
-                  <i class="fas fa-info-circle"></i>
-                {% endif %}
-              </div>
-              <div class="alert-content">
-                <p>{{ message }}</p>
-              </div>
-            </div>
-          {% endfor %}
-        {% endif %}
+    <!-- LEFT — security info panel -->
+    <aside class="cp-info-panel">
 
-        {% if form.non_field_errors %}
-          <div class="message-alert error">
-            <div class="alert-icon">
-              <i class="fas fa-exclamation-circle"></i>
-            </div>
-            <div class="alert-content">
-              {% for error in form.non_field_errors %}
-                <p>{{ error }}</p>
-              {% endfor %}
-            </div>
+      <div class="cp-panel-icon-wrap">
+        <i class="bi bi-shield-lock-fill cp-panel-icon"></i>
+      </div>
+
+      <h2 class="cp-panel-title">Password requirements</h2>
+
+      <ul class="cp-req-list">
+        <li class="cp-req-item" id="req-length">
+          <span class="cp-req-dot"></span>
+          At least 8 characters
+        </li>
+        <li class="cp-req-item" id="req-upper">
+          <span class="cp-req-dot"></span>
+          One uppercase letter
+        </li>
+        <li class="cp-req-item" id="req-number">
+          <span class="cp-req-dot"></span>
+          One number
+        </li>
+        <li class="cp-req-item" id="req-special">
+          <span class="cp-req-dot"></span>
+          One special character
+        </li>
+        <li class="cp-req-item" id="req-notnumeric">
+          <span class="cp-req-dot"></span>
+          Cannot be entirely numeric
+        </li>
+      </ul>
+
+      <div class="cp-panel-divider"></div>
+
+      <div class="cp-tip">
+        <p class="cp-tip-label"><i class="bi bi-lightbulb"></i> Tips</p>
+        <ul class="cp-tip-list">
+          <li>Use a password you don't use anywhere else.</li>
+          <li>Avoid using your name, email, or date of birth.</li>
+          <li>Consider a password manager.</li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT — form -->
+    <div class="cp-form-section">
+
+      <!-- Django messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="cp-alert {{ message.tags }}">
+            <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}x-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+            <span>{{ message }}</span>
           </div>
-        {% endif %}
+        {% endfor %}
+      {% endif %}
 
-        <!-- Password Form -->
-        <form method="post" class="password-form" id="passwordChangeForm">
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+        <div class="cp-alert error">
+          <i class="bi bi-x-circle-fill"></i>
+          <span>{{ form.non_field_errors|join:" " }}</span>
+        </div>
+      {% endif %}
+
+      <div class="cp-form-card">
+
+        <form method="POST" class="cp-form" id="changePassForm">
           {% csrf_token %}
 
           <!-- Current Password -->
-          <div class="input-wrapper">
-            <label for="{{ form.old_password.id_for_label }}" class="input-label">
-              <i class="fas fa-lock"></i>
-              Current Password
-              <span class="required">*</span>
+          <div class="cp-form-group">
+            <label class="cp-label" for="{{ form.old_password.id_for_label }}">
+              Current Password <span class="cp-required">*</span>
             </label>
-            <div class="password-field">
+            <div class="cp-input-wrap">
+              <i class="bi bi-lock cp-input-icon"></i>
               {{ form.old_password }}
-              <button type="button" class="toggle-visibility" onclick="togglePassword('{{ form.old_password.id_for_label }}')">
-                <i class="fas fa-eye"></i>
+              <button type="button"
+                      class="cp-toggle-btn"
+                      data-target="{{ form.old_password.id_for_label }}"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
               </button>
             </div>
             {% if form.old_password.errors %}
-              <div class="field-error">
-                {% for error in form.old_password.errors %}
-                  <i class="fas fa-exclamation-triangle"></i>
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
+              <p class="cp-field-error">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ form.old_password.errors|join:" " }}
+              </p>
             {% endif %}
           </div>
 
           <!-- New Password -->
-          <div class="input-wrapper">
-            <label for="{{ form.new_password1.id_for_label }}" class="input-label">
-              <i class="fas fa-key"></i>
-              New Password
-              <span class="required">*</span>
+          <div class="cp-form-group">
+            <label class="cp-label" for="{{ form.new_password1.id_for_label }}">
+              New Password <span class="cp-required">*</span>
             </label>
-            <div class="password-field">
+            <div class="cp-input-wrap">
+              <i class="bi bi-key cp-input-icon"></i>
               {{ form.new_password1 }}
-              <button type="button" class="toggle-visibility" onclick="togglePassword('{{ form.new_password1.id_for_label }}')">
-                <i class="fas fa-eye"></i>
+              <button type="button"
+                      class="cp-toggle-btn"
+                      data-target="{{ form.new_password1.id_for_label }}"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
               </button>
             </div>
             {% if form.new_password1.errors %}
-              <div class="field-error">
-                {% for error in form.new_password1.errors %}
-                  <i class="fas fa-exclamation-triangle"></i>
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
+              <p class="cp-field-error">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ form.new_password1.errors|join:" " }}
+              </p>
             {% endif %}
 
-            <!-- Password Strength Indicator -->
-            <div class="strength-meter">
-              <div class="strength-bar">
-                <div class="strength-fill" id="strengthFill"></div>
+            <!-- Strength bar -->
+            <div class="cp-strength-wrap" id="strengthWrap" style="display:none;">
+              <div class="cp-strength-track">
+                <div class="cp-strength-fill" id="strengthFill"></div>
               </div>
-              <span class="strength-text" id="strengthText">Password Strength</span>
+              <span class="cp-strength-label" id="strengthLabel">Weak</span>
             </div>
           </div>
 
           <!-- Confirm Password -->
-          <div class="input-wrapper">
-            <label for="{{ form.new_password2.id_for_label }}" class="input-label">
-              <i class="fas fa-check-double"></i>
-              Confirm New Password
-              <span class="required">*</span>
+          <div class="cp-form-group">
+            <label class="cp-label" for="{{ form.new_password2.id_for_label }}">
+              Confirm New Password <span class="cp-required">*</span>
             </label>
-            <div class="password-field">
+            <div class="cp-input-wrap">
+              <i class="bi bi-lock-fill cp-input-icon"></i>
               {{ form.new_password2 }}
-              <button type="button" class="toggle-visibility" onclick="togglePassword('{{ form.new_password2.id_for_label }}')">
-                <i class="fas fa-eye"></i>
+              <button type="button"
+                      class="cp-toggle-btn"
+                      data-target="{{ form.new_password2.id_for_label }}"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
               </button>
             </div>
             {% if form.new_password2.errors %}
-              <div class="field-error">
-                {% for error in form.new_password2.errors %}
-                  <i class="fas fa-exclamation-triangle"></i>
-                  <span>{{ error }}</span>
-                {% endfor %}
-              </div>
+              <p class="cp-field-error">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ form.new_password2.errors|join:" " }}
+              </p>
             {% endif %}
+            <!-- Match indicator -->
+            <p class="cp-match-hint" id="matchHint" style="display:none;"></p>
           </div>
 
-          <!-- Password Requirements -->
-          <div class="requirements-box">
-            <h4 class="requirements-title">
-              <i class="fas fa-shield-check"></i>
-              Password Requirements
-            </h4>
-            <ul class="requirements-list">
-              <li class="requirement-item">
-                <i class="fas fa-circle-check"></i>
-                <span>At least 8 characters long</span>
-              </li>
-              <li class="requirement-item">
-                <i class="fas fa-circle-check"></i>
-                <span>Not similar to your personal information</span>
-              </li>
-              <li class="requirement-item">
-                <i class="fas fa-circle-check"></i>
-                <span>Not a commonly used password</span>
-              </li>
-              <li class="requirement-item">
-                <i class="fas fa-circle-check"></i>
-                <span>Cannot be entirely numeric</span>
-              </li>
+          <!-- Mobile-only requirements (shown inline on small screens) -->
+          <div class="cp-mobile-reqs" id="mobileReqs">
+            <p class="cp-mobile-reqs-title">Requirements</p>
+            <ul class="cp-req-list">
+              <li class="cp-req-item" id="m-req-length"><span class="cp-req-dot"></span> At least 8 characters</li>
+              <li class="cp-req-item" id="m-req-upper"><span class="cp-req-dot"></span> One uppercase letter</li>
+              <li class="cp-req-item" id="m-req-number"><span class="cp-req-dot"></span> One number</li>
+              <li class="cp-req-item" id="m-req-special"><span class="cp-req-dot"></span> One special character</li>
+              <li class="cp-req-item" id="m-req-notnumeric"><span class="cp-req-dot"></span> Cannot be entirely numeric</li>
             </ul>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="form-buttons">
-            <button type="submit" class="submit-btn">
-              <i class="fas fa-check-circle"></i>
-              <span>Update Password</span>
+          <!-- Actions -->
+          <div class="cp-form-actions">
+            <a href="javascript:history.back()" class="cp-btn-cancel">Cancel</a>
+            <button type="submit" class="cp-btn-submit" id="btnSubmit">
+              <span class="cp-btn-text">
+                <i class="bi bi-check2-circle"></i> Update Password
+              </span>
+              <span class="cp-btn-loading" style="display:none;">
+                <span class="cp-spinner"></span> Updating...
+              </span>
             </button>
-            <a href="javascript:history.back()" class="cancel-btn">
-              <i class="fas fa-times-circle"></i>
-              <span>Cancel</span>
-            </a>
           </div>
+
         </form>
-
-        <!-- Security Tips -->
-        <div class="security-tips">
-          <div class="tip-icon">
-            <i class="fas fa-lightbulb"></i>
-          </div>
-          <div class="tip-content">
-            <h5>Security Tips</h5>
-            <ul>
-              <li>Use a unique password you don't use elsewhere</li>
-              <li>Consider using a password manager</li>
-              <li>Enable two-factor authentication for extra security</li>
-            </ul>
-          </div>
-        </div>
-
       </div>
-
     </div>
+
   </div>
 </div>
 
-<script>
-// Toggle Password Visibility
-function togglePassword(fieldId) {
-  const field = document.getElementById(fieldId);
-  const button = event.currentTarget;
-  const icon = button.querySelector('i');
-  
-  if (field.type === 'password') {
-    field.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
-  } else {
-    field.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
-  }
-}
+{% endblock %}
 
-// Password Strength Checker (optional enhancement)
-document.addEventListener('DOMContentLoaded', function() {
-  const newPasswordField = document.querySelector('input[name="new_password1"]');
-  if (newPasswordField) {
-    newPasswordField.addEventListener('input', function() {
-      const password = this.value;
-      const strengthFill = document.getElementById('strengthFill');
-      const strengthText = document.getElementById('strengthText');
-      
-      let strength = 0;
-      if (password.length >= 8) strength++;
-      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
-      if (password.match(/[0-9]/)) strength++;
-      if (password.match(/[^a-zA-Z0-9]/)) strength++;
-      
-      const percentage = (strength / 4) * 100;
-      strengthFill.style.width = percentage + '%';
-      
-      if (strength === 0) {
-        strengthFill.className = 'strength-fill';
-        strengthText.textContent = 'Password Strength';
-      } else if (strength <= 2) {
-        strengthFill.className = 'strength-fill weak';
-        strengthText.textContent = 'Weak';
-      } else if (strength === 3) {
-        strengthFill.className = 'strength-fill medium';
-        strengthText.textContent = 'Medium';
-      } else {
-        strengthFill.className = 'strength-fill strong';
-        strengthText.textContent = 'Strong';
-      }
+
+{% block extra_js %}
+<script>
+  // ---- Toggle password visibility ----
+  document.querySelectorAll('.cp-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const icon  = btn.querySelector('i');
+      if (!input) return;
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  });
+
+  // ---- Requirement checker (updates both sidebar + mobile list) ----
+  const checks = {
+    length:     v => v.length >= 8,
+    upper:      v => /[A-Z]/.test(v),
+    number:     v => /[0-9]/.test(v),
+    special:    v => /[^a-zA-Z0-9]/.test(v),
+    notnumeric: v => !/^\d+$/.test(v) || v.length === 0,
+  };
+
+  function updateReq(id, passing) {
+    ['', 'm-'].forEach(prefix => {
+      const el = document.getElementById(prefix + 'req-' + id);
+      if (!el) return;
+      el.classList.toggle('met', passing);
+      el.classList.toggle('unmet', !passing);
     });
   }
-});
-</script>
 
+  // ---- Strength meter ----
+  const strengthWrap  = document.getElementById('strengthWrap');
+  const strengthFill  = document.getElementById('strengthFill');
+  const strengthLabel = document.getElementById('strengthLabel');
+
+  const newPassInput = document.querySelector('input[name="new_password1"]');
+  if (newPassInput) {
+    newPassInput.addEventListener('input', () => {
+      const v = newPassInput.value;
+      strengthWrap.style.display = v.length ? 'flex' : 'none';
+
+      let score = 0;
+      Object.entries(checks).forEach(([key, fn]) => {
+        const pass = fn(v);
+        if (pass) score++;
+        updateReq(key, pass);
+      });
+
+      const levels = [
+        { w: '20%',  color: '#e05c5c', label: 'Very weak' },
+        { w: '40%',  color: '#e0933a', label: 'Weak' },
+        { w: '60%',  color: '#c19b76', label: 'Fair' },
+        { w: '80%',  color: '#7db87d', label: 'Good' },
+        { w: '100%', color: '#3aaa6e', label: 'Strong' },
+      ];
+      const lvl = levels[Math.max(score - 1, 0)];
+      strengthFill.style.width      = lvl.w;
+      strengthFill.style.background = lvl.color;
+      strengthLabel.textContent     = lvl.label;
+      strengthLabel.style.color     = lvl.color;
+    });
+  }
+
+  // ---- Confirm password match hint ----
+  const confirmInput = document.querySelector('input[name="new_password2"]');
+  const matchHint    = document.getElementById('matchHint');
+
+  if (confirmInput && newPassInput) {
+    function checkMatch() {
+      const v1 = newPassInput.value;
+      const v2 = confirmInput.value;
+      if (!v2.length) { matchHint.style.display = 'none'; return; }
+      matchHint.style.display = 'flex';
+      if (v1 === v2) {
+        matchHint.textContent  = '✓ Passwords match';
+        matchHint.className    = 'cp-match-hint match';
+      } else {
+        matchHint.textContent  = '✕ Passwords do not match';
+        matchHint.className    = 'cp-match-hint no-match';
+      }
+    }
+    confirmInput.addEventListener('input', checkMatch);
+    newPassInput.addEventListener('input', checkMatch);
+  }
+
+  // ---- Loading state on submit ----
+  document.getElementById('changePassForm').addEventListener('submit', function () {
+    const btn      = document.getElementById('btnSubmit');
+    const textSpan = btn.querySelector('.cp-btn-text');
+    const loadSpan = btn.querySelector('.cp-btn-loading');
+    textSpan.style.display = 'none';
+    loadSpan.style.display = 'flex';
+    btn.disabled = true;
+  });
+</script>
 {% endblock %}
