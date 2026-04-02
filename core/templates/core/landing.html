@@ -424,8 +424,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
     <div class="hero-inner">
       <h1>Find Your<br><em>Perfect</em> Property</h1>
       <p class="hero-sub">
-        Estate Web connects property seekers, agents, and companies on one
-        modern, trusted platform built for Nigeria's real estate market.
+        The advocacy-first ecosystem redefining Nigerian real estate. We unite property seekers, agents, and landlords on a high-trust platform designed to eliminate fraud and simplify discovery.
       </p>
 
       <div class="hero-cta-strip">
@@ -636,15 +635,17 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
               <i class="bi bi-person"></i>
               <div><strong>Customer</strong><small class="d-block">Find your dream property</small></div>
             </a>
-            <hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)">
             <a class="dropdown-item" href="{% url 'register-agent' %}">
               <i class="bi bi-award"></i>
               <div><strong>Agent</strong><small class="d-block">Manage listings and grow your career</small></div>
             </a>
-            <hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)">
             <a class="dropdown-item" href="{% url 'register-company' %}">
               <i class="bi bi-building"></i>
               <div><strong>Company</strong><small class="d-block">Corporate solutions</small></div>
+            </a>
+            <a class="dropdown-item" href="{% url 'register-landlord' %}">
+              <i class="bi bi-person-badge"></i>
+              <div><strong>Landlord</strong><small class="d-block">Asset protection</small></div>
             </a>
           </div>
         </div>
@@ -691,7 +692,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2025 Estate Web. All rights reserved. | <a href="{%url 'terms-agreement'%}">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+&copy; 2026 Estate Web. All rights reserved. | <a href="{% url 'terms-agreement' %}">Legal</a></p>
     </div>
   </div>
 </footer>

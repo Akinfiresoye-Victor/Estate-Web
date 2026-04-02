@@ -11,59 +11,85 @@
 
   <!-- PAGE HEADER -->
   <div class="ft-header">
-    <div class="ft-header-text">
-      <h1 class="ft-title">Find Talents</h1>
-      <p class="ft-subtitle">Discover skilled real estate agents on Estate Web</p>
-    </div>
+    <h1 class="ft-title">Find Talents</h1>
+    <p class="ft-subtitle">Discover skilled real estate agents on Estate Web</p>
   </div>
 
 
-  <!-- FILTERS -->
-  <div class="ft-filters">
+<!-- FILTERS -->
+<div class="ft-filters">
 
-    <div class="filter-group">
-      <label class="filter-label">Location</label>
-      <select class="filter-select" id="filterLocation">
-        <option value="">All Locations</option>
-        <option value="lagos">Lagos</option>
-        <option value="abuja">Abuja</option>
-        <option value="ibadan">Ibadan</option>
-        <option value="port harcourt">Port Harcourt</option>
-        <option value="kano">Kano</option>
-        <option value="enugu">Enugu</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label class="filter-label">Nature of Work</label>
-      <select class="filter-select" id="filterWork">
-        <option value="">All Work Types</option>
-        <option value="residential">Residential Sales</option>
-        <option value="commercial">Commercial Properties</option>
-        <option value="rental">Property Rentals</option>
-        <option value="management">Property Management</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label class="filter-label">Status</label>
-      <select class="filter-select" id="filterStatus">
-        <option value="">All Agents</option>
-        <option value="verified">Verified Only</option>
-        <option value="universal">Universal Agents</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label class="filter-label">Search</label>
-      <div class="search-wrap">
-        <i class="bi bi-search"></i>
-        <input type="text" class="filter-select search-input" id="filterSearch" placeholder="Search by name...">
-      </div>
-    </div>
-
+  <div class="filter-group">
+    <label class="filter-label">Location</label>
+    <select class="filter-select" id="filterLocation">
+      <option value="">All States</option>
+      <option value="abia">Abia</option>
+      <option value="adamawa">Adamawa</option>
+      <option value="akwa ibom">Akwa Ibom</option>
+      <option value="anambra">Anambra</option>
+      <option value="bauchi">Bauchi</option>
+      <option value="bayelsa">Bayelsa</option>
+      <option value="benue">Benue</option>
+      <option value="borno">Borno</option>
+      <option value="cross river">Cross River</option>
+      <option value="delta">Delta</option>
+      <option value="ebonyi">Ebonyi</option>
+      <option value="edo">Edo</option>
+      <option value="ekiti">Ekiti</option>
+      <option value="enugu">Enugu</option>
+      <option value="abuja">FCT – Abuja</option>
+      <option value="gombe">Gombe</option>
+      <option value="imo">Imo</option>
+      <option value="jigawa">Jigawa</option>
+      <option value="kaduna">Kaduna</option>
+      <option value="kano">Kano</option>
+      <option value="katsina">Katsina</option>
+      <option value="kebbi">Kebbi</option>
+      <option value="kogi">Kogi</option>
+      <option value="kwara">Kwara</option>
+      <option value="lagos">Lagos</option>
+      <option value="nasarawa">Nasarawa</option>
+      <option value="niger">Niger</option>
+      <option value="ogun">Ogun</option>
+      <option value="ondo">Ondo</option>
+      <option value="osun">Osun</option>
+      <option value="oyo">Oyo</option>
+      <option value="plateau">Plateau</option>
+      <option value="rivers">Rivers</option>
+      <option value="sokoto">Sokoto</option>
+      <option value="taraba">Taraba</option>
+      <option value="yobe">Yobe</option>
+      <option value="zamfara">Zamfara</option>
+    </select>
   </div>
 
+  <div class="filter-group">
+    <label class="filter-label">Nature of Work</label>
+    <div class="search-wrap">
+      <i class="bi bi-briefcase"></i>
+      <!-- Free text search — matches agent.work_type which is a free CharField -->
+      <input type="text" class="filter-select search-input" id="filterWork" placeholder="e.g. Residential, Rental...">
+    </div>
+  </div>
+
+  <div class="filter-group">
+    <label class="filter-label">Status</label>
+    <select class="filter-select" id="filterStatus">
+      <option value="">All Agents</option>
+      <option value="verified">Verified Only</option>
+      <option value="standard">Not Yet Verified</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label class="filter-label">Search by Name</label>
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="filter-select search-input" id="filterSearch" placeholder="Search by name...">
+    </div>
+  </div>
+
+</div>
 
   <!-- AGENT GRID -->
   {% if agents %}
@@ -71,27 +97,29 @@
 
     {% for agent in agents %}
     <div class="agent-card"
-         data-location="{{ agent.location|lower }}"
-         data-work="{{ agent.work_type|lower }}"
-         data-status="{% if agent.universal_agent %}universal{% elif agent.verified %}verified{% else %}standard{% endif %}"
-         data-name="{{ agent.first_name|lower }} {{ agent.last_name|lower }}">
+          data-location="{{ agent.location|lower }}"
+          data-work="{{ agent.work_type|lower }}"
+          data-status="{% if agent.verified %}verified{% else %}standard{% endif %}"
+          data-name="{{ agent.first_name|lower }} {{ agent.last_name|lower }}">
 
-      <!-- Card Top: Avatar + Name block -->
+      <!-- CARD TOP: avatar + name block -->
       <div class="card-top">
 
         <div class="agent-avatar-wrap">
           {% if agent.profile_picture %}
-            <img src="{{ agent.profile_picture.url }}" alt="{{ agent.first_name }} {{ agent.last_name }}" class="agent-avatar">
+            <img src="{{ agent.profile_picture.url }}"
+                 alt="{{ agent.first_name }} {{ agent.last_name }}"
+                 class="agent-avatar">
           {% else %}
             <img src="https://ui-avatars.com/api/?name={{ agent.first_name|urlencode }}+{{ agent.last_name|urlencode }}&size=80&background=1a3c4e&color=fff&bold=true"
-                 alt="{{ agent.first_name }} {{ agent.last_name }}" class="agent-avatar">
+                 alt="{{ agent.first_name }} {{ agent.last_name }}"
+                 class="agent-avatar">
           {% endif %}
 
-          <!-- Badge overlays -->
-          {% if agent.universal_agent %}
-            <span class="avatar-badge universal" title="Universal Agent"><i class="bi bi-star-fill"></i></span>
-          {% elif agent.verified %}
-            <span class="avatar-badge verified" title="Verified Agent"><i class="bi bi-patch-check-fill"></i></span>
+          {% if agent.verified %}
+            <span class="avatar-badge verified" title="Verified Agent">
+              <i class="bi bi-patch-check-fill"></i>
+            </span>
           {% endif %}
         </div>
 
@@ -99,16 +127,21 @@
           <h2 class="agent-name">{{ agent.first_name }} {{ agent.last_name }}</h2>
           <p class="agent-work">{{ agent.work_type }}</p>
           <div class="agent-meta">
-            <span class="meta-chip"><i class="bi bi-geo-alt-fill"></i> {{ agent.location }}</span>
-            {% if agent.verified %}<span class="meta-chip verified-chip"><i class="bi bi-patch-check-fill"></i> Verified</span>{% endif %}
-            {% if agent.universal_agent %}<span class="meta-chip universal-chip"><i class="bi bi-star-fill"></i> Universal</span>{% endif %}
+            <span class="meta-chip">
+              <i class="bi bi-geo-alt-fill"></i> {{ agent.location }}
+            </span>
+            {% if agent.verified %}
+              <span class="meta-chip verified-chip">
+                <i class="bi bi-patch-check-fill"></i> Verified
+              </span>
+            {% endif %}
           </div>
         </div>
 
       </div>
 
 
-      <!-- Language / Bio -->
+      <!-- LANGUAGE -->
       {% if agent.language %}
       <div class="agent-lang">
         <i class="bi bi-translate"></i>
@@ -116,12 +149,14 @@
       </div>
       {% endif %}
 
+
+      <!-- BIO -->
       {% if agent.bio %}
       <p class="agent-bio">{{ agent.bio|truncatechars:140 }}</p>
       {% endif %}
 
 
-      <!-- Experience preview (first entry) -->
+      <!-- EXPERIENCE (first entry only) -->
       {% with agent.experiences.first as exp %}
       {% if exp %}
       <div class="exp-preview">
@@ -132,12 +167,15 @@
       {% endwith %}
 
 
-      <!-- Social links -->
+      <!-- SOCIAL LINKS -->
       {% if agent.social.exists %}
       <div class="social-row">
         {% for link in agent.social.all %}
-        <a href="{{ link.link_to_social }}" target="_blank" rel="noopener noreferrer"
-           class="social-link" title="{{ link.social_platform }}">
+        <a href="{{ link.link_to_social }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="social-link"
+           title="{{ link.social_platform }}">
           <i class="bi bi-{{ link.social_platform|lower }}"></i>
         </a>
         {% endfor %}
@@ -145,9 +183,9 @@
       {% endif %}
 
 
-      <!-- Actions -->
+      <!-- ACTIONS -->
       <div class="card-actions">
-        <a href="{%url 'agent:agent-profile' agent.agent_uuid%}" class="btn-view">
+        <a href="{% url 'customer:agent-profile' agent.agent_uuid %}" class="btn-view">
           <i class="bi bi-person-lines-fill"></i>
           View Profile
         </a>
@@ -160,11 +198,17 @@
     </div>
     {% endfor %}
 
+    <!-- Shown by JS when all cards are filtered out -->
+    <div id="noResult">
+      <i class="bi bi-search" style="font-size:1.5rem; display:block; margin-bottom:8px;"></i>
+      No agents match your filters. Try adjusting your search.
+    </div>
+
   </div>
 
   {% else %}
 
-  <!-- EMPTY STATE -->
+  <!-- EMPTY STATE (no agents at all) -->
   <div class="ft-empty">
     <div class="ft-empty-icon"><i class="bi bi-people"></i></div>
     <h3>No agents found</h3>
@@ -180,13 +224,16 @@
 (function () {
   'use strict';
 
-  var cards = document.querySelectorAll('.agent-card');
+  var cards    = document.querySelectorAll('.agent-card');
+  var noResult = document.getElementById('noResult');
 
   function applyFilters() {
     var loc    = document.getElementById('filterLocation').value.toLowerCase();
     var work   = document.getElementById('filterWork').value.toLowerCase();
     var status = document.getElementById('filterStatus').value.toLowerCase();
-    var search = document.getElementById('filterSearch').value.toLowerCase();
+    var search = document.getElementById('filterSearch').value.toLowerCase().trim();
+
+    var visibleCount = 0;
 
     cards.forEach(function (card) {
       var cloc  = card.dataset.location || '';
@@ -201,17 +248,19 @@
         (!search || cname.includes(search));
 
       card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
     });
 
-    /* Show/hide empty state message */
-    var visible = Array.from(cards).filter(function (c) { return c.style.display !== 'none'; });
-    var noResult = document.getElementById('noResult');
-    if (noResult) noResult.style.display = visible.length ? 'none' : 'block';
+    if (noResult) {
+      noResult.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
   }
 
   ['filterLocation', 'filterWork', 'filterStatus', 'filterSearch'].forEach(function (id) {
     var el = document.getElementById(id);
-    if (el) el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', applyFilters);
+    if (el) {
+      el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', applyFilters);
+    }
   });
 
 }());

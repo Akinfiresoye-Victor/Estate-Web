@@ -15,6 +15,7 @@ from .models import ErrorLog
 import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
 from landlord.models import LandlordInformation
+from django_ratelimit.decorators import ratelimit
 # from django.core.mail import send_mail
 
 # send_mail(
@@ -92,6 +93,7 @@ def feedbacks(request):
 
 
 '''New Multi-Channel Feedback System — receives AJAX POST from the feedback modal'''
+@ratelimit(key='ip', rate='10/m', method='POST', block=True)
 @require_POST
 def submit_feedback(request):
     try:
@@ -455,6 +457,7 @@ def lease_property(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})        
 
 
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 def toggle_listing(request, property_id, property_type):
     """
     Toggles a property between inventory (private) and listed(public).
@@ -1417,3 +1420,10 @@ def partnership_terms(request):
 
 def estate_web_guide(request):
     return render(request, 'core/faq.html')
+
+
+def ratelimit_error(request, exception=None):
+    return render(request, 'core/429.html', status=429)
+
+def lockout_response(request, credentials, *args, **kwargs):
+    return render(request, 'core/lockout.html', status=403)

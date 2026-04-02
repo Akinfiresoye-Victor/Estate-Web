@@ -9,8 +9,6 @@
 
 <!-- ═══════════════════════════════════════════
      PROFILE HEADER
-     Mobile: compact — avatar left, name right, bell top-right
-     Desktop: wider with more breathing room
      ═══════════════════════════════════════════ -->
 <div class="profile-header">
   <div class="profile-cover"></div>
@@ -29,9 +27,9 @@
       <h1 class="agent-name">{{ greeting }}, {{ first_name }}!</h1>
       <p class="agent-role">{{ work_type }}</p>
       {% if agent_info.verified %}
-      <span class="verified-tag"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        <span class="verified-tag"><i class="bi bi-patch-check-fill"></i> Verified</span>
       {% else %}
-      <span class="unverified-tag"><i class="bi bi-patch-exclamation-fill"></i> Setup Incomplete</span>
+        <span class="unverified-tag"><i class="bi bi-patch-exclamation-fill"></i> Setup Incomplete</span>
       {% endif %}
     </div>
 
@@ -41,7 +39,6 @@
 
 <!-- ═══════════════════════════════════════════
      PROGRESS TRACKER
-     Slim bar — tap to reveal missions
      ═══════════════════════════════════════════ -->
 <div class="progress-tracker-bar">
   <div class="page-pad">
@@ -93,14 +90,15 @@
         </div>
 
       </div>
+
       {% if has_headshot and has_whatsapp and has_listing %}
       <div class="cl-complete">
         <i class="bi bi-trophy-fill"></i>
         {% if agent_info.verified %}
           <span>All missions complete! Your profile is fully set up.</span>
-        {%else%}
+        {% else %}
           <span>Wait while we review your account for verification.</span>
-        {%endif%}
+        {% endif %}
       </div>
       {% endif %}
     </div>
@@ -109,12 +107,13 @@
 
 
 <!-- ═══════════════════════════════════════════
-     MAIN CONTENT
+     MAIN CONTENT WRAPPER
+     On mobile: single column top-to-bottom.
+     On desktop: two columns — main + sidebar.
      ═══════════════════════════════════════════ -->
 <div class="page-pad main-content">
 
-
-  <!-- TIP BANNER -->
+  <!-- TIP BANNER — full width on both layouts -->
   <div class="tip-banner">
     <div class="tip-icon"><i class="bi bi-lightbulb-fill"></i></div>
     <div class="tip-body">
@@ -125,311 +124,346 @@
 
 
   <!-- ─────────────────────────────────────────
-       SECTION 1: MY ACTIVE LISTINGS
-       Horizontal swipeable stat cards on mobile.
-       2 cards visible at once — user can see
-       there's more to swipe to.
+       LEFT COLUMN — the four main sections
+       On mobile these just stack normally.
+       On desktop they go in the left column.
        ───────────────────────────────────────── -->
-  <section class="section-block">
-    <div class="section-header">
-      <h2 class="section-title"> Overview</h2>
-      <a href="{% url 'listings' %}" class="see-all-link">View All <i class="bi bi-arrow-right-short"></i></a>
-    </div>
+  <div class="content-main">
 
-    <div class="stats-scroll" id="statsScroll">
-
-      <div class="stat-card">
-        <div class="stat-icon blue"><i class="bi bi-house-check"></i></div>
-        <div class="stat-data">
-          <h3>{{ house_count }}</h3>
-          <p>Active Listings</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="bi bi-people-fill"></i></div>
-        <div class="stat-data">
-          <h3>{{ lead_count }}</h3>
-          <p>Total Leads</p>
-          {% if new_lead_count > 0 %}
-          <span class="new-badge">+{{ new_lead_count }} New</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon orange"><i class="bi bi-calendar-event"></i></div>
-        <div class="stat-data">
-          <h3>{{ todays_appointment|length }}</h3>
-          <p>Appointments Today</p>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon purple"><i class="bi bi-star-fill"></i></div>
-        <div class="stat-data">
-          <h3>{{ avg_rating|default:"0.0"|floatformat:'1' }}</h3>
-          <p>Avg Rating</p>
-          <span class="stat-sub">{{ total_reviews|default:"0" }} reviews</span>
-        </div>
-      </div>
-
-      {% if potential_commission %}
-      <div class="stat-card">
-        <div class="stat-icon gold"><i class="bi bi-cash-coin"></i></div>
-        <div class="stat-data">
-          <h3 class="commission-val">₦{{ potential_commission|floatformat:"0" }}</h3>
-          <p>Potential Commission</p>
-          <span class="stat-sub">From active listings</span>
-        </div>
-      </div>
-      {% endif %}
-
-    </div>
-
-    <div class="scroll-dots" id="scrollDots">
-      <span class="scroll-dot active"></span>
-      <span class="scroll-dot"></span>
-      <span class="scroll-dot"></span>
-      <span class="scroll-dot"></span>
-      {% if potential_commission %}<span class="scroll-dot"></span>{% endif %}
-    </div>
-  </section>
-
-
-  <!-- ─────────────────────────────────────────
-       SECTION 2: INQUIRY INBOX
-       People interested in your houses.
-       Most important action: WhatsApp button.
-       ───────────────────────────────────────── -->
-  <section class="section-block">
-    <div class="section-header">
-      <h2 class="section-title"><i class="bi bi-chat-dots-fill"></i> People Interested</h2>
-      <a href="{% url 'agent:leads' %}" class="see-all-link">View All <i class="bi bi-arrow-right-short"></i></a>
-    </div>
-
-    {% if recent_inquiries %}
-    <div class="inbox-list">
-      {% for inquiry in recent_inquiries %}
-      <div class="inbox-item">
-        <div class="lead-avatar">{{ inquiry.name|slice:":1"|upper }}</div>
-        <div class="lead-info">
-          <span class="lead-name">{{ inquiry.name }}</span>
-          <span class="lead-prop"><i class="bi bi-house"></i> {{ inquiry.property_name }}</span>
-          <span class="lead-time">{{ inquiry.date_created|timesince }} ago</span>
-        </div>
-        <a href="#"
-           class="wa-btn"
-           data-phone="{{ inquiry.phone_no }}"
-           data-name="{{ inquiry.name }}"
-           data-agent="{{ name }}"
-           data-property="{{ inquiry.property_name }}"
-           onclick="openWhatsApp(this); return false;">
-          <i class="bi bi-whatsapp"></i>
-          <span>Chat</span>
+    <!-- SECTION 1: OVERVIEW STATS -->
+    <section class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">Overview</h2>
+        <a href="{% url 'listings' %}" class="see-all-link">
+          View All <i class="bi bi-arrow-right-short"></i>
         </a>
       </div>
-      {% endfor %}
-    </div>
 
-    {% else %}
-    <div class="inbox-empty">
-      <div class="empty-icon-wrap"><i class="bi bi-chat-dots"></i></div>
-      <h3>No Inquiries Yet</h3>
-      <p>Share your listings to attract buyers and renters.</p>
-      <a href="{% url 'lease-property' %}" class="btn-primary-action">
-        <i class="bi bi-house-add"></i> Post a Listing
-      </a>
-    </div>
-    {% endif %}
-  </section>
+      <div class="stats-scroll" id="statsScroll">
 
-
-  <!-- ─────────────────────────────────────────
-       SECTION 3: QUICK ACTIONS
-       2×2 grid on mobile — big tap targets.
-       4-col on desktop.
-       ───────────────────────────────────────── -->
-  <section class="section-block">
-    <div class="section-header">
-      <h2 class="section-title"><i class="bi bi-lightning-charge-fill"></i> Quick Actions</h2>
-    </div>
-
-    <div class="actions-grid">
-
-      <a href="{% url 'lease-property' %}" class="action-card primary">
-        <div class="action-icon"><i class="bi bi-house-add"></i></div>
-        <div class="action-info"><h4>Lease</h4><p>List a rental</p></div>
-      </a>
-
-      <a href="{% url 'sell-property' %}" class="action-card primary">
-        <div class="action-icon"><i class="bi bi-tag-fill"></i></div>
-        <div class="action-info"><h4>Sell</h4><p>List for sale</p></div>
-      </a>
-
-      <a href="{% url 'listings' %}" class="action-card">
-        <div class="action-icon"><i class="bi bi-grid-3x3-gap"></i></div>
-        <div class="action-info"><h4>Portfolio</h4><p>All listings</p></div>
-      </a>
-
-      <a href="{% url 'agent:leads' %}" class="action-card">
-        <div class="action-icon"><i class="bi bi-person-badge-fill"></i></div>
-        <div class="action-info"><h4>Leads</h4><p>Track clients</p></div>
-      </a>
-
-      <a href="{% url 'appointment' %}" class="action-card">
-        <div class="action-icon"><i class="bi bi-calendar-check"></i></div>
-        <div class="action-info"><h4>Schedule</h4><p>View viewings</p></div>
-      </a>
-
-      <a href="{% url 'agent:analytics' %}" class="action-card">
-        <div class="action-icon"><i class="bi bi-graph-up-arrow"></i></div>
-        <div class="action-info"><h4>Analytics</h4><p>Track insights</p></div>
-      </a>
-
-      <div class="action-card coming-soon-card">
-        <div class="cs-badge"><i class="bi bi-clock-history"></i> Soon</div>
-        <div class="action-icon disabled-icon"><i class="bi bi-briefcase"></i></div>
-        <div class="action-info"><h4>Jobs</h4><p>Job Applications</p></div>
-      </div>
-
-      <div class="action-card coming-soon-card">
-        <div class="cs-badge"><i class="bi bi-clock-history"></i> Soon</div>
-        <div class="action-icon disabled-icon"><i class="bi bi-file-earmark-text"></i></div>
-        <div class="action-info"><h4>Documents</h4><p>Contracts</p></div>
-      </div>
-
-      <a href="{% url 'agent:settings' %}" class="action-card">
-        <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
-        <div class="action-info"><h4>Settings</h4><p>Preferences</p></div>
-      </a>
-
-    </div>
-  </section>
-
-
-  <!-- ─────────────────────────────────────────
-       SECTION 4: TODAY'S SCHEDULE
-       ───────────────────────────────────────── -->
-  <section class="section-block">
-    <div class="section-header">
-      <h2 class="section-title"><i class="bi bi-calendar-day"></i> Today's Schedule</h2>
-      <a href="{% url 'add-schedule' %}" class="add-link">
-        <i class="bi bi-plus-circle-fill"></i> Add
-      </a>
-    </div>
-
-    {% if todays_appointment %}
-    <div class="schedule-list">
-      {% for appointment in todays_appointment %}
-      <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="schedule-card">
-        <div class="schedule-time">
-          {% if appointment.time %}
-            <span class="time-val">{{ appointment.time }}</span>
-            <span class="time-fmt">{{ appointment.timeformat }}</span>
-          {% else %}
-            <span class="time-val">Any</span>
-            <span class="time-fmt">Time</span>
-          {% endif %}
-        </div>
-        <div class="schedule-info">
-          <h4 class="schedule-title">{{ appointment.appointment_type }}</h4>
-          <p class="schedule-loc">
-            <i class="bi bi-geo-alt"></i>
-            {% if appointment.appointment_type == 'Virtual' %}Virtual Meeting
-            {% elif appointment.location %}{{ appointment.location }}
-            {% else %}Not Specified{% endif %}
-          </p>
-          <span class="schedule-tag {{ appointment.appointment_type|lower }}">{{ appointment.appointment_type }}</span>
-        </div>
-        <i class="bi bi-chevron-right schedule-chevron"></i>
-      </a>
-      {% endfor %}
-    </div>
-
-    {% else %}
-    <div class="empty-schedule">
-      <i class="bi bi-calendar-x empty-schedule-icon"></i>
-      <p>No appointments today. Your schedule is clear!</p>
-      <a href="{% url 'add-schedule' %}" class="btn-primary-action">
-        <i class="bi bi-plus-circle"></i> Add Appointment
-      </a>
-    </div>
-    {% endif %}
-  </section>
-
-
-  <!-- ─────────────────────────────────────────
-       ACCORDION SECTIONS (mobile-friendly bottom info)
-       Company News + Your Info collapse on mobile,
-       shown fully expanded on desktop.
-       ───────────────────────────────────────── -->
-
-  <!-- Company News -->
-  <div class="accordion-card">
-    <button class="accordion-trigger" onclick="toggleAccordion(this)">
-      {%if agent_info.company_uuid%}
-        <span class="acc-title"><i class="bi bi-megaphone-fill"></i> {{company_name}} Announcements</span>
-      {%else%}
-        <span class="acc-title"><i class="bi bi-megaphone-fill"></i> Company News</span>
-      {%endif%}
-      <i class="bi bi-chevron-down acc-chevron"></i>
-    </button>
-    <div class="accordion-body">
-      {% if company_announcements %}
-        {% for announcement in company_announcements %}
-        <div class="news-card">
-          <div class="news-meta">
-            <span class="news-badge"><i class="bi bi-building"></i> {{ announcement.company.company_name }}</span>
-            <span class="news-time">{{ announcement.created_at|timesince }} ago</span>
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="bi bi-house-check"></i></div>
+          <div class="stat-data">
+            <h3>{{ house_count }}</h3>
+            <p>Active Listings</p>
           </div>
-          <h4 class="news-title">{{ announcement.title }}</h4>
-          <p class="news-body">{{ announcement.message }}</p>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="bi bi-people-fill"></i></div>
+          <div class="stat-data">
+            <h3>{{ lead_count }}</h3>
+            <p>Total Leads</p>
+            {% if new_lead_count > 0 %}
+              <span class="new-badge">+{{ new_lead_count }} New</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon orange"><i class="bi bi-calendar-event"></i></div>
+          <div class="stat-data">
+            <h3>{{ todays_appointment|length }}</h3>
+            <p>Appointments Today</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="bi bi-star-fill"></i></div>
+          <div class="stat-data">
+            <h3>{{ avg_rating|default:"0.0"|floatformat:'1' }}</h3>
+            <p>Avg Rating</p>
+            <span class="stat-sub">{{ total_reviews|default:"0" }} reviews</span>
+          </div>
+        </div>
+
+        {% if potential_commission %}
+        <div class="stat-card">
+          <div class="stat-icon gold"><i class="bi bi-cash-coin"></i></div>
+          <div class="stat-data">
+            <h3 class="commission-val">₦{{ potential_commission|floatformat:"0" }}</h3>
+            <p>Potential Commission</p>
+            <span class="stat-sub">From active listings</span>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <div class="scroll-dots" id="scrollDots">
+        <span class="scroll-dot active"></span>
+        <span class="scroll-dot"></span>
+        <span class="scroll-dot"></span>
+        <span class="scroll-dot"></span>
+        {% if potential_commission %}<span class="scroll-dot"></span>{% endif %}
+      </div>
+    </section>
+
+
+    <!-- SECTION 2: INQUIRY INBOX -->
+    <section class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="bi bi-chat-dots-fill"></i> People Interested
+        </h2>
+        <a href="{% url 'agent:leads' %}" class="see-all-link">
+          View All <i class="bi bi-arrow-right-short"></i>
+        </a>
+      </div>
+
+      {% if recent_inquiries %}
+      <div class="inbox-list">
+        {% for inquiry in recent_inquiries %}
+        <div class="inbox-item">
+          <div class="lead-avatar">{{ inquiry.name|slice:":1"|upper }}</div>
+          <div class="lead-info">
+            <span class="lead-name">{{ inquiry.name }}</span>
+            <span class="lead-prop">
+              <i class="bi bi-house"></i> {{ inquiry.property_name }}
+            </span>
+            <span class="lead-time">{{ inquiry.date_created|timesince }} ago</span>
+          </div>
+          <a href="#"
+             class="wa-btn"
+             data-phone="{{ inquiry.phone_no }}"
+             data-name="{{ inquiry.name }}"
+             data-agent="{{ name }}"
+             data-property="{{ inquiry.property_name }}"
+             onclick="openWhatsApp(this); return false;">
+            <i class="bi bi-whatsapp"></i>
+            <span>Chat</span>
+          </a>
         </div>
         {% endfor %}
-      {% elif agent_info.company_uuid %}
-        <div class="acc-empty">
-          <i class="bi bi-megaphone"></i>
-          <p>No announcements yet from your company admin.</p>
-          <small class="text-muted">Check back later for updates.</small>
-        </div>
-      {% else %}
-        <div class="acc-empty">
-          <i class="bi bi-megaphone"></i>
-          <p>Join a company to see Live Updates</p>
-        </div>
-      {% endif %}
-    </div>
-  </div>
+      </div>
 
-  <!-- Your Information -->
-  <div class="accordion-card">
-    <button class="accordion-trigger" onclick="toggleAccordion(this)">
-      <span class="acc-title"><i class="bi bi-person-circle"></i> Your Information</span>
-      <i class="bi bi-chevron-down acc-chevron"></i>
-    </button>
-    <div class="accordion-body">
-      <div class="info-grid">
-        <div class="info-row">
-          <i class="bi bi-envelope info-icon"></i>
-          <div><span class="info-label">Email</span><span class="info-val">{{ email }}</span></div>
+      {% else %}
+      <div class="inbox-empty">
+        <div class="empty-icon-wrap"><i class="bi bi-chat-dots"></i></div>
+        <h3>No Inquiries Yet</h3>
+        <p>Share your listings to attract buyers and renters.</p>
+        <a href="{% url 'lease-property' %}" class="btn-primary-action">
+          <i class="bi bi-house-add"></i> Post a Listing
+        </a>
+      </div>
+      {% endif %}
+    </section>
+
+
+    <!-- SECTION 3: QUICK ACTIONS -->
+    <section class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="bi bi-lightning-charge-fill"></i> Quick Actions
+        </h2>
+      </div>
+
+      <div class="actions-grid">
+
+        <a href="{% url 'lease-property' %}" class="action-card primary">
+          <div class="action-icon"><i class="bi bi-house-add"></i></div>
+          <div class="action-info"><h4>Lease</h4><p>List a rental</p></div>
+        </a>
+
+        <a href="{% url 'sell-property' %}" class="action-card primary">
+          <div class="action-icon"><i class="bi bi-tag-fill"></i></div>
+          <div class="action-info"><h4>Sell</h4><p>List for sale</p></div>
+        </a>
+
+        <a href="{% url 'listings' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+          <div class="action-info"><h4>Portfolio</h4><p>All listings</p></div>
+        </a>
+
+        <a href="{% url 'agent:leads' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-person-badge-fill"></i></div>
+          <div class="action-info"><h4>Leads</h4><p>Track clients</p></div>
+        </a>
+
+        <a href="{% url 'appointment' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-calendar-check"></i></div>
+          <div class="action-info"><h4>Schedule</h4><p>View viewings</p></div>
+        </a>
+
+        <a href="{% url 'agent:analytics' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <div class="action-info"><h4>Analytics</h4><p>Track insights</p></div>
+        </a>
+
+        <div class="action-card coming-soon-card">
+          <div class="cs-badge"><i class="bi bi-clock-history"></i> Soon</div>
+          <div class="action-icon disabled-icon"><i class="bi bi-briefcase"></i></div>
+          <div class="action-info"><h4>Jobs</h4><p>Job Applications</p></div>
         </div>
-        <div class="info-row">
-          <i class="bi bi-telephone info-icon"></i>
-          <div><span class="info-label">Phone</span><span class="info-val">{{ phone }}</span></div>
+
+        <div class="action-card coming-soon-card">
+          <div class="cs-badge"><i class="bi bi-clock-history"></i> Soon</div>
+          <div class="action-icon disabled-icon"><i class="bi bi-file-earmark-text"></i></div>
+          <div class="action-info"><h4>Documents</h4><p>Contracts</p></div>
         </div>
-        <div class="info-row">
-          <i class="bi bi-geo-alt info-icon"></i>
-          <div><span class="info-label">Location</span><span class="info-val">{{ location }}, Nigeria</span></div>
-        </div>
-        <div class="info-row">
-          <i class="bi bi-building info-icon"></i>
-          <div><span class="info-label">Company</span><span class="info-val">{{ company_name|default:"N/A" }}</span></div>
+
+        <a href="{% url 'agent:settings' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
+          <div class="action-info"><h4>Settings</h4><p>Preferences</p></div>
+        </a>
+
+      </div>
+    </section>
+
+
+    <!-- SECTION 4: TODAY'S SCHEDULE -->
+    <section class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="bi bi-calendar-day"></i> Today's Schedule
+        </h2>
+        <a href="{% url 'add-schedule' %}" class="add-link">
+          <i class="bi bi-plus-circle-fill"></i> Add
+        </a>
+      </div>
+
+      {% if todays_appointment %}
+      <div class="schedule-list">
+        {% for appointment in todays_appointment %}
+        <a href="{% url 'view-schedule' appointment.appointment_uuid %}" class="schedule-card">
+          <div class="schedule-time">
+            {% if appointment.time %}
+              <span class="time-val">{{ appointment.time }}</span>
+              <span class="time-fmt">{{ appointment.timeformat }}</span>
+            {% else %}
+              <span class="time-val">Any</span>
+              <span class="time-fmt">Time</span>
+            {% endif %}
+          </div>
+          <div class="schedule-info">
+            <h4 class="schedule-title">{{ appointment.appointment_type }}</h4>
+            <p class="schedule-loc">
+              <i class="bi bi-geo-alt"></i>
+              {% if appointment.appointment_type == 'Virtual' %}Virtual Meeting
+              {% elif appointment.location %}{{ appointment.location }}
+              {% else %}Not Specified{% endif %}
+            </p>
+            <span class="schedule-tag {{ appointment.appointment_type|lower }}">
+              {{ appointment.appointment_type }}
+            </span>
+          </div>
+          <i class="bi bi-chevron-right schedule-chevron"></i>
+        </a>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="empty-schedule">
+        <i class="bi bi-calendar-x empty-schedule-icon"></i>
+        <p>No appointments today. Your schedule is clear!</p>
+        <a href="{% url 'add-schedule' %}" class="btn-primary-action">
+          <i class="bi bi-plus-circle"></i> Add Appointment
+        </a>
+      </div>
+      {% endif %}
+    </section>
+
+  </div><!-- end .content-main -->
+
+
+  <!-- ─────────────────────────────────────────
+       RIGHT SIDEBAR — info cards
+       On mobile these appear below the sections.
+       On desktop they live in the right column.
+       ───────────────────────────────────────── -->
+  <aside class="content-sidebar">
+
+    <!-- YOUR INFORMATION -->
+    <div class="accordion-card" id="yourInfoCard">
+      <button class="accordion-trigger" onclick="toggleAccordion(this)">
+        <span class="acc-title">
+          <i class="bi bi-person-circle"></i> Your Information
+        </span>
+        <i class="bi bi-chevron-down acc-chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="info-grid">
+          <div class="info-row">
+            <i class="bi bi-envelope info-icon"></i>
+            <div>
+              <span class="info-label">Email</span>
+              <span class="info-val">{{ email }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i class="bi bi-telephone info-icon"></i>
+            <div>
+              <span class="info-label">Phone</span>
+              <span class="info-val">{{ phone }}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i class="bi bi-geo-alt info-icon"></i>
+            <div>
+              <span class="info-label">Location</span>
+              <span class="info-val">{{ location }}, Nigeria</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <i class="bi bi-building info-icon"></i>
+            <div>
+              <span class="info-label">Company</span>
+              <span class="info-val">{{ company_name|default:"Independent" }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
+
+    <!-- COMPANY ANNOUNCEMENTS — COMING SOON -->
+    <div class="coming-soon-feature">
+      <div class="csf-header">
+        <div class="csf-icon-wrap">
+          <i class="bi bi-megaphone-fill"></i>
+        </div>
+        <div>
+          <h3 class="csf-title">Company Announcements</h3>
+          <span class="csf-badge">
+            <i class="bi bi-clock-history"></i> Coming Soon
+          </span>
+        </div>
+      </div>
+      <p class="csf-desc">
+        Stay updated with messages from your company admin — property updates,
+        team news, and event reminders all in one place.
+      </p>
+      <!-- Preview of what it will look like — greyed out -->
+      <div class="csf-preview" aria-hidden="true">
+        <div class="csf-preview-item">
+          <div class="csf-preview-dot"></div>
+          <div class="csf-preview-lines">
+            <div class="csf-line long"></div>
+            <div class="csf-line short"></div>
+          </div>
+        </div>
+        <div class="csf-preview-item">
+          <div class="csf-preview-dot"></div>
+          <div class="csf-preview-lines">
+            <div class="csf-line medium"></div>
+            <div class="csf-line short"></div>
+          </div>
+        </div>
+        <div class="csf-preview-item">
+          <div class="csf-preview-dot"></div>
+          <div class="csf-preview-lines">
+            <div class="csf-line long"></div>
+            <div class="csf-line medium"></div>
+          </div>
+        </div>
+      </div>
+      <p class="csf-footnote">
+        <i class="bi bi-info-circle"></i>
+        This feature will be available in an upcoming update.
+      </p>
+    </div>
+
+  </aside><!-- end .content-sidebar -->
 
 </div><!-- end .main-content -->
 
@@ -442,12 +476,18 @@
   <p class="post-popup-label">What would you like to post?</p>
   <a href="{% url 'lease-property' %}" class="post-popup-btn">
     <div class="popup-icon lease"><i class="bi bi-house-add-fill"></i></div>
-    <div class="popup-text"><strong>Lease Property</strong><span>List a rental property</span></div>
+    <div class="popup-text">
+      <strong>Lease Property</strong>
+      <span>List a rental property</span>
+    </div>
     <i class="bi bi-chevron-right popup-arrow"></i>
   </a>
   <a href="{% url 'sell-property' %}" class="post-popup-btn">
     <div class="popup-icon sell"><i class="bi bi-tag-fill"></i></div>
-    <div class="popup-text"><strong>Sell Property</strong><span>List a property for sale</span></div>
+    <div class="popup-text">
+      <strong>Sell Property</strong>
+      <span>List a property for sale</span>
+    </div>
     <i class="bi bi-chevron-right popup-arrow"></i>
   </a>
 </div>
@@ -457,16 +497,22 @@
      MOBILE BOTTOM NAV
      ═══════════════════════════════════════════ -->
 <nav class="mobile-bottom-nav">
-  <a href="#" class="nav-tab active"><i class="bi bi-house-fill"></i><span>Home</span></a>
-
+  <a href="#" class="nav-tab active">
+    <i class="bi bi-house-fill"></i><span>Home</span>
+  </a>
   <button class="nav-tab nav-post-btn" id="postNavBtn" onclick="togglePostPopup()">
     <div class="nav-post-circle" id="postNavIcon"><i class="bi bi-plus-lg"></i></div>
     <span>Post</span>
   </button>
-
-  <a href="{% url 'agent:leads' %}" class="nav-tab"><i class="bi bi-person-lines-fill"></i><span>Inbox</span></a>
-  <a href="{% url 'appointment' %}" class="nav-tab"><i class="bi bi-calendar-check"></i><span>Schedule</span></a>
-  <a href="{% url 'agent:settings' %}" class="nav-tab"><i class="bi bi-gear-fill"></i><span>More</span></a>
+  <a href="{% url 'agent:leads' %}" class="nav-tab">
+    <i class="bi bi-person-lines-fill"></i><span>Inbox</span>
+  </a>
+  <a href="{% url 'appointment' %}" class="nav-tab">
+    <i class="bi bi-calendar-check"></i><span>Schedule</span>
+  </a>
+  <a href="{% url 'agent:settings' %}" class="nav-tab">
+    <i class="bi bi-gear-fill"></i><span>More</span>
+  </a>
 </nav>
 
 

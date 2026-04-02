@@ -3,9 +3,25 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/buy.css' %}">
+  <link rel="stylesheet" href="{% static 'estate/css/safety_tips.css' %}">
 {% endblock %}
 
 {% block content %}
+
+
+<!-- Safety Shield Trigger - Top Right -->
+<button class="safety-trigger" id="safetyTrigger">
+  <i class="bi bi-shield-check"></i>
+  Safety Tips
+</button>
+
+<!-- Safety Modal -->
+<div class="safety-modal" id="safetyModal">
+  <div class="safety-modal-content">
+    <button class="safety-close" id="safetyClose">&times;</button>
+    {% include 'estate/includes/safety_tips.html' %}
+  </div>
+</div>
 
 <!-- ── HERO ──────────────────────────────────────── -->
 <section class="buy-hero">
@@ -182,8 +198,10 @@
   {% endif %}
 
 </div><!-- end .buy-page -->
+{%endblock%}
 
 
+{%block extra_js%}
 <script>
 /* ── Filter toggle ─────────────────────────────── */
 function toggleFilters() {
@@ -228,12 +246,12 @@ function toggleFilters() {
         return res.json();
       })
       .then(function (data) {
+        if (!data) return;
         /* Confirm with server's actual state */
         setHeart(icon, data.added);
         btn.dataset.added = String(data.added);
         btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
 
-        // Show premium toast
         window.showEstateToast(
           data.added ? 'Property added to your wishlist.' : 'Property removed from your wishlist.',
           'success'
@@ -256,6 +274,8 @@ function toggleFilters() {
     icon.style.color = isAdded ? '#ef4444' : '';
   }
 }());
+
+/* ── Compare Toggle ────────────────────────────── */
 document.querySelectorAll('.cmp-toggle-btn').forEach(function (btn) {
   btn.addEventListener('click', function () {
     fetch(btn.dataset.url, {
@@ -281,6 +301,25 @@ document.querySelectorAll('.cmp-toggle-btn').forEach(function (btn) {
     .catch(function () {
       window.showEstateToast('Something went wrong. Try again.', 'error');
     });
+  });
+}); // ✅ forEach properly closed here
+
+/* ── Safety Modal ──────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+  const trigger = document.getElementById('safetyTrigger');
+  const modal   = document.getElementById('safetyModal');
+  const close   = document.getElementById('safetyClose');
+
+  trigger.addEventListener('click', function () {
+    modal.classList.add('active');
+  });
+
+  close.addEventListener('click', function () {
+    modal.classList.remove('active');
+  });
+
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) modal.classList.remove('active');
   });
 });
 </script>

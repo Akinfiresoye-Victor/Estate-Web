@@ -562,3 +562,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+.cp-btn-contact, .cp-btn-msg, .lp-btn-contact, .lp-btn-msg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* Removes the underline */
+    gap: 8px;              /* Puts space between the icon and text */
+}

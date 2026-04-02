@@ -18,7 +18,7 @@ from core.utils import *
 from agents.models import AgentInformation
 from django.urls import reverse
 import traceback
-
+from django_ratelimit.decorators import ratelimit
 
 
 
@@ -1112,7 +1112,7 @@ def delete_vacancy(request, job_id):
         messages.error(request, 'An unexpected error occurred while deleting the job listing.')
         return redirect('company:application-management')
 
-
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 def toggle_job_status(request, job_id):
     """Toggle job active/inactive status"""
     if not request.user.is_authenticated:
@@ -1197,7 +1197,7 @@ def onboard_agent(request, agent_uuid):
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
-
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def generate_invite_link(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to continue.')

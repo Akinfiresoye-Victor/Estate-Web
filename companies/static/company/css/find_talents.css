@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════
-   find_talents.css — mobile-first
-   Uses the same color palette as the rest of Estate Web.
+   find_talents.css  —  mobile-first
+   Prefix: ft-
    ═══════════════════════════════════════════════════ */
 
 :root {
@@ -20,7 +20,7 @@
   --shadow-md:  0 4px 16px rgba(26,60,78,.10);
   --radius:     14px;
   --radius-sm:  8px;
-  --ease:       all 0.25s ease;
+  --ease:       all 0.22s ease;
 }
 
 
@@ -29,17 +29,17 @@
   padding: 16px;
   background: var(--bg);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  /* No flex/gap here — we space children manually so nothing bleeds */
 }
 
 
 /* ── PAGE HEADER ─────────────────────────────────── */
-.ft-header { padding: 4px 0 8px; }
+.ft-header {
+  padding: 4px 0 16px;
+}
 
 .ft-title {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: var(--primary);
   margin: 0 0 4px;
@@ -47,7 +47,7 @@
 }
 
 .ft-subtitle {
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   color: var(--text-light);
   margin: 0;
 }
@@ -62,9 +62,14 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 16px;
 }
 
-.filter-group { display: flex; flex-direction: column; gap: 5px; }
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
 .filter-label {
   font-size: 11px;
@@ -85,14 +90,19 @@
   outline: none;
   transition: var(--ease);
   font-family: inherit;
+  box-sizing: border-box;
 }
+
 .filter-select:focus {
   background: var(--white);
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(26,60,78,.08);
 }
 
-.search-wrap { position: relative; }
+.search-wrap {
+  position: relative;
+}
+
 .search-wrap > i {
   position: absolute;
   left: 11px;
@@ -102,7 +112,10 @@
   pointer-events: none;
   font-size: 14px;
 }
-.search-input { padding-left: 34px !important; }
+
+.search-input {
+  padding-left: 34px !important;
+}
 
 
 /* ── AGENT GRID ──────────────────────────────────── */
@@ -110,6 +123,8 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
+  /* Critical: prevents grid children from overflowing their column */
+  min-width: 0;
 }
 
 
@@ -117,18 +132,20 @@
 .agent-card {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-sm);
   border: 1.5px solid transparent;
   transition: var(--ease);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 11px;
+  /* These two lines are the core fix — card cannot grow beyond its grid column */
+  min-width: 0;
+  overflow: hidden;
 }
 
 .agent-card:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-3px);
   border-color: rgba(193,155,118,.3);
 }
 
@@ -136,50 +153,56 @@
 /* CARD TOP — avatar left, info right */
 .card-top {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   align-items: flex-start;
+  /* Prevent this flex row from stretching the card */
+  min-width: 0;
 }
 
 .agent-avatar-wrap {
   position: relative;
-  flex-shrink: 0;
-  width: 68px;
-  height: 68px;
+  flex-shrink: 0;   /* avatar never shrinks */
+  width: 64px;
+  height: 64px;
 }
 
 .agent-avatar {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 10px;
   object-fit: cover;
   display: block;
 }
 
-/* Verified / Universal badge overlaid on avatar */
 .avatar-badge {
   position: absolute;
   bottom: -4px;
   right: -4px;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 10px;
 }
 .avatar-badge.verified  { background: #3b82f6; color: #fff; }
 .avatar-badge.universal { background: var(--warning); color: #fff; }
 
-.agent-headline { flex: 1; min-width: 0; }
+.agent-headline {
+  flex: 1;
+  /* Critical: without min-width:0, flex children won't shrink below content size */
+  min-width: 0;
+}
 
 .agent-name {
-  font-size: 1rem;
+  font-size: 0.975rem;
   font-weight: 800;
   color: var(--text-dark);
-  margin: 0 0 3px;
-  line-height: 1.2;
+  margin: 0 0 2px;
+  line-height: 1.25;
+  /* Ellipsis on very long names */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -190,12 +213,16 @@
   color: var(--text-light);
   margin: 0 0 7px;
   font-weight: 500;
+  /* Prevent long work type text from stretching */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .agent-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .meta-chip {
@@ -208,8 +235,13 @@
   font-weight: 600;
   background: rgba(26,60,78,.08);
   color: var(--primary);
+  /* Chips that are too long should truncate, not stretch the card */
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.meta-chip i { font-size: 11px; }
+.meta-chip i { font-size: 11px; flex-shrink: 0; }
 
 .verified-chip  { background: rgba(59,130,246,.1);  color: #3b82f6; }
 .universal-chip { background: rgba(217,119,6,.1);   color: var(--warning); }
@@ -220,23 +252,35 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 12px;
+  padding: 7px 11px;
   background: rgba(193,155,118,.08);
   border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 600;
   color: var(--accent);
   border: 1px solid rgba(193,155,118,.2);
+  /* Prevent overflow */
+  min-width: 0;
+  overflow: hidden;
 }
-.agent-lang i { font-size: 14px; color: var(--secondary); }
+.agent-lang span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agent-lang i { font-size: 13px; color: var(--secondary); flex-shrink: 0; }
 
 
-/* BIO */
+/* BIO — This is where the overflow was happening */
 .agent-bio {
   font-size: 0.83rem;
   color: var(--text-mid);
   line-height: 1.65;
   margin: 0;
+  /* These three lines fix the long-unbroken-text overflow bug */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
 }
 
 
@@ -247,15 +291,27 @@
   gap: 7px;
   font-size: 12px;
   color: var(--text-light);
-  padding: 8px 12px;
+  padding: 8px 11px;
   background: var(--bg);
   border-radius: var(--radius-sm);
+  /* Prevent overflow */
+  min-width: 0;
+  overflow: hidden;
+}
+.exp-preview span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .exp-preview i { color: var(--secondary); font-size: 13px; flex-shrink: 0; }
 
 
 /* SOCIAL LINKS */
-.social-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.social-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
 .social-link {
   width: 32px;
@@ -270,6 +326,7 @@
   color: var(--text-mid);
   text-decoration: none;
   transition: var(--ease);
+  flex-shrink: 0;
 }
 .social-link:hover {
   background: var(--primary);
@@ -281,25 +338,29 @@
 /* ACTION BUTTONS */
 .card-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 2px;
+  gap: 8px;
+  margin-top: auto;   /* pushes buttons to bottom of card */
 }
 
 .btn-view,
 .btn-contact {
   flex: 1;
-  padding: 10px 14px;
+  padding: 10px 8px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   text-decoration: none;
   transition: var(--ease);
   border: none;
   cursor: pointer;
+  /* Prevent button text from overflowing */
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .btn-view {
@@ -309,7 +370,6 @@
 .btn-view:hover {
   background: var(--primary-lt);
   color: var(--white);
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26,60,78,.25);
 }
 
@@ -355,13 +415,27 @@
 .ft-empty p  { font-size: 0.88rem; margin: 0; max-width: 280px; }
 
 
+/* ── NO RESULT (inline empty state after filter) ─── */
+#noResult {
+  display: none;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
+  grid-column: 1 / -1;   /* span full grid width */
+}
+
+
 /* ═══════════════════════════════════════════════════
    TABLET  600px+
    ═══════════════════════════════════════════════════ */
 @media (min-width: 600px) {
 
-  .ft-page { padding: 20px; gap: 20px; }
-  .ft-title { font-size: 1.75rem; }
+  .ft-page { padding: 20px; }
+  .ft-title { font-size: 1.65rem; }
 
   /* Filters: 2 columns */
   .ft-filters {
@@ -369,6 +443,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 14px;
     align-items: end;
+    margin-bottom: 20px;
   }
 
   /* Agent grid: 2 columns */
@@ -382,22 +457,34 @@
    ═══════════════════════════════════════════════════ */
 @media (min-width: 900px) {
 
-  .ft-page { padding: 28px 32px; gap: 24px; }
-  .ft-title { font-size: 2rem; }
-  .ft-subtitle { font-size: 1rem; }
+  .ft-page { padding: 28px 32px; }
+  .ft-title { font-size: 1.9rem; }
+  .ft-subtitle { font-size: 0.95rem; }
+  .ft-header { padding-bottom: 20px; }
 
   /* Filters: 4 columns */
-  .ft-filters { grid-template-columns: repeat(4, 1fr); padding: 20px 24px; }
+  .ft-filters {
+    grid-template-columns: repeat(4, 1fr);
+    padding: 18px 22px;
+    margin-bottom: 24px;
+  }
 
   /* Agent grid: 3 columns */
-  .agent-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .agent-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
 
-  .agent-card { padding: 22px; }
-  .agent-card:hover { transform: translateY(-5px); }
+  .agent-card { padding: 20px; }
 
-  .agent-avatar-wrap { width: 78px; height: 78px; }
-  .agent-name { font-size: 1.05rem; white-space: normal; }
+  .agent-avatar-wrap { width: 72px; height: 72px; }
 
+  /* Name can wrap on desktop since there's more room */
+  .agent-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
 }
 
 
@@ -405,5 +492,7 @@
    LARGE DESKTOP  1200px+
    ═══════════════════════════════════════════════════ */
 @media (min-width: 1200px) {
-  .agent-grid { grid-template-columns: repeat(4, 1fr); }
+  .ft-page { padding: 32px 48px; }
+  .agent-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .agent-card { padding: 22px; }
 }

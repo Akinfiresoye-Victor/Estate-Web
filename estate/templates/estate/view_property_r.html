@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'estate/css/view_prop_r.css' %}">
+<link rel="stylesheet" href="{% static 'estate/css/safety_tips.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -221,26 +222,17 @@
         </div>
       </div>
 
-      {# ── Scam Warning ────────────────────────────────────────────── #}
-      <div class="scam-warning">
-        <div class="warning-header">
-          <i class="bi bi-shield-exclamation"></i>
-          <span>Safety Tips</span>
+      {# ── Enhanced Safety Center ────────────────────────────────────── #}
+      <div class="safety-center sidebar-section">
+        <button class="safety-trigger sidebar-trigger">
+          <i class="bi bi-shield-check"></i> Trust & Safety Tips
+        </button>
+        <div class="safety-modal sidebar-modal">
+          <div class="safety-modal-content">
+            <button class="safety-close">&times;</button>
+            {% include 'estate/includes/safety_tips.html' %}
+          </div>
         </div>
-        <ul class="warning-tips">
-          <li>
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Check the lister's profile and verify their identity is <strong>Verified</strong></span>
-          </li>
-          <li>
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Visit the property in person or send a trusted agent to inspect</span>
-          </li>
-          <li>
-            <i class="bi bi-check-circle-fill"></i>
-            <span>Never send payment without meeting the lister or verifying in person</span>
-          </li>
-        </ul>
       </div>
 
       {# Agent / Company / Landlord Details #}
@@ -351,8 +343,29 @@
 
 {% block extra_js %}
 <script>
+/* Safety Modal JS for sidebar */
+document.addEventListener('DOMContentLoaded', function() {
+  const triggers = document.querySelectorAll('.safety-trigger');
+  triggers.forEach(trigger => {
+    const modal = trigger.closest('.safety-center')?.querySelector('.safety-modal') || document.getElementById('safetyModal');
+    const close = modal?.querySelector('.safety-close');
+    
+    if (trigger && modal) {
+      trigger.addEventListener('click', () => modal.classList.add('active'));
+    }
+    if (close) {
+      close.addEventListener('click', () => modal.classList.remove('active'));
+    }
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+    }
+  });
+});
+
 (function() {
-    const csrftoken = '{{ csrf_token }}';   {# ← use this, not getCookie #}
+    const csrftoken = '{{ csrf_token }}';
 
     function showToast(message, isAdded) {
         let toast = document.getElementById('wishlist-toast');

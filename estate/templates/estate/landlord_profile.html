@@ -74,11 +74,10 @@
         </div>
 
         <div class="lp-hero-actions">
-          <button class="lp-btn-contact"
-                  data-bs-toggle="modal"
-                  data-bs-target="#contactModal">
-            <i class="bi bi-envelope-fill"></i> Contact Landlord
-          </button>
+          <a href="mailto:{{ landlord.email }}?subject=Inquiry for {{ property.title|urlencode }}" 
+            class="lp-btn-contact text-decoration-none">
+              <i class="bi bi-envelope-fill"></i> Contact Landlord
+          </a>
           <a href="tel:{{ landlord.phone_number }}" class="lp-btn-call">
             <i class="bi bi-telephone-fill"></i> Call Now
           </a>
@@ -177,11 +176,10 @@
               </div>
             </div>
 
-            <button class="lp-btn-msg"
-                    data-bs-toggle="modal"
-                    data-bs-target="#contactModal">
-              <i class="bi bi-send-fill"></i> Send Message
-            </button>
+            <a href="mailto:{{ landlord.email }}?subject=Message regarding {{ property.title|urlencode }}&body=Hello, I saw your listing for {{ property.title|urlencode }} on Estate Web and would like to move forward. Please let me know the next steps." 
+              class="lp-btn-msg text-decoration-none">
+                <i class="bi bi-send-fill"></i> Send Message
+            </a>
 
           </div>
         </div>

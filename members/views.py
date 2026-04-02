@@ -14,7 +14,14 @@ from allauth.socialaccount.models import SocialLogin
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress
 from allauth.account.models import EmailConfirmationHMAC
+from django_ratelimit.decorators import ratelimit
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+import json
 
+
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def agent_google_login(request):
     # 1. Tag the session so we remember this is an Agent
     request.session['user_role'] = 'agent'
@@ -23,6 +30,7 @@ def agent_google_login(request):
     # This URL is usually '/accounts/google/login/'
     return redirect('/accounts/google/login/')
 
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def company_google_login(request):
     # 1. Tag the session so we remember this is an Agent
     request.session['user_role'] = 'company'
@@ -31,6 +39,7 @@ def company_google_login(request):
     # This URL is usually '/accounts/google/login/'
     return redirect('/accounts/google/login/')
 
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def landlord_google_login(request):
     # 1. Tag the session so we remember this is a Landlord
     request.session['user_role'] = 'landlord'
@@ -39,7 +48,7 @@ def landlord_google_login(request):
     return redirect('/accounts/google/login/')
 
 
-
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def login_user(request):
     # 1. Guard clause for already logged-in users
     if request.user.is_authenticated:
@@ -110,7 +119,7 @@ def logout_user(request):
 
 
 # ─── register_customer ───────────────────────────────────────────────────────
-
+@ratelimit(key='ip', rate='3/m', method='POST', block=True)
 def register_customer(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -126,7 +135,23 @@ def register_customer(request):
                 user = cast(User, authenticate(request, username=username, password=password))
                 if user:
                     login(request, user)
-                    messages.success(request, f'Welcome {user.username}! Thank you for joining Estate Web.')
+                    subject = f'Welcome to Estate Web, {user.username}!'
+                    html_message = render_to_string('registration/welcome_email.html', {
+                        'user': user,
+                        'protocol': 'https' if not settings.DEBUG else 'http',
+                        'domain': request.get_host(),
+                    })
+                    
+                    send_mail(
+                        subject,
+                        'Welcome!',  # plain text fallback
+                        settings.DEFAULT_FROM_EMAIL,
+                        [user.email],
+                        html_message=html_message,
+                        fail_silently=False,
+                    )
+                    
+                    messages.success(request, f'Welcome {user.username}! Check your email for onboarding info.')
 
                 # --- START SECURITY FIX ---
                 next_url = request.POST.get('next') or request.GET.get('next')
@@ -155,6 +180,7 @@ def register_customer(request):
 
 
 # ─── register_agent ───────────────────────────────────────────────────────────
+@ratelimit(key='ip', rate='3/m', method='POST', block=True)
 def register_agent(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -165,6 +191,23 @@ def register_agent(request):
                 agent = form.save(commit=False)
                 agent.role = 'agent'
                 agent.save()
+                
+                # Send welcome email
+                subject = f'Welcome to Estate Web, {agent.username}!'
+                html_message = render_to_string('registration/welcome_email.html', {
+                    'user': agent,
+                    'protocol': 'https' if not settings.DEBUG else 'http',
+                    'domain': request.get_host(),
+                })
+                send_mail(
+                    subject,
+                    'Welcome!', 
+                    settings.DEFAULT_FROM_EMAIL,
+                    [agent.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                
                 email_address = EmailAddress.objects.create(
                     user=agent,
                     email=agent.email,
@@ -187,7 +230,7 @@ def register_agent(request):
 
 
 # ─── register_company ─────────────────────────────────────────────────────────
-
+@ratelimit(key='ip', rate='3/m', method='POST', block=True)
 def register_company(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -198,6 +241,23 @@ def register_company(request):
                 company = form.save(commit=False)
                 company.role = 'company'
                 company.save()
+                
+                # Send welcome email
+                subject = f'Welcome to Estate Web, {company.username}!'
+                html_message = render_to_string('registration/welcome_email.html', {
+                    'user': company,
+                    'protocol': 'https' if not settings.DEBUG else 'http',
+                    'domain': request.get_host(),
+                })
+                send_mail(
+                    subject,
+                    'Welcome!', 
+                    settings.DEFAULT_FROM_EMAIL,
+                    [company.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                
                 email_address = EmailAddress.objects.create(
                     user=company,
                     email=company.email,
@@ -220,7 +280,7 @@ def register_company(request):
 
 
 # ─── register_landlord ────────────────────────────────────────────────────────
-
+@ratelimit(key='ip', rate='3/m', method='POST', block=True)
 def register_landlord(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -231,6 +291,23 @@ def register_landlord(request):
                 landlord = form.save(commit=False)
                 landlord.role = 'landlord'
                 landlord.save()
+                
+                # Send welcome email
+                subject = f'Welcome to Estate Web, {landlord.username}!'
+                html_message = render_to_string('registration/welcome_email.html', {
+                    'user': landlord,
+                    'protocol': 'https' if not settings.DEBUG else 'http',
+                    'domain': request.get_host(),
+                })
+                send_mail(
+                    subject,
+                    'Welcome!', 
+                    settings.DEFAULT_FROM_EMAIL,
+                    [landlord.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                
                 email_address = EmailAddress.objects.create(
                     user=landlord,
                     email=landlord.email,

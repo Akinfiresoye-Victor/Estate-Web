@@ -49,17 +49,13 @@
 
 
   <!-- ── NEWS BANNER ──────────────────────────────── -->
-  {% if headline %}
-  <div class="cp-news">
+  <div class="cp-news cp-card-locked">
     <div class="cp-news-left">
       <span class="cp-news-pill"><i class="bi bi-newspaper"></i> News</span>
-      <p class="cp-news-text">{{ headline }}</p>
+      <p class="cp-news-text">Latest real estate updates and market insights</p>
     </div>
-    <a href="{% url 'articles' %}" class="cp-news-link">
-      Read <i class="bi bi-arrow-right-short"></i>
-    </a>
+    <div class="cp-news-badge">Coming Soon</div>
   </div>
-  {% endif %}
 
 
   <!-- ── SECTION LABEL ────────────────────────────── -->

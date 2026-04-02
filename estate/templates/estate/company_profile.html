@@ -59,10 +59,9 @@
           </span>
         </div>
 
-        <div class="cp-hero-actions">
-          <button class="cp-btn-contact" data-bs-toggle="modal" data-bs-target="#contactModal">
-            <i class="bi bi-envelope-fill"></i> Contact Company
-          </button>
+          <a href="mailto:{{ company.email }}" class="cp-btn-contact text-decoration-none">
+              <i class="bi bi-envelope-fill"></i> Contact Company
+          </a>
           <button class="cp-btn-share" onclick="shareCompany()" title="Share">
             <i class="bi bi-share-fill"></i>
           </button>
@@ -171,9 +170,10 @@
               </div>
             </div>
 
-            <button class="cp-btn-msg" data-bs-toggle="modal" data-bs-target="#contactModal">
-              <i class="bi bi-send-fill"></i> Send Message
-            </button>
+              <a href="mailto:{{ company.email }}?subject=Property Inquiry - Estate Web&body=Hello, I am interested in your properties. Please provide more details." 
+                class="cp-btn-msg text-decoration-none">
+                  <i class="bi bi-send-fill"></i> Send Message
+              </a>
 
           </div>
         </div>
@@ -210,12 +210,6 @@
             <h2 class="cp-section-title">
               <i class="bi bi-houses-fill"></i> Recent Listings
             </h2>
-            {% if on_sale or on_lease %}
-              <a href="{% url 'company:company-properties' company_uuid=company.unique_company_id %}"
-                 class="cp-view-all-link">
-                View All <i class="bi bi-arrow-right"></i>
-              </a>
-            {% endif %}
           </div>
 
           {% if on_sale or on_lease %}

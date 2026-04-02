@@ -7,167 +7,108 @@
 {% endblock %}
 
 {% block content %}
-<a href="javascript:history.back()" class="attractive-back-button">
-    &larr; Go back
-</a>
-
-<style>
-.attractive-back-button {
-    margin-bottom: 1.5rem;
-}
-
-.attractive-back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.7rem 1.5rem;
-    background: #fff;
-    color: #c19b76;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect: Changes appearance on mouse over */
-.attractive-back-button:hover {
-    background-color: #1a3c4e; /* Darker color */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slightly flatter shadow */
-    transform: translateY(-2px); /* Lifts the button */
-}
-
-/* Active Effect: Simulates a press */
-.attractive-back-button:active {
-    background-color: #0a0a0aff; /* Even darker color */
-    transform: translateY(0); /* Pushes the button down */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Flattens shadow completely */
-}
-</style>
 
 {% if user.is_authenticated %}
+<div class="up-page">
 
-<div class="profile-wrapper">
-    <div class="profile-container">
-        <div class="profile-card">
-            
-            <!-- Header Section -->
-            <div class="profile-header">
-                <div class="header-icon">
-                    <i class="bi bi-person-circle"></i>
-                </div>
-                <h2 class="profile-title">Update Your Profile</h2>
-                <p class="profile-subtitle">Modify your account details and preferences</p>
-            </div>
+  <!-- ── LEFT PANEL ── -->
+  <aside class="up-panel">
+    <div class="up-panel-inner">
+      <a href="javascript:history.back()" class="up-back">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
 
-            <!-- Form -->
-            <form method="POST" enctype="multipart/form-data" class="profile-form">
-                {% csrf_token %}
-
-                {% if form.non_field_errors %}
-                    <div class="error-alert">
-                        <div class="error-header">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <span>Form Errors</span>
-                        </div>
-                        <ul class="error-list">
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-
-                <div class="form-grid">
-                    {% for field in form %}
-                        <div class="form-group {% if field.name == 'bio' or field.name == 'about' %}form-group-full{% endif %}">
-                            <label for="{{ field.id_for_label }}" class="form-label">
-                                {% if 'first' in field.name or 'name' in field.name %}
-                                    <i class="bi bi-person-fill me-2"></i>
-                                {% elif 'email' in field.name %}
-                                    <i class="bi bi-envelope-fill me-2"></i>
-                                {% elif 'phone' in field.name %}
-                                    <i class="bi bi-telephone-fill me-2"></i>
-                                {% elif 'location' in field.name or 'address' in field.name or 'city' in field.name %}
-                                    <i class="bi bi-geo-alt-fill me-2"></i>
-                                {% elif 'image' in field.name or 'photo' in field.name or 'avatar' in field.name %}
-                                    <i class="bi bi-image-fill me-2"></i>
-                                {% elif 'bio' in field.name or 'about' in field.name %}
-                                    <i class="bi bi-text-paragraph me-2"></i>
-                                {% elif 'username' in field.name %}
-                                    <i class="bi bi-at me-2"></i>
-                                {% else %}
-                                    <i class="bi bi-pencil-fill me-2"></i>
-                                {% endif %}
-                                {{ field.label }}
-                            </label>
-
-                            {% if field.name == 'bio' or field.name == 'about' %}
-                                {% render_field field class="form-textarea" rows="4" %}
-                            {% elif 'image' in field.name or 'photo' in field.name or 'avatar' in field.name %}
-                                <div class="file-upload-wrapper">
-                                    {% render_field field class="form-input-file" %}
-                                    <div class="file-upload-hint">
-                                        <i class="bi bi-cloud-upload"></i>
-                                        <span>Choose a file or drag here</span>
-                                    </div>
-                                </div>
-                            {% else %}
-                                {% render_field field class="form-input" %}
-                            {% endif %}
-
-                            {% if field.help_text %}
-                                <div class="form-help-text">{{ field.help_text }}</div>
-                            {% endif %}
-
-                            {% if field.errors %}
-                                <div class="field-error">
-                                    {% for error in field.errors %}
-                                        <i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <button type="submit" class="btn-submit">
-                        <span>Save Changes</span>
-                        <i class="bi bi-check-circle-fill"></i>
-                    </button>
-                    <a href="{% url 'customer:settings'  %}" class="btn-cancel">
-                        <span>Cancel</span>
-                        <i class="bi bi-x-circle-fill"></i>
-                    </a>
-                </div>
-            </form>
-
+      <div class="up-panel-brand">
+        <div class="up-avatar-ring">
+          <div class="up-avatar-placeholder">
+            <i class="bi bi-person-fill"></i>
+          </div>
         </div>
+        <h2 class="up-panel-title">Update<br>Profile</h2>
+        <p class="up-panel-sub">Keep your information accurate to build trust with buyers and renters.</p>
+      </div>
+
+      <ul class="up-panel-tips">
+        <li><i class="bi bi-shield-check-fill"></i> Verified profiles get 3× more enquiries</li>
+        <li><i class="bi bi-camera-fill"></i> Add a clear photo for credibility</li>
+        <li><i class="bi bi-telephone-fill"></i> Keep your contact details up to date</li>
+      </ul>
+
+      <div class="up-panel-deco" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
     </div>
+  </aside>
+
+  <!-- ── RIGHT FORM ── -->
+  <main class="up-main">
+
+    <!-- Mobile-only back + heading -->
+    <div class="up-mobile-header">
+      <a href="javascript:history.back()" class="up-back up-back--mobile">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+      <div class="up-mobile-title">
+        <h1>Update Profile</h1>
+        <p>Make changes to your account information</p>
+      </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="up-form" novalidate>
+      {% csrf_token %}
+
+      <div class="up-form-body">
+        <div class="up-form-grid">
+          {% for field in form %}
+            <div class="up-field{% if field.field.widget.attrs.fullwidth %} up-field--full{% endif %}">
+              <div class="up-input-wrap">
+                {% render_field field class="up-input" placeholder=" " attrs="rows:4" %}
+                <label class="up-label" for="{{ field.id_for_label }}">
+                  {{ field.label }}
+                </label>
+                <span class="up-focus-bar"></span>
+              </div>
+              {% if field.errors %}
+                <p class="up-error">
+                  <i class="bi bi-exclamation-circle-fill"></i>
+                  {% for error in field.errors %}{{ error }}{% endfor %}
+                </p>
+              {% endif %}
+              {% if field.help_text %}
+                <p class="up-hint">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="up-form-footer">
+        <a href="{% url 'customer:settings' %}" class="up-btn up-btn--ghost">
+          <i class="bi bi-x-lg"></i> Cancel
+        </a>
+        <button type="submit" class="up-btn up-btn--primary">
+          <i class="bi bi-check2"></i> Save Changes
+        </button>
+      </div>
+
+    </form>
+  </main>
+
 </div>
 
 {% else %}
 
-<!-- Access Denied -->
-<div class="access-denied">
-    <div class="denied-content">
-        <div class="denied-icon">
-            <i class="bi bi-lock-fill"></i>
-        </div>
-        <h2 class="denied-title">Login Required</h2>
-        <p class="denied-message">You need to be logged in to update your profile.</p>
-        <a href="{% url 'login' %}" class="btn-login">
-            <i class="bi bi-box-arrow-in-right me-2"></i>
-            Log In Here
-        </a>
-    </div>
+<!-- ── NOT LOGGED IN ── -->
+<div class="up-gate">
+  <div class="up-gate-inner">
+    <div class="up-gate-icon"><i class="bi bi-lock-fill"></i></div>
+    <h2>Login Required</h2>
+    <p>You need to be logged in to update your profile.</p>
+    <a href="{% url 'login' %}" class="up-btn up-btn--primary">
+      <i class="bi bi-box-arrow-in-right"></i> Go to Login
+    </a>
+  </div>
 </div>
 
 {% endif %}
-
-<!-- Include Bootstrap Icons if not already in base.html -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
 {% endblock %}

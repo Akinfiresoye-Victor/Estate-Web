@@ -1,8 +1,9 @@
 /* ═══════════════════════════════════════════════════
    AGENT DASHBOARD — mobile-first
-   Same color palette as company dashboard.
-   Base styles = mobile. Desktop overrides at 900px+.
+   Prefix: ad- (used only where needed alongside
+   shared classes below)
    ═══════════════════════════════════════════════════ */
+
 :root {
   --primary:    #1a3c4e;
   --secondary:  #c19b76;
@@ -24,7 +25,7 @@
   --r-sm:       8px;
   --r-md:       12px;
   --r-lg:       16px;
-  --ease:       all 0.3s ease;
+  --ease:       all 0.25s ease;
   --nav-h:      64px;
 }
 
@@ -35,13 +36,10 @@ body {
   background: var(--bg);
   color: var(--text-dark);
   line-height: 1.6;
-  /* room for fixed bottom nav on mobile */
   padding-bottom: calc(var(--nav-h) + 1rem);
 }
 
 button { font-family: inherit; font-size: inherit; }
-
-/* Horizontal page padding — consistent gutters */
 .page-pad { padding: 0 1rem; }
 
 
@@ -64,11 +62,12 @@ button { font-family: inherit; font-size: inherit; }
 .profile-cover::before {
   content: '';
   position: absolute; inset: 0;
-  background: repeating-linear-gradient(45deg, transparent, transparent 30px,
-    rgba(255,255,255,.03) 30px, rgba(255,255,255,.03) 60px);
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 30px,
+    rgba(255,255,255,.03) 30px, rgba(255,255,255,.03) 60px
+  );
 }
 
-/* Mobile: centred column */
 .profile-content {
   display: flex;
   align-items: center;
@@ -103,15 +102,13 @@ button { font-family: inherit; font-size: inherit; }
   border: 2px solid var(--white); border-radius: 50%;
 }
 
-.agent-details { flex: 1; min-width: 0; padding-top: 0.5rem; }
-
-.agent-name {
-  font-size: 1.1rem; font-weight: 800;
-  color: var(--primary); line-height: 1.2;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.agent-details  { flex: 1; min-width: 0; padding-top: 0.5rem; }
+.agent-name     {
+  font-size: 1.1rem; font-weight: 800; color: var(--primary);
+  line-height: 1.2; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
 }
-
-.agent-role { font-size: 0.78rem; color: var(--text-light); font-weight: 500; margin-top: 2px; }
+.agent-role     { font-size: 0.78rem; color: var(--text-light); font-weight: 500; margin-top: 2px; }
 
 .verified-tag,
 .unverified-tag {
@@ -121,24 +118,6 @@ button { font-family: inherit; font-size: inherit; }
 }
 .verified-tag   { background: rgba(16,185,129,.10); color: var(--green); }
 .unverified-tag { background: rgba(245,158,11,.12);  color: #9a7000; }
-
-.header-actions { flex-shrink: 0; padding-top: 0.4rem; }
-
-.icon-btn {
-  position: relative;
-  width: 40px; height: 40px;
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; color: var(--text-dark);
-  cursor: pointer; transition: var(--ease);
-}
-.notif-dot {
-  position: absolute; top: -3px; right: -3px;
-  width: 10px; height: 10px;
-  background: #ef4444; border: 2px solid var(--white);
-  border-radius: 50%;
-}
 
 
 /* ═══════════════════════════════════════════════════
@@ -223,20 +202,24 @@ button { font-family: inherit; font-size: inherit; }
 
 
 /* ═══════════════════════════════════════════════════
-   MAIN CONTENT AREA
+   MAIN CONTENT — outer wrapper
+   Mobile: single column flex stack
+   Desktop: 2-column grid via .content-main + .content-sidebar
    ═══════════════════════════════════════════════════ */
-.main-content { display: flex; flex-direction: column; gap: 1.1rem; }
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;   /* children handle their own spacing */
+}
 
-
-/* ═══════════════════════════════════════════════════
-   TIP BANNER
-   ═══════════════════════════════════════════════════ */
+/* Tip banner */
 .tip-banner {
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   padding: 1rem 1.1rem;
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-md);
   display: flex; align-items: center; gap: 0.85rem;
+  margin-bottom: 1rem;
 }
 .tip-icon {
   width: 42px; height: 42px; flex-shrink: 0;
@@ -247,6 +230,21 @@ button { font-family: inherit; font-size: inherit; }
 }
 .tip-text   { font-size: 0.85rem; color: white; font-style: italic; line-height: 1.5; margin-bottom: 3px; }
 .tip-author { font-size: 0.75rem; color: rgba(255,255,255,.8); font-weight: 600; }
+
+/* Main sections column */
+.content-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Sidebar column */
+.content-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 
 /* ═══════════════════════════════════════════════════
@@ -265,8 +263,7 @@ button { font-family: inherit; font-size: inherit; }
 }
 
 .section-title {
-  font-size: 0.95rem; font-weight: 800;
-  color: var(--primary);
+  font-size: 0.95rem; font-weight: 800; color: var(--primary);
   display: flex; align-items: center; gap: 6px;
 }
 .section-title i { color: var(--secondary); }
@@ -288,7 +285,7 @@ button { font-family: inherit; font-size: inherit; }
 
 
 /* ═══════════════════════════════════════════════════
-   SECTION 1 — STAT CARDS (horizontal scroll)
+   SECTION 1 — STAT CARDS (horizontal scroll on mobile)
    ═══════════════════════════════════════════════════ */
 .stats-scroll {
   display: flex; gap: 0.65rem;
@@ -303,11 +300,9 @@ button { font-family: inherit; font-size: inherit; }
   padding: 0.9rem;
   border-radius: var(--r-md);
   display: flex; align-items: center; gap: 0.8rem;
-  /* Show 2 at once on mobile */
   flex: 0 0 calc(50% - 0.33rem);
   min-width: 155px;
   scroll-snap-align: start;
-  transition: var(--ease);
 }
 
 .stat-icon {
@@ -326,7 +321,7 @@ button { font-family: inherit; font-size: inherit; }
 .stat-data h3   { font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1; }
 .stat-data p    { font-size: 0.72rem; color: var(--text-light); }
 .stat-sub       { font-size: 0.68rem; color: var(--text-muted); }
-.commission-val { font-size: 1.1rem; color: var(--accent); }
+.commission-val { font-size: 1.1rem !important; color: var(--accent); }
 
 .new-badge {
   display: inline-block; padding: 2px 6px;
@@ -334,7 +329,6 @@ button { font-family: inherit; font-size: inherit; }
   border-radius: 8px; font-size: 0.68rem; font-weight: 700;
 }
 
-/* Scroll dots */
 .scroll-dots { display: flex; justify-content: center; gap: 5px; margin-top: 0.6rem; }
 .scroll-dot  { width: 6px; height: 6px; border-radius: 50%; background: #d1d5db; transition: all 0.25s ease; }
 .scroll-dot.active { background: var(--secondary); width: 18px; border-radius: 3px; }
@@ -361,22 +355,18 @@ button { font-family: inherit; font-size: inherit; }
 }
 
 .lead-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-
 .lead-name {
   font-size: 0.86rem; font-weight: 700; color: var(--text-dark);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-
 .lead-prop {
   font-size: 0.74rem; color: var(--text-light);
   display: flex; align-items: center; gap: 4px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .lead-prop i { color: var(--secondary); flex-shrink: 0; }
-
 .lead-time { font-size: 0.68rem; color: var(--text-muted); }
 
-/* WhatsApp button — the most important element here */
 .wa-btn {
   display: flex; align-items: center; gap: 4px;
   padding: 8px 12px;
@@ -389,7 +379,6 @@ button { font-family: inherit; font-size: inherit; }
 .wa-btn i { font-size: 1rem; }
 .wa-btn:active { background: #1da851; transform: scale(0.94); color: white; }
 
-/* Inbox empty state */
 .inbox-empty {
   display: flex; flex-direction: column; align-items: center;
   gap: 0.75rem; padding: 2rem 1rem; text-align: center;
@@ -415,7 +404,7 @@ button { font-family: inherit; font-size: inherit; }
 
 
 /* ═══════════════════════════════════════════════════
-   SECTION 3 — QUICK ACTIONS (2×2 grid mobile)
+   SECTION 3 — QUICK ACTIONS
    ═══════════════════════════════════════════════════ */
 .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
 
@@ -438,7 +427,7 @@ button { font-family: inherit; font-size: inherit; }
 }
 
 .action-card.coming-soon-card {
-  opacity: 0.6; pointer-events: none; cursor: not-allowed;
+  opacity: 0.6; pointer-events: none;
   background: linear-gradient(135deg, #f8f9fa, #e9ecef);
 }
 
@@ -488,7 +477,7 @@ button { font-family: inherit; font-size: inherit; }
 
 .schedule-info { flex: 1; min-width: 0; }
 .schedule-title { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
-.schedule-loc   {
+.schedule-loc {
   font-size: 0.75rem; color: var(--text-light);
   display: flex; align-items: center; gap: 4px; margin-bottom: 5px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -499,13 +488,12 @@ button { font-family: inherit; font-size: inherit; }
   display: inline-block; padding: 2px 8px;
   border-radius: 8px; font-size: 0.68rem; font-weight: 700; text-transform: capitalize;
 }
-.schedule-tag.personal { background: rgba(59,130,246,.10); color: #3b82f6; }
+.schedule-tag.personal { background: rgba(59,130,246,.10);  color: #3b82f6; }
 .schedule-tag.business { background: rgba(245,158,11,.10);  color: #f59e0b; }
 .schedule-tag.virtual  { background: rgba(139,92,246,.10);  color: #8b5cf6; }
 
 .schedule-chevron { font-size: 1rem; color: var(--text-muted); flex-shrink: 0; }
 
-/* Empty schedule */
 .empty-schedule {
   display: flex; flex-direction: column; align-items: center;
   gap: 0.75rem; padding: 2rem 1rem; text-align: center;
@@ -515,7 +503,7 @@ button { font-family: inherit; font-size: inherit; }
 
 
 /* ═══════════════════════════════════════════════════
-   ACCORDION CARDS (Company News + Your Info)
+   ACCORDION CARDS (Your Information)
    ═══════════════════════════════════════════════════ */
 .accordion-card {
   background: var(--white);
@@ -545,42 +533,10 @@ button { font-family: inherit; font-size: inherit; }
   transition: max-height 0.4s ease;
   padding: 0 1rem;
 }
-.accordion-card.open .accordion-body { max-height: 600px; padding: 0 1rem 1rem; }
+.accordion-card.open .accordion-body    { max-height: 500px; padding: 0 1rem 1rem; }
 .accordion-card.open .accordion-trigger { border-bottom: 1px solid var(--border); }
 
-/* News cards inside accordion */
-.news-card {
-  padding: 0.9rem;
-  background: var(--bg); border-radius: var(--r-md);
-  border-left: 3px solid var(--primary);
-  margin-bottom: 0.6rem;
-}
-.news-card:last-child { margin-bottom: 0; }
-
-.news-meta {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 5px; margin-bottom: 6px;
-}
-.news-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 8px;
-  background: rgba(26,60,78,.08); border-radius: 8px;
-  font-size: 0.7rem; font-weight: 700; color: var(--primary);
-}
-.news-time  { font-size: 0.7rem; color: var(--text-muted); }
-.news-title { font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
-.news-body  { font-size: 0.8rem; color: var(--text-light); line-height: 1.6; }
-
-.acc-empty {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 8px; padding: 1.5rem; text-align: center; color: var(--text-muted);
-}
-.acc-empty i { font-size: 1.8rem; }
-.acc-empty p { font-size: 0.82rem; }
-
-/* Info rows inside accordion */
 .info-grid { display: flex; flex-direction: column; gap: 0.5rem; }
-
 .info-row {
   display: flex; align-items: center; gap: 0.75rem;
   padding: 0.75rem; background: var(--bg); border-radius: var(--r-sm);
@@ -600,6 +556,89 @@ button { font-family: inherit; font-size: inherit; }
   display: block; font-size: 0.84rem; font-weight: 600; color: var(--text-dark);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+
+
+/* ═══════════════════════════════════════════════════
+   COMING SOON FEATURE CARD (Company Announcements)
+   ═══════════════════════════════════════════════════ */
+.coming-soon-feature {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.1rem;
+  border: 1.5px dashed var(--border);
+}
+
+.csf-header {
+  display: flex; align-items: center; gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.csf-icon-wrap {
+  width: 44px; height: 44px; flex-shrink: 0;
+  background: rgba(26,60,78,.06);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: var(--text-muted);
+}
+
+.csf-title {
+  font-size: 0.9rem; font-weight: 700; color: var(--text-dark);
+  margin: 0 0 4px;
+}
+
+.csf-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 0.7rem; font-weight: 700;
+  background: rgba(139,92,246,.1); color: #7c3aed;
+}
+.csf-badge i { font-size: 0.7rem; }
+
+.csf-desc {
+  font-size: 0.8rem; color: var(--text-light);
+  line-height: 1.6; margin-bottom: 1rem;
+}
+
+/* Ghost preview — greyed-out placeholder lines to show what's coming */
+.csf-preview {
+  background: var(--bg);
+  border-radius: var(--r-sm);
+  padding: 0.85rem;
+  display: flex; flex-direction: column; gap: 0.65rem;
+  margin-bottom: 0.9rem;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.csf-preview-item {
+  display: flex; align-items: center; gap: 0.7rem;
+}
+.csf-preview-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border); flex-shrink: 0;
+}
+.csf-preview-lines { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.csf-line {
+  height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--border), #f1f3f5);
+  animation: shimmer 1.8s ease-in-out infinite alternate;
+}
+.csf-line.long   { width: 80%; }
+.csf-line.medium { width: 55%; }
+.csf-line.short  { width: 35%; }
+
+@keyframes shimmer {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+.csf-footnote {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; color: var(--text-muted);
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+}
+.csf-footnote i { flex-shrink: 0; }
 
 
 /* ═══════════════════════════════════════════════════
@@ -642,7 +681,6 @@ button { font-family: inherit; font-size: inherit; }
   margin-bottom: 0.4rem;
   -webkit-tap-highlight-color: transparent;
 }
-.post-popup-btn:last-child { margin-bottom: 0; }
 .post-popup-btn:active { background: var(--bg); }
 
 .popup-icon {
@@ -659,15 +697,9 @@ button { font-family: inherit; font-size: inherit; }
 .popup-text span   { font-size: 0.74rem; color: var(--text-light); }
 .popup-arrow { font-size: 0.85rem; color: var(--text-muted); flex-shrink: 0; }
 
-/* Hide popup on desktop */
-@media (min-width: 900px) {
-  .post-popup, .post-backdrop { display: none !important; }
-}
-
 
 /* ═══════════════════════════════════════════════════
    MOBILE BOTTOM NAV
-   Fixed — same system as company dashboard
    ═══════════════════════════════════════════════════ */
 .mobile-bottom-nav {
   display: flex; align-items: stretch; justify-content: space-around;
@@ -694,12 +726,10 @@ button { font-family: inherit; font-size: inherit; }
 .nav-tab.active { color: var(--primary); }
 .nav-tab.active i { transform: translateY(-2px); }
 
-/* Post button */
 .nav-post-btn {
   background: none; border: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-
 .nav-post-circle {
   width: 50px; height: 50px; border-radius: 50%;
   background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -715,120 +745,98 @@ button { font-family: inherit; font-size: inherit; }
 
 
 /* ═══════════════════════════════════════════════════
-   ANIMATIONS
+   ENTRY ANIMATIONS
    ═══════════════════════════════════════════════════ */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.stat-card:nth-child(1)   { animation: fadeUp .35s ease .04s both; }
-.stat-card:nth-child(2)   { animation: fadeUp .35s ease .08s both; }
-.stat-card:nth-child(3)   { animation: fadeUp .35s ease .12s both; }
-.stat-card:nth-child(4)   { animation: fadeUp .35s ease .16s both; }
-.action-card:nth-child(1) { animation: fadeUp .35s ease .05s both; }
-.action-card:nth-child(2) { animation: fadeUp .35s ease .09s both; }
-.action-card:nth-child(3) { animation: fadeUp .35s ease .13s both; }
-.action-card:nth-child(4) { animation: fadeUp .35s ease .17s both; }
+.stat-card:nth-child(1) { animation: fadeUp .35s ease .04s both; }
+.stat-card:nth-child(2) { animation: fadeUp .35s ease .08s both; }
+.stat-card:nth-child(3) { animation: fadeUp .35s ease .12s both; }
+.stat-card:nth-child(4) { animation: fadeUp .35s ease .16s both; }
 
 
 /* ═══════════════════════════════════════════════════
    DESKTOP — 900px+
-   Two-column layout: main content (1fr) + sidebar (320px)
-   Mobile CSS is completely untouched above this block.
+   Two-column layout.
+   This is the ONLY @media (min-width: 900px) block.
    ═══════════════════════════════════════════════════ */
 @media (min-width: 900px) {
 
   body { padding-bottom: 0; }
 
-  /* Wider gutters on desktop */
   .page-pad { padding: 0 2.5rem; }
 
-  /* ── Profile header ─────────────────────── */
-  .profile-cover      { height: 165px; }
-  .profile-content    { padding: 0 2.5rem 2rem; gap: 2rem; }
-  .agent-avatar-wrap  { width: 115px; height: 115px; margin-top: -58px; }
-  .avatar-placeholder { font-size: 2.8rem; }
-  .agent-name         { font-size: 2rem; white-space: normal; }
-  .agent-role         { font-size: 1rem; }
-  .icon-btn           { width: 48px; height: 48px; font-size: 1.25rem; }
+  /* Profile header */
+  .profile-cover     { height: 165px; }
+  .profile-content   { padding: 0 2.5rem 2rem; gap: 2rem; }
+  .agent-avatar-wrap { width: 115px; height: 115px; margin-top: -58px; }
+  .avatar-placeholder{ font-size: 2.8rem; }
+  .agent-name        { font-size: 2rem; white-space: normal; }
+  .agent-role        { font-size: 1rem; }
 
-  /* ── Progress tracker ───────────────────── */
+  /* Progress tracker */
   .progress-tracker-bar .page-pad { padding: 0 2.5rem; }
   .progress-checklist.open        { padding-bottom: 1.25rem; }
-  .checklist-grid                 { flex-direction: row; flex-wrap: wrap; }
-  .checklist-item                 { flex: 1 1 260px; }
+  .checklist-grid { flex-direction: row; flex-wrap: wrap; }
+  .checklist-item { flex: 1 1 260px; }
 
-  /* ── TWO-COLUMN MAIN LAYOUT ─────────────────
-     Children of .main-content in DOM order:
-       1. .tip-banner            → spans full width
-       2-5. .section-block ×4   → left column (1fr)
-       6-7. .accordion-card ×2  → right column (320px sidebar)
-     ─────────────────────────────────────────── */
+  /* Main content: switch to 2-column grid
+     .tip-banner spans full width via grid-column
+     .content-main goes left, .content-sidebar goes right */
   .main-content {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: auto;
+    column-gap: 1.75rem;
+    row-gap: 0;
     max-width: 1300px;
     margin: 0 auto;
     padding: 0 2.5rem;
-    /* Two-column grid */
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    column-gap: 1.75rem;
-    row-gap: 1.4rem;
     align-items: start;
   }
 
-  /* Tip banner: spans both columns */
+  /* Tip banner — row 1, spans both columns */
   .tip-banner {
     grid-column: 1 / -1;
+    grid-row: 1;
     padding: 1.4rem 1.75rem;
-    align-items: center;
+    margin-bottom: 0;
   }
   .tip-text { font-size: 1rem; }
 
-  /* Section blocks: always in left column.
-     align-self: start stops the grid stretching a section to match
-     a taller sidebar card in the same row — fixes the empty gap
-     between People Interested and Quick Actions. */
-  .section-block {
+  /* Content main — row 2, left column */
+  .content-main {
     grid-column: 1;
+    grid-row: 2;
+    gap: 1.25rem;
+    margin-bottom: 0;
+  }
+
+  /* Sidebar — row 2, right column
+     align-self: start means it won't stretch to match
+     the height of content-main — no gap! */
+  .content-sidebar {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    gap: 1.25rem;
+    position: sticky;
+    top: 1rem;   /* sticks to top of viewport as user scrolls */
+  }
+
+  /* Section block styling on desktop */
+  .section-block {
     padding: 1.5rem;
-    align-self: start;
   }
-
-  /* Accordion cards: sidebar (right column).
-    nth-child(6) = Company News
-    nth-child(7) = Your Information */
-  .main-content > .accordion-card:nth-child(6) {
-    grid-column: 2;
-    grid-row: 2 / span 3;   /* spans rows 2-4 so it doesn't force gap in left column */
-  }
-  .main-content > .accordion-card:nth-child(7) {
-    grid-column: 2;
-    grid-row: 5;
-  }
-  .main-content > .accordion-card:nth-child(6),
-  .main-content > .accordion-card:nth-child(7) {
-    align-self: start;
-  }
-
-  /* Auto-expand accordions on desktop — no need to tap */
-  .accordion-trigger  { pointer-events: none; cursor: default; }
-  .acc-chevron        { display: none; }
-  .accordion-body     { max-height: none !important; padding: 0 1rem 1.1rem !important; overflow: visible; }
-  .accordion-card.open .accordion-trigger { border-bottom: none; }
-  /* Give card header same style as info-card on company dashboard */
-  .accordion-trigger {
-    background: var(--bg);
-    border-bottom: 2px solid var(--border) !important;
-  }
-
-  /* ── Section titles ─────────────────────── */
-  .section-title  { font-size: 1.1rem; }
+  .section-title  { font-size: 1.05rem; }
   .section-header { margin-bottom: 1.1rem; }
 
-  /* ── Stat cards: full grid, no scroll ───── */
+  /* Stat cards: full grid, no horizontal scroll */
   .stats-scroll {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     overflow-x: unset;
     scroll-snap-type: unset;
     padding-bottom: 0;
@@ -839,12 +847,11 @@ button { font-family: inherit; font-size: inherit; }
   .stat-data h3       { font-size: 1.9rem; }
   .scroll-dots        { display: none; }
 
-  /* ── Inquiry inbox ──────────────────────── */
-  .inbox-item         { padding: 1rem 1.1rem; }
-  .lead-name          { font-size: 0.93rem; }
-  .wa-btn:hover       { background: #1da851; color: white; }
+  /* Inbox */
+  .inbox-item   { padding: 1rem 1.1rem; }
+  .wa-btn:hover { background: #1da851; color: white; }
 
-  /* ── Quick actions: 4 columns ───────────── */
+  /* Quick actions: 4 columns, horizontal layout */
   .actions-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
@@ -856,24 +863,38 @@ button { font-family: inherit; font-size: inherit; }
     padding: 1rem;
     min-height: unset;
   }
-  .action-card:hover  { border-color: var(--secondary); transform: translateY(-3px); box-shadow: var(--shadow-md); }
-  .action-icon        { width: 46px; height: 46px; font-size: 1.2rem; }
-  .action-info h4     { font-size: 0.88rem; }
-  .action-info p      { font-size: 0.76rem; }
+  .action-card:hover {
+    border-color: var(--secondary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+  .action-icon   { width: 46px; height: 46px; font-size: 1.2rem; }
+  .action-info h4{ font-size: 0.88rem; }
+  .action-info p { font-size: 0.76rem; }
 
-  /* ── Schedule ───────────────────────────── */
+  /* Schedule */
   .schedule-card      { padding: 1.1rem 1.25rem; }
-  .schedule-card:hover { transform: translateX(4px); }
+  .schedule-card:hover{ transform: translateX(4px); }
 
-  /* ── Sidebar info: single column (narrow) ─ */
-  .info-grid          { display: flex; flex-direction: column; gap: 0.55rem; }
-  .info-val           { font-size: 0.82rem; }
+  /* Sidebar: Your Information accordion always open */
+  #yourInfoCard .accordion-trigger { pointer-events: none; cursor: default; }
+  #yourInfoCard .acc-chevron        { display: none; }
+  #yourInfoCard .accordion-body {
+    max-height: none !important;
+    padding: 0 1rem 1rem !important;
+    overflow: visible;
+  }
+  #yourInfoCard .accordion-trigger {
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+  }
 
-  /* ── News cards in sidebar ──────────────── */
-  .news-list          { display: flex; flex-direction: column; gap: 0.65rem; }
+  /* Coming soon card on desktop — same style, just a bit more padding */
+  .coming-soon-feature { padding: 1.25rem; }
 
-  /* ── Hide mobile nav ────────────────────── */
-  .mobile-bottom-nav  { display: none; }
+  /* Hide mobile nav */
+  .mobile-bottom-nav         { display: none; }
+  .post-popup, .post-backdrop{ display: none !important; }
 }
 
 
@@ -882,47 +903,6 @@ button { font-family: inherit; font-size: inherit; }
    ═══════════════════════════════════════════════════ */
 @media (min-width: 1200px) {
   .main-content { grid-template-columns: 1fr 350px; }
-  .stat-card { padding: 1.25rem; }
+  .stat-card    { padding: 1.25rem; }
   .stat-data h3 { font-size: 2.1rem; }
-}
-
-
-@media (min-width: 900px) {
-
-  /* ... all your other desktop rules stay the same ... */
-
-  .main-content {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 0 2.5rem;
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    column-gap: 1.75rem;
-    row-gap: 1.4rem;
-    align-items: start;   /* <-- THIS is the key line */
-  }
-
-  /* Tip banner still spans both columns */
-  .tip-banner {
-    grid-column: 1 / -1;
-  }
-
-  /* All section blocks stay in left column */
-  .section-block {
-    grid-column: 1;
-    padding: 1.5rem;
-    align-self: start;   /* prevents stretching to match sidebar height */
-  }
-
-  /* Sidebar accordion cards */
-  .main-content > .accordion-card:nth-child(6) {
-    grid-column: 2;
-    grid-row: 2 / span 2;   /* spans 2 rows — won't create gaps */
-    align-self: start;
-  }
-  .main-content > .accordion-card:nth-child(7) {
-    grid-column: 2;
-    grid-row: 4;
-    align-self: start;
-  }
-}
+} 

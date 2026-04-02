@@ -22,6 +22,9 @@ from core.utils import refresh_activity_score
 from django.urls import reverse
 import traceback
 from landlord.models import LandlordInformation
+from django_ratelimit.decorators import ratelimit
+
+
 
 '''Algorithms Start👇'''
 
@@ -87,7 +90,7 @@ def buy_property(request):
         myfilter = PropertySaleFilter(request.GET, queryset=sale_qs)
         sale_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementSale.objects.none()
  
-        p       = Paginator(sale_qs, 9)
+        p       = Paginator(sale_qs, 12)
         page    = request.GET.get('page')
         on_sale = p.get_page(page)
         nums    = "a" * on_sale.paginator.num_pages
@@ -124,7 +127,7 @@ def rent_property(request):
         myfilter = PropertyRentFilter(request.GET, queryset=rent_qs)
         rent_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementRent.objects.none()
  
-        p        = Paginator(rent_qs, 9)
+        p        = Paginator(rent_qs, 12)
         page     = request.GET.get('page')
         on_lease = p.get_page(page)
         nums     = "a" * on_lease.paginator.num_pages
@@ -221,7 +224,7 @@ def view_property_on_sale(request, property_id):
             'agent_info':    agent_in_charge,
             'company_info':  company_in_charge,
             'info':          landlord_in_charge if prop.landlord_uuid else None,
-            'landlord_info':          landlord_in_charge if prop.landlord_uuid else None,
+            'landlord_info': landlord_in_charge if prop.landlord_uuid else None,
             'base_template': base_template,
             'role':          request.user.role,
             'in_wishlist':   in_wishlist,
@@ -362,7 +365,7 @@ def listed_properties(request):
 
 
 
-
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 def toggle_wishlist_rent(request, property_id):
     """
     Toggle wishlist for a rent property.
@@ -417,7 +420,7 @@ def toggle_wishlist_rent(request, property_id):
  
  
 # ─── toggle_wishlist_buy ──────────────────────────────────────────────────────
- 
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 def toggle_wishlist_buy(request, property_id):
     """
     Toggle wishlist for a sale property.
@@ -543,6 +546,7 @@ def update_profile(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
+@ratelimit(key='ip', rate='3/h', method='POST', block=True)
 def change_password(request):
     """
     Change User Passwords with precise lines of code
@@ -667,7 +671,7 @@ def review_company(request, company_uuid):
     # Check if user is a customer
     if request.user.role != 'customer':
         messages.error(request, 'Reviews are restricted to customer accounts.')
-        return redirect('company:company-profile', company_uuid=company_uuid)
+        return redirect('customer:company-profile', company_uuid=company_uuid)
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to submit a review.')
         return redirect('landing')
@@ -682,7 +686,7 @@ def review_company(request, company_uuid):
         
         if existing_review:
             messages.warning(request, 'You have already submitted a review for this company.')
-            return redirect('company:company-profile', company_uuid=company_uuid)
+            return redirect('customer:company-profile', company_uuid=company_uuid)
         
         if request.method == 'POST':
             form = ReviewFormCompany(request.POST)
@@ -694,15 +698,15 @@ def review_company(request, company_uuid):
                 # Ensure rating is between 1 and 5
                 if not (1 <= review.rating <= 5):
                     messages.error(request, 'Please provide a rating between 1 and 5 stars.')
-                    return redirect('company:company-profile', company_uuid=company_uuid)
+                    return redirect('customer:company-profile', company_uuid=company_uuid)
                 
                 review.save()
                 messages.success(request, 'Thank you for sharing your feedback!')
-                return redirect('company:company-profile', company_uuid=company_uuid)
+                return redirect('customer:company-profile', company_uuid=company_uuid)
             else:
                 messages.error(request, 'Please correct the errors in your review.')
         
-        return redirect('company:company-profile', company_uuid=company_uuid)
+        return redirect('customer:company-profile', company_uuid=company_uuid)
         
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -714,7 +718,7 @@ def review_agent(request, agent_uuid):
     # Check role
     if hasattr(request.user, 'role') and request.user.role != 'customer':
         messages.error(request, 'Reviews are restricted to customer accounts.')
-        return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+        return redirect('customer:agent-profile', agent_uuid=agent_uuid)
     
     # Check authentication
     if not request.user.is_authenticated:
@@ -732,7 +736,7 @@ def review_agent(request, agent_uuid):
         
         if existing_review:
             messages.warning(request, 'You have already submitted a review for this agent.')
-            return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+            return redirect('customer:agent-profile', agent_uuid=agent_uuid)
         
         if request.method == 'POST':
             form = ReviewFormAgent(request.POST)
@@ -744,15 +748,15 @@ def review_agent(request, agent_uuid):
                 # Validate rating range
                 if not (1 <= review.rating <= 5):
                     messages.error(request, 'Please provide a rating between 1 and 5 stars.')
-                    return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+                    return redirect('customer:agent-profile', agent_uuid=agent_uuid)
                 
                 review.save()
                 messages.success(request, 'Thank you for sharing your feedback!')
-                return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+                return redirect('customer:agent-profile', agent_uuid=agent_uuid)
             else:
                 messages.error(request, 'Please correct the errors in your review.')
         
-        return redirect('agent:agent-profile', agent_uuid=agent_uuid)
+        return redirect('customer:agent-profile', agent_uuid=agent_uuid)
         
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -762,7 +766,7 @@ def review_agent(request, agent_uuid):
 
 
 
-
+@ratelimit(key='ip', rate='10/h', method='POST', block=True)
 def inquiry_form(request, property_type, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to send an inquiry.')
@@ -901,7 +905,7 @@ def flag_listing(request, property_id, property_type):
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
-
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 def toggle_compare(request, property_type, property_id):
     """
     Adds or removes a property from the compare session list.

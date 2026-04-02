@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account Locked - Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/lockout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="lockout-container">
+  <div class="lockout-card">
+    <div class="lockout-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+    </div>
+    
+    <h1 class="lockout-title">Account Locked</h1>
+    
+    <p class="lockout-message">
+      Too many failed attempts. Your account has been temporarily locked for security.
+    </p>
+    
+    <div class="lockout-details">
+      <div class="detail-item">
+Lockout Duration: {{ axes_cooloff_time|default:"1 hour" }}
+        <span class="detail-value">15 minutes</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Attempts:</span>
+        <span class="detail-value">5+ failed logins</span>
+      </div>
+    </div>
+    
+    <div class="lockout-actions">
+      <a href="{% url 'landing' %}" class="btn btn-secondary">Home</a>
+Retry in {{ axes_cooloff_time|default:"1 hour" }}
+    </div>
+    
+    <div class="lockout-tips">
+      <h3>Prevention Tips:</h3>
+      <ul>
+        <li>✓ Use password manager</li>
+        <li>✓ Enable 2FA when available</li>
+        <li>✓ Clear browser cache</li>
+        <li>✓ Try different browser</li>
+      </ul>
+    </div>
+    
+    <div class="lockout-footer">
+      <p>Need help? <a href="mailto:support@estateweb.com">Contact Support</a></p>
+      <p>Lockout expires: <span id="countdown"></span></p>
+    </div>
+  </div>
+</div>
+
+<script>
+function retryIn(minutes) {
+  const now = new Date();
+  const retryTime = new Date(now.getTime() + minutes * 60 * 1000);
+  document.getElementById('countdown').textContent = retryTime.toLocaleString();
+}
+
+retryIn({{ axes_cooloff_time|default:"60" }})
+</script>
+{% endblock %}

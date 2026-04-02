@@ -105,7 +105,7 @@
         </div>
 
         <div class="mc-hero-actions">
-          <a href="{%url 'company:company-profile' company.unique_company_id%}" class="mc-btn primary">
+          <a href="{%url 'customer:company-profile' company.unique_company_id%}" class="mc-btn primary">
             <i class="bi bi-building-fill"></i> View Company Profile
           </a>
           <a href="tel:{{ company.phone_number }}" class="mc-btn secondary">
@@ -333,10 +333,11 @@
             {% if teammate.verified %}
               <span class="mc-v-badge"><i class="bi bi-patch-check-fill"></i></span>
             {% endif %}
-            <a href="{%url 'agent:agent-profile' teammate.agent_uuid%}" class="mc-icon-btn">
+            <a href="{%url 'customer:agent-profile' teammate.agent_uuid%}" class="mc-icon-btn">
               <i class="bi bi-eye"></i>
             </a>
           </div>
+          {% comment %} TODO Fix find talents UI {% endcomment %}
         </div>
         {% empty %}
         <div class="mc-empty">
@@ -435,7 +436,7 @@
             <span>Analytics</span>
           </a>
 
-          <a href="{%url 'company:company-profile' company.unique_company_id%}" class="mc-quick-btn">
+          <a href="{%url 'customer:company-profile' company.unique_company_id%}" class="mc-quick-btn">
             <div class="mc-qb-icon profile"><i class="bi bi-building-fill"></i></div>
             <span>Company Profile</span>
           </a>

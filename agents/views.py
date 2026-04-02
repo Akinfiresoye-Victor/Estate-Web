@@ -17,7 +17,7 @@ from core.utils import monthly_change, engagement_rate, total_agents_engagement_
 from companies.models import JobPost,CompanyInformation,InviteLink, CompanyActivityLog, Employees
 from django.urls import reverse
 import traceback
-
+from django_ratelimit.decorators import ratelimit
 
 # Create your views here.
 def calculate_agent_profile_strength(has_picture, has_listing, has_phone):
@@ -859,7 +859,7 @@ def delete_agent(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-
+@ratelimit(key='ip', rate='30/m', method='POST', block=True)
 def join_via_invite(request):
     """
     Agent lands here after clicking the invite link.

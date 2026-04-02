@@ -8,11 +8,14 @@ from django.core.exceptions import ValidationError
 
 #form for registering users 
 class CustomerSignUpForm(UserCreationForm):
-    first_name= forms.CharField(max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
+    agree_terms = forms.BooleanField(
+        required=True,
+        label='',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
     
-    last_name= forms.CharField(max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Last Name'}), label='')
+
     
     username= forms.CharField(max_length=20, widget=forms.TextInput(
         attrs= {'class': 'form-control', 'placeholder': 'Username'}), label='', help_text='')
@@ -28,10 +31,15 @@ class CustomerSignUpForm(UserCreationForm):
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
+        fields=('username', 'email', 'password1', 'password2', 'agree_terms')
 
 
 class AgentSignUpForm(UserCreationForm):
+    agree_terms = forms.BooleanField(
+        required=True,
+        label='',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
     first_name= forms.CharField(max_length=50, widget=forms.TextInput(
         attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
     
@@ -52,10 +60,15 @@ class AgentSignUpForm(UserCreationForm):
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
+        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'agree_terms')
 
 
 class CompanySignUpForm(UserCreationForm):
+    agree_terms = forms.BooleanField(
+        required=True,
+        label='',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
     first_name= forms.CharField(max_length=50, widget=forms.TextInput(
         attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
     
@@ -76,10 +89,15 @@ class CompanySignUpForm(UserCreationForm):
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
+        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'agree_terms')
 
 
 class LandlordSignUpForm(UserCreationForm):
+    agree_terms = forms.BooleanField(
+        required=True,
+        label='',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
     first_name= forms.CharField(max_length=50, widget=forms.TextInput(
         attrs={'class': 'form-control','placeholder': 'First Name'}), label='')
     
@@ -100,7 +118,7 @@ class LandlordSignUpForm(UserCreationForm):
     
     class Meta:
         model=User
-        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2') 
+        fields=('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'agree_terms')
 
 
 #form for updating users profile and info

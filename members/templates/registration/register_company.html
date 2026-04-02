@@ -108,7 +108,7 @@
         <div class="form-row full">
           <div class="form-group">
             <label for="{{ form.email.id_for_label }}" class="form-label">
-              <i class="bi bi-at"></i> Email
+              <i class="bi bi-at"></i> Email <small>(will be verified after sign up)</small>
             </label>
             {{ form.email }}
           </div>
@@ -126,6 +126,15 @@
               <i class="bi bi-shield-lock-fill"></i> Confirm Password
             </label>
             {{ form.password2 }}
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
+            <label class="form-check-label small" for="agree_terms">
+              I agree to the <a href="{% url 'terms-agreement' %}" target="_blank" rel="noopener">Terms & Privacy Policy</a>
+            </label>
           </div>
         </div>
 
