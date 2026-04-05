@@ -309,7 +309,7 @@
 (function() {
     'use strict';
 
-    console.log('Script loaded'); // Debug log
+
 
     // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
@@ -318,15 +318,14 @@
         const filterTabs = document.querySelectorAll('.filter-tab');
         const propertyCards = document.querySelectorAll('.property-card');
 
-        console.log('Filter tabs found:', filterTabs.length); // Debug
-        console.log('Property cards found:', propertyCards.length); // Debug
+
 
         filterTabs.forEach(tab => {
             tab.addEventListener('click', function(e) {
                 e.preventDefault(); // Prevent any default behavior
                 
                 const filterType = this.dataset.filter;
-                console.log('Filter clicked:', filterType); // Debug
+
 
                 // Update active tab
                 filterTabs.forEach(t => t.classList.remove('active'));
@@ -355,7 +354,7 @@
                     }
                 });
 
-                console.log('Visible cards:', visibleCount); // Debug
+
             });
         });
 

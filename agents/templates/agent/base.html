@@ -12,6 +12,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+
   <!-- Favicon -->
   <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
 
@@ -484,9 +487,14 @@
         {# Role-based question — injected by JS based on user role #}
         <p class="feedback-role-question" id="feedbackRoleQuestion"></p>
 
+        {# CSRF Token Input (Django template tag - reliable fallback) #}
+        {% csrf_token %}
+        <input type="hidden" id="feedbackCsrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
         {# Field 1: Reaction Emojis #}
         <div class="feedback-field">
           <label class="feedback-label">How do you feel right now?</label>
+
           <div class="feedback-emoji-row" role="group" aria-label="Reaction selector">
             <button class="feedback-emoji-btn" data-value="1" title="Very Bad"    type="button">😡</button>
             <button class="feedback-emoji-btn" data-value="2" title="Not Happy"   type="button">🙁</button>
@@ -532,7 +540,7 @@
         </div>
 
         {# Submit #}
-        <button class="feedback-submit-btn" type="button" onclick="submitFeedback()">
+        <button class="feedback-submit-btn" type="button" onclick="submitFeedback(event)">
           <i class="bi bi-send-fill me-2"></i>Send Feedback
         </button>
 
@@ -571,113 +579,72 @@
 
   {# --- Feedback System JavaScript --------------------------------- #}
   <script>
-    // ── Role & User Config ───────────────────────────────────────────
-    // "agent" is hardcoded here because this is the Agent base.html.
-    // The company and admin base.html files will have their own value.
-    const ESTATE_USER_ROLE = 'agent';
+const ESTATE_USER_ROLE = 'agent';
+const ESTATE_USER_NAME = '{{ request.user.first_name|default:"there" }}';
 
-    // Django injects the logged-in user's first name via template tag.
-    // The |default:"there" fallback handles unauthenticated edge cases.
-    const ESTATE_USER_NAME = '{{ request.user.first_name|default:"there" }}';
+const ROLE_QUESTIONS = {
+  agent:   'Did you face any issues while uploading property photos or managing your listings today?',
+  company: 'How easy was it to manage your agents and listings today?',
+  admin:   'Are there any platform issues or improvements you want to flag?',
+  landlord:'Did anything confuse you while using the platform today?'
+};
 
-    // ── Role-Based Questions ─────────────────────────────────────────
-    // Each role sees a different contextual question at the top of the form.
-    // Only the 'agent' key is active here; others included for reference.
-    const ROLE_QUESTIONS = {
-      agent:   'Did you face any issues while uploading property photos or managing your listings today?',
-      company: 'How easy was it to manage your agents and listings today?',
-      admin:   'Are there any platform issues or improvements you want to flag?',
-      landlord:'Did anything confuse you while using the platform today?'
-    };
+function openFeedbackModal() {
+  const overlay = document.getElementById('feedbackOverlay');
+  const question = ROLE_QUESTIONS[ESTATE_USER_ROLE] || 'How can we improve Estate Web for you?';
+  document.getElementById('feedbackRoleQuestion').textContent = question;
+  document.getElementById('feedbackUserName').textContent = ESTATE_USER_NAME;
+  overlay.classList.add('active');
+  document.getElementById('feedbackModal').focus();
+}
 
-    // ── Open Modal ───────────────────────────────────────────────────
-    function openFeedbackModal() {
-      const overlay = document.getElementById('feedbackOverlay');
+function closeFeedbackModal() {
+  const overlay = document.getElementById('feedbackOverlay');
+  overlay.classList.remove('active');
+  setTimeout(resetFeedbackForm, 280);
+}
 
-      // Inject the role-based question
-      const question = ROLE_QUESTIONS[ESTATE_USER_ROLE] || 'How can we improve Estate Web for you?';
-      document.getElementById('feedbackRoleQuestion').textContent = question;
+function resetFeedbackForm() {
+  document.getElementById('feedbackReaction').value = '';
+  document.getElementById('feedbackCategory').value = '';
+  document.getElementById('feedbackDetails').value = '';
+  document.getElementById('screenshotField').style.display = 'none';
+  document.getElementById('screenshotName').textContent = '';
+  document.querySelectorAll('.feedback-emoji-btn').forEach(function(btn) {
+    btn.classList.remove('selected');
+  });
+  document.getElementById('feedbackThankyou').style.display = 'none';
+  document.getElementById('feedbackFormBody').style.display = 'block';
+}
 
-      // Inject user name into thank-you state
-      document.getElementById('feedbackUserName').textContent = ESTATE_USER_NAME;
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('feedbackOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeFeedbackModal();
+  });
+});
 
-      // Make overlay visible
-      overlay.classList.add('active');
-
-      // Trap focus inside modal for accessibility
-      document.getElementById('feedbackModal').focus();
-    }
-
-    // ── Close Modal ──────────────────────────────────────────────────
-    function closeFeedbackModal() {
-      const overlay = document.getElementById('feedbackOverlay');
-      overlay.classList.remove('active');
-      // Reset form after fade-out animation finishes (250ms)
-      setTimeout(resetFeedbackForm, 280);
-    }
-
-    // ── Reset Form to Initial State ──────────────────────────────────
-    function resetFeedbackForm() {
-      document.getElementById('feedbackReaction').value = '';
-      document.getElementById('feedbackCategory').value = '';
-      document.getElementById('feedbackDetails').value = '';
-      document.getElementById('screenshotField').style.display = 'none';
-      document.getElementById('screenshotName').textContent = '';
-
-      // Reset emoji button selection
-      document.querySelectorAll('.feedback-emoji-btn').forEach(function(btn) {
-        btn.classList.remove('selected');
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.feedback-emoji-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.feedback-emoji-btn').forEach(function(b) {
+        b.classList.remove('selected');
       });
-
-      // Hide thank-you, show form body
-      document.getElementById('feedbackThankyou').style.display = 'none';
-      document.getElementById('feedbackFormBody').style.display = 'block';
-    }
-
-    // ── Close Overlay When Clicking the Dark Background ─────────────
-    // This lets users dismiss the modal by tapping outside it on mobile.
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('feedbackOverlay').addEventListener('click', function(e) {
-        // Only close if the click was directly on the overlay, not the modal card
-        if (e.target === this) {
-          closeFeedbackModal();
-        }
-      });
+      this.classList.add('selected');
+      document.getElementById('feedbackReaction').value = this.dataset.value;
     });
+  });
+});
 
-    // ── Emoji Button Selection ───────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.feedback-emoji-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          // Deselect all, then select clicked one
-          document.querySelectorAll('.feedback-emoji-btn').forEach(function(b) {
-            b.classList.remove('selected');
-          });
-          this.classList.add('selected');
-          // Store value in hidden input
-          document.getElementById('feedbackReaction').value = this.dataset.value;
-        });
-      });
-    });
+function toggleScreenshot() {
+  const category = document.getElementById('feedbackCategory').value;
+  document.getElementById('screenshotField').style.display = (category === 'bug') ? 'block' : 'none';
+}
 
-    // ── Toggle Screenshot Field ──────────────────────────────────────
-    // Only shows when "Bug Report" is selected in the category dropdown.
-    function toggleScreenshot() {
-      const category = document.getElementById('feedbackCategory').value;
-      const screenshotField = document.getElementById('screenshotField');
-      screenshotField.style.display = (category === 'bug') ? 'block' : 'none';
-    }
+function updateScreenshotLabel(input) {
+  document.getElementById('screenshotName').textContent = input.files[0] ? input.files[0].name : '';
+}
 
-    // ── Update Screenshot File Label ─────────────────────────────────
-    function updateScreenshotLabel(input) {
-      const nameEl = document.getElementById('screenshotName');
-      nameEl.textContent = input.files[0] ? input.files[0].name : '';
-    }
-
-    // ── Submit Feedback via AJAX ─────────────────────────────────────
-    // Uses fetch() so the page does NOT reload — the user stays exactly
-    // where they are. The form data goes to /feedback/submit/ (Django view).
-    function submitFeedback() {
+async function submitFeedback(event) {
   const reaction = document.getElementById('feedbackReaction').value;
   const category = document.getElementById('feedbackCategory').value;
   const details  = document.getElementById('feedbackDetails').value.trim();
@@ -685,102 +652,116 @@
   const existingError = document.getElementById('feedbackErrorMsg');
   if (existingError) existingError.remove();
 
-  if (!reaction) { showFeedbackError('Please tap an emoji to show how you feel.'); return; }
-  if (!category) { showFeedbackError('Please select a category for your feedback.'); return; }
-
-  const form   = document.createElement('form');
-  form.method  = 'POST';
-  form.action  = '/feedback/submit/';
-  form.enctype = 'multipart/form-data';
-
-  const csrf = document.createElement('input');
-  csrf.type  = 'hidden';
-  csrf.name  = 'csrfmiddlewaretoken';
-  csrf.value = getCookie('csrftoken');
-  form.appendChild(csrf);
-
-  Object.entries({ reaction, category, details, role: ESTATE_USER_ROLE }).forEach(function([name, value]) {
-    const input = document.createElement('input');
-    input.type  = 'hidden';
-    input.name  = name;
-    input.value = value;
-    form.appendChild(input);
-  });
-
-  const screenshotInput = document.getElementById('feedbackScreenshot');
-  if (screenshotInput && screenshotInput.files[0]) {
-    screenshotInput.name = 'screenshot';
-    form.appendChild(screenshotInput);
+  if (!reaction) {
+    showFeedbackError('Please tap an emoji to show how you feel.');
+    return;
+  }
+  if (!category) {
+    showFeedbackError('Please select a category for your feedback.');
+    return;
   }
 
-  document.body.appendChild(form);
-  form.submit();
-}
+  const submitBtn = event.target.closest('.feedback-submit-btn')
+                    || document.querySelector('#feedbackFormBody .feedback-submit-btn');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Sending...';
 
-function showFeedbackError(message) {
-  const errorDiv         = document.createElement('div');
-  errorDiv.id            = 'feedbackErrorMsg';
-  errorDiv.style.cssText = 'background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:13px;color:#856404;margin-bottom:12px;font-family:Poppins,sans-serif;';
-  errorDiv.textContent   = '⚠ ' + message;
-  const formBody = document.getElementById('feedbackFormBody');
-  formBody.insertBefore(errorDiv, formBody.firstChild);
-}
-    // ── CSRF Cookie Helper ───────────────────────────────────────────
-    // Django requires the CSRF token on every POST request.
-    // This reads it from the browser cookie that Django sets automatically.
-    function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        document.cookie.split(';').forEach(function(cookie) {
-          const c = cookie.trim();
-          if (c.startsWith(name + '=')) {
-            cookieValue = decodeURIComponent(c.slice(name.length + 1));
-          }
-        });
-      }
-      return cookieValue;
-    }
+  const formData = new FormData();
+  formData.append('reaction', reaction);
+  formData.append('category', category);
+  formData.append('details', details);
+  formData.append('role', ESTATE_USER_ROLE);
 
-    // ── Post-Action Toast Public API ─────────────────────────────────
-    // Call showFeedbackToast() from ANY page after a major action.
-    // Example (in agent_form.html after property is saved):
-    //   showFeedbackToast("How was the listing process?");
+  const screenshotInput = document.getElementById('feedbackScreenshot');
+  if (screenshotInput.files[0]) {
+    formData.append('screenshot', screenshotInput.files[0]);
+  }
 
-    function showFeedbackToast(message) {
-      const toast  = document.getElementById('feedbackToast');
-      const msgEl  = document.getElementById('feedbackToastMsg');
-      if (message) msgEl.textContent = message;
-      toast.style.display = 'block';
-      // Auto-dismiss after 8 seconds so it doesn't block the screen
-      setTimeout(dismissToast, 8000);
-    }
+  try {
+    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!csrfToken) csrfToken = getCookie('csrftoken');
+    if (!csrfToken) throw new Error('CSRF token not found');
 
-    function dismissToast() {
-      document.getElementById('feedbackToast').style.display = 'none';
-    }
-
-    // quickRate: user taps a number on the toast →
-    // dismiss toast, open full modal, pre-select that emoji
-    function quickRate(value) {
-      dismissToast();
-      openFeedbackModal();
-      // Small delay so the modal is rendered before we try to click the button
-      setTimeout(function() {
-        const emojiBtn = document.querySelector('.feedback-emoji-btn[data-value="' + value + '"]');
-        if (emojiBtn) emojiBtn.click();
-      }, 120);
-    }
-
-    // ── Keyboard: Close modal on Escape key ──────────────────────────
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        const overlay = document.getElementById('feedbackOverlay');
-        if (overlay.classList.contains('active')) {
-          closeFeedbackModal();
-        }
+    const response = await fetch('/feedback/submit/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest'
       }
     });
 
+    if (response.ok) {
+      document.getElementById('feedbackFormBody').style.display = 'none';
+      document.getElementById('feedbackThankyou').style.display = 'block';
+      showFeedbackToast('Feedback submitted successfully!');
+    } else {
+      let errorMsg = `Server error (${response.status})`;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.error || errorMsg;
+      } catch (_) {}
+      throw new Error(errorMsg);
+    }
+  } catch (error) {
+    console.error('Feedback submission error:', error);
+    showFeedbackError('Submission failed: ' + error.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+  }
+}
+
+function showFeedbackError(message) {
+  const errorDiv = document.createElement('div');
+  errorDiv.id = 'feedbackErrorMsg';
+  errorDiv.style.cssText = 'background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:13px;color:#856404;margin-bottom:12px;font-family:Poppins,sans-serif;';
+  errorDiv.innerHTML = '⚠ ' + message;
+  const formBody = document.getElementById('feedbackFormBody');
+  formBody.insertBefore(errorDiv, formBody.firstChild);
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    document.cookie.split(';').forEach(function(cookie) {
+      const c = cookie.trim();
+      if (c.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(c.slice(name.length + 1));
+      }
+    });
+  }
+  return cookieValue;
+}
+
+function showFeedbackToast(message) {
+  const toast = document.getElementById('feedbackToast');
+  const msgEl = document.getElementById('feedbackToastMsg');
+  if (message) msgEl.textContent = message;
+  toast.style.display = 'block';
+  setTimeout(dismissToast, 8000);
+}
+
+function dismissToast() {
+  document.getElementById('feedbackToast').style.display = 'none';
+}
+
+function quickRate(value) {
+  dismissToast();
+  openFeedbackModal();
+  setTimeout(function() {
+    const emojiBtn = document.querySelector('.feedback-emoji-btn[data-value="' + value + '"]');
+    if (emojiBtn) emojiBtn.click();
+  }, 120);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('feedbackOverlay');
+    if (overlay.classList.contains('active')) closeFeedbackModal();
+  }
+});
   </script>
 
   {# ================================================================ #}

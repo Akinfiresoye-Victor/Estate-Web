@@ -12,15 +12,9 @@
 
 {# ── Back Button ─────────────────────────────────────────────────── #}
 <div class="container">
-  {% if role == 'customer' %}
-  <a href="{% url 'customer:rent-property' %}" class="back-button">
-    <i class="bi bi-arrow-left"></i> Go Back
-  </a>
-  {% else %}
   <a href="javascript:history.back()" class="back-button">
     <i class="bi bi-arrow-left"></i> Go Back
   </a>
-  {% endif %}
 </div>
 
 <div class="sticky-cta">
@@ -296,21 +290,21 @@
           </div>
 
           <div class="contact-action-btns">
-            {% if agent_info %}
+            {% if property.agent_uuid and property.agent_uuid != 'None' %}
               <a href="{% url 'customer:agent-profile' agent_uuid=property.agent_uuid %}"
                 class="btn-contact secondary">
                 <i class="bi bi-person-circle"></i> View Agent Profile
               </a>
             {% endif %}
 
-            {% if company_info %}
+            {% if property.company_uuid and property.company_uuid != 'None'%}
               <a href="{% url 'customer:company-profile' company_uuid=property.company_uuid %}"
                 class="btn-contact secondary">
                 <i class="bi bi-building"></i> View Company Profile
               </a>
             {% endif %}
 
-            {% if landlord_info %}
+            {% if property.landlord_uuid and property.landlord_uuid != 'None'%}
               <a href="{% url 'customer:landlord-profile' landlord_uuid=property.landlord_uuid %}"
                 class="btn-contact secondary">
                 <i class="bi bi-building"></i> View Landlord Profile

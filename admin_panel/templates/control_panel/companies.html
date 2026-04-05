@@ -1,0 +1,77 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<div class="adm-detail-header">
+    <h2 style="margin:0;">Company Management</h2>
+</div>
+
+<form method="get" class="adm-filter-bar">
+    <select name="verified" class="adm-select" onchange="this.form.submit()">
+        <option value="">Verification Status (All)</option>
+        <option value="yes" {% if request.GET.verified == 'yes' %}selected{% endif %}>Verified</option>
+        <option value="no" {% if request.GET.verified == 'no' %}selected{% endif %}>Unverified</option>
+    </select>
+    <select name="tier" class="adm-select" onchange="this.form.submit()">
+        <option value="">All Tiers</option>
+        <option value="starter" {% if request.GET.tier == 'starter' %}selected{% endif %}>Starter</option>
+        <option value="growth" {% if request.GET.tier == 'growth' %}selected{% endif %}>Growth</option>
+        <option value="enterprise" {% if request.GET.tier == 'enterprise' %}selected{% endif %}>Enterprise</option>
+    </select>
+    <button type="submit" class="adm-btn adm-btn-primary" style="display:none;">Search</button>
+</form>
+
+<div class="adm-table-container">
+    <table class="adm-table">
+        <thead>
+            <tr>
+                <th>Company Info</th>
+                <th>Contact</th>
+                <th>Tier</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in page_obj %}
+            <tr>
+                <td>
+                    <strong>{{ company.company_name }}</strong><br>
+                    <small style="color:var(--text-light)">{{ company.address|truncatechars:30 }}</small>
+                </td>
+                <td>
+                    {{ company.email }}<br>
+                    <small style="color:var(--text-light)">{{ company.phone_number }}</small>
+                </td>
+                <td><span style="text-transform: capitalize;">{{ company.company_tier }}</span></td>
+                <td>
+                    {% if company.verified %}
+                        <span class="adm-badge adm-badge-success">Verified</span>
+                    {% else %}
+                        <span class="adm-badge adm-badge-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>{{ company.date_joined|date:"M Y" }}</td>
+                <td>
+                    <a href="{% url 'control_panel:company_detail' company.unique_company_id %}" class="adm-btn adm-btn-outline adm-btn-sm">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No companies found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&verified={{ request.GET.verified }}&tier={{ request.GET.tier }}" class="adm-btn adm-btn-outline">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&verified={{ request.GET.verified }}&tier={{ request.GET.tier }}" class="adm-btn adm-btn-outline">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

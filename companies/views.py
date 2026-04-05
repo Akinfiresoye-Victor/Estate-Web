@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from .forms import SocialLinksFormset, CompanyForm,JobPostForm, InviteLinkForm, EditEmployeeForm
+from django.template.loader import render_to_string
+from core.utils import send_estate_email
+from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -17,20 +20,11 @@ from django.db.models import Avg, Count, Sum
 from core.utils import *
 from agents.models import AgentInformation
 from django.urls import reverse
+import threading
 import traceback
 from django_ratelimit.decorators import ratelimit
 
 
-
-def calculate_profile_strength(has_logo, has_agent, is_verified):
-    """
-    Lives outside the view — defined once, not recreated on every request.
-    """
-    score = 0
-    if has_logo:    score += 20
-    if has_agent:   score += 30
-    if is_verified: score += 50
-    return score
 
 def calculate_profile_strength(has_logo, has_agent, is_verified):
     """
@@ -47,7 +41,6 @@ def dashboard(request):
     """
     HomePage for companies
     """
-    
     if not request.user.is_authenticated:
         messages.info(request, 'Log in to access page')
         return redirect('landing')
@@ -57,7 +50,7 @@ def dashboard(request):
         return redirect('landing')
 
     try:
-        company      = CompanyInformation.objects.get(user_id=request.user.id)
+        company= CompanyInformation.objects.get(user_id=request.user.id)
         social_links = company.social.all()
         if company.user_id != request.user.id:
             messages.error(request, 'Error Redirecting To Dashboard....')
@@ -713,7 +706,7 @@ def delete_lead(request, lead_id):
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         if lead_to_delete.schedule_tour:
-            appointment=Appointments.objects.filter(lead_id=lead_to_delete.lead_id)
+            appointment=Appointments.objects.filter(lead_uuid=lead_to_delete.lead_id)
             appointment.delete()
         lead_to_delete.delete()
         messages.success(request, "Lead deleted successfully.")
@@ -1183,6 +1176,18 @@ def onboard_agent(request, agent_uuid):
             )
             agent.company_uuid=company.unique_company_id
             agent.save()
+
+            # Send email to agent (background thread)
+            threading.Thread(
+                target=send_estate_email,
+                kwargs=dict(
+                    subject=f"You've joined {company.company_name}!",
+                    template_name='emails/agent_joined_notification.html',
+                    context={'agent': agent.users, 'company': company, 'request': request},
+                    recipient_list=[agent.email],
+                ),
+                daemon=True,
+            ).start()
             CompanyActivityLog.objects.create(
                 company=company,
                 action='Agent Onboarded'
@@ -1196,6 +1201,7 @@ def onboard_agent(request, agent_uuid):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
 
 @ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def generate_invite_link(request):
@@ -1302,13 +1308,26 @@ def remove_agent(request, agent_uuid):
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
-        #handing every property and lead data back to the company
-        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None,user_id=request.user.id)
-        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None, user_id=request.user.id)
-        LeadInfo.objects.filter(agent_id=agent.agent_uuid).update(agent_id=None)
-        Appointments.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
+        #handing every property and lead data they got during their stay in the company back to the company
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None,user_id=request.user.id)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None, user_id=request.user.id)
+        LeadInfo.objects.filter(agent_id=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_id=None)
+        Appointments.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None)
         agent.company_uuid = None
         agent.save()
+        
+        # Send email to agent (background thread)
+        threading.Thread(
+            target=send_estate_email,
+            kwargs=dict(
+                subject=f"Update on your status with {company.company_name}",
+                template_name='emails/agent_removed_notification.html',
+                context={'agent': agent.users, 'company': company, 'request': request},
+                recipient_list=[agent.email],
+            ),
+            daemon=True,
+        ).start()
+
         employee.delete()
         messages.success(request, 'Agent has been successfully removed from the company.')
         CompanyActivityLog.objects.create(
@@ -1364,3 +1383,24 @@ def edit_employee(request, agent_uuid):
     })
 
 
+def company_feedbacks(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Please sign in to continue.')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.info(request, 'Access denied: This page is for company accounts only.')
+        return redirect('landing')
+    
+    try:
+        company_uuid = CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+        company_rating = CompanyRating.objects.filter(company_uuid=company_uuid)
+        avg_rating = company_rating.aggregate(Avg('rating'))['rating__avg'] or 0
+
+        return render(request, 'company/company_feedbacks.html', {
+            'feedback': company_rating,
+            'avg_rating': avg_rating,
+        })
+    
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

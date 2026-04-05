@@ -84,6 +84,7 @@ class LeaseForm(ModelForm):
                 'location': 'Precise Location',
                 'price_range': 'Price (per year)',
                 'phone_number': 'Phone Number',
+                'size': 'Size(Leave blank if not sure)',
                 'state': 'State',
                 'base_image': 'Add Overview image Of Property ',
         }
@@ -95,8 +96,8 @@ class LeaseForm(ModelForm):
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Oda Road, Kagola, Plot2,3'}),
                     'price_range': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 1,500,000'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-                    'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-                    'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+                    'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+                    'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
         }
@@ -136,6 +137,7 @@ class SellForm(ModelForm):
                 'property_description': 'Property Description',
                 'location': 'Location',
                 'phone_number': 'Phone.No',
+                'size': 'Size(Leave blank if not sure)',
                 'price': 'Price',
                 'state': 'State',
                 'base_image': 'Add Overview image Of Property ',
@@ -145,8 +147,8 @@ class SellForm(ModelForm):
                     'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'E.g Akure,Oda road'}),
                     'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
                     'price': forms.TextInput(attrs={'class': 'form-control'}),
-                    'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-                    'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+                    'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+                    'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'parking_spaces':forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
                     'size': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Measured in square feet(sqft)'}),
         }

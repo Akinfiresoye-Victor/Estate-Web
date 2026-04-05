@@ -1,0 +1,54 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<div class="adm-detail-header">
+    <h2 style="margin:0;">User Detail: {{ target_user.username }}</h2>
+    <a href="{% url 'control_panel:users' %}" class="adm-btn adm-btn-outline">&larr; Back</a>
+</div>
+
+<div class="adm-info-grid">
+    <div class="adm-card">
+        <h4 style="margin-top:0;">Profile Details</h4>
+        <p><strong>Email:</strong> {{ target_user.email }}</p>
+        <p><strong>Role:</strong> <span style="text-transform: capitalize;">{{ target_user.role }}</span></p>
+        <p><strong>Joined:</strong> {{ target_user.date_joined|date:"M d, Y H:i" }}</p>
+        <p><strong>Last Login:</strong> {{ target_user.last_login|date:"M d, Y H:i"|default:"Never" }}</p>
+        <p>
+            <strong>Status:</strong> 
+            {% if target_user.is_active %}
+                <span class="adm-badge adm-badge-success">Active</span>
+            {% else %}
+                <span class="adm-badge adm-badge-danger">Suspended</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="adm-card" style="border-left: 4px solid var(--danger);">
+        <h4 style="margin-top:0; color:var(--danger)">Danger Zone</h4>
+        
+        <div style="margin-bottom:20px;">
+            <p><strong>Suspend User Account</strong></p>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:10px;">Suspends login capability. Cannot be used by Superusers.</p>
+            <form method="post" action="{% url 'control_panel:suspend_user' target_user.id %}">
+                {% csrf_token %}
+                <input type="text" name="reason" class="adm-input" placeholder="Reason for action" required style="width:100%; margin-bottom:10px;">
+                {% if target_user.is_active %}
+                    <button type="submit" class="adm-btn adm-btn-warning">Suspend User</button>
+                {% else %}
+                    <button type="submit" class="adm-btn adm-btn-success">Unsuspend User</button>
+                {% endif %}
+            </form>
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-top:20px;">
+            <p><strong>Permanently Delete</strong></p>
+            <p style="font-size:13px; color:var(--text-light); margin-bottom:10px;">This will strictly cascade and delete everything relating manually. Requires user naming exactness.</p>
+            <form method="post" action="{% url 'control_panel:delete_user' target_user.id %}" class="adm-confirm-form" data-expected="{{ target_user.username }}">
+                {% csrf_token %}
+                <input type="text" name="confirm_username" class="adm-input adm-confirm-input" placeholder="Type '{{ target_user.username }}' to confirm" required style="width:100%; margin-bottom:10px;">
+                <button type="submit" class="adm-btn adm-btn-danger">Delete User Permanently</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

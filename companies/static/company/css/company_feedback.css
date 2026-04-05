@@ -1,0 +1,342 @@
+/* ============================================
+   Agent Feedback Page — agent_feedback.css
+   Theme: Light (#f4f6f9), Gold accent (#c19b76)
+   Mobile-first
+   ============================================ */
+
+/* --- Page Shell --- */
+.feedback-page {
+  padding: 24px 16px 60px;
+  background-color: #f4f6f9;
+  min-height: 100vh;
+  max-width: 860px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* --- Page Header --- */
+.feedback-header {
+  margin-bottom: 28px;
+}
+
+.feedback-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e2329;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.feedback-subtitle {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* --- Summary Bar --- */
+.feedback-summary {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.summary-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.score-number {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #1e2329;
+  line-height: 1;
+}
+
+.score-label,
+.count-label {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.summary-divider {
+  width: 1px;
+  height: 48px;
+  background-color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.summary-count {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.count-number {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #1e2329;
+  line-height: 1;
+}
+
+/* --- Star Icons (shared) --- */
+.star {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star.filled {
+  color: #c19b76;
+}
+
+.star.empty {
+  color: #d1d5db;
+}
+
+.summary-stars {
+  display: flex;
+  gap: 2px;
+}
+
+/* --- Feedback List --- */
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --- Feedback Card --- */
+.feedback-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  transition: box-shadow 0.2s ease;
+}
+
+.feedback-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+/* Card Top Row */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* Avatar Circle */
+.client-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background-color: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c19b76;
+  letter-spacing: 0.03em;
+}
+
+/* Client Name + Stars */
+.client-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.client-name {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e2329;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.star-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.rating-text {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-left: 6px;
+}
+
+/* Rating Badge */
+.rating-badge {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rating-5 {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.rating-4 {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.rating-3 {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+.rating-2 {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.rating-1 {
+  background-color: #fde8e8;
+  color: #7f1d1d;
+}
+
+/* Comment Body */
+.card-comment {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 14px;
+}
+
+.card-comment p {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Card Footer */
+.card-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.review-date {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* --- Empty State --- */
+.empty-state {
+  background: #ffffff;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #c19b76;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.empty-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e2329;
+  margin: 0 0 10px;
+}
+
+.empty-message {
+  font-family: 'DM Sans', 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  color: #6b7280;
+  line-height: 1.6;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   RESPONSIVE — Tablet and up (768px+)
+   ============================================ */
+@media (min-width: 768px) {
+  .feedback-page {
+    padding: 36px 28px 80px;
+  }
+
+  .feedback-title {
+    font-size: 2.4rem;
+  }
+
+  .feedback-card {
+    padding: 24px 28px;
+  }
+
+  .client-avatar {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .card-top {
+    gap: 16px;
+  }
+
+  .star {
+    font-size: 1.05rem;
+  }
+}
+
+/* ============================================
+   RESPONSIVE — Desktop (1100px+)
+   ============================================ */
+@media (min-width: 1100px) {
+  .feedback-page {
+    padding: 48px 0 100px;
+  }
+
+  .feedback-title {
+    font-size: 2.8rem;
+  }
+
+  .feedback-summary {
+    padding: 24px 32px;
+  }
+
+  .feedback-list {
+    gap: 20px;
+  }
+
+  .feedback-card {
+    padding: 28px 32px;
+  }
+}

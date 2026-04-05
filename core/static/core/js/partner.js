@@ -97,9 +97,6 @@ if (partnershipForm) {
       message: document.getElementById('message').value
     };
     
-    // Log form data (in production, you'd send this to your backend)
-    console.log('Partnership Form Data:', formData);
-    
     // Show success message (replace with actual backend call)
     alert('Thank you for your interest in partnering with Estate Web! We will review your application and get back to you within 24-48 hours.');
     

@@ -245,7 +245,7 @@
             <div class="inquiry-footer">
               <span class="tour-badge">
                 <i class="bi bi-calendar-event-fill"></i>
-                Tour: {{ lead.schedule_tour|date:"M d, Y" }}
+                Tour: {{ lead.schedule_tour|date:"M d, Y"|default:'Not Provided' }}
               </span>
             </div>
           </div>

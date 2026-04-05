@@ -260,14 +260,10 @@
             
             allAlerts.forEach(function(alert) {
                 // Skip if this alert is inside current-file-info
-                if (alert.closest('.current-file-info')) {
-                    console.log('Protecting file info alert from auto-dismiss');
-                    return; // Skip this alert
-                }
+                
                 
                 // Skip if alert has data-permanent attribute
                 if (alert.hasAttribute('data-permanent')) {
-                    console.log('Protecting permanent alert from auto-dismiss');
                     return;
                 }
                 

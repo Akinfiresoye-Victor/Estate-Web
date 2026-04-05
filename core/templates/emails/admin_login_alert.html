@@ -1,0 +1,30 @@
+{% extends "emails/base_email.html" %}
+
+{% block header_content %}
+<h1 style="color: #ff4d4d;">⚠️ Security Alert: Admin Login</h1>
+{% endblock %}
+
+{% block content %}
+<p>Hello,</p>
+<p>This is an automated security notification from <strong>Estate Web</strong>.</p>
+<p>An administrative account has just been logged into from a new session.</p>
+
+<div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 24px 0;">
+    <p style="margin-bottom: 8px;"><strong>User:</strong> {{ username }}</p>
+    <p style="margin-bottom: 8px;"><strong>IP Address:</strong> {{ ip }}</p>
+    <p style="margin-bottom: 0;"><strong>Time:</strong> {% now "F j, Y, g:i a" %} UTC</p>
+</div>
+
+<p>If this was you, you can safely ignore this email. No further action is required.</p>
+
+<p style="color: #ef4444; font-weight: 600;">If this was NOT you, please take immediate action:</p>
+<ul style="color: #4b5563;">
+    <li>Change your administrative password immediately.</li>
+    <li>Review the recent access logs in the control panel.</li>
+    <li>Contact the technical team if you suspect unauthorized access.</li>
+</ul>
+
+<div style="text-align: center; margin-top: 32px;">
+    <a href="{{ protocol }}://{{ domain }}{% url 'control_panel:dashboard' %}" class="btn">Go to Control Panel</a>
+</div>
+{% endblock %}

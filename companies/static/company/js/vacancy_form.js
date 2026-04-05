@@ -263,9 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     try {
       localStorage.setItem('vacancyFormDraft', JSON.stringify(formData));
-      console.log('Draft saved');
     } catch (e) {
-      console.error('Failed to save draft:', e);
+      // Failed to save draft
     }
   }
 
@@ -285,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showAlert('info', 'Draft restored successfully');
       }
     } catch (e) {
-      console.error('Failed to load draft:', e);
+      // Failed to load draft
     }
   }
 

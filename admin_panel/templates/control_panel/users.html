@@ -1,0 +1,73 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<div class="adm-detail-header">
+    <h2 style="margin:0;">User Management</h2>
+</div>
+
+<form method="get" class="adm-filter-bar">
+    <select name="role" class="adm-select" onchange="this.form.submit()">
+        <option value="">All Roles</option>
+        <option value="customer" {% if request.GET.role == 'customer' %}selected{% endif %}>Customer</option>
+        <option value="agent" {% if request.GET.role == 'agent' %}selected{% endif %}>Agent</option>
+        <option value="company" {% if request.GET.role == 'company' %}selected{% endif %}>Company</option>
+        <option value="landlord" {% if request.GET.role == 'landlord' %}selected{% endif %}>Landlord</option>
+    </select>
+    <select name="status" class="adm-select" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+        <option value="suspended" {% if request.GET.status == 'suspended' %}selected{% endif %}>Suspended</option>
+    </select>
+    <input type="text" name="search" class="adm-input" placeholder="Search username or email..." value="{{ request.GET.search }}">
+    <button type="submit" class="adm-btn adm-btn-primary">Search</button>
+</form>
+
+<div class="adm-table-container">
+    <table class="adm-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Date Joined</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+            <tr>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.email }}</td>
+                <td><span style="text-transform: capitalize;">{{ user.role }}</span></td>
+                <td>
+                    {% if user.is_active %}
+                        <span class="adm-badge adm-badge-success">Active</span>
+                    {% else %}
+                        <span class="adm-badge adm-badge-danger">Suspended</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                <td>
+                    <a href="{% url 'control_panel:user_detail' user.id %}" class="adm-btn adm-btn-outline adm-btn-sm">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No users found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&role={{ request.GET.role }}&status={{ request.GET.status }}&search={{ request.GET.search }}" class="adm-btn adm-btn-outline">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&role={{ request.GET.role }}&status={{ request.GET.status }}&search={{ request.GET.search }}" class="adm-btn adm-btn-outline">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

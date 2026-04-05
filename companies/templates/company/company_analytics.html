@@ -4,6 +4,45 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'company/css/analytics.css' %}">
+<link rel="stylesheet" href="{% static 'agent/css/tooltips.css' %}">
+<style>
+/* ── Tooltip Fix ── */
+.tooltip-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.tooltip-trigger:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a3c4e;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  white-space: normal;
+  max-width: 260px;
+  width: max-content;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  line-height: 1.4;
+  pointer-events: none;
+}
+.tooltip-trigger:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1a3c4e;
+  z-index: 10000;
+  pointer-events: none;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -30,6 +69,12 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- Analytics Note Banner -->
+<div class="metric-note-banner">
+  <i class="bi bi-info-circle"></i>
+  📊 Metrics and market position use 30-day rolling windows from company creation date + last reset.
 </div>
 
 {# ── Main Analytics Container ─────────────────────────────────────── #}
@@ -75,7 +120,12 @@
         <i class="bi bi-{% if market_position < 1 %}trophy-fill{% elif market_position < 5 %}award-fill{% elif market_position < 25 %}star-fill{% else %}graph-up{% endif %}"></i>
       </div>
       <div class="metric-data">
-        <p class="metric-label">Market Ranking</p>
+        <p class="metric-label">
+          Market Ranking
+          <i class="bi bi-info-circle tooltip-trigger ms-1"
+             data-tooltip="Your engagement score vs all companies. Formula: (your score / total market score) × 100. Engagement = 40% likes + 30% prop views + 20% profile views + 10% (rating × reviews)."
+             style="font-size:0.82em; cursor:help; color:var(--gray-500);"></i>
+        </p>
         <h3 class="metric-value">{{ competition }}</h3>
         <div class="metric-trend {% if market_position < 25 %}positive{% else %}neutral{% endif %}">
           <i class="bi bi-{% if market_position < 10 %}arrow-up-circle-fill{% elif market_position < 25 %}dash-circle-fill{% else %}arrow-right-circle{% endif %}"></i>
@@ -99,7 +149,12 @@
         <i class="bi bi-chat-dots-fill"></i>
       </div>
       <div class="metric-data">
-        <p class="metric-label">Inquiry Rate</p>
+        <p class="metric-label">
+          Inquiry Rate
+          <i class="bi bi-info-circle tooltip-trigger ms-1"
+             data-tooltip="How engaging your listings are: 40% total likes + 30% avg property views + 20% avg profile views + 10% (avg rating × total reviews), normalised to 0–100."
+             style="font-size:0.82em; cursor:help; color:var(--gray-500);"></i>
+        </p>
         <h3 class="metric-value">{{ inq_rate|floatformat:1 }}%</h3>
         <div class="metric-trend {% if inq_rate > 40 %}positive{% else %}warning{% endif %}">
           <i class="bi bi-{% if inq_rate > 40 %}check-circle{% else %}exclamation-triangle{% endif %}"></i>

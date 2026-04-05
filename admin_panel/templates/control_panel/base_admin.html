@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Admin | Estate Web</title>
+    <!-- Prefixed stylesheet -->
+    <link rel="stylesheet" href="{% static 'admin_panel/css/admin.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="adm-body">
+
+    <div class="adm-wrapper">
+        <!-- Sidebar -->
+        <aside class="adm-sidebar" id="adm-sidebar">
+            <div class="adm-sidebar-brand">
+                ESTATE WEB
+            </div>
+            <nav class="adm-sidebar-nav">
+                <a href="{% url 'control_panel:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}adm-active{% endif %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <a href="{% url 'control_panel:users' %}" class="{% if 'user' in request.resolver_match.url_name %}adm-active{% endif %}">
+                    <i class="bi bi-people"></i> Users
+                </a>
+                <a href="{% url 'control_panel:agents' %}" class="{% if 'agent' in request.resolver_match.url_name %}adm-active{% endif %}">
+                    <i class="bi bi-person-badge"></i> Agents
+                </a>
+                <a href="{% url 'control_panel:companies' %}" class="{% if 'compan' in request.resolver_match.url_name %}adm-active{% endif %}">
+                    <i class="bi bi-building"></i> Companies
+                </a>
+                <a href="{% url 'control_panel:listings' %}" class="{% if 'listing' in request.resolver_match.url_name %}adm-active{% endif %}">
+                    <i class="bi bi-house"></i> Listings
+                </a>
+                <a href="{% url 'control_panel:access_log' %}" class="{% if 'access_log' in request.resolver_match.url_name %}adm-active{% endif %}">
+                    <i class="bi bi-journal-text"></i> Access Log
+                </a>
+                <div class="adm-sidebar-divider"></div>
+                
+                <form action="{% url 'control_panel:logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="adm-btn adm-btn-outline" style="border:none; color:inherit; justify-content:flex-start; width:100%; text-align:left; padding:12px 20px;">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
+
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="adm-main">
+            <!-- Topbar -->
+            <header class="adm-topbar">
+                <div class="adm-topbar-left">
+                    <button class="adm-hamburger" id="adm-hamburger-btn">
+                        <i class="bi bi-list"></i>
+                    </button>
+                </div>
+                <div class="adm-topbar-right">
+                    <strong>{{ request.user.username }}</strong>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <section class="adm-content">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="adm-card" style="margin-bottom:15px; border-left:4px solid {% if message.tags == 'error' %}var(--danger){% else %}var(--success){% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'admin_panel/js/admin.js' %}"></script>
+</body>
+</html>

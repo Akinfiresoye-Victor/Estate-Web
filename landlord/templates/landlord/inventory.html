@@ -189,6 +189,10 @@
         <a href="{% url 'customer:view-property-s' p.pk %}" class="li-card__action-btn" target="_blank" title="Preview public listing">
           <i class="bi bi-box-arrow-up-right"></i>
         </a>
+
+        <button class="li-card__action-btn li-card__action-btn--delete" onclick="showDeleteModal('{{ p.pk }}', 'sale')" title="Delete property">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </div>
 
@@ -282,6 +286,10 @@
         <a href="{% url 'customer:view-property-r' p.pk %}" class="li-card__action-btn" target="_blank" title="Preview public listing">
           <i class="bi bi-box-arrow-up-right"></i>
         </a>
+
+        <button class="li-card__action-btn li-card__action-btn--delete" onclick="showDeleteModal('{{ p.pk }}', 'rent')" title="Delete property">
+          <i class="bi bi-trash"></i>
+        </button>
       </div>
     </div>
 
@@ -294,8 +302,25 @@
 {# ── Toast ── #}
 <div class="li-toast" id="li-toast"></div>
 
-{% endblock %}
+{# ── Delete Confirmation Modal ── #}
+<div class="li-modal" id="li-delete-modal">
+  <div class="li-modal__overlay" onclick="hideDeleteModal()"></div>
+  <div class="li-modal__content">
+    <div class="li-modal__header">
+      <h3><i class="bi bi-exclamation-triangle"></i> Delete Property?</h3>
+      <button class="li-modal__close" onclick="hideDeleteModal()">&times;</button>
+    </div>
+    <div class="li-modal__body">
+      <p>Are you sure you want to permanently delete this property? This action cannot be undone.</p>
+    </div>
+    <div class="li-modal__footer">
+      <button class="li-btn li-btn--secondary" onclick="hideDeleteModal()">Cancel</button>
+      <button class="li-btn li-btn--danger" id="li-confirm-delete" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
 
+{% endblock %}
 
 {% block extra_js %}
 <script>
@@ -305,24 +330,19 @@
 
 const csrfToken = '{{ csrf_token }}';
 
+let currentDeleteId   = null;
+let currentDeleteType = null;
+
 /**
  * toggleListing(id, type, btn)
- *
- * id   — the property primary key (e.g. 42)
- * type — 'sale' or 'rent'
- * btn  — the button element that was clicked
- *
  * POSTs to /toggle_listing/<type>/<id>/
- * On success: updates the card's status badge + button text without reloading the page.
+ * Updates badge + button in place without reloading.
  */
 function toggleListing(id, type, btn) {
-  // Disable button while the request is in flight so user can't double-click
   btn.disabled = true;
   btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-  const url = `/toggle_listing/${type}/${id}/`;
-
-  fetch(url, {
+  fetch(`/toggle_listing/${type}/${id}/`, {
     method: 'POST',
     headers: {
       'X-CSRFToken': csrfToken,
@@ -337,35 +357,32 @@ function toggleListing(id, type, btn) {
   .then(data => {
     if (data.error) {
       showToast(data.error, 'error');
-      // Reset button to previous state on error
       btn.disabled = false;
-      // Figure out current status from card's data-status
-      const card = btn.closest('.li-card');
-      const isLive = card.dataset.status === 'live';
-      restoreToggleBtn(btn, isLive);
+      const card  = btn.closest('.li-card');
+      restoreToggleBtn(btn, card.dataset.status === 'live');
       return;
     }
 
-    // Server returned the new is_listed state
     const isNowLive = data.is_listed;
+    const card      = btn.closest('.li-card');
 
-    // 1. Update card's data-status attribute (used by filters)
-    const card = btn.closest('.li-card');
+    // 1. Update card filter attribute
     card.dataset.status = isNowLive ? 'live' : 'inventory';
 
-    // 2. Update the status badge (top-right of image)
+    // 2. Update status badge
     const badge = document.getElementById(`status-badge-${type}-${id}`);
     if (badge) {
       badge.className = `li-card__status-badge ${isNowLive ? 'li-card__status-badge--live' : 'li-card__status-badge--inventory'}`;
-      badge.innerHTML = isNowLive
+      badge.innerHTML  = isNowLive
         ? '<i class="bi bi-broadcast"></i> Live'
         : '<i class="bi bi-archive"></i> Stored';
     }
 
-    // 3. Update the toggle button itself
+    // 3. Update toggle button
     btn.disabled = false;
     restoreToggleBtn(btn, isNowLive);
-// 4. Update the Live Now counter
+
+    // 4. Update Live Now counter
     if (data.live_count !== undefined) {
       const liveCountEl = document.getElementById('li-live-count');
       if (liveCountEl) {
@@ -374,30 +391,25 @@ function toggleListing(id, type, btn) {
       }
     }
 
-    // 5. Show a friendly toast message
     showToast(data.message || (isNowLive ? 'Listing is now live!' : 'Property moved to inventory.'), 'success');
   })
   .catch(() => {
     showToast('Something went wrong. Please try again.', 'error');
     btn.disabled = false;
     const card = btn.closest('.li-card');
-    const isLive = card.dataset.status === 'live';
-    restoreToggleBtn(btn, isLive);
+    restoreToggleBtn(btn, card.dataset.status === 'live');
   });
 }
 
-/**
- * Resets the toggle button appearance based on whether the property is currently live.
- */
 function restoreToggleBtn(btn, isLive) {
   if (isLive) {
     btn.classList.add('is-live');
     btn.innerHTML = '<i class="bi bi-eye-slash"></i> Unlist';
-    btn.title = 'Hide from public listings';
+    btn.title     = 'Hide from public listings';
   } else {
     btn.classList.remove('is-live');
     btn.innerHTML = '<i class="bi bi-broadcast"></i> Publish';
-    btn.title = 'Make this listing public';
+    btn.title     = 'Make this listing public';
   }
 }
 
@@ -406,22 +418,19 @@ function restoreToggleBtn(btn, isLive) {
    ───────────────────────────────────────── */
 document.querySelectorAll('.li-tab-btn').forEach(function(tab) {
   tab.addEventListener('click', function() {
-    // Mark this tab as active, remove from others
     document.querySelectorAll('.li-tab-btn').forEach(t => t.classList.remove('active'));
     this.classList.add('active');
 
-    const filter = this.dataset.filter; // 'all' | 'sale' | 'rent' | 'live' | 'inventory'
-    const cards = document.querySelectorAll('#li-property-grid .li-card');
-
-    cards.forEach(function(card) {
-      const type   = card.dataset.type;    // 'sale' or 'rent'
-      const status = card.dataset.status;  // 'live' or 'inventory'
-
+    const filter = this.dataset.filter;
+    document.querySelectorAll('#li-property-grid .li-card').forEach(function(card) {
+      const type   = card.dataset.type;
+      const status = card.dataset.status;
       let show = false;
-      if (filter === 'all')       show = true;
-      else if (filter === 'sale') show = (type === 'sale');
-      else if (filter === 'rent') show = (type === 'rent');
-      else if (filter === 'live') show = (status === 'live');
+
+      if      (filter === 'all')       show = true;
+      else if (filter === 'sale')      show = (type === 'sale');
+      else if (filter === 'rent')      show = (type === 'rent');
+      else if (filter === 'live')      show = (status === 'live');
       else if (filter === 'inventory') show = (status === 'inventory');
 
       card.style.display = show ? '' : 'none';
@@ -430,20 +439,120 @@ document.querySelectorAll('.li-tab-btn').forEach(function(tab) {
 });
 
 /* ─────────────────────────────────────────
-   Toast Helper
+   Delete Modal
+   ───────────────────────────────────────── */
+
+function showDeleteModal(id, type) {
+  currentDeleteId   = id;
+  currentDeleteType = type;
+  document.getElementById('li-delete-modal').classList.add('show');
+}
+
+function hideDeleteModal() {
+  document.getElementById('li-delete-modal').classList.remove('show');
+  currentDeleteId   = null;
+  currentDeleteType = null;
+  /* reset the button label in case a previous delete was interrupted */
+  const btn = document.getElementById('li-confirm-delete');
+  btn.disabled    = false;
+  btn.textContent = 'Delete';
+}
+
+function confirmDelete() {
+  if (!currentDeleteId || !currentDeleteType) return;
+
+  const btn = document.getElementById('li-confirm-delete');
+  btn.disabled    = true;
+  btn.textContent = 'Deleting…';
+
+  /*
+   * ── IMPORTANT ──
+   * Grab the card and its live-status NOW, before we remove it from the DOM.
+   * This is the fix for the "wasLive always false" bug — we read the data
+   * attribute while the element still exists, then pass it into the update fn.
+   */
+  const toggleBtn = document.getElementById(`toggle-btn-${currentDeleteType}-${currentDeleteId}`);
+  let card    = null;
+  let wasLive = false;
+  if (toggleBtn) {
+    card    = toggleBtn.closest('.li-card');
+    wasLive = card.dataset.status === 'live';
+  }
+
+  const url = `/delete_property_${currentDeleteType === 'rent' ? 'r' : 's'}/${currentDeleteId}/`;
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrfToken,
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'same-origin'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Delete failed');
+    return res.json().catch(() => ({}));
+  })
+  .then(data => {
+    hideDeleteModal();           // close modal first
+    if (card) card.remove();     // remove card from DOM
+    updateStatsAfterDelete(wasLive); // then update counters
+
+    showToast(data.message || 'Property deleted successfully!', 'success');
+  })
+  .catch(() => {
+    showToast('Delete failed. Please try again.', 'error');
+    btn.disabled    = false;
+    btn.textContent = 'Delete';
+  });
+}
+
+/**
+ * updateStatsAfterDelete(wasLive)
+ *
+ * wasLive — boolean, was the deleted property live before deletion?
+ *           We need this because the card is already removed from DOM by now.
+ */
+function updateStatsAfterDelete(wasLive) {
+  // ── Slots Used chip ──
+  const usedChipValue = document.querySelector('.li-stat-chip--accent .li-stat-chip__value');
+  if (usedChipValue) {
+    const match = usedChipValue.textContent.match(/(\d+)\s?\/\s?(\d+)/);
+    if (match) {
+      const newUsed = Math.max(0, parseInt(match[1]) - 1);
+      const total   = parseInt(match[2]);
+      usedChipValue.textContent = `${newUsed} / ${total}`;
+
+      // Shrink the slot progress bar proportionally
+      const fill = usedChipValue.parentElement.querySelector('.li-slot-bar__fill');
+      if (fill) fill.style.width = `${(newUsed / total) * 100}%`;
+    }
+  }
+
+  // ── Live Now chip ──
+  const liveChipValue = document.getElementById('li-live-count');
+  if (liveChipValue) {
+    const match = liveChipValue.textContent.match(/(\d+)\s?\/\s?(\d+)/);
+    if (match) {
+      // Only decrement if the deleted property was actually live
+      const newLive = Math.max(0, parseInt(match[1]) - (wasLive ? 1 : 0));
+      liveChipValue.textContent = `${newLive} / ${match[2]}`;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────
+   Toast
    ───────────────────────────────────────── */
 let toastTimer = null;
 
 function showToast(message, type) {
-  const toast = document.getElementById('li-toast');
+  const toast       = document.getElementById('li-toast');
   toast.textContent = message;
-  toast.className = `li-toast li-toast--${type || 'success'} show`;
+  toast.className   = `li-toast li-toast--${type || 'success'} show`;
 
-  // Auto-hide after 3 seconds
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() {
-    toast.classList.remove('show');
-  }, 3000);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
 </script>
 {% endblock %}

@@ -425,11 +425,11 @@
               <h4>Delete Account</h4>
               <p>Permanently delete your account and all associated data. This cannot be undone.</p>
             </div>
+            {# ✅ FIX: This is the TRIGGER button that opens the modal — id must be deleteAccountBtn #}
             <button class="btn-danger-action critical" type="button" id="deleteAccountBtn">
               <i class="bi bi-trash"></i> Delete Account
             </button>
           </div>
-
         </div>
       </div>
     </div>
@@ -487,9 +487,11 @@
       <button class="btn-modal-cancel" id="cancelDeleteBtn">
         <i class="bi bi-arrow-left-circle"></i> Cancel
       </button>
+      {# ✅ FIX: data-company-uuid is here on the CONFIRM button — this is what the JS reads #}
       <button
         class="btn-modal-delete"
         id="confirmDeleteBtn"
+        data-company-uuid="{{ company.unique_company_id }}"
         disabled
       >
         <i class="bi bi-trash"></i> Delete Company Forever
@@ -506,24 +508,18 @@
 {% block extra_js %}
 <script src="{% static 'company/js/company_settings.js' %}"></script>
 
-{# Sync pill nav with sidebar nav active state #}
 <script>
 (function () {
-  // Both pill buttons and sidebar items share data-section
-  // The existing company_settings.js handles .active on .nav-item
-  // This syncs the pill nav to match.
   const allNavBtns = document.querySelectorAll('.pill-nav-btn, .nav-item');
 
   allNavBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       const section = this.dataset.section;
 
-      // Sync pill buttons
       document.querySelectorAll('.pill-nav-btn').forEach(function (b) {
         b.classList.toggle('active', b.dataset.section === section);
       });
 
-      // Sync sidebar items
       document.querySelectorAll('.nav-item').forEach(function (b) {
         b.classList.toggle('active', b.dataset.section === section);
       });

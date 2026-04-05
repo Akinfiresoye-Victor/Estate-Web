@@ -178,6 +178,7 @@ def landlord_inquiries(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
     
 
+
 def delete_lead(request, lead_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
@@ -258,4 +259,5 @@ def delete_account(request):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
 

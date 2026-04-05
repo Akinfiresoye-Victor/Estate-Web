@@ -22,7 +22,7 @@ class AgentInformation(models.Model):
     first_name = models.CharField('First Name', max_length=50, blank=False, default='Unspecified')
     last_name = models.CharField('Last Name', max_length=50, blank=False, default='j')
     agent_uuid = models.CharField('Agent uuid', unique=True, max_length=36, blank=False, default=uuid.uuid4)
-    company_uuid = models.CharField('Company uuid', blank=True, null=True, max_length=36)
+    company_uuid = models.CharField('Company uuid', blank=True, null=True, max_length=36, db_index=True)
     phone_number = models.CharField('Phone.No', blank=False, max_length=12)
     email = models.EmailField('Email', blank=True, max_length=75)
     location = models.CharField('Base City', blank=False, choices=STATES)
@@ -31,7 +31,7 @@ class AgentInformation(models.Model):
     work_type = models.CharField('Nature of work', blank=False, max_length=100)
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=agent_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
-    certificate = models.FileField('Professional Certificate', blank=True, null=True)
+    certificate = models.FileField('Professional Certificate', blank=True, null=True, upload_to='agent/certificates', validators=[validate_file])
     inventory_slot=models.IntegerField('Inventory Slots', default=10)
     listing_slots=models.IntegerField('Listing Slots', default=6)
     verified = models.BooleanField('Verified agent', default=False)
@@ -49,8 +49,7 @@ class Experience(models.Model):
     start_date = models.DateField('Started')
     end_date = models.DateField('Ended', null=True, blank=True)    
     
-    class Meta:
-        unique_together = ('')
+
     def __str__(self):
         return(f'{self.agent.first_name} {self.agent.last_name}')
     

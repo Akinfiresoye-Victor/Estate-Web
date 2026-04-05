@@ -1,0 +1,61 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<h2 style="margin-top:0;">Access Log</h2>
+
+<form method="get" class="adm-filter-bar">
+    <select name="action" class="adm-select" onchange="this.form.submit()">
+        <option value="">All Actions</option>
+        <option value="LOGIN_SUCCESS" {% if request.GET.action == 'LOGIN_SUCCESS' %}selected{% endif %}>Login Success</option>
+        <option value="LOGIN_FAILED" {% if request.GET.action == 'LOGIN_FAILED' %}selected{% endif %}>Login Failed</option>
+        <option value="USER_SUSPENDED" {% if request.GET.action == 'USER_SUSPENDED' %}selected{% endif %}>User Suspended</option>
+        <option value="AGENT_VERIFIED" {% if request.GET.action == 'AGENT_VERIFIED' %}selected{% endif %}>Agent Verified</option>
+        <option value="COMPANY_VERIFIED" {% if request.GET.action == 'COMPANY_VERIFIED' %}selected{% endif %}>Company Verified</option>
+        <option value="LISTING_UNLISTED" {% if request.GET.action == 'LISTING_UNLISTED' %}selected{% endif %}>Listing Unlisted</option>
+    </select>
+    <input type="text" name="search" class="adm-input" placeholder="Search user or IP..." value="{{ request.GET.search }}">
+    <button type="submit" class="adm-btn adm-btn-primary">Filter</button>
+</form>
+
+<div class="adm-table-container">
+    <table class="adm-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Admin User</th>
+                <th>IP Address</th>
+                <th>Action</th>
+                <th>Target</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in page_obj %}
+            <tr>
+                <td>{{ log.timestamp|date:"M d Y, H:i" }}</td>
+                <td>{{ log.user.username|default:"System/Unknown" }}</td>
+                <td>{{ log.ip_address }}</td>
+                <td><span class="adm-badge adm-badge-neutral">{{ log.action }}</span></td>
+                <td>{% if log.target_type %}{{ log.target_type }} #{{ log.target_id|truncatechars:10 }}{% else %}-{% endif %}</td>
+                <td>{{ log.notes|truncatechars:50 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">No logs found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&action={{ request.GET.action }}&search={{ request.GET.search }}" class="adm-btn adm-btn-outline">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&action={{ request.GET.action }}&search={{ request.GET.search }}" class="adm-btn adm-btn-outline">Next</a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

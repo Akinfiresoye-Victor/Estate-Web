@@ -1,355 +1,513 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from core.forms import *
-from django.http import HttpResponseRedirect, JsonResponse
-from django.db import transaction
-from companies.models import CompanyInformation, CompanyActivityLog
-from agents.models import AgentInformation
-from estate.models import LeadInfo
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.http import require_POST
-from core.utils import *
-from django.utils.http import url_has_allowed_host_and_scheme
-from agents.forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
-from members.models import User
-from django.utils import timezone
-from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, Appointments, ErrorLog
-from agents.quotes import get_random_quote
-from django.db.models import Sum, Avg, Count,Q
-from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator
-from django.urls import reverse
-from companies.forms import SocialLinksFormset, CompanyForm,JobPostForm, InviteLinkForm, EditEmployeeForm
-from .models import *
-from datetime import date, timedelta
-from django.core.paginator import Paginator
-from core.utils import *
-import traceback
-from estate.models import *
-from estate.forms import *
-from members.forms import UpdateUserForm
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
-from core import news_scrape as ns
-from estate.filters import *
-from core.models import *
-import uuid
-from core.utils import refresh_activity_score
+from django.contrib import messages
+from django.db.models import Count, Q
 from itertools import chain
-from django.views.decorators.csrf import ensure_csrf_cookie
+import time
+from datetime import date, timedelta
+from django.utils import timezone
+from django.core.paginator import Paginator
+from django_ratelimit.decorators import ratelimit
+
+from .decorators import admin_required
+from .forms import AdminLoginForm
+from .models import AdminAccessLog
+
+from members.models import User
+from agents.models import AgentInformation
+from companies.models import CompanyInformation
+from landlord.models import LandlordInformation
+from core.models import PropertyManagementSale, PropertyManagementRent
+from estate.models import LeadInfo
+from core.utils import score_new_listing, refresh_activity_score
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR')
 
+@ratelimit(key='ip', rate='5/10m', block=False)
+def admin_login(request):
+    if getattr(request, 'limited', False):
+        from django.http import HttpResponse
+        return HttpResponse('Too many login attempts. Please try again later.', status=429)
 
-def admin_dashboard(request):
-    # ... your auth checks here ...
+    if request.user.is_authenticated and request.user.is_staff and request.session.get('_admin_authenticated'):
+        return redirect('control_panel:dashboard')
 
-    now = timezone.now()
+    if request.method == 'POST':
+        form = AdminLoginForm(request.POST, request=request)
+        if form.is_valid():
+            user = form.user_cache
+            login(request, user)
+            request.session['_admin_authenticated'] = True
+            request.session.set_expiry(3600 * 8)  # session expires in 8 hours
+            AdminAccessLog.objects.create(
+                user=user,
+                ip_address=get_client_ip(request),
+                action='LOGIN_SUCCESS',
+            )
+            return redirect('control_panel:dashboard')
+        else:
+            time.sleep(2)
+            AdminAccessLog.objects.create(
+                ip_address=get_client_ip(request),
+                action='LOGIN_FAILED',
+                notes=f'Attempted username: {request.POST.get("username")}'
+            )
+            error = 'Invalid credentials.'
+            return render(request, 'control_panel/login.html', {'form': form, 'error': error})
+    else:
+        form = AdminLoginForm(request=request)
+    return render(request, 'control_panel/login.html', {'form': form})
+
+@admin_required
+@require_POST
+def admin_logout(request):
+    AdminAccessLog.objects.create(
+        user=request.user,
+        ip_address=get_client_ip(request),
+        action='LOGOUT',
+    )
+    if '_admin_authenticated' in request.session:
+        del request.session['_admin_authenticated']
+    logout(request)
+    return redirect('control_panel:login')
+
+@admin_required
+def dashboard(request):
     today = date.today()
-    one_week_ago = now - timedelta(days=7)
+    one_week_ago = timezone.now() - timedelta(days=7)
 
-    # ─────────────────────────────────────────────────────────────────────
-    # 1. USER STATS — 1 query (aggregate everything in one hit)
-    # ─────────────────────────────────────────────────────────────────────
+    # 1. USER STATS 
     user_stats = User.objects.aggregate(
         total=Count('id'),
         customer_count=Count('id', filter=Q(role='customer')),
         agent_count=Count('id', filter=Q(role='agent')),
         company_count=Count('id', filter=Q(role='company')),
-        new_this_week=Count('id', filter=Q(date_joined__gte=one_week_ago)),
+        landlord_count=Count('id', filter=Q(role='landlord')),
     )
 
-    total_users     = user_stats['total']
-    total_customers = user_stats['customer_count']
-    total_agents    = user_stats['agent_count']
-    total_companies = user_stats['company_count']
-    new_this_week   = user_stats['new_this_week']
+    suspended_users = User.objects.filter(is_active=False).count()
 
-    # ─────────────────────────────────────────────────────────────────────
-    # 2. AGENTS — 2 queries (one aggregate, one slice)
-    # ─────────────────────────────────────────────────────────────────────
-    agent_stats = AgentInformation.objects.aggregate(
-        # Rename 'verified' to 'verified_count'
-        verified_count=Count('id', filter=Q(verified=True)),
-        # Rename 'unverified' to 'unverified_count'
-        unverified_count=Count('id', filter=Q(verified=False)),
-    )
+    # 2. AGENTS & COMPANIES 
+    unverified_agents = AgentInformation.objects.filter(verified=False).count()
+    unverified_companies = CompanyInformation.objects.filter(verified=False).count()
 
-    # Then access them like this:
-    verified_agents = agent_stats['verified_count']
-    pending_agent_count = agent_stats['unverified_count']
-    verified_agents_pct = (verified_agents / total_agents * 100) if total_agents else 0
-
-    pending_agent_list = AgentInformation.objects.filter(verified=False)[:5]
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 3. COMPANIES — 2 queries (one aggregate, one slice)
-    # ─────────────────────────────────────────────────────────────────────
-    company_stats = CompanyInformation.objects.aggregate(
-        verified_count=Count('id', filter=Q(verified=True)),
-        unverified_count=Count('id', filter=Q(verified=False)),
-        starter=Count('id', filter=Q(company_tier='starter')),
-        growth=Count('id', filter=Q(company_tier='growth')),
-        enterprise=Count('id', filter=Q(company_tier='enterprise')),
-    )
-    verified_companies     = company_stats['verified_count']
-    pending_company_count  = company_stats['unverified_count']
-    verified_companies_pct = (verified_companies / total_companies * 100) if total_companies else 0
-    starter_companies      = company_stats['starter']
-    growth_companies       = company_stats['growth']
-    enterprise_companies   = company_stats['enterprise']
-
-    pending_company_list = CompanyInformation.objects.filter(verified=False)[:5]
-
-    pending_verifications = pending_agent_count + pending_company_count
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 4. PROPERTIES — 2 queries (one aggregate each model)
-    # ─────────────────────────────────────────────────────────────────────
+    # 3. PROPERTIES 
     sale_stats = PropertyManagementSale.objects.aggregate(
         total=Count('id'),
         live=Count('id', filter=Q(is_listed=True)),
         flagged=Count('id', filter=Q(flagged=True)),
-        residential=Count('id', filter=Q(property_category='Residential')),
-        commercial=Count('id', filter=Q(property_category='Commercial')),
-        land=Count('id', filter=Q(property_category='Land')),
-        new_this_week=Count('id', filter=Q(listed_date__gte=one_week_ago)),
     )
     rent_stats = PropertyManagementRent.objects.aggregate(
         total=Count('id'),
         live=Count('id', filter=Q(is_listed=True)),
         flagged=Count('id', filter=Q(flagged=True)),
-        residential=Count('id', filter=Q(property_category='Residential')),
-        commercial=Count('id', filter=Q(property_category='Commercial')),
-        land=Count('id', filter=Q(property_category='Land')),
-        new_this_week=Count('id', filter=Q(listed_date__gte=one_week_ago)),
     )
 
-    total_sale        = sale_stats['total']
-    total_rent        = rent_stats['total']
-    total_properties  = total_sale + total_rent
-    live_listings     = sale_stats['live'] + rent_stats['live']
-    stored_listings   = total_properties - live_listings
-    live_listings_pct = (live_listings / total_properties * 100) if total_properties else 0
-    flagged_listings  = sale_stats['flagged'] + rent_stats['flagged']
-    residential_count = sale_stats['residential'] + rent_stats['residential']
-    commercial_count  = sale_stats['commercial']  + rent_stats['commercial']
-    land_count        = sale_stats['land']        + rent_stats['land']
-    new_listings_this_week = sale_stats['new_this_week'] + rent_stats['new_this_week']
+    total_sale = sale_stats['total']
+    total_rent = rent_stats['total']
+    total_properties = total_sale + total_rent
+    live_listings = sale_stats['live'] + rent_stats['live']
+    inventory_listings = total_properties - live_listings
+    flagged_listings = sale_stats['flagged'] + rent_stats['flagged']
+    
+    # Recent Logs
+    recent_logs = AdminAccessLog.objects.all()[:10]
 
-    # Recent listings — combine both querysets, sort in Python (avoids UNION complexity)
-    # 2 queries
-    recent_sale = list(PropertyManagementSale.objects.order_by('-listed_date')[:8])
-    recent_rent = list(PropertyManagementRent.objects.order_by('-listed_date')[:8])
-
-    # Keep as model instances so template properties like .base_image and .residential work correctly.
-    recent_listings = sorted(
-        chain(recent_sale, recent_rent),
-        key=lambda x: x.listed_date,
-        reverse=True
-    )[:8]
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 5. INQUIRIES — 1 query (aggregate) + 1 slice
-    # ─────────────────────────────────────────────────────────────────────
-    inquiry_stats = LeadInfo.objects.aggregate(
-        total=Count('id'),
-        today=Count('id', filter=Q(date_created=today)),
-    )
-    total_inquiries     = inquiry_stats['total']
-    new_inquiries_today = inquiry_stats['today']
-    recent_inquiries    = LeadInfo.objects.order_by('-date_created')[:6]
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 6. PARTNERSHIPS — 1 query (aggregate) + 1 slice
-    # ─────────────────────────────────────────────────────────────────────
-    partnership_stats = Partnership.objects.aggregate(
-        total=Count('id'),
-        pending=Count('id', filter=Q(status='pending')),
-    )
-    total_partnerships   = partnership_stats['total']
-    pending_partnerships = partnership_stats['pending']
-    recent_partnerships  = Partnership.objects.order_by('-created_at')[:5]
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 7. REVIEWS — 2 queries, merged in Python
-    # ─────────────────────────────────────────────────────────────────────
-    agent_name_map = {
-        a.agent_uuid: f"{a.first_name} {a.last_name}"
-        for a in AgentInformation.objects.only('agent_uuid', 'first_name', 'last_name')
-    }
-    company_name_map = {
-        c.unique_company_id: c.company_name
-        for c in CompanyInformation.objects.only('unique_company_id', 'company_name')
-    }
-
-    recent_agent_reviews = AgentRating.objects.select_related('user').order_by('-created_at')[:6]
-    recent_company_reviews = CompanyRating.objects.select_related('user').order_by('-created_at')[:6]
-
-    recent_reviews = []
-    for r in recent_agent_reviews:
-        recent_reviews.append({
-            'user': r.user,
-            'rating': r.rating,
-            'comment': r.comment,
-            'created_at': r.created_at,
-            'source': 'Agent',
-            'target_uuid': r.agent_uuid,
-            'target_name': agent_name_map.get(r.agent_uuid, 'Unknown Agent'),
-        })
-    for r in recent_company_reviews:
-        recent_reviews.append({
-            'user': r.user,
-            'rating': r.rating,
-            'comment': r.comment,
-            'created_at': r.created_at,
-            'source': 'Company',
-            'target_uuid': r.company_uuid,
-            'target_name': company_name_map.get(r.company_uuid, 'Unknown Company'),
-        })
-
-    recent_reviews = sorted(
-        recent_reviews,
-        key=lambda x: x['created_at'],
-        reverse=True
-    )[:6]
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 8. RECENT SIGNUPS — 1 query
-    # ─────────────────────────────────────────────────────────────────────
-    recent_signups = User.objects.order_by('-date_joined')[:8]
-
-    # ─────────────────────────────────────────────────────────────────────
-    # 9. TOP AGENTS — counts from both sale + rent flows
-    # ─────────────────────────────────────────────────────────────────────
-    sale_counts = PropertyManagementSale.objects.values('agent_uuid').annotate(count=Count('id'))
-    rent_counts = PropertyManagementRent.objects.values('agent_uuid').annotate(count=Count('id'))
-
-    agent_listing_counts = {}
-    for item in sale_counts:
-        if item['agent_uuid']:
-            agent_listing_counts[item['agent_uuid']] = agent_listing_counts.get(item['agent_uuid'], 0) + item['count']
-    for item in rent_counts:
-        if item['agent_uuid']:
-            agent_listing_counts[item['agent_uuid']] = agent_listing_counts.get(item['agent_uuid'], 0) + item['count']
-
-    top_agent_uuids = sorted(agent_listing_counts, key=lambda k: agent_listing_counts[k], reverse=True)[:5]
-
-    top_agents = []
-    for agent_uuid in top_agent_uuids:
-        agent = AgentInformation.objects.filter(agent_uuid=agent_uuid).first()
-        if not agent:
-            continue
-        top_agents.append({
-            'agent': agent,
-            'listing_count': agent_listing_counts.get(agent_uuid, 0),
-        })
-
-
-    # ─────────────────────────────────────────────────────────────────────
-    # CONTEXT
-    # ─────────────────────────────────────────────────────────────────────
     context = {
-        # Users
-        'total_users':               total_users,
-        'total_customers':           total_customers,
-        'total_agents':              total_agents,
-        'total_companies':           total_companies,
-        'new_users_this_week':       new_this_week,
-
-        # Agent verification
-        'verified_agents':           verified_agents,
-        'verified_agents_pct':       round(verified_agents_pct, 1),
-        'pending_agent_verifications': pending_agent_count,
-        'pending_agent_list':        pending_agent_list,
-
-        # Company verification
-        'verified_companies':        verified_companies,
-        'verified_companies_pct':    round(verified_companies_pct, 1),
-        'pending_company_verifications': pending_company_count,
-        'pending_company_list':      pending_company_list,
-
-        # Combined verification
-        'pending_verifications':     pending_verifications,
-
-        # Properties
-        'total_properties':          total_properties,
-        'total_sale':                total_sale,
-        'total_rent':                total_rent,
-        'live_listings':             live_listings,
-        'stored_listings':           stored_listings,
-        'live_listings_pct':         round(live_listings_pct, 1),
-        'flagged_listings':          flagged_listings,
-        'residential_count':         residential_count,
-        'commercial_count':          commercial_count,
-        'land_count':                land_count,
-        'new_listings_this_week':    new_listings_this_week,
-        'recent_listings':           recent_listings,
-
-        # Inquiries
-        'total_inquiries':           total_inquiries,
-        'new_inquiries_today':       new_inquiries_today,
-        'recent_inquiries':          recent_inquiries,
-
-        # Partnerships
-        'total_partnerships':        total_partnerships,
-        'pending_partnerships':      pending_partnerships,
-        'recent_partnerships':       recent_partnerships,
-
-        # Reviews
-        'recent_reviews':            recent_reviews,
-
-        # Company tiers
-        'starter_companies':         starter_companies,
-        'growth_companies':          growth_companies,
-        'enterprise_companies':      enterprise_companies,
-
-        # Users
-        'recent_signups':            recent_signups,
-
-        # Top agents
-        'top_agents':                top_agents,
-
-        # Misc
-        'today':                     today,
+        'total_users': user_stats['total'],
+        'total_customers': user_stats['customer_count'],
+        'total_agents': user_stats['agent_count'],
+        'total_companies': user_stats['company_count'],
+        'total_landlords': user_stats['landlord_count'],
+        'suspended_users': suspended_users,
+        'unverified_agents': unverified_agents,
+        'unverified_companies': unverified_companies,
+        'total_properties': total_properties,
+        'total_sale': total_sale,
+        'total_rent': total_rent,
+        'live_listings': live_listings,
+        'inventory_listings': inventory_listings,
+        'flagged_listings': flagged_listings,
+        'recent_logs': recent_logs,
     }
 
-    return render(request, 'executive/admin_dashboard.html', context)
+    return render(request, 'control_panel/dashboard.html', context)
 
+@admin_required
+def users(request):
+    users_qs = User.objects.all().order_by('-date_joined')
+    
+    # Filters
+    role_filter = request.GET.get('role', '')
+    status_filter = request.GET.get('status', '')
+    search_query = request.GET.get('search', '')
 
-@ensure_csrf_cookie
-def agent_verification(request, agent_uuid):
-    try:
-        AgentInformation.objects.filter(agent_uuid=agent_uuid).update(verified=True)
-        messages.success(request, 'Agent Verified')
-        if 'HTTP_REFERER' in request.META:
-            return redirect(request.META['HTTP_REFERER'])
-        else:
-            return redirect('executive:admin-dashboard')
-    except ObjectDoesNotExist:
-        messages.error(request, 'Company Doesnt exists')
-    except:
-        messages.error(request, 'An Error Occured')
-        error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+    if role_filter:
+        users_qs = users_qs.filter(role=role_filter)
+    if status_filter == 'active':
+        users_qs = users_qs.filter(is_active=True)
+    elif status_filter == 'suspended':
+        users_qs = users_qs.filter(is_active=False)
+    if search_query:
+        users_qs = users_qs.filter(Q(username__icontains=search_query) | Q(email__icontains=search_query))
 
-@ensure_csrf_cookie
-def company_verification(request, company_uuid):
-    try:
-        CompanyInformation.objects.filter(unique_company_id=company_uuid).update(verified=True)
-        messages.success(request, 'Company Verified')
-        if 'HTTP_REFERER' in request.META:
-            return redirect(request.META['HTTP_REFERER'])
-        else:
-            return redirect('executive:admin-dashboard')
-    except ObjectDoesNotExist:
-        messages.error(request, 'Company Doesnt exists')
-    except:
-        messages.error(request, 'An Error Occured')
-        error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+    paginator = Paginator(users_qs, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
+    return render(request, 'control_panel/users.html', {'page_obj': page_obj})
 
+@admin_required
+def user_detail(request, user_id):
+    target_user = get_object_or_404(User, id=user_id)
+    return render(request, 'control_panel/user_detail.html', {'target_user': target_user})
 
-def suspend_account(request):
-    pass
+@admin_required
+@require_POST
+def suspend_user(request, user_id):
+    target_user = get_object_or_404(User, id=user_id)
+    if target_user.is_superuser:
+        messages.error(request, "Cannot suspend a superuser.")
+        return redirect('control_panel:user_detail', user_id=target_user.id)
+
+    reason = request.POST.get('reason', 'No reason provided')
+    
+    if target_user.is_active:
+        target_user.is_active = False
+        action_msg = 'USER_SUSPENDED'
+    else:
+        target_user.is_active = True
+        action_msg = 'USER_UNSUSPENDED'
+
+    target_user.save()
+
+    AdminAccessLog.objects.create(
+        user=request.user,
+        ip_address=get_client_ip(request),
+        action=action_msg,
+        target_type='user',
+        target_id=str(target_user.id),
+        notes=f'Reason or intent: {reason}'
+    )
+    
+    return redirect('control_panel:user_detail', user_id=target_user.id)
+
+@admin_required
+@require_POST
+def delete_user(request, user_id):
+    target_user = get_object_or_404(User, id=user_id)
+    confirm_username = request.POST.get('confirm_username')
+    
+    if target_user.is_superuser:
+        messages.error(request, "Cannot delete superuser.")
+        return redirect('control_panel:users')
+
+    if confirm_username != target_user.username:
+        messages.error(request, "Confirmation username did not match!")
+        return redirect('control_panel:user_detail', user_id=target_user.id)
+
+    user_info = f"{target_user.username} ({target_user.email}) [{target_user.role}]"
+    
+    # Pre-clean the related profiles explicitly
+    if target_user.role == 'agent':
+        AgentInformation.objects.filter(user_id=target_user.id).delete()
+    elif target_user.role == 'company':
+        CompanyInformation.objects.filter(user_id=target_user.id).delete()
+    elif target_user.role == 'landlord':
+        LandlordInformation.objects.filter(user_id=target_user.id).delete()
+
+    # Once profile is cleaned, safely delete the main user record
+    target_user.delete()
+
+    AdminAccessLog.objects.create(
+        user=request.user,
+        ip_address=get_client_ip(request),
+        action='USER_DELETED',
+        target_type='user',
+        target_id=str(user_id),
+        notes=f'Deleted user: {user_info}'
+    )
+    messages.success(request, f"User {confirm_username} permanently deleted.")
+    return redirect('control_panel:users')
+
+@admin_required
+def agents(request):
+    agents_qs = AgentInformation.objects.all().order_by('-agent_uuid')
+    
+    is_verified = request.GET.get('verified', '')
+    is_solo = request.GET.get('solo', '')
+    search = request.GET.get('search', '')
+
+    if is_verified == 'yes':
+        agents_qs = agents_qs.filter(verified=True)
+    elif is_verified == 'no':
+        agents_qs = agents_qs.filter(verified=False)
+    
+    if is_solo == 'yes':
+        agents_qs = agents_qs.filter(Q(company_uuid__isnull=True) | Q(company_uuid=''))
+    elif is_solo == 'no':
+        agents_qs = agents_qs.exclude(Q(company_uuid__isnull=True) | Q(company_uuid=''))
+
+    if search:
+        agents_qs = agents_qs.filter(Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(email__icontains=search))
+
+    paginator = Paginator(agents_qs, 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'control_panel/agents.html', {'page_obj': page_obj})
+
+@admin_required
+def agent_detail(request, agent_uuid):
+    agent = get_object_or_404(AgentInformation, agent_uuid=agent_uuid)
+    listings_count = PropertyManagementSale.objects.filter(agent_uuid=agent_uuid).count() + PropertyManagementRent.objects.filter(agent_uuid=agent_uuid).count()
+    return render(request, 'control_panel/agent_detail.html', {'agent': agent, 'listings_count': listings_count})
+
+@admin_required
+@require_POST
+def toggle_agent_verified(request, agent_uuid):
+    agent = get_object_or_404(AgentInformation, agent_uuid=agent_uuid)
+    
+    agent.verified = not agent.verified
+    agent.save()
+    
+    action = 'AGENT_VERIFIED' if agent.verified else 'AGENT_UNVERIFIED'
+    
+    AdminAccessLog.objects.create(
+        user=request.user,
+        ip_address=get_client_ip(request),
+        action=action,
+        target_type='agent',
+        target_id=agent_uuid,
+    )
+    return redirect('control_panel:agent_detail', agent_uuid=agent_uuid)
+
+@admin_required
+def companies(request):
+    companies_qs = CompanyInformation.objects.all().order_by('-date_joined')
+    
+    is_verified = request.GET.get('verified', '')
+    tier = request.GET.get('tier', '')
+
+    if is_verified == 'yes':
+        companies_qs = companies_qs.filter(verified=True)
+    elif is_verified == 'no':
+        companies_qs = companies_qs.filter(verified=False)
+    
+    if tier:
+        companies_qs = companies_qs.filter(company_tier=tier)
+
+    paginator = Paginator(companies_qs, 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'control_panel/companies.html', {'page_obj': page_obj})
+
+@admin_required
+def company_detail(request, company_id):
+    company = get_object_or_404(CompanyInformation, unique_company_id=company_id)
+    agents_list = AgentInformation.objects.filter(company_uuid=company_id)
+    listings_count = PropertyManagementSale.objects.filter(company_uuid=company_id).count() + PropertyManagementRent.objects.filter(company_uuid=company_id).count()
+    return render(request, 'control_panel/company_detail.html', {'company': company, 'agents_list': agents_list, 'listings_count': listings_count})
+
+@admin_required
+@require_POST
+def toggle_company_verified(request, company_id):
+    company = get_object_or_404(CompanyInformation, unique_company_id=company_id)
+    company.verified = not company.verified
+    company.save()
+    
+    action = 'COMPANY_VERIFIED' if company.verified else 'COMPANY_UNVERIFIED'
+    AdminAccessLog.objects.create(
+        user=request.user,
+        ip_address=get_client_ip(request),
+        action=action,
+        target_type='company',
+        target_id=company_id,
+    )
+    return redirect('control_panel:company_detail', company_id=company_id)
+
+@admin_required
+@require_POST
+def change_company_tier(request, company_id):
+    company = get_object_or_404(CompanyInformation, unique_company_id=company_id)
+    new_tier = request.POST.get('tier')
+    
+    if new_tier in ['starter', 'growth', 'enterprise']:
+        old_tier = company.company_tier
+        company.company_tier = new_tier
+        company.save()
+        
+        AdminAccessLog.objects.create(
+            user=request.user,
+            ip_address=get_client_ip(request),
+            action='COMPANY_TIER_CHANGED',
+            target_type='company',
+            target_id=company_id,
+            notes=f'Changed from {old_tier} to {new_tier}'
+        )
+    return redirect('control_panel:company_detail', company_id=company_id)
+
+@admin_required
+def listings(request):
+    # Query Filter Extraction
+    f_type = request.GET.get('type', '')
+    f_status = request.GET.get('status', '')
+    f_feat = request.GET.get('featured', '')
+    f_flagged = request.GET.get('flagged', '')
+    f_cat = request.GET.get('category', '')
+    search = request.GET.get('search', '')
+
+    # Define the common fields we need for the template
+    # Note: Sale has 'price' and Rent has 'price_range'. We'll alias them.
+    common_fields = [
+        'id', 'location', 'state', 'is_listed', 'listed_date', 
+        'property_category', 'residential', 'commercial', 'lands',
+        'listing_score', 'featured_listings', 'flagged', 'is_flagged', 'property_type'
+    ]
+
+    def _apply_filters(qs):
+        if f_status == 'listed': qs = qs.filter(is_listed=True)
+        elif f_status == 'inventory': qs = qs.filter(is_listed=False)
+        
+        if f_feat == 'yes': qs = qs.filter(featured_listings=True)
+        elif f_feat == 'no': qs = qs.filter(featured_listings=False)
+
+        if f_flagged == 'yes': qs = qs.filter(flagged=True)
+        elif f_flagged == 'no': qs = qs.filter(flagged=False)
+
+        if f_cat: qs = qs.filter(property_category=f_cat)
+        
+        if search:
+            qs = qs.filter(
+                Q(location__icontains=search) | 
+                Q(state__icontains=search) | 
+                Q(residential__icontains=search) | 
+                Q(commercial__icontains=search) | 
+                Q(lands__icontains=search)
+            )
+        return qs
+
+    sale_qs = _apply_filters(PropertyManagementSale.objects.all()).values(*common_fields)
+    rent_qs = _apply_filters(PropertyManagementRent.objects.all()).values(*common_fields)
+
+    if f_type == 'sale':
+        combined_qs = sale_qs.order_by('-listed_date')
+    elif f_type == 'rent':
+        combined_qs = rent_qs.order_by('-listed_date')
+    else:
+        # Use union to combine them at the DB level
+        combined_qs = sale_qs.union(rent_qs).order_by('-listed_date')
+
+    paginator = Paginator(combined_qs, 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'control_panel/listings.html', {'page_obj': page_obj})
+
+@admin_required
+def listing_detail(request, type, pk):
+    if type not in ('sale', 'rent'):
+        from django.http import Http404
+        raise Http404
+    if type == 'sale':
+        listing = get_object_or_404(PropertyManagementSale, pk=pk)
+    else:
+        listing = get_object_or_404(PropertyManagementRent, pk=pk)
+    
+    agent = AgentInformation.objects.filter(agent_uuid=listing.agent_uuid).first() if listing.agent_uuid else None
+    
+    logs = AdminAccessLog.objects.filter(target_type=f'listing_{type}', target_id=str(pk))
+    
+    return render(request, 'control_panel/listing_detail.html', {'listing': listing, 'type': type, 'agent': agent, 'logs': logs})
+
+@admin_required
+@require_POST
+def force_unlist(request, type, pk):
+    if type not in ('sale', 'rent'):
+        from django.http import Http404
+        raise Http404
+    model = PropertyManagementSale if type == 'sale' else PropertyManagementRent
+    listing = get_object_or_404(model, pk=pk)
+    listing.is_listed = False
+    listing.save()
+    
+    AdminAccessLog.objects.create(user=request.user, ip_address=get_client_ip(request), action='LISTING_UNLISTED', target_type=f'listing_{type}', target_id=str(pk))
+    return redirect('control_panel:listing_detail', type=type, pk=pk)
+
+@admin_required
+@require_POST
+def toggle_feature(request, type, pk):
+    if type not in ('sale', 'rent'):
+        from django.http import Http404
+        raise Http404
+    model = PropertyManagementSale if type == 'sale' else PropertyManagementRent
+    listing = get_object_or_404(model, pk=pk)
+    
+    listing.featured_listings = not listing.featured_listings
+    listing.save()
+    
+    # Recalculate scoring as requested
+    prop_type_str = 'Sale' if type == 'sale' else 'Rent'
+    refresh_activity_score(listing, prop_type_str, force=True)
+
+    action = 'LISTING_FEATURED' if listing.featured_listings else 'LISTING_UNFEATURED'
+    AdminAccessLog.objects.create(user=request.user, ip_address=get_client_ip(request), action=action, target_type=f'listing_{type}', target_id=str(pk))
+    return redirect('control_panel:listing_detail', type=type, pk=pk)
+
+@admin_required
+@require_POST
+def toggle_flag(request, type, pk):
+    if type not in ('sale', 'rent'):
+        from django.http import Http404
+        raise Http404
+    model = PropertyManagementSale if type == 'sale' else PropertyManagementRent
+    listing = get_object_or_404(model, pk=pk)
+    
+    listing.flagged = not listing.flagged
+    listing.save()
+
+    action = 'LISTING_FLAGGED' if listing.flagged else 'LISTING_UNFLAGGED'
+    AdminAccessLog.objects.create(user=request.user, ip_address=get_client_ip(request), action=action, target_type=f'listing_{type}', target_id=str(pk))
+    return redirect('control_panel:listing_detail', type=type, pk=pk)
+
+@admin_required
+@require_POST
+def delete_listing(request, type, pk):
+    if type not in ('sale', 'rent'):
+        from django.http import Http404
+        raise Http404
+    model = PropertyManagementSale if type == 'sale' else PropertyManagementRent
+    listing = get_object_or_404(model, pk=pk)
+    
+    # Try identifying by name correctly
+    c_name = listing.residential or listing.commercial or listing.lands or "Unknown"
+
+    confirm_name = request.POST.get('confirm_name')
+    if confirm_name != c_name:
+        messages.error(request, "Confirmation name did not match!")
+        return redirect('control_panel:listing_detail', type=type, pk=pk)
+        
+    listing.delete()
+    AdminAccessLog.objects.create(user=request.user, ip_address=get_client_ip(request), action='LISTING_DELETED', target_type=f'listing_{type}', target_id=str(pk), notes=f'Permanently deleted property {c_name}')
+    
+    messages.success(request, f"Listing deleted.")
+    return redirect('control_panel:listings')
+
+@admin_required
+def access_log(request):
+    logs = AdminAccessLog.objects.all()
+    
+    f_action = request.GET.get('action')
+    search = request.GET.get('search')
+    
+    if f_action: logs = logs.filter(action=f_action)
+    if search: logs = logs.filter(Q(user__username__icontains=search) | Q(ip_address__icontains=search))
+        
+    paginator = Paginator(logs, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    
+    return render(request, 'control_panel/access_log.html', {'page_obj': page_obj})

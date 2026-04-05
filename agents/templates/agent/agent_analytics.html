@@ -4,7 +4,45 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'agent/css/agent_analytics.css' %}">
+<link rel="stylesheet" href="{% static 'agent/css/tooltips.css' %}">
 <style>
+/* ── Tooltip Fix ── */
+.tooltip-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.tooltip-trigger:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a3c4e;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  white-space: normal;
+  max-width: 260px;
+  width: max-content;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  line-height: 1.4;
+  pointer-events: none;
+}
+.tooltip-trigger:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1a3c4e;
+  z-index: 10000;
+  pointer-events: none;
+}
+
 /* ── Period Banner ── */
 .ag-period-banner {
   background: rgba(26,60,78,.04);
@@ -164,7 +202,7 @@
   <span class="ag-period-sep"></span>
   <strong>Today</strong>
   <span style="margin-left:auto; color:var(--text-light);">
-    All metrics below reflect activity within this 30-day rolling window
+    📊 30-day rolling window from join date + last reset. All metrics & market position calculated based on this period.
   </span>
 </div>
 
@@ -205,7 +243,12 @@
       <div class="ag-kpi-icon market"><i class="bi bi-graph-up"></i></div>
       <div class="ag-kpi-body">
         <span class="ag-kpi-val">{{ competition }}</span>
-        <span class="ag-kpi-lbl">Market Position</span>
+        <span class="ag-kpi-lbl">
+          Market Position
+          <i class="bi bi-info-circle tooltip-trigger"
+             data-tooltip="Market rank: (your engagement / total market engagement) × 100. Engagement = 40% likes + 30% prop views + 20% profile views + 10% (rating × reviews). 30-day window."
+             style="font-size:0.85em; cursor:help; color:var(--text-light); margin-left:3px;"></i>
+        </span>
       </div>
     </div>
     <span class="ag-kpi-badge {% if market_position <= 25 %}positive{% else %}neutral{% endif %}">
@@ -218,7 +261,12 @@
       <div class="ag-kpi-icon engage"><i class="bi bi-chat-square-heart-fill"></i></div>
       <div class="ag-kpi-body">
         <span class="ag-kpi-val">{{ inq_rate|floatformat:1 }}%</span>
-        <span class="ag-kpi-lbl">Engagement Rate</span>
+        <span class="ag-kpi-lbl">
+          Engagement Rate
+          <i class="bi bi-info-circle tooltip-trigger"
+             data-tooltip="How engaging your listings are: 40% total likes + 30% avg prop views + 20% avg profile views + 10% (avg rating × total reviews), normalised to 0–100."
+             style="font-size:0.85em; cursor:help; color:var(--text-light); margin-left:3px;"></i>
+        </span>
       </div>
     </div>
     <span class="ag-kpi-badge {% if inq_rate > 40 %}positive{% else %}warn{% endif %}">
@@ -403,7 +451,6 @@
       <div class="ag-rating-row">
         <div class="ag-rating-big">{{ average_rating|floatformat:1 }}</div>
         <div class="ag-rating-meta">
-          <!-- Star display — filled, half, empty based on average_rating -->
           <div class="ag-stars">
             {% for i in "12345" %}
               {% with i_int=forloop.counter %}
@@ -478,7 +525,6 @@
 
     <div class="ag-insights-grid">
 
-      <!-- Profile -->
       {% if profile_incr_perc > 0 %}
         <div class="ag-insight success">
           <div class="ag-insight-icon"><i class="bi bi-arrow-up-circle-fill"></i></div>
@@ -497,7 +543,6 @@
         </div>
       {% endif %}
 
-      <!-- Engagement -->
       {% if inq_rate > 40 %}
         <div class="ag-insight success">
           <div class="ag-insight-icon"><i class="bi bi-hand-thumbs-up-fill"></i></div>
@@ -516,7 +561,6 @@
         </div>
       {% endif %}
 
-      <!-- Listing views -->
       {% if total_prop_incr_perc > 0 %}
         <div class="ag-insight success">
           <div class="ag-insight-icon"><i class="bi bi-graph-up-arrow"></i></div>
@@ -543,7 +587,6 @@
         </div>
       {% endif %}
 
-      <!-- Leads -->
       {% if leads_change > 0 %}
         <div class="ag-insight success">
           <div class="ag-insight-icon"><i class="bi bi-person-plus-fill"></i></div>
@@ -562,7 +605,6 @@
         </div>
       {% endif %}
 
-      <!-- Competition -->
       {% if market_position <= 25 %}
         <div class="ag-insight success">
           <div class="ag-insight-icon"><i class="bi bi-trophy-fill"></i></div>

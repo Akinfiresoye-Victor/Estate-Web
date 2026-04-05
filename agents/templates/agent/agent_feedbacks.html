@@ -1,0 +1,125 @@
+{% extends 'agent/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'agent/css/agent_feedback.css' %}">
+
+<section class="feedback-page">
+
+  <!-- Page Header -->
+  <div class="feedback-header">
+    <h1 class="feedback-title">Client Reviews</h1>
+    <p class="feedback-subtitle">See what your clients are saying about your service</p>
+  </div>
+
+  <!-- Summary Bar -->
+  {% if feedback %}
+  <div class="feedback-summary">
+
+    <div class="summary-score">
+      <span class="score-number">{{ avg_rating|floatformat:1 }}</span>
+      <div class="summary-stars">
+        {% with avg_rating|floatformat:0 as rounded %}
+          {% for i in "12345" %}
+            {% if forloop.counter <= rounded|add:"0" %}
+              <span class="star filled">&#9733;</span>
+            {% else %}
+              <span class="star empty">&#9733;</span>
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+      </div>
+      <span class="score-label">Average Rating</span>
+    </div>
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-count">
+      <span class="count-number">{{ feedback|length }}</span>
+      <span class="count-label">Total Review{{ feedback|length|pluralize }}</span>
+    </div>
+
+  </div>
+  {% endif %}
+
+  <!-- Feedback Cards -->
+  <div class="feedback-list">
+
+    {% if feedback %}
+      {% for feeds in feedback %}
+      <div class="feedback-card">
+
+        <!-- Card Top: Avatar + Rating -->
+        <div class="card-top">
+          <div class="client-avatar">
+            <!-- Initials fallback — replace with feeds.client.get_full_name if available -->
+            <span>{{ feeds.user.first_name|first|upper }}{{ feeds.user.last_name|first|upper }}</span>
+          </div>
+
+          <div class="client-info">
+            <p class="client-name">
+              {% if feeds.user.get_full_name %}
+                {{ feeds.user.get_full_name }}
+              {% else %}
+                Anonymous Client
+              {% endif %}
+            </p>
+            <div class="star-row">
+              {% for i in "12345" %}
+                {% if forloop.counter <= feeds.rating %}
+                  <span class="star filled">&#9733;</span>
+                {% else %}
+                  <span class="star empty">&#9733;</span>
+                {% endif %}
+              {% endfor %}
+              <span class="rating-text">{{ feeds.rating }}/5</span>
+            </div>
+          </div>
+
+          <!-- Rating Badge -->
+          <div class="rating-badge rating-{{ feeds.rating }}">
+            {% if feeds.rating == 5 %}Excellent
+            {% elif feeds.rating == 4 %}Very Good
+            {% elif feeds.rating == 3 %}Average
+            {% elif feeds.rating == 2 %}Poor
+            {% else %}Bad
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Comment -->
+        {% if feeds.comment %}
+        <div class="card-comment">
+          <p>{{ feeds.comment }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Card Footer: Date if available -->
+        {% if feeds.created_at %}
+        <div class="card-footer">
+          <span class="review-date">{{ feeds.created_at|naturaltime }}</span>
+        </div>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon">&#9734;</div>
+        <h2 class="empty-title">No Reviews Yet</h2>
+        <p class="empty-message">
+          Once clients complete transactions with you, their reviews will appear here.
+          Keep delivering great service!
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+
+</section>
+
+{% endblock %}

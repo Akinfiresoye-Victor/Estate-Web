@@ -1,55 +1,19 @@
 from django.utils import timezone
 from datetime import timedelta
-from agents.models import AgentAnalytics
-from core.models import PropertyViews
-from companies.models import SessionId
-from django.utils import timezone
-from datetime import timedelta
 from django.db.models import Sum
-from estate.models import LeadInfo
-from core.models import PropertyManagementRent, PropertyManagementSale,PropertyViews, WishlistStorageUnit
-from estate.models import LeadInfo
-from agents.models import AgentInformation
-from companies.models import CompanyInformation
 from django.shortcuts import render
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.template import TemplateDoesNotExist
+from agents.models import AgentInformation
+from companies.models import CompanyInformation, SessionId
+from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, WishlistStorageUnit, ErrorLog
+from estate.models import LeadInfo
+import traceback
 
-def monthly_change(current_value, average_value):
-    """Calculate percentage change from average"""
-    if average_value == 0:
-        return 0 if current_value == 0 else 100
-    change = ((current_value - average_value) / average_value) * 100
-    return round(change, 2)
-
-
-def engagement_rate(total_likes, avg_property_views, avg_profile_views, rating_score):
-    """
-    Calculate engagement rate based on:
-    - Total property likes
-    - Average property views
-    - Average profile views
-    - Rating score (rating * review_count)
-    """
-    if avg_property_views == 0 and avg_profile_views == 0:
-        return 0.0
-    
-    # Weighted engagement calculation
-    like_weight = 0.4
-    view_weight = 0.3
-    profile_weight = 0.2
-    rating_weight = 0.1
-    
-    # Normalize values
-    like_score = min(total_likes / max(1, avg_property_views / 10), 100) * like_weight
-    view_score = min(avg_property_views / 10, 100) * view_weight
-    profile_score = min(avg_profile_views / 5, 100) * profile_weight
-    rating_score_normalized = min(rating_score * 2, 100) * rating_weight
-    
-    total_engagement = like_score + view_score + profile_score + rating_score_normalized
-    
-    return round(total_engagement, 2)
-
-
-def reset_button(analytics, agent_uuid, lease_views, sale_views):
+def agent_reset_button(analytics, agent_uuid, lease_views, sale_views):
     """Reset monthly tracking if 30 days have passed"""
     
     current_time = timezone.now()
@@ -443,31 +407,27 @@ def score_new_listing(property_obj, property_type):
     return points
 
 
-def refresh_activity_score(property_obj, property_type):
+def refresh_activity_score(property_obj, property_type, force=False, save=True):
     """
-    Recalculates the full score from scratch and saves it.
+    Recalculates the full score from scratch and follows a 24-hour gate.
 
-    Uses last_reset_date as a 24-hour gate: if it was already updated
-    in the last 24 hours this function returns immediately without
-    touching the database.  This means it is safe to call from any
-    view (e.g. a property-detail view) without risk of the score
-    ballooning on every request.
-
-    Returns the new score, or the current stored score if the gate
-    prevented a recalculation.
+    If save=False, the object is updated in memory but not saved to the DB.
+    This is useful for bulk_update operations.
     """
     now     = timezone.now()
     elapsed = now - property_obj.last_reset_date
 
     # ── 24-hour gate ──────────────────────────────────────────────────
-    if elapsed < timedelta(hours=24):
+    if not force and elapsed < timedelta(hours=24):
         return property_obj.listing_score          # nothing to do
 
     points = _calculate_full_score(property_obj, property_type)
 
     property_obj.listing_score  = points
     property_obj.last_reset_date = now
-    property_obj.save(update_fields=['listing_score', 'last_reset_date'])
+    
+    if save:
+        property_obj.save(update_fields=['listing_score', 'last_reset_date'])
 
     return points
 
@@ -522,7 +482,7 @@ def can_add_to_inventory(agent, company=None, landlord=None):
         limit = landlord.inventory_slots
         used = get_inventory_count(None, None, landlord)
     else:
-        limit=company.inventory_slots if company else agent.inventory_slots
+        limit=company.inventory_slots if company else agent.inventory_slot
         used=get_inventory_count(agent, company)
     
     if used >= limit:
@@ -557,3 +517,43 @@ def get_agent_company(agent):
     except CompanyInformation.DoesNotExist:
         return None
 
+def send_estate_email(subject, template_name, context, recipient_list):
+    """
+    Centralized utility to send HTML emails with a plain-text fallback.
+    - subject: Email subject
+    - template_name: Path to HTML template (e.g., 'emails/inquiry_notification.html')
+    - context: Dictionary of data for the template
+    - recipient_list: List of email addresses
+    """
+    try:
+        # 1. Add common context (domain, protocol)
+        if 'domain' not in context:
+            # Try to get from request if provided in context, else from settings or hardcoded
+            if 'request' in context:
+                context['domain'] = context['request'].get_host()
+                context['protocol'] = 'https' if context['request'].is_secure() else 'http'
+            else:
+                context['domain'] = 'estatewebng.com' if not settings.DEBUG else 'localhost:8000'
+                context['protocol'] = 'https' if not settings.DEBUG else 'http'
+        
+        # 2. Render HTML
+        html_content = render_to_string(template_name, context)
+        
+        # 3. Create plain-text fallback
+        text_content = strip_tags(html_content)
+        
+        # 4. Create Email
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=recipient_list
+        )
+        email.attach_alternative(html_content, "text/html")
+        
+        # 5. Send
+        email.send(fail_silently=False)
+        return True
+    except Exception as e:
+        ErrorLog.objects.create(traceback=f"Email Error ({subject}) to {recipient_list}: {str(e)}\n{traceback.format_exc()}")
+        return False

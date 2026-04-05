@@ -1,8 +1,6 @@
 from pathlib import Path
 import os
 from decouple import config, Csv
-import dj_database_url
-import cloudinary_storage
 
 
 # =============================================================================
@@ -17,6 +15,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # =============================================================================
 
 SECRET_KEY = config('SECRET_KEY')
+ADMIN_SECRET_PATH = config('ADMIN_SECRET_PATH')
+DJANGO_ADMIN_PATH = config('DJANGO_ADMIN_PATH')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
@@ -26,7 +26,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.estatewebng.com',
 ]
 
-print('Debug Mode:', DEBUG)
+
 
 
 # =============================================================================
@@ -120,7 +120,6 @@ TEMPLATES = [
 # =============================================================================
 
 if config('USE_DB', cast=bool):
-    print('Active DB: PostgreSQL')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -129,10 +128,10 @@ if config('USE_DB', cast=bool):
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default=5432, cast=int),
+            'CONN_MAX_AGE': 60,
         }
     }
 else:
-    print('Active DB: SQLite (local dev)')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -190,6 +189,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = 'landing'
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_ADAPTER = 'members.adapter.MySocialAccountAdapter'
+ACCOUNT_ADAPTER = 'members.adapter.MyAccountAdapter'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -228,7 +228,6 @@ else:
 # =============================================================================
 
 USE_CLOUDINARY = config('USE_CLOUDINARY', cast=bool)
-print('Cloudinary active:', USE_CLOUDINARY)
 
 if USE_CLOUDINARY:
     CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME')

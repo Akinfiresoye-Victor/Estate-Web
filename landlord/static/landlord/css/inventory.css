@@ -478,3 +478,102 @@
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* ── Delete Confirmation Modal ── */
+.li-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  inset: 0; /* shorthand for top/right/bottom/left: 0 all at once */
+  align-items: center;
+  justify-content: center;
+}
+.li-modal.show {
+  display: flex;
+}
+.li-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.li-modal__content {
+  position: relative; /* so it sits on top of the overlay */
+  background: #fff;
+  border-radius: 10px;
+  max-width: 420px;
+  width: calc(100% - 2rem);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  animation: li-modal-pop 0.18s ease;
+}
+@keyframes li-modal-pop {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.li-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+.li-modal__header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc3545;
+}
+.li-modal__close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  padding: 0 0.25rem;
+  transition: color 0.15s;
+}
+.li-modal__close:hover { color: #333; }
+
+.li-modal__body {
+  padding: 1.5rem;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.li-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Danger button (used in modal footer) */
+.li-btn--danger {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.li-btn--danger:hover:not(:disabled)  { background: #b02a37; }
+.li-btn--danger:disabled              { opacity: 0.65; cursor: not-allowed; }
+
+.li-btn--secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.li-btn--secondary:hover { background: #e0e0e0; }

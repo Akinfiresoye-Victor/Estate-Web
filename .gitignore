@@ -52,3 +52,7 @@ docs/TODO_new.md
 *.swo
 .DS_Store
 Thumbs.db
+
+estate_web_code_audit.md
+post_fix_code_audit.md
+speed_security_audit.md

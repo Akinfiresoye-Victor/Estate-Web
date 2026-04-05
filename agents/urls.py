@@ -20,6 +20,7 @@ urlpatterns = [
     path('delete/agent_info', views.delete_agent, name='delete-agent'),
     path('invite/join/', views.join_via_invite, name='join_via_invite'),
     path('mycompany/', views.my_company, name='my-company'),
-    path('leave_company', views.leave_company, name='leave-company')
+    path('leave_company', views.leave_company, name='leave-company'),
+    path('view_feedbacks/', views.agent_feedbacks, name='view-feedbacks')
 ]
 

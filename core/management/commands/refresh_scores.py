@@ -50,36 +50,58 @@ class Command(BaseCommand):
             self.stdout.write('Force flag set — all properties will be refreshed.')
 
         # ── Sale properties ───────────────────────────────────────────
-        sale_props = PropertyManagementSale.objects.all()
+        sale_qs = PropertyManagementSale.objects.all()
+        to_update_sale = []
         sale_updated = 0
+        sale_errors  = 0
 
-        for prop in sale_props:
-            old_score = prop.listing_score
-            new_score = refresh_activity_score(prop, 'Sale')
-            if new_score != old_score:
-                sale_updated += 1
+        for prop in sale_qs:
+            try:
+                old_score = prop.listing_score
+                new_score = refresh_activity_score(prop, 'Sale', save=False)
+                if new_score != old_score:
+                    sale_updated += 1
+                to_update_sale.append(prop)
+            except Exception as e:
+                sale_errors += 1
+                self.stderr.write(f'Error scoring Sale #{prop.pk}: {e}')
+                continue
+
+        if to_update_sale:
+            PropertyManagementSale.objects.bulk_update(to_update_sale, ['listing_score', 'last_reset_date'])
 
         self.stdout.write(
             self.style.SUCCESS(
-                f'Sale properties: {sale_props.count()} checked, '
-                f'{sale_updated} scores updated.'
+                f'Sale properties: {len(to_update_sale)} updated, '
+                f'{sale_errors} errors.'
             )
         )
 
         # ── Rent properties ───────────────────────────────────────────
-        rent_props = PropertyManagementRent.objects.all()
+        rent_qs = PropertyManagementRent.objects.all()
+        to_update_rent = []
         rent_updated = 0
+        rent_errors  = 0
 
-        for prop in rent_props:
-            old_score = prop.listing_score
-            new_score = refresh_activity_score(prop, 'Rent')
-            if new_score != old_score:
-                rent_updated += 1
+        for prop in rent_qs:
+            try:
+                old_score = prop.listing_score
+                new_score = refresh_activity_score(prop, 'Rent', save=False)
+                if new_score != old_score:
+                    rent_updated += 1
+                to_update_rent.append(prop)
+            except Exception as e:
+                rent_errors += 1
+                self.stderr.write(f'Error scoring Rent #{prop.pk}: {e}')
+                continue
+
+        if to_update_rent:
+            PropertyManagementRent.objects.bulk_update(to_update_rent, ['listing_score', 'last_reset_date'])
 
         self.stdout.write(
             self.style.SUCCESS(
-                f'Rent properties: {rent_props.count()} checked, '
-                f'{rent_updated} scores updated.'
+                f'Rent properties: {len(to_update_rent)} updated, '
+                f'{rent_errors} errors.'
             )
         )
 

@@ -193,7 +193,7 @@ function initializeToggleSwitches() {
 
     toggleSwitches.forEach(toggle => {
         toggle.addEventListener('change', function() {
-            console.log('Toggle changed:', this.checked);
+
             // Add your toggle change logic here
         });
     });
@@ -211,7 +211,7 @@ function initializeDangerZoneActions() {
             const confirmed = confirm('Are you sure you want to deactivate your account? You can reactivate it anytime by logging back in.');
             
             if (confirmed) {
-                console.log('Deactivating account...');
+
                 // Add deactivation logic here
                 alert('Account deactivated successfully');
             }
@@ -318,7 +318,6 @@ function initializeDeleteModal() {
                 const companyUuid = this.getAttribute('data-company-uuid');
                 
                 if (!companyUuid) {
-                    console.error('Company UUID not found');
                     alert('Error: Company ID not found. Please refresh the page and try again.');
                     return;
                 }
@@ -358,7 +357,6 @@ function initializeDeleteModal() {
                 }
                 
                 if (!csrfToken) {
-                    console.error('CSRF token not found');
                     alert('Error: Security token not found. Please refresh the page and try again.');
                     return;
                 }
@@ -438,7 +436,7 @@ function initializeAutoSave() {
             
             // Set new timeout for auto-save
             saveTimeout = setTimeout(() => {
-                console.log('Auto-saving...');
+
                 // Add auto-save logic here
             }, 2000); // Auto-save after 2 seconds of inactivity
         });

@@ -13,11 +13,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from .quotes import get_random_quote
 from django.db.models import Sum, Avg, Count
-from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator,get_inventory_count,get_listing_count
+from core.utils import monthly_change, engagement_rate, total_agents_engagement_calculator,get_inventory_count,get_listing_count, send_estate_email
 from companies.models import JobPost,CompanyInformation,InviteLink, CompanyActivityLog, Employees
 from django.urls import reverse
 import traceback
 from django_ratelimit.decorators import ratelimit
+import threading
 
 # Create your views here.
 def calculate_agent_profile_strength(has_picture, has_listing, has_phone):
@@ -207,8 +208,8 @@ def agent_form(request):
                         return HttpResponseRedirect(f"{request.path}?submitted=True")
                         
                 except Exception:
-                    print(f"Error saving agent data")
-                    messages.error(request, 'An error occurred while saving your profile. Please try again.')
+                    error = ErrorLog.objects.create(traceback=traceback.format_exc())
+                    messages.error(request, f'An error occurred while saving your profile. Ref: {error.ref_id}')
                     # Forms will be re-rendered with the POST data below
             else:
                 if not form_valid:
@@ -288,8 +289,19 @@ def update_agent_profile(request):
                         agent.save()
                         
                         # Save formsets (they're already linked to agent via instance)
-                        social_form.save()
-                        exp_form.save()
+                        socials = social_form.save(commit=False)
+                        for social in socials:
+                            social.agent = agent
+                            social.save()
+                        for social in social_form.deleted_objects:
+                            social.delete()
+
+                        experiences = exp_form.save(commit=False)
+                        for exp in experiences:
+                            exp.agent = agent
+                            exp.save()
+                        for exp in exp_form.deleted_objects:
+                            exp.delete()
                         
                         messages.success(request, 'Profile updated successfully!')
                         return redirect('agent:settings')
@@ -312,7 +324,6 @@ def update_agent_profile(request):
                 # Display first error to user
                 if error_messages:
                     messages.error(request, 'Please correct the errors in the form')
-                    print('\n'.join(error_messages))
         
         else:
             # GET request - initialize forms with instance
@@ -497,7 +508,7 @@ def analytics(request):
             total_agents_eng.append(ag_eng_rate)
 
             # Capture current agent score without an extra save inside the loop
-            if record.agent.id == current_agent.id:
+            if record.agent.id == current_agent.pk:
                 current_agent_score = ag_eng_rate
 
         # Save all updated fields in one single DB write
@@ -615,9 +626,9 @@ def lead_detail(request, lead_id):
     """
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to continue.')
-        return render('login')
+        return redirect('login')
     if request.user.role != 'agent':
-        messages.error(request, "Access denied: This page is for agent accounts only.")
+        messages.error(request, "Acceied: This page is for agent accounts only.")
         return redirect('landing')
     try:
         agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
@@ -761,7 +772,7 @@ def delete_lead(request, lead_id):
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         if lead_to_delete.schedule_tour:
-            appointment=Appointments.objects.filter(lead_id=lead_to_delete.lead_id)
+            appointment=Appointments.objects.filter(lead_uuid=lead_to_delete.lead_id)
             appointment.delete()
         lead_to_delete.delete()
         messages.success(request, "Lead and other Related data deleted successfully.")
@@ -851,7 +862,7 @@ def delete_agent(request):
             messages.success(request, 'Agent account and all associated data deleted successfully.')
             return redirect('landing')
         except Exception as e:
-            print(e) 
+            ErrorLog.objects.create(traceback=traceback.format_exc())
             messages.error(request, 'The agent profile could not be found.')
             return redirect('landing')
     except Exception:
@@ -938,6 +949,18 @@ def join_via_invite(request):
         agent.company_uuid = company.unique_company_id
         agent.save()
 
+        # Send email to agent (background thread — never block the user)
+        threading.Thread(
+            target=send_estate_email,
+            kwargs=dict(
+                subject=f"Welcome to {company.company_name}!",
+                template_name='emails/agent_joined_notification.html',
+                context={'agent': agent.users, 'company': company, 'request': request},
+                recipient_list=[agent.email],
+            ),
+            daemon=True,
+        ).start()
+
         invite_link.use_count += 1
         invite_link.save(update_fields=['use_count'])
 
@@ -978,17 +1001,25 @@ def my_company(request):
             my_listing_count=PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count() + PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count()
         else:
             company=None
+            teamates=None
+            company_property_sale= None
+            company_property_rent=None
+            inventory_used=None
+            live_used=None
+            inv_limit=None
+            live_limit=None
+            my_listing_count=None
         context={
             'agent':agent,
             'company':company,
-            'teammates':teamates[:10],
+            'teammates':teamates[:10] if teamates else None,
             'company_sale_props': company_property_sale,
             'company_rent_props': company_property_rent,
             'inv_used': inventory_used,
             'live_used':live_used,
             'live_limit':live_limit,
             'inv_limit':inv_limit,
-            'total_team': teamates.count(),
+            'total_team': teamates.count() if teamates else None,
             'my_listings_count':my_listing_count
         }
         return render(request, 'agent/agent_companies.html', context)
@@ -1022,12 +1053,24 @@ def leave_company(request):
         
         agent=AgentInformation.objects.get(agent_uuid=agent.agent_uuid)
         #handing every property and lead data back to the company
-        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None,user_id=company.user_id)
-        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None, user_id=company.user_id)
-        LeadInfo.objects.filter(agent_id=agent.agent_uuid).update(agent_id=None)
-        Appointments.objects.filter(agent_uuid=agent.agent_uuid).update(agent_uuid=None)
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None,user_id=company.user_id)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None, user_id=company.user_id)
+        LeadInfo.objects.filter(agent_id=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_id=None)
+        Appointments.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None)
         agent.company_uuid = None
         agent.save()
+
+        # Send email to agent (background thread — never block the user)
+        threading.Thread(
+            target=send_estate_email,
+            kwargs=dict(
+                subject=f"Update on your status with {company.company_name}",
+                template_name='emails/agent_removed_notification.html',
+                context={'agent': agent.users, 'company': company, 'request': request},
+                recipient_list=[agent.email],
+            ),
+            daemon=True,
+        ).start()
         employee.delete()
         CompanyActivityLog.objects.create(
             company=company,
@@ -1038,6 +1081,30 @@ def leave_company(request):
     except ObjectDoesNotExist:
         messages.error(request, 'The requested data could not be found.')
         return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+def agent_feedbacks(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Please sign in to continue.')
+        return redirect('login')
+    if request.user.role != 'agent':
+        messages.info(request, 'Access denied: This page is for agent accounts only.')
+        return redirect('landing')
+    
+    try:
+        agent_uuid = AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+        agent_rating = AgentRating.objects.filter(agent_uuid=agent_uuid)
+        avg_rating = agent_rating.aggregate(Avg('rating'))['rating__avg'] or 0
+
+        return render(request, 'agent/agent_feedbacks.html', {
+            'feedback': agent_rating,
+            'avg_rating': avg_rating,
+        })
+    
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

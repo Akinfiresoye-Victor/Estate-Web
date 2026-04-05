@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<a href="{%url 'company:dashboard%}" class="attractive-back-button">
+<a href="{% url 'company:dashboard' %}" class="attractive-back-button">
     &larr; Go back
 </a>
 
@@ -428,7 +428,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form id="uploadForm">
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
           
           <div class="upload-area" id="uploadArea">
             <i class="bi bi-cloud-arrow-up"></i>
@@ -594,13 +595,11 @@
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 fileInput.files = files;
-                console.log('Files dropped:', files);
             }
         });
 
         fileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
-                console.log('Files selected:', this.files);
             }
         });
     }

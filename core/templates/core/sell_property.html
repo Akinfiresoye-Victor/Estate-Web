@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css">
 <link rel="stylesheet" href="{% static 'estate/css/sell_property.css' %}">
+<link rel="stylesheet" href="{% static 'estate/css/safety_tips_lister.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -18,6 +19,19 @@
   <i class="bi bi-arrow-left-circle-fill"></i>
   <span>Go Back</span>
 </a>
+
+<!-- Pro Tips Trigger - Sticky Top Right -->
+<button class="lister-trigger" id="listerTrigger">
+  <i class="bi bi-lightbulb"></i> Pro Tips
+</button>
+
+<!-- Pro Tips Modal -->
+<div class="lister-modal" id="listerModal">
+  <button class="lister-close" id="listerClose">&times;</button>
+  <div class="lister-modal-content">
+    {% include 'estate/includes/safety_tips_lister.html' %}
+  </div>
+</div>
 
 <div class="wizard-wrapper">
 
@@ -364,6 +378,13 @@
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  // Pro Tips Modal JS - Add at top
+  const listerTrigger = document.getElementById('listerTrigger');
+  const listerModal = document.getElementById('listerModal');
+  const listerClose = document.getElementById('listerClose');
+  if (listerTrigger) listerTrigger.addEventListener('click', () => listerModal.classList.add('active'));
+  if (listerClose) listerClose.addEventListener('click', () => listerModal.classList.remove('active'));
+  if (listerModal) listerModal.addEventListener('click', (e) => { if (e.target === listerModal) listerModal.classList.remove('active'); });
 
   /* ═══════════════════════════════════════════════
      STEP WIZARD

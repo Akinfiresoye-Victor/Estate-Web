@@ -1,0 +1,47 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<div class="adm-detail-header">
+    <h2 style="margin:0;">Agent: {{ agent.first_name }} {{ agent.last_name }}</h2>
+    <a href="{% url 'control_panel:agents' %}" class="adm-btn adm-btn-outline">&larr; Back</a>
+</div>
+
+<div class="adm-info-grid">
+    <div class="adm-card">
+        <h4 style="margin-top:0;">Profile Information</h4>
+        {% if agent.profile_picture %}
+            <img src="{{ agent.profile_picture.url }}" alt="Profile" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:15px;">
+        {% endif %}
+        <p><strong>UUID:</strong> {{ agent.agent_uuid }}</p>
+        <p><strong>Email:</strong> {{ agent.email }}</p>
+        <p><strong>Phone:</strong> {{ agent.phone_number }}</p>
+        <p><strong>Location:</strong> {{ agent.location }}</p>
+        <p><strong>Type:</strong> {% if agent.company_uuid %}Company Agent{% else %}Solo Agent{% endif %}</p>
+        <p>
+            <strong>Status:</strong> 
+            {% if agent.verified %}
+                <span class="adm-badge adm-badge-success">Verified</span>
+            {% else %}
+                <span class="adm-badge adm-badge-warning">Unverified</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="adm-card">
+        <h4 style="margin-top:0;">Activity & Quotas</h4>
+        <p><strong>Listings Hosted:</strong> {{ listings_count }}</p>
+        <p><strong>Inventory Slots:</strong> {{ agent.inventory_slots }}</p>
+        <p><strong>Listing Slots:</strong> {{ agent.listing_slots }}</p>
+        
+        <h4 style="margin-top:20px;">Managerial Actions</h4>
+        <form method="post" action="{% url 'control_panel:toggle_agent_verified' agent.agent_uuid %}">
+            {% csrf_token %}
+            {% if agent.verified %}
+                <button type="submit" class="adm-btn adm-btn-warning">Revoke Verification</button>
+            {% else %}
+                <button type="submit" class="adm-btn adm-btn-success">Verify Agent</button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

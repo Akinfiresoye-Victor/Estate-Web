@@ -104,7 +104,7 @@
           <span>You joined as <strong>{{ agent.work_type }}</strong></span>
         </div>
 
-        <div class="mc-hero-actions">
+    <div class="mc-hero-actions">
           <a href="{%url 'customer:company-profile' company.unique_company_id%}" class="mc-btn primary">
             <i class="bi bi-building-fill"></i> View Company Profile
           </a>
@@ -118,6 +118,15 @@
   </div>
 </div>
 
+<!-- ── COMPANY POLICY INFO ───────────────────────── -->
+<div class="mc-policy-info">
+  <div class="mc-policy-icon">
+    <i class="bi bi-info-circle-fill"></i>
+  </div>
+  <div class="mc-policy-text">
+    <strong>Estate Web's Policy:</strong> Pre-existing listings stay yours. New listings during tenure belong to {{ company.company_name }}. On leaving, company retains properties/leads/inquiries from your stay; pre-join listings revert to you. <em>(Future: Personal/Company listing dropdown)</em>
+  </div>
+</div>
 
 <!-- ── SLOT METERS ──────────────────────────────── -->
 <div class="mc-slots">

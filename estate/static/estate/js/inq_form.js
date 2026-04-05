@@ -278,7 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 showNotification('Draft restored', 'info');
             } catch (e) {
-                console.error('Error loading draft:', e);
             }
         }
     }
@@ -322,5 +321,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    console.log('Inquiry form initialized successfully');
+
 });

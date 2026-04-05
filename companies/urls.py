@@ -26,6 +26,7 @@ urlpatterns = [
     path('invite/generate/', views.generate_invite_link, name='generate_invite_link'),
     path('revoke_invite/<token>', views.revoke_invite_link, name='revoke-link'),
     path('remove_agent/<agent_uuid>', views.remove_agent, name='remove-agent'),
-    path('employee/edit/<str:agent_uuid>', views.edit_employee, name='edit-employee')
+    path('employee/edit/<str:agent_uuid>', views.edit_employee, name='edit-employee'),
+    path('myfeedbacks/', views.company_feedbacks, name='view-feedbacks')
 ]
 

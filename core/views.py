@@ -731,19 +731,22 @@ def delete_property_on_lease(request, property_id):
             company=None
             agent_uuid=None
         else:
-            messages.info(request, 'Coming soon!')
+            messages.info(request, 'Error... You dont have the feature')
             return redirect('landing')
 
-        property1= PropertyManagementSale.objects.get(pk=property_id)
-        
+        property1= PropertyManagementRent.objects.get(pk=property_id)
         #Additional layer of security
-        if company and property1.company_uuid != company.unique_company_id:
+        if company and (property1.company_uuid != company.unique_company_id):
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Property Listing Deleted'
+            )
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
-        elif agent_uuid and property1.agent_uuid != agent_uuid:
+        elif agent_uuid and (property1.agent_uuid != agent_uuid):
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
-        elif landlord_uuid and property1.landlord_uuid != landlord_uuid:
+        elif landlord_uuid and (property1.landlord_uuid != landlord_uuid):
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         
@@ -765,14 +768,12 @@ def delete_property_on_lease(request, property_id):
             property_views.delete()
             property1.delete()
             messages.success(request, "Property deleted successfully.")
-            if request.user.role == 'company':
-                CompanyActivityLog.objects.create(
-                    company=company,
-                    action= 'Property Listing Deleted'
-                )
             return redirect('listings')
         except Exception:
             messages.error(request, 'An unexpected error occurred. Please try again.')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property Data Not Found')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -785,7 +786,7 @@ def delete_property_on_sale(request, property_id):
     if request.user.role == 'customer':
         messages.warning(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
-    try:
+    try:    
         if request.user.role == 'company':
             company=CompanyInformation.objects.get(user_id=request.user.id)
             agent_uuid=None
@@ -835,6 +836,9 @@ def delete_property_on_sale(request, property_id):
                 action= 'Property Listing Deleted'
             )
         return redirect('listings')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property Data Not Found')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -1026,19 +1030,24 @@ def appointment(request):
         user_role=request.user.role
         if user_role == 'company':
             base_template = 'company/base.html'
+            try:
+                company= CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+                total_appointment= Appointments.objects.filter(company_uuid=company)
+                return render(request, 'core/appointment.html', {'appointments': total_appointment, 'base_template':base_template})
+            except ObjectDoesNotExist:
+                messages.error(request, 'An error occured')
+                return redirect('landing')
         elif user_role == 'agent':
             base_template = 'agent/base.html'
+            try:
+                agent= AgentInformation.objects.get(user_id=request.user.id)
+                total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
+                return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':f'{agent.first_name} {agent.last_name}'})
+            except ObjectDoesNotExist:
+                messages.error(request, 'An Error Occured')
+                return redirect('landing')
         else:
             base_template='estate/base.html'
-        
-        try:
-            company= CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
-            total_appointment= Appointments.objects.filter(company_uuid=company)
-            return render(request, 'core/appointment.html', {'appointments': total_appointment, 'base_template':base_template})
-        except ObjectDoesNotExist:
-            agent= AgentInformation.objects.get(user_id=request.user.id)
-            total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
-            return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':f'{agent.first_name} {agent.last_name}'})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -1078,13 +1087,13 @@ def manage_listings(request):
             base_template = 'agent/base.html'
         else:
             base_template='estate/base.html'
-        if request.user.role == 'company':
+        if user_role == 'company':
             company=CompanyInformation.objects.get(user_id=request.user.id)
             agent=None
             property_on_lease=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
             property_on_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
             role='company'
-        elif request.user.role == 'agent':
+        elif user_role == 'agent':
             agent=AgentInformation.objects.get(user_id=request.user.id)
             company=None
             if agent.company_uuid:
@@ -1253,7 +1262,7 @@ def view_client(request, appointment_uuid):
     else:
         base_template = 'estate/base.html'
     try:
-        try:
+        if request.user.role == 'company':
             company=CompanyInformation.objects.get(user_id= request.user.id)
             lead_item=LeadInfo.objects.filter(company_uuid=company.unique_company_id).first()
             if lead_item.company_uuid == company.unique_company_id:
@@ -1261,7 +1270,7 @@ def view_client(request, appointment_uuid):
             else:
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
-        except:
+        elif request.user.role == 'agent':
             agent= AgentInformation.objects.get(user_id=request.user.id)
             lead_item= LeadInfo.objects.filter(agent_id=agent.agent_uuid).first()
             if lead_item.agent_id == agent.agent_uuid:
@@ -1269,7 +1278,13 @@ def view_client(request, appointment_uuid):
             else:
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
+        else:
+            messages.info(request, 'Invalid Action')
+            return redirect('landing')
         return render(request, 'core/lead_list.html', {'leads': leads, 'base_template': base_template, 'appointment_id':appointment_uuid})
+    except ObjectDoesNotExist:
+        messages.error(request, 'Data not found.')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

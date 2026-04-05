@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Login | Estate Web</title>
+    <link rel="stylesheet" href="{% static 'admin_panel/css/admin.css' %}">
+</head>
+<body class="adm-body">
+
+    <div class="adm-login-wrapper">
+        <div class="adm-login-card">
+            <h1 class="adm-login-title">ESTATE WEB &mdash; INTERNAL</h1>
+            
+            {% if error %}
+                <div style="background:var(--danger); color:#fff; padding:10px; border-radius:4px; margin-bottom:15px; text-align:center; font-size:14px;">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'control_panel:login' %}" class="adm-login-form">
+                {% csrf_token %}
+                {{ form.username }}
+                {{ form.password }}
+                
+                <button type="submit" class="adm-btn adm-btn-secondary" style="margin-top:10px; width:100%; padding:10px;">
+                    Enter Control Panel
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

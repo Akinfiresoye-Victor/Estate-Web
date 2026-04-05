@@ -1,0 +1,72 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<h2 style="margin-top:0;">Real-time Dashboard</h2>
+
+<div class="adm-grid">
+    <div class="adm-card">
+        <div class="adm-card-title">Total Users</div>
+        <div class="adm-card-value">{{ total_users }}</div>
+        <div style="font-size:12px; color:var(--text-light); margin-top:5px;">
+            C: {{ total_customers }} | A: {{ total_agents }} | Co: {{ total_companies }} | L: {{ total_landlords }}
+        </div>
+    </div>
+    
+    <div class="adm-card">
+        <div class="adm-card-title">Total Properties</div>
+        <div class="adm-card-value">{{ total_properties }}</div>
+        <div style="font-size:12px; color:var(--text-light); margin-top:5px;">
+            Listed: {{ live_listings }} | Inventory: {{ inventory_listings }}
+        </div>
+    </div>
+
+    <div class="adm-card" style="border-left: 4px solid var(--warning);">
+        <div class="adm-card-title">Pending Verifications</div>
+        <div class="adm-card-value">{{ unverified_agents|add:unverified_companies }}</div>
+        <div style="font-size:12px; color:var(--warning); margin-top:5px;">
+            Agents: {{ unverified_agents }} | Companies: {{ unverified_companies }}
+        </div>
+    </div>
+    
+    <div class="adm-card" style="border-left: 4px solid var(--danger);">
+        <div class="adm-card-title">Action Required</div>
+        <div class="adm-card-value text-danger">{{ flagged_listings|add:suspended_users }}</div>
+        <div style="font-size:12px; color:var(--danger); margin-top:5px;">
+            Flagged: {{ flagged_listings }} | Suspended Users: {{ suspended_users }}
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom: 20px; display:flex; gap:10px;">
+    <a href="{% url 'control_panel:agents' %}" class="adm-btn adm-btn-primary">Go to Agents</a>
+    <a href="{% url 'control_panel:companies' %}" class="adm-btn adm-btn-secondary">Go to Companies</a>
+    <a href="{% url 'control_panel:listings' %}" class="adm-btn adm-btn-outline">Go to Listings</a>
+</div>
+
+<h3 style="margin-bottom:10px;">Recent Access Logs</h3>
+<div class="adm-table-container">
+    <table class="adm-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Target</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in recent_logs %}
+            <tr>
+                <td>{{ log.timestamp|date:"M d, H:i" }}</td>
+                <td>{{ log.user.username|default:"System" }}</td>
+                <td><span class="adm-badge adm-badge-neutral">{{ log.action }}</span></td>
+                <td>{{ log.target_type }} #{{ log.target_id|truncatechars:10 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No recent logs.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

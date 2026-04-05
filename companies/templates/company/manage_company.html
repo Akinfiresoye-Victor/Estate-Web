@@ -625,7 +625,7 @@
     document.getElementById('removeAgentDesc').innerHTML =
       '<strong>' + name + '</strong> will be removed from your company. ' +
       'Their listings and leads will remain attributed to your company.';
-    document.getElementById('removeConfirmBtn').href = '/company/team/remove/' + uuid + '/';
+    document.getElementById('removeConfirmBtn').href = '/company/remove_agent/' + uuid;
     document.getElementById('removeConfirmInput').value = '';
     var btn = document.getElementById('removeConfirmBtn');
     btn.style.pointerEvents = 'none';

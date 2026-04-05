@@ -1,0 +1,78 @@
+{% extends 'control_panel/base_admin.html' %}
+
+{% block content %}
+<div class="adm-detail-header">
+    <h2 style="margin:0;">Agents Management</h2>
+</div>
+
+<form method="get" class="adm-filter-bar">
+    <select name="verified" class="adm-select" onchange="this.form.submit()">
+        <option value="">Verification Status (All)</option>
+        <option value="yes" {% if request.GET.verified == 'yes' %}selected{% endif %}>Verified</option>
+        <option value="no" {% if request.GET.verified == 'no' %}selected{% endif %}>Unverified</option>
+    </select>
+    <select name="solo" class="adm-select" onchange="this.form.submit()">
+        <option value="">Agent Type (All)</option>
+        <option value="yes" {% if request.GET.solo == 'yes' %}selected{% endif %}>Solo Agents</option>
+        <option value="no" {% if request.GET.solo == 'no' %}selected{% endif %}>Company Agents</option>
+    </select>
+    <input type="text" name="search" class="adm-input" placeholder="Search name or email..." value="{{ request.GET.search }}">
+    <button type="submit" class="adm-btn adm-btn-primary">Search</button>
+</form>
+
+<div class="adm-table-container">
+    <table class="adm-table">
+        <thead>
+            <tr>
+                <th>Agent Info</th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Verified</th>
+                <th>Joined</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for agent in page_obj %}
+            <tr>
+                <td>
+                    <strong>{{ agent.first_name }} {{ agent.last_name }}</strong><br>
+                    <small style="color:var(--text-light)">{{ agent.email }}</small>
+                </td>
+                <td>{{ agent.phone_number|default:"-" }}</td>
+                <td>{{ agent.location }}</td>
+                <td>
+                    {% if agent.company_uuid %}Company{% else %}Solo{% endif %}
+                </td>
+                <td>
+                    {% if agent.verified %}
+                        <span class="adm-badge adm-badge-success">Verified</span>
+                    {% else %}
+                        <span class="adm-badge adm-badge-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>{{ agent.date_joined|date:"M Y" }}</td>
+                <td>
+                    <a href="{% url 'control_panel:agent_detail' agent.agent_uuid %}" class="adm-btn adm-btn-outline adm-btn-sm">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No agents found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&verified={{ request.GET.verified }}&solo={{ request.GET.solo }}&search={{ request.GET.search }}" class="adm-btn adm-btn-outline">Previous</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&verified={{ request.GET.verified }}&solo={{ request.GET.solo }}&search={{ request.GET.search }}" class="adm-btn adm-btn-outline">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -18,7 +18,9 @@ from django_ratelimit.decorators import ratelimit
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
+from core.utils import send_estate_email
 import json
+import threading
 
 
 @ratelimit(key='ip', rate='5/m', method='POST', block=True)
@@ -101,7 +103,6 @@ def login_user(request):
 
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        print(traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
@@ -135,21 +136,19 @@ def register_customer(request):
                 user = cast(User, authenticate(request, username=username, password=password))
                 if user:
                     login(request, user)
-                    subject = f'Welcome to Estate Web, {user.username}!'
-                    html_message = render_to_string('registration/welcome_email.html', {
-                        'user': user,
-                        'protocol': 'https' if not settings.DEBUG else 'http',
-                        'domain': request.get_host(),
-                    })
-                    
-                    send_mail(
-                        subject,
-                        'Welcome!',  # plain text fallback
-                        settings.DEFAULT_FROM_EMAIL,
-                        [user.email],
-                        html_message=html_message,
-                        fail_silently=False,
-                    )
+                    threading.Thread(
+                        target=send_estate_email,
+                        kwargs={
+                            'subject': f'Welcome to Estate Web, {user.username}!',
+                            'template_name': 'registration/welcome_email.html',
+                            'context': {
+                                'user': user,
+                                'request': request
+                            },
+                            'recipient_list': [user.email]
+                        },
+                        daemon=True
+                    ).start()
                     
                     messages.success(request, f'Welcome {user.username}! Check your email for onboarding info.')
 
@@ -175,7 +174,6 @@ def register_customer(request):
             return render(request, 'registration/register_customer.html', {'form': form, 'role': 'Customer'})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        print(traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
@@ -192,21 +190,17 @@ def register_agent(request):
                 agent.role = 'agent'
                 agent.save()
                 
-                # Send welcome email
-                subject = f'Welcome to Estate Web, {agent.username}!'
-                html_message = render_to_string('registration/welcome_email.html', {
-                    'user': agent,
-                    'protocol': 'https' if not settings.DEBUG else 'http',
-                    'domain': request.get_host(),
-                })
-                send_mail(
-                    subject,
-                    'Welcome!', 
-                    settings.DEFAULT_FROM_EMAIL,
-                    [agent.email],
-                    html_message=html_message,
-                    fail_silently=False,
-                )
+                # Send welcome email (Background)
+                threading.Thread(
+                    target=send_estate_email,
+                    kwargs={
+                        'subject': f'Welcome to Estate Web, {agent.username}!',
+                        'template_name': 'registration/welcome_email.html',
+                        'context': {'user': agent, 'request': request},
+                        'recipient_list': [agent.email]
+                    },
+                    daemon=True
+                ).start()
                 
                 email_address = EmailAddress.objects.create(
                     user=agent,
@@ -215,7 +209,12 @@ def register_agent(request):
                     verified=False
                 )
                 confirmation = EmailConfirmationHMAC(email_address)
-                get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+                threading.Thread(
+                    target=get_adapter(request).send_confirmation_mail,
+                    args=(request, confirmation),
+                    kwargs={'signup': True},
+                    daemon=True
+                ).start()
                 messages.success(request, 'Account created! Please check your email to verify your account.')
                 return redirect('account_email_verification_sent')
             else:
@@ -242,21 +241,17 @@ def register_company(request):
                 company.role = 'company'
                 company.save()
                 
-                # Send welcome email
-                subject = f'Welcome to Estate Web, {company.username}!'
-                html_message = render_to_string('registration/welcome_email.html', {
-                    'user': company,
-                    'protocol': 'https' if not settings.DEBUG else 'http',
-                    'domain': request.get_host(),
-                })
-                send_mail(
-                    subject,
-                    'Welcome!', 
-                    settings.DEFAULT_FROM_EMAIL,
-                    [company.email],
-                    html_message=html_message,
-                    fail_silently=False,
-                )
+                # Send welcome email (Background)
+                threading.Thread(
+                    target=send_estate_email,
+                    kwargs={
+                        'subject': f'Welcome to Estate Web, {company.username}!',
+                        'template_name': 'registration/welcome_email.html',
+                        'context': {'user': company, 'request': request},
+                        'recipient_list': [company.email]
+                    },
+                    daemon=True
+                ).start()
                 
                 email_address = EmailAddress.objects.create(
                     user=company,
@@ -265,7 +260,12 @@ def register_company(request):
                     verified=False
                 )
                 confirmation = EmailConfirmationHMAC(email_address)
-                get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+                threading.Thread(
+                    target=get_adapter(request).send_confirmation_mail,
+                    args=(request, confirmation),
+                    kwargs={'signup': True},
+                    daemon=True
+                ).start()
                 messages.success(request, 'Account created! Please check your email to verify your account.')
                 return redirect('account_email_verification_sent')
             else:
@@ -292,21 +292,17 @@ def register_landlord(request):
                 landlord.role = 'landlord'
                 landlord.save()
                 
-                # Send welcome email
-                subject = f'Welcome to Estate Web, {landlord.username}!'
-                html_message = render_to_string('registration/welcome_email.html', {
-                    'user': landlord,
-                    'protocol': 'https' if not settings.DEBUG else 'http',
-                    'domain': request.get_host(),
-                })
-                send_mail(
-                    subject,
-                    'Welcome!', 
-                    settings.DEFAULT_FROM_EMAIL,
-                    [landlord.email],
-                    html_message=html_message,
-                    fail_silently=False,
-                )
+                # Send welcome email (Background)
+                threading.Thread(
+                    target=send_estate_email,
+                    kwargs={
+                        'subject': f'Welcome to Estate Web, {landlord.username}!',
+                        'template_name': 'registration/welcome_email.html',
+                        'context': {'user': landlord, 'request': request},
+                        'recipient_list': [landlord.email]
+                    },
+                    daemon=True
+                ).start()
                 
                 email_address = EmailAddress.objects.create(
                     user=landlord,
@@ -315,7 +311,12 @@ def register_landlord(request):
                     verified=False
                 )
                 confirmation = EmailConfirmationHMAC(email_address)
-                get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+                threading.Thread(
+                    target=get_adapter(request).send_confirmation_mail,
+                    args=(request, confirmation),
+                    kwargs={'signup': True},
+                    daemon=True
+                ).start()
                 messages.success(request, 'Account created! Please check your email to verify your account.')
                 return redirect('account_email_verification_sent')
             else:

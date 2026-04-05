@@ -18,11 +18,13 @@ from agents.models import SessionId as sd
 import uuid
 from django.db.models import Avg, Count
 from django.core.exceptions import ObjectDoesNotExist
-from core.utils import refresh_activity_score
+from core.utils import refresh_activity_score, send_estate_email
 from django.urls import reverse
 import traceback
 from landlord.models import LandlordInformation
 from django_ratelimit.decorators import ratelimit
+from django.utils import timezone
+import threading
 
 
 
@@ -184,16 +186,20 @@ def view_property_on_sale(request, property_id):
         else:
             try:
                 company_in_charge = CompanyInformation.objects.get(user_id=prop.user_id)
-                agent_in_charge   = (
-                    AgentInformation.objects.get(agent_uuid=prop.agent_uuid)
-                    if prop.agent_uuid != 'None' else None
-                )
+                if prop.agent_uuid:
+                    agent_in_charge   = (
+                        AgentInformation.objects.get(agent_uuid=prop.agent_uuid)
+                        if prop.agent_uuid != 'None' else None
+                    )
+                else:
+                    agent_in_charge=None
                 view_id = company_in_charge.unique_company_id
                 msg = (
                     f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
                     if agent_in_charge
                     else f'Listed by {company_in_charge.company_name}'
                 )
+                landlord_in_charge=None
 
             except CompanyInformation.DoesNotExist:
                 agent_in_charge   = AgentInformation.objects.get(user_id=prop.user_id)
@@ -205,8 +211,9 @@ def view_property_on_sale(request, property_id):
                 msg = (
                     f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
                     if company_in_charge
-                    else f'Listed by {agent_in_charge.first_name} (Independent)'
+                    else f'Listed by {agent_in_charge.first_name} (Independent Agent)'
                 )
+                landlord_in_charge=None
 
         messages.info(request, msg)
         property_view_count(property_id, "Sale", request.user.id, view_id)
@@ -223,8 +230,8 @@ def view_property_on_sale(request, property_id):
             'property':      prop,
             'agent_info':    agent_in_charge,
             'company_info':  company_in_charge,
-            'info':          landlord_in_charge if prop.landlord_uuid else None,
-            'landlord_info': landlord_in_charge if prop.landlord_uuid else None,
+            'info':          landlord_in_charge if landlord_in_charge else None,
+            'landlord_info': landlord_in_charge if landlord_in_charge else None,
             'base_template': base_template,
             'role':          request.user.role,
             'in_wishlist':   in_wishlist,
@@ -267,16 +274,20 @@ def view_property_on_lease(request, property_id):
         else:
             try:
                 company_in_charge = CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
-                agent_in_charge   = (
-                    AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
-                    if property_to_be_viewed.agent_uuid != 'None' else None
-                )
+                if property_to_be_viewed.agent_uuid:
+                    agent_in_charge   = (
+                        AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
+                        if property_to_be_viewed.agent_uuid != 'None' else None
+                    )
+                else:
+                    agent_in_charge=None
                 view_id = company_in_charge.unique_company_id
                 msg = (
                     f'{company_in_charge.company_name} listing: {agent_in_charge.first_name} in charge'
                     if agent_in_charge
                     else f'Listed by {company_in_charge.company_name}'
                 )
+                landlord_in_charge=None
 
             except CompanyInformation.DoesNotExist:
                 agent_in_charge   = AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
@@ -288,8 +299,9 @@ def view_property_on_lease(request, property_id):
                 msg = (
                     f'Listed by {agent_in_charge.first_name} at {company_in_charge.company_name}'
                     if company_in_charge
-                    else f'Listed by {agent_in_charge.first_name} (Independent)'
+                    else f'Listed by {agent_in_charge.first_name} (Independent Agent)'
                 )
+                landlord_in_charge=None
 
         messages.info(request, msg)
         property_view_count(property_id, "Rent", request.user.id, view_id)
@@ -306,8 +318,8 @@ def view_property_on_lease(request, property_id):
             'property':      property_to_be_viewed,
             'agent_info':    agent_in_charge,
             'company_info':  company_in_charge,
-            'info':          landlord_in_charge if property_to_be_viewed.landlord_uuid else None,
-            'landlord_info':          landlord_in_charge if property_to_be_viewed.landlord_uuid else None,
+            'info':          landlord_in_charge,
+            'landlord_info': landlord_in_charge,
             'base_template': base_template,
             'role':          request.user.role,
             'in_wishlist':   in_wishlist,
@@ -701,6 +713,27 @@ def review_company(request, company_uuid):
                     return redirect('customer:company-profile', company_uuid=company_uuid)
                 
                 review.save()
+                
+                # Send email notification to company owner
+                owner = company.users
+                if owner and owner.email:
+                    threading.Thread(
+                        target=send_estate_email,
+                        kwargs=dict(
+                            subject="New Review Received!",
+                            template_name='emails/review_notification.html',
+                            context={
+                                'recipient_name': company.company_name,
+                                'rating': review.rating,
+                                'review': review,
+                                'profile_url': reverse('customer:company-profile', kwargs={'company_uuid': company.unique_company_id}),
+                                'request': request
+                            },
+                            recipient_list=[owner.email],
+                        ),
+                        daemon=True,
+                    ).start()
+
                 messages.success(request, 'Thank you for sharing your feedback!')
                 return redirect('customer:company-profile', company_uuid=company_uuid)
             else:
@@ -751,6 +784,26 @@ def review_agent(request, agent_uuid):
                     return redirect('customer:agent-profile', agent_uuid=agent_uuid)
                 
                 review.save()
+
+                # Send email notification to agent
+                if agent.email:
+                    threading.Thread(
+                        target=send_estate_email,
+                        kwargs=dict(
+                            subject="New Review Received!",
+                            template_name='emails/review_notification.html',
+                            context={
+                                'recipient_name': agent.first_name,
+                                'rating': review.rating,
+                                'review': review,
+                                'profile_url': reverse('customer:agent-profile', kwargs={'agent_uuid': agent.agent_uuid}),
+                                'request': request
+                            },
+                            recipient_list=[agent.email],
+                        ),
+                        daemon=True,
+                    ).start()
+
                 messages.success(request, 'Thank you for sharing your feedback!')
                 return redirect('customer:agent-profile', agent_uuid=agent_uuid)
             else:
@@ -838,9 +891,87 @@ def inquiry_form(request, property_type, property_id):
                     inq_form.property_name=asset.commercial
                 else:
                     inq_form.property_name=asset.lands
-                inq_form.date_created=date.today()
+                inq_form.date_created=timezone.now().date()
                 
                 inq_form.save()
+
+                # ── Send Emails ───────────────────────────────────────────
+                # 1. To Receiver (Owner)
+                receiver_email = None
+                owner_name = "Propety Manager"
+                
+                if asset.company_uuid:
+                    try:
+                        company = CompanyInformation.objects.get(unique_company_id=asset.company_uuid)
+                        receiver_email = company.email or company.users.email
+                        owner_name = company.company_name
+                    except ObjectDoesNotExist:
+                        messages.error(request, 'Company not found.')
+                        return redirect('landing')
+                    except Exception:
+                        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+                        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+                elif asset.landlord_uuid:
+                    try:
+                        landlord = LandlordInformation.objects.get(landlord_uuid=asset.landlord_uuid)
+                        receiver_email = landlord.email or User.objects.get(pk=asset.user_id).email
+                        owner_name = landlord.first_name
+                    except ObjectDoesNotExist:
+                        messages.error(request, 'Landlord not found.')
+                        return redirect('landing')
+                    except Exception:
+                        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+                        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+                else: # Agent
+                    try:
+                        agent = AgentInformation.objects.get(agent_uuid=asset.agent_uuid)
+                        receiver_email = agent.email
+                        owner_name = agent.first_name
+                    except ObjectDoesNotExist:
+                        messages.error(request, 'Agent not found.')
+                        return redirect('landing')
+                    except Exception:
+                        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+                        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+                if receiver_email:
+                    threading.Thread(
+                        target=send_estate_email,
+                        kwargs=dict(
+                            subject=f"New Inquiry: {inq_form.property_name}",
+                            template_name='emails/inquiry_notification.html',
+                            context={
+                                'owner_name': owner_name,
+                                'property_name': inq_form.property_name,
+                                'lead': inq_form,
+                                'lead_detail_url': reverse('company:lead-detail', kwargs={'lead_id': inq_form.lead_id}) if asset.company_uuid else reverse('agent:lead-detail', kwargs={'lead_id': inq_form.lead_id}) if asset.agent_uuid else reverse('landlord:inquiries'),
+                                'request': request
+                            },
+                            recipient_list=[receiver_email],
+                        ),
+                        daemon=True,
+                    ).start()
+
+                # 2. To Sender (Customer)
+                if inq_form.email:
+                    threading.Thread(
+                        target=send_estate_email,
+                        kwargs=dict(
+                            subject=f"Inquiry Sent: {inq_form.property_name}",
+                            template_name='emails/inquiry_confirmation.html',
+                            context={
+                                'property_name': inq_form.property_name,
+                                'property': asset,
+                                'lead': inq_form,
+                                'property_url': reverse('customer:view-property-s', kwargs={'property_id': property_id}) if property_type == 'Sale' else reverse('customer:view-property-r', kwargs={'property_id': property_id}),
+                                'request': request
+                            },
+                            recipient_list=[inq_form.email],
+                        ),
+                        daemon=True,
+                    ).start()
+
                 return HttpResponseRedirect('?submitted=True')
         else:
             inq_form=InquiryForm()
@@ -849,6 +980,9 @@ def inquiry_form(request, property_type, property_id):
                 submitted=True
         
         return render(request, 'estate/inq_form.html', {'form':inq_form, 'submitted':submitted})
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property Data Missing')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -901,6 +1035,12 @@ def flag_listing(request, property_id, property_type):
                 return redirect(request.META['HTTP_REFERER'])  
             else:
                 return redirect('landing')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property not found.')
+        if 'HTTP_REFERER' in request.META:
+            return redirect(request.META['HTTP_REFERER'])  
+        else:
+            return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -1036,21 +1176,14 @@ def agent_profile(request, agent_uuid):
                 analytics_data.profile_views += 1
                 analytics_data.save()
         
-        # Get agent's other data (adjust based on your models)
-        house_count = agent.properties.count() if hasattr(agent, 'properties') else 0
-        lead_count = agent.leads.count() if hasattr(agent, 'leads') else 0
-        new_lead_count = agent.leads.filter(status='new').count() if hasattr(agent, 'leads') else 0
         
         context = {
             'agent': agent,
-            'name': f'{agent.first_name} {agent.last_name}' if hasattr(agent, 'first_name') else agent.user.get_full_name(),
+            'name': f'{agent.first_name} {agent.last_name}' if hasattr(agent, 'first_name') else request.user.get_full_name(),
             'work_type': agent.work_type if hasattr(agent, 'work_type') else 'Real Estate Agent',
-            'email': agent.email if hasattr(agent, 'email') else agent.user.email,
+            'email': agent.email if hasattr(agent, 'email') else request.user.email,
             'phone': agent.phone_number if hasattr(agent, 'phone_number') else '',
             'location': agent.location if hasattr(agent, 'location') else '',
-            'house_count': house_count,
-            'lead_count': lead_count,
-            'new_lead_count': new_lead_count,
             'base_template': base_template,
             
             # Review context
