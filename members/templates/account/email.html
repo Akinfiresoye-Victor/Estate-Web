@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification — Estate Web</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #1a3c4e;
+      --secondary:  #c19b76;
+      --text-dark:  #1e293b;
+      --text-light: #6b7280;
+      --bg:         #f4f6f8;
+      --white:      #ffffff;
+      --border:     #e5e7eb;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* ── Messages (Django) ── */
+    .ev-messages {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 340px;
+      width: 100%;
+    }
+
+    .ev-message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: slideIn 0.2s ease;
+      line-height: 1.5;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .ev-message.success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .ev-message.error   { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .ev-message.info    { background: #e0edf5; color: var(--primary); border: 1px solid #bfdbf7; }
+
+    /* ── Layout ── */
+    .ev-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    /* ── Logo ── */
+    .ev-logo {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .ev-logo a {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ev-logo-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+    }
+
+    .ev-logo-dot {
+      color: var(--secondary);
+    }
+
+    /* ── Card ── */
+    .ev-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 36px;
+      max-width: 560px;
+      width: 100%;
+    }
+
+    .ev-icon {
+      width: 56px;
+      height: 56px;
+      background: #e8f0f5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .ev-icon i { font-size: 26px; color: var(--primary); }
+
+    .ev-card h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .ev-card p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    /* ── Email list ── */
+    .ev-email-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 28px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ev-email-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f9fafb;
+      flex-wrap: wrap;
+    }
+
+    .ev-email-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      word-break: break-word;
+    }
+
+    .ev-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .ev-badge.verified   { background: #dcfce7; color: #15803d; }
+    .ev-badge.unverified { background: #fef9c3; color: #a16207; }
+    .ev-badge.primary-b  { background: #e0edf5; color: var(--primary); }
+
+    /* ── Resend form ── */
+    .ev-resend-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .ev-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .ev-btn:hover { opacity: 0.88; }
+
+    .ev-btn-primary { background: var(--primary); color: var(--white); }
+
+    .ev-btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+
+    .ev-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: #9ca3af !important;
+      color: #fff !important;
+    }
+
+    /* ── Divider ── */
+    .ev-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* ── Notice ── */
+    .ev-notice {
+      background: #fff8ed;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      color: #92400e;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+
+    .ev-notice i { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+
+    @media (max-width: 580px) {
+      .ev-card { padding: 28px 20px; }
+      .ev-card h1 { font-size: 1.2rem; }
+      .ev-email-item { flex-direction: column; align-items: flex-start; }
+      .ev-messages { right: 12px; left: 12px; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  {% if messages %}
+  <div class="ev-messages">
+    {% for message in messages %}
+      <div class="ev-message {{ message.tags }}">
+        <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="ev-wrap">
+
+    <div class="ev-logo">
+      <a href="{% url 'landing' %}">
+        <span class="ev-logo-text">Estate<span class="ev-logo-dot"> Web</span></span>
+      </a>
+    </div>
+
+    <div class="ev-card">
+
+      <div class="ev-icon">
+        <i class="bi bi-envelope-check"></i>
+      </div>
+
+      <h1>Email Verification</h1>
+      <p>
+        Manage the email address linked to your account below.
+        A verified email is required to receive property alerts and account notifications.
+      </p>
+
+      {% if emailaddresses %}
+        <ul class="ev-email-list">
+          {% for emailaddress in emailaddresses %}
+            <li class="ev-email-item">
+              <div class="ev-email-left">
+                <i class="bi bi-envelope" style="color: var(--text-light);"></i>
+                <span>{{ emailaddress.email }}</span>
+                {% if emailaddress.primary %}
+                  <span class="ev-badge primary-b">Primary</span>
+                {% endif %}
+                {% if emailaddress.verified %}
+                  <span class="ev-badge verified"><i class="bi bi-check-circle-fill"></i> Verified</span>
+                {% else %}
+                  <span class="ev-badge unverified">Unverified</span>
+                {% endif %}
+              </div>
+
+              {% if not emailaddress.verified %}
+                <form method="post" action="{% url 'account_email' %}" class="ev-resend-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="email" value="{{ emailaddress.email }}">
+                  <button type="submit" name="action_send" class="ev-btn ev-btn-primary">
+                    <i class="bi bi-send"></i> Resend Email
+                  </button>
+                </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="color: var(--text-light); font-style: italic;">
+          No email address found on your account.
+        </p>
+      {% endif %}
+
+      <hr class="ev-divider">
+
+      <div class="ev-notice">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>
+          Check your spam or junk folder if the email doesn't arrive within a few minutes.
+          The verification link expires after <strong>3 days</strong>.
+        </span>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <a href="{% url 'landing' %}" class="ev-btn ev-btn-outline">
+          <i class="bi bi-arrow-left"></i> Back to Home
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Auto-dismiss messages after 5 seconds
+    setTimeout(function () {
+      document.querySelectorAll('.ev-message').forEach(function (el) {
+        el.style.transition = 'opacity 0.4s';
+        el.style.opacity = '0';
+        setTimeout(function () { el.remove(); }, 400);
+      });
+    }, 5000);
+
+    // Resend cooldown timer
+    document.addEventListener('DOMContentLoaded', function () {
+      const COOLDOWN = 300;
+
+      document.querySelectorAll('.ev-resend-form').forEach(function (form) {
+        const button = form.querySelector('button[name="action_send"]');
+        if (!button) return;
+
+        const email = (form.querySelector('input[name="email"]') || {}).value || 'default';
+        const key = 'resendTimer_' + email;
+        const lastSent = sessionStorage.getItem(key);
+
+        if (lastSent) {
+          const elapsed = Math.floor((Date.now() - parseInt(lastSent)) / 1000);
+          const remaining = COOLDOWN - elapsed;
+          if (remaining > 0) {
+            button.disabled = true;
+            startCountdown(button, remaining, key);
+            return;
+          } else {
+            sessionStorage.removeItem(key);
+          }
+        }
+
+        form.addEventListener('submit', function () {
+          sessionStorage.setItem(key, Date.now().toString());
+        });
+      });
+
+      function startCountdown(button, seconds, key) {
+        let remaining = seconds;
+        function tick() {
+          if (remaining <= 0) {
+            button.disabled = false;
+            button.innerHTML = '<i class="bi bi-send"></i> Resend Email';
+            sessionStorage.removeItem(key);
+            return;
+          }
+          const m = Math.floor(remaining / 60);
+          const s = remaining % 60;
+          button.innerHTML = 'Resend in ' + m + ':' + String(s).padStart(2, '0');
+          remaining--;
+          setTimeout(tick, 1000);
+        }
+        tick();
+      }
+    });
+  </script>
+
+</body>
+</html>

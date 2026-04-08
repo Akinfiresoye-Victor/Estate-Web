@@ -35,6 +35,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 INSTALLED_APPS = [
     # Django core
+    'axes',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,7 +59,6 @@ INSTALLED_APPS = [
     'django_filters',
     'cloudinary',
     'cloudinary_storage',
-    'axes',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -166,6 +166,8 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = 'landing'
 PASSWORD_RESET_TIMEOUT = 3600
+ALLAUTH_TRUSTED_PROXY_COUNT = 1
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 
 
 # =============================================================================
@@ -273,7 +275,15 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 1209600        # 2 weeks in seconds
 
+
+
+
+
+
+
+
 CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax' 
 X_FRAME_OPTIONS = 'DENY'
 
 
@@ -306,3 +316,10 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Lagos'
 USE_I18N = True
 USE_TZ = True
+
+
+# =============================================================================
+# RATE LIMITING CACHES
+# =============================================================================
+
+#TODO add the one for production

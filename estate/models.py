@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from core.choices import LEAD_STAGES, LEAD_STATUS, CONTACT_TYPE
 import uuid
+from members.models import User
 
 
 

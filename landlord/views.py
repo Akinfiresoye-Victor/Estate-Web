@@ -116,7 +116,7 @@ def profile_setup(request):
             if form.is_valid():
                 with transaction.atomic():
                     landlord = form.save(commit=False)
-                    landlord.user = request.user
+                    landlord.users = request.user
                     landlord.user_id = request.user.id
                     landlord.first_name = request.user.first_name
                     landlord.last_name = request.user.last_name

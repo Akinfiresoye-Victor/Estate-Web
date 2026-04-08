@@ -190,17 +190,6 @@ def register_agent(request):
                 agent.role = 'agent'
                 agent.save()
                 
-                # Send welcome email (Background)
-                threading.Thread(
-                    target=send_estate_email,
-                    kwargs={
-                        'subject': f'Welcome to Estate Web, {agent.username}!',
-                        'template_name': 'registration/welcome_email.html',
-                        'context': {'user': agent, 'request': request},
-                        'recipient_list': [agent.email]
-                    },
-                    daemon=True
-                ).start()
                 
                 email_address = EmailAddress.objects.create(
                     user=agent,
@@ -216,6 +205,16 @@ def register_agent(request):
                     daemon=True
                 ).start()
                 messages.success(request, 'Account created! Please check your email to verify your account.')
+                threading.Thread(
+                    target=send_estate_email,
+                    kwargs={
+                        'subject': f'Welcome to Estate Web, {agent.username}!',
+                        'template_name': 'registration/welcome_email.html',
+                        'context': {'user': agent, 'request': request},
+                        'recipient_list': [agent.email]
+                    },
+                    daemon=True
+                ).start()
                 return redirect('account_email_verification_sent')
             else:
                 messages.error(request, 'Please correct the highlighted errors in the form.')

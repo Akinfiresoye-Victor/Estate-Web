@@ -412,6 +412,7 @@ def toggle_wishlist_rent(request, property_id):
             added = False
         else:
             WishlistStorageUnit.objects.create(
+                owner=request.user,
                 user_id=request.user.id,
                 property_id=property_id,
                 property_type="Rent"
@@ -465,6 +466,7 @@ def toggle_wishlist_buy(request, property_id):
             added = False
         else:
             WishlistStorageUnit.objects.create(
+                owner=request.user,
                 user_id=request.user.id,
                 property_id=property_id,
                 property_type="Sale"

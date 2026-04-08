@@ -11,6 +11,7 @@ class User(AbstractUser):
         ('landlord', 'Landlord'),
     )
     role = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='customer')   
+    email=models.EmailField(unique=True)
     unique_user_id = models.CharField('uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
 
 

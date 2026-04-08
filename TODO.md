@@ -1,0 +1,1 @@
+- [x] 2. Implement JS/CSS timer in email.html

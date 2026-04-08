@@ -9,7 +9,7 @@ def landlord_picture_path(instance, filename):
     return f"Landlord/{instance.first_name}/profile/{filename}"
 
 class LandlordInformation(models.Model):
-    users = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    users = models.ForeignKey(User, on_delete=models.CASCADE)
     user_id = models.IntegerField(blank=False)
     first_name = models.CharField('First Name', max_length=50, blank=False, default='Unspecified')
     last_name = models.CharField('Last Name', max_length=50, blank=False, default='Unspecified')

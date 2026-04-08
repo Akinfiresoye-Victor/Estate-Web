@@ -1,14 +1,16 @@
-
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static 
 from django.conf import settings 
+from allauth.account.views import EmailView
+from django.urls import reverse_lazy
 
 
 urlpatterns = [
     path(f'{settings.DJANGO_ADMIN_PATH}/', admin.site.urls),
     path('', include('core.urls')),
     path('customer/', include('estate.urls', namespace='customer')),
+    path('accounts/email/', EmailView.as_view(success_url=reverse_lazy('account_email')), name='account_email'),
     path('members/', include('django.contrib.auth.urls')),
     path('accounts/', include('allauth.urls')),
     path('members/', include('members.urls')),

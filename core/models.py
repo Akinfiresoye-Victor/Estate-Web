@@ -5,6 +5,7 @@ from django.utils import timezone
 from members.models import User 
 import uuid
 from django.conf import settings
+from members.models import User
 
 
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
@@ -197,11 +198,10 @@ class Feedbacks(models.Model):
 
 
 class WishlistStorageUnit(models.Model):
+    owner=models.ForeignKey(User, on_delete=models.CASCADE)
     user_id=models.IntegerField('Owner Of Wishlist', default=1, null=False, blank=False)
     property_id=models.IntegerField('Property In Question', default=1,null=False, blank=False)
     property_type=models.CharField('Property_type', default='Rent', null=False, blank=False)
-
-
 
 class PropertyViews(models.Model):
     user_id=models.IntegerField('Users ID', default=1, blank=False, null=False)
