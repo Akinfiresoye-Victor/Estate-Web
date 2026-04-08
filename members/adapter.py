@@ -3,6 +3,7 @@ from allauth.account.adapter import DefaultAccountAdapter
 from django.shortcuts import resolve_url
 from core.utils import send_estate_email
 
+
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def get_login_redirect_url(self, request):
         user = request.user

@@ -208,7 +208,7 @@ EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBack
 ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
 ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Estate Web <no-reply@estatewebng.com>')
-
+EMAIL_PORT=587
 
 # =============================================================================
 # STATIC FILES

@@ -16,16 +16,16 @@ import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
 from landlord.models import LandlordInformation
 from django_ratelimit.decorators import ratelimit
-# from django.core.mail import send_mail
+from django.core.mail import send_mail
+import threading
 
-# send_mail(
-#     subject='Hello!',
-#     message='This is an acknowledgement for your action on our website',
-#     from_email='rebecca@zylker.com',
-#     recipient_list=['sam@zylker.com']
-# )
-
-# Create your views here.
+send_mail(
+    subject='Hello!',
+    message='This is an acknowledgement for your action on our website',
+    from_email='rebecca@zylker.com',
+    recipient_list=['sam@zylker.com'],
+    html_message='This is an acknowledgement for your action on our website'
+)
 
 def landing_page(request):
     if not request.user.is_authenticated:
@@ -1423,6 +1423,9 @@ def delete_client(request, appointment_uuid):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
 
 
 
