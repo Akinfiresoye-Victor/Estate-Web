@@ -162,7 +162,7 @@ def sell_property(request):
             
         if request.user.role == 'agent':
             try:
-                agent=AgentInformation.objects.get(user_id=request.user.id)
+                agent=AgentInformation.objects.get(user=request.user)
             except ObjectDoesNotExist:
                 messages.info(request, 'Please complete your profile setup.')
                 return redirect('agent:agent-form')
@@ -177,7 +177,7 @@ def sell_property(request):
             Company listed themselves
             """
             try:
-                company=CompanyInformation.objects.get(user_id=request.user.id)
+                company=CompanyInformation.objects.get(user=request.user)
             except ObjectDoesNotExist:
                 messages.info(request, 'Please complete your profile setup.')
                 return redirect('company:company_form')
@@ -189,7 +189,7 @@ def sell_property(request):
         elif request.user.role == 'landlord':
             from landlord.models import LandlordInformation
             try:
-                landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+                landlord_info = LandlordInformation.objects.get(user=request.user)
             except ObjectDoesNotExist:
                 messages.info(request, 'Please complete your profile setup.')
                 return redirect('landlord:profile-setup')
@@ -223,9 +223,9 @@ def sell_property(request):
                         landlord.commercial = ''
  
                     try:
-                        company = CompanyInformation.objects.get(user_id=request.user.id)
+                        company = CompanyInformation.objects.get(user=request.user)
                         landlord.company_uuid  = company.unique_company_id
-                        landlord.user_id       = request.user.id
+                        landlord.user       = request.user
                         landlord.time_stamp    = timezone.now()
                         landlord.is_listed=False
                         landlord.save()
@@ -243,11 +243,11 @@ def sell_property(request):
  
                     except CompanyInformation.DoesNotExist:
                         try:
-                            agent = AgentInformation.objects.get(user_id=request.user.id)
+                            agent = AgentInformation.objects.get(user=request.user)
                             landlord.agent_uuid   = str(agent.agent_uuid)
                             if agent.company_uuid:
                                 landlord.company_uuid = agent.company_uuid
-                            landlord.user_id= request.user.id
+                            landlord.user= request.user
                             landlord.time_stamp= timezone.now()
                             landlord.is_listed=False
                             landlord.save()
@@ -259,9 +259,9 @@ def sell_property(request):
                             score_new_listing(landlord, 'Sale')
                         except AgentInformation.DoesNotExist:
                             from landlord.models import LandlordInformation
-                            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+                            landlord_info = LandlordInformation.objects.get(user=request.user)
                             landlord.landlord_uuid = str(landlord_info.landlord_uuid)
-                            landlord.user_id = request.user.id
+                            landlord.user = request.user
                             landlord.time_stamp = timezone.now()
                             landlord.is_listed = False
                             landlord.save()
@@ -320,7 +320,7 @@ def lease_property(request):
             base_template = 'estate/base.html'
         if request.user.role == 'agent':
             try:
-                agent=AgentInformation.objects.get(user_id=request.user.id)
+                agent=AgentInformation.objects.get(user=request.user)
             except ObjectDoesNotExist:
                 messages.info(request, 'Please complete your profile setup.')
                 return redirect('agent:agent-form')
@@ -335,7 +335,7 @@ def lease_property(request):
             Company listed themselves
             """
             try:
-                company=CompanyInformation.objects.get(user_id=request.user.id)
+                company=CompanyInformation.objects.get(user=request.user)
             except ObjectDoesNotExist:
                 messages.info(request, 'Please complete your profile setup.')
                 return redirect('company:company_form')
@@ -347,7 +347,7 @@ def lease_property(request):
         elif request.user.role == 'landlord':
             from landlord.models import LandlordInformation
             try:
-                landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+                landlord_info = LandlordInformation.objects.get(user=request.user)
             except ObjectDoesNotExist:
                 messages.info(request, 'Please complete your profile setup.')
                 return redirect('landlord:profile-setup')
@@ -377,9 +377,9 @@ def lease_property(request):
                         landlord.commercial = ''
  
                     try:
-                        company = CompanyInformation.objects.get(user_id=request.user.id)
+                        company = CompanyInformation.objects.get(user=request.user)
                         landlord.company_uuid  = company.unique_company_id
-                        landlord.user_id       = request.user.id
+                        landlord.user       = request.user
                         landlord.time_stamp    = timezone.now()
                         landlord.is_listed=False
                         landlord.save()
@@ -397,11 +397,11 @@ def lease_property(request):
  
                     except CompanyInformation.DoesNotExist:
                         try:
-                            agent = AgentInformation.objects.get(user_id=request.user.id)
+                            agent = AgentInformation.objects.get(user=request.user)
                             landlord.agent_uuid = agent.agent_uuid
                             if agent.company_uuid is not None:
                                 landlord.company_uuid = agent.company_uuid
-                            landlord.user_id      = request.user.id
+                            landlord.user      = request.user
                             landlord.time_stamp   = timezone.now()
                             landlord.is_listed=False
                             landlord.save()
@@ -413,9 +413,9 @@ def lease_property(request):
                             score_new_listing(landlord, 'Rent')
                         except AgentInformation.DoesNotExist:
                             from landlord.models import LandlordInformation
-                            landlord_info = LandlordInformation.objects.get(user_id=request.user.id)
+                            landlord_info = LandlordInformation.objects.get(user=request.user)
                             landlord.landlord_uuid = str(landlord_info.landlord_uuid)
-                            landlord.user_id = request.user.id
+                            landlord.user = request.user
                             landlord.time_stamp = timezone.now()
                             landlord.is_listed = False
                             landlord.save()
@@ -460,14 +460,14 @@ def toggle_listing(request, property_id, property_type):
     try:
         #making the user who posted have access to the property
         if request.user.role == 'company':
-            company=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+            company=CompanyInformation.objects.filter(user=request.user).values_list('unique_company_id', flat=True).first()
             prop=Model.objects.get(pk=property_id, company_uuid=company)
         elif request.user.role == 'landlord':
             from landlord.models import LandlordInformation
-            landlord=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            landlord=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
             prop=Model.objects.get(pk=property_id, landlord_uuid=landlord)
         else:
-            agent=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+            agent=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
             prop=Model.objects.get(pk=property_id, agent_uuid=agent)
     except:
         if is_ajax:
@@ -484,13 +484,13 @@ def toggle_listing(request, property_id, property_type):
             try:
                 if request.user.role == 'landlord':
                     from landlord.models import LandlordInformation
-                    landlord_obj = LandlordInformation.objects.get(user_id=request.user.id)
+                    landlord_obj = LandlordInformation.objects.get(user=request.user)
                     live_count = get_listing_count(None, None, landlord_obj)
                 elif request.user.role == 'company':
-                    company_obj = CompanyInformation.objects.get(user_id=request.user.id)
+                    company_obj = CompanyInformation.objects.get(user=request.user)
                     live_count = get_listing_count(None, company_obj)
                 else: # agent
-                    agent_obj = AgentInformation.objects.get(user_id=request.user.id)
+                    agent_obj = AgentInformation.objects.get(user=request.user)
                     live_count = get_listing_count(agent_obj)
             except Exception:
                 live_count = 0  # Fallback
@@ -503,13 +503,13 @@ def toggle_listing(request, property_id, property_type):
         landlord_obj = None
 
         if request.user.role == 'agent':
-            agent_obj = AgentInformation.objects.get(user_id=request.user.id)
+            agent_obj = AgentInformation.objects.get(user=request.user)
             company_obj = get_agent_company(agent_obj)
         elif request.user.role == 'company':
-            company_obj = CompanyInformation.objects.get(user_id=request.user.id)
+            company_obj = CompanyInformation.objects.get(user=request.user)
         elif request.user.role == 'landlord':
             from landlord.models import LandlordInformation
-            landlord_obj = LandlordInformation.objects.get(user_id=request.user.id)
+            landlord_obj = LandlordInformation.objects.get(user=request.user)
         
         allowed, reason = can_go_live(agent=agent_obj, company=company_obj, landlord=landlord_obj)
         if not allowed:
@@ -562,7 +562,6 @@ def articles(request):
 
 
 #view to update listed property on rent
-#todo adjust the update forms
 def update_property_rent(request, property_id):
     # 1. Quick Authentication Guard
     if not request.user.is_authenticated:
@@ -590,18 +589,18 @@ def update_property_rent(request, property_id):
         is_authorized = False
         
         if user_role == 'agent':
-            agent_uuid = AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+            agent_uuid = AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
             is_authorized = (property_obj.agent_uuid == agent_uuid)
             
         elif user_role == 'company':
-            company = CompanyInformation.objects.filter(user_id=request.user.id).first()
+            company = CompanyInformation.objects.filter(user=request.user).first()
             if company:
                 is_authorized = (property_obj.company_uuid == company.unique_company_id)
                 if is_authorized and request.method == 'POST':
                     CompanyActivityLog.objects.create(company=company, action='Property Listing Updated')
 
         elif user_role == 'landlord':
-            landlord_uuid = LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            landlord_uuid = LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
             is_authorized = (property_obj.landlord_uuid == landlord_uuid)
 
         # Final check: If role isn't recognized or ownership fails
@@ -656,7 +655,7 @@ def update_property_sale(request, property_id):
             base_template='estate/base.html'
         #limiting update access to owner of listings
         if user_role == 'agent':
-            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+            agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
             if property.agent_uuid != agent_uuid:
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
@@ -664,7 +663,7 @@ def update_property_sale(request, property_id):
                 else:
                     return redirect('landing')
         elif user_role == 'company':
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            company=CompanyInformation.objects.get(user=request.user)
             if property.company_uuid != company.unique_company_id:
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
@@ -676,7 +675,7 @@ def update_property_sale(request, property_id):
                 action= 'Property Listing Updated'
             )
         elif user_role == 'landlord':
-            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            landlord_uuid=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
             if property.landlord_uuid !=landlord_uuid :
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 if 'HTTP_REFERER' in request.META:
@@ -710,15 +709,15 @@ def delete_property_on_lease(request, property_id):
         return redirect('landing')
     try:
         if request.user.role == 'company':
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            company=CompanyInformation.objects.get(user=request.user)
             agent_uuid=None
             landlord_uuid=None
         elif request.user.role == 'agent':
-            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+            agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
             company=None
             landlord_uuid=None
         elif request.user.role == 'landlord':
-            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            landlord_uuid=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
             company=None
             agent_uuid=None
         else:
@@ -779,15 +778,15 @@ def delete_property_on_sale(request, property_id):
         return redirect('landing')
     try:    
         if request.user.role == 'company':
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            company=CompanyInformation.objects.get(user=request.user)
             agent_uuid=None
             landlord_uuid=None
         elif request.user.role == 'agent':
-            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+            agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
             company=None
             landlord_uuid=None
         elif request.user.role == 'landlord':
-            landlord_uuid=LandlordInformation.objects.filter(user_id=request.user.id).values_list('landlord_uuid', flat=True).first()
+            landlord_uuid=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
             company=None
             agent_uuid=None
         else:
@@ -894,14 +893,14 @@ def appointment_detail(request,appt_uuid):
         else:
             base_template='estate/base.html'
         if request.user.role == 'company':
-            company=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+            company=CompanyInformation.objects.filter(user=request.user).values_list('unique_company_id', flat=True).first()
             sample= Appointments.objects.get(appointment_uuid=appt_uuid)
             if company != sample.company_uuid:
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('appointment')
             appointment=sample
         else:
-            agent=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+            agent=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
             sample= Appointments.objects.get(appointment_uuid=appt_uuid)
             if agent != sample.agent_uuid:
                 messages.warning(request, 'Access denied: Unauthorized action.')
@@ -942,14 +941,14 @@ def add_schedule(request):
                 appointment = form.save(commit=False)
                 
                 if request.user.role == 'company':
-                    company=CompanyInformation.objects.get(user_id=request.user.id)
+                    company=CompanyInformation.objects.get(user=request.user)
                     appointment.company_uuid = str(company.unique_company_id)
                     CompanyActivityLog.objects.create(
                         company=company,
                         action= 'Appointment Created'
                     )
                 elif request.user.role == 'agent':
-                    agent=AgentInformation.objects.get(user_id=request.user.id)
+                    agent=AgentInformation.objects.get(user=request.user)
                     appointment.agent_uuid = str(agent.agent_uuid)
                 
                 # Handle property selection if provided
@@ -1022,7 +1021,7 @@ def appointment(request):
         if user_role == 'company':
             base_template = 'company/base.html'
             try:
-                company= CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+                company= CompanyInformation.objects.filter(user=request.user).values_list('unique_company_id', flat=True).first()
                 total_appointment= Appointments.objects.filter(company_uuid=company)
                 return render(request, 'core/appointment.html', {'appointments': total_appointment, 'base_template':base_template})
             except ObjectDoesNotExist:
@@ -1031,7 +1030,7 @@ def appointment(request):
         elif user_role == 'agent':
             base_template = 'agent/base.html'
             try:
-                agent= AgentInformation.objects.get(user_id=request.user.id)
+                agent= AgentInformation.objects.get(user=request.user)
                 total_appointment= Appointments.objects.filter(agent_uuid=agent.agent_uuid)
                 return render(request, 'core/appointment.html', {'appointments': total_appointment,'base_template':base_template ,'agent_name':f'{agent.first_name} {agent.last_name}'})
             except ObjectDoesNotExist:
@@ -1079,13 +1078,13 @@ def manage_listings(request):
         else:
             base_template='estate/base.html'
         if user_role == 'company':
-            company=CompanyInformation.objects.get(user_id=request.user.id)
+            company=CompanyInformation.objects.get(user=request.user)
             agent=None
             property_on_lease=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
             property_on_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
             role='company'
         elif user_role == 'agent':
-            agent=AgentInformation.objects.get(user_id=request.user.id)
+            agent=AgentInformation.objects.get(user=request.user)
             company=None
             if agent.company_uuid:
                 company=CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
@@ -1141,7 +1140,7 @@ def edit_appointment(request, appointment_uuid):
             base_template = 'estate/base.html'
         
         if request.user.role == 'company':
-            company = CompanyInformation.objects.get(user_id=request.user.id)
+            company = CompanyInformation.objects.get(user=request.user)
             item= Appointments.objects.filter(company_uuid=company.unique_company_id).get(appointment_uuid=appointment_uuid)
             if item.company_uuid == company.unique_company_id:
                 appointment=item
@@ -1149,7 +1148,7 @@ def edit_appointment(request, appointment_uuid):
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         else:
-            agent = AgentInformation.objects.get(user_id=request.user.id)
+            agent = AgentInformation.objects.get(user=request.user)
             item = Appointments.objects.filter(agent_uuid=agent.agent_uuid).get(appointment_uuid=appointment_uuid)
             if item.agent_uuid == agent.agent_uuid:
                 appointment= item
@@ -1254,7 +1253,7 @@ def view_client(request, appointment_uuid):
         base_template = 'estate/base.html'
     try:
         if request.user.role == 'company':
-            company=CompanyInformation.objects.get(user_id= request.user.id)
+            company=CompanyInformation.objects.get(user= request.user)
             lead_item=LeadInfo.objects.filter(company_uuid=company.unique_company_id).first()
             if lead_item.company_uuid == company.unique_company_id:
                 leads=LeadInfo.objects.filter(company_uuid=company.unique_company_id)
@@ -1262,7 +1261,7 @@ def view_client(request, appointment_uuid):
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         elif request.user.role == 'agent':
-            agent= AgentInformation.objects.get(user_id=request.user.id)
+            agent= AgentInformation.objects.get(user=request.user)
             lead_item= LeadInfo.objects.filter(agent_id=agent.agent_uuid).first()
             if lead_item.agent_id == agent.agent_uuid:
                 leads= LeadInfo.objects.filter(agent_id=agent.agent_uuid)
@@ -1290,7 +1289,7 @@ def add_client(request, lead_uuid, appointment_uuid):
         return redirect('landing')
     try:
         if request.user.role == 'company':
-            company= CompanyInformation.objects.get(user_id=request.user.id)
+            company= CompanyInformation.objects.get(user=request.user)
             raw_data= Appointments.objects.get(appointment_uuid=appointment_uuid)
             raw_lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
             if raw_data.company_uuid == company.unique_company_id and raw_lead_data.company_uuid == company.unique_company_id:
@@ -1300,7 +1299,7 @@ def add_client(request, lead_uuid, appointment_uuid):
                 messages.warning(request, 'Access denied: Unauthorized action.')
                 return redirect('landing')
         elif request.user.role == 'agent':
-            agent= AgentInformation.objects.get(user_id=request.user.id)
+            agent= AgentInformation.objects.get(user=request.user)
             raw_data= Appointments.objects.get(appointment_uuid=appointment_uuid)
             raw_lead_data= LeadInfo.objects.get(lead_id=lead_uuid)
             if raw_data.agent_uuid == agent.agent_uuid and raw_lead_data.agent_id == agent.agent_uuid:
@@ -1331,7 +1330,7 @@ def delete_appointment(request, appointment_uuid):
         appointment=Appointments.objects.get(appointment_uuid=appointment_uuid)
         if request.user.role == 'company':
             try:
-                company= CompanyInformation.objects.get(user_id=request.user.id)
+                company= CompanyInformation.objects.get(user=request.user)
                 if appointment.company_uuid == company.unique_company_id:
                     appointment.delete()
                     CompanyActivityLog.objects.create(
@@ -1348,7 +1347,7 @@ def delete_appointment(request, appointment_uuid):
                 return redirect('landing')
         elif request.user.role == 'agent':
             try:
-                agent=AgentInformation.objects.get(user_id=request.user.id)
+                agent=AgentInformation.objects.get(user=request.user)
                 if appointment.agent_uuid == agent.agent_uuid:
                     appointment.delete()
                     messages.success(request, 'Appointment deleted successfully.')
@@ -1378,7 +1377,7 @@ def delete_client(request, appointment_uuid):
         appointment=Appointments.objects.get(appointment_uuid=appointment_uuid)
         if request.user.role == 'company':
             try:
-                company= CompanyInformation.objects.get(user_id=request.user.id)
+                company= CompanyInformation.objects.get(user=request.user)
                 if appointment.company_uuid == company.unique_company_id:
                     appointment.lead_uuid = None
                     appointment.save()
@@ -1396,7 +1395,7 @@ def delete_client(request, appointment_uuid):
                 return redirect('landing')
         elif request.user.role == 'agent':
             try:
-                agent=AgentInformation.objects.get(user_id=request.user.id)
+                agent=AgentInformation.objects.get(user=request.user)
                 if appointment.agent_uuid == agent.agent_uuid:
                     appointment.lead_uuid = None
                     appointment.save()

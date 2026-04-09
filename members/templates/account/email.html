@@ -25,7 +25,6 @@
       min-height: 100vh;
     }
 
-    /* ── Messages (Django) ── */
     .ev-messages {
       position: fixed;
       top: 20px;
@@ -59,7 +58,6 @@
     .ev-message.error   { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
     .ev-message.info    { background: #e0edf5; color: var(--primary); border: 1px solid #bfdbf7; }
 
-    /* ── Layout ── */
     .ev-wrap {
       min-height: 100vh;
       display: flex;
@@ -69,7 +67,6 @@
       padding: 40px 16px;
     }
 
-    /* ── Logo ── */
     .ev-logo {
       margin-bottom: 28px;
       text-align: center;
@@ -89,11 +86,8 @@
       letter-spacing: -0.3px;
     }
 
-    .ev-logo-dot {
-      color: var(--secondary);
-    }
+    .ev-logo-dot { color: var(--secondary); }
 
-    /* ── Card ── */
     .ev-card {
       background: var(--white);
       border: 1px solid var(--border);
@@ -130,7 +124,6 @@
       line-height: 1.6;
     }
 
-    /* ── Email list ── */
     .ev-email-list {
       list-style: none;
       padding: 0;
@@ -142,14 +135,12 @@
 
     .ev-email-item {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      flex-direction: column;
+      gap: 10px;
       padding: 14px 16px;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: #f9fafb;
-      flex-wrap: wrap;
     }
 
     .ev-email-left {
@@ -159,6 +150,7 @@
       font-size: 0.9rem;
       color: var(--text-dark);
       word-break: break-word;
+      flex-wrap: wrap;
     }
 
     .ev-badge {
@@ -173,12 +165,16 @@
     .ev-badge.unverified { background: #fef9c3; color: #a16207; }
     .ev-badge.primary-b  { background: #e0edf5; color: var(--primary); }
 
-    /* ── Resend form ── */
-    .ev-resend-form {
+    .ev-email-actions {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ev-resend-form {
+      display: flex;
+      align-items: center;
     }
 
     .ev-btn {
@@ -196,9 +192,7 @@
     }
 
     .ev-btn:hover { opacity: 0.88; }
-
     .ev-btn-primary { background: var(--primary); color: var(--white); }
-
     .ev-btn-outline {
       background: transparent;
       color: var(--primary);
@@ -212,14 +206,12 @@
       color: #fff !important;
     }
 
-    /* ── Divider ── */
     .ev-divider {
       border: none;
       border-top: 1px solid var(--border);
       margin: 28px 0;
     }
 
-    /* ── Notice ── */
     .ev-notice {
       background: #fff8ed;
       border: 1px solid #fde68a;
@@ -235,11 +227,119 @@
 
     .ev-notice i { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
 
+    /* ── Modal ── */
+    .ev-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .ev-modal-overlay.open { display: flex; }
+
+    .ev-modal {
+      background: var(--white);
+      border-radius: 12px;
+      max-width: 460px;
+      width: 100%;
+      padding: 32px 28px;
+      position: relative;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .ev-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .ev-modal-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ev-modal-header h2 i { color: var(--primary); }
+
+    .ev-modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: 1rem;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+
+    .ev-modal-close:hover { color: var(--text-dark); }
+
+    .ev-modal-body p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .ev-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .ev-field label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .ev-input {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+
+    .ev-input:focus { border-color: var(--primary); }
+
+    .ev-modal-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #e0edf5;
+      border-radius: 7px;
+      padding: 12px 14px;
+      margin-top: 16px;
+      font-size: 0.83rem;
+      color: var(--primary);
+      line-height: 1.5;
+    }
+
+    .ev-modal-notice i { flex-shrink: 0; margin-top: 1px; }
+
     @media (max-width: 580px) {
       .ev-card { padding: 28px 20px; }
       .ev-card h1 { font-size: 1.2rem; }
-      .ev-email-item { flex-direction: column; align-items: flex-start; }
       .ev-messages { right: 12px; left: 12px; max-width: 100%; }
+      .ev-modal { padding: 24px 18px; }
     }
   </style>
 </head>
@@ -280,6 +380,8 @@
         <ul class="ev-email-list">
           {% for emailaddress in emailaddresses %}
             <li class="ev-email-item">
+
+              <!-- Email address + badges -->
               <div class="ev-email-left">
                 <i class="bi bi-envelope" style="color: var(--text-light);"></i>
                 <span>{{ emailaddress.email }}</span>
@@ -287,21 +389,30 @@
                   <span class="ev-badge primary-b">Primary</span>
                 {% endif %}
                 {% if emailaddress.verified %}
-                  <span class="ev-badge verified"><i class="bi bi-check-circle-fill"></i> Verified</span>
+                  <span class="ev-badge verified">
+                    <i class="bi bi-check-circle-fill"></i> Verified
+                  </span>
                 {% else %}
                   <span class="ev-badge unverified">Unverified</span>
                 {% endif %}
               </div>
 
-              {% if not emailaddress.verified %}
-                <form method="post" action="{% url 'account_email' %}" class="ev-resend-form">
-                  {% csrf_token %}
-                  <input type="hidden" name="email" value="{{ emailaddress.email }}">
-                  <button type="submit" name="action_send" class="ev-btn ev-btn-primary">
-                    <i class="bi bi-send"></i> Resend Email
-                  </button>
-                </form>
-              {% endif %}
+              <!-- Action buttons -->
+              <div class="ev-email-actions">
+                {% if not emailaddress.verified %}
+                  <form method="post" action="{% url 'resend_verification' %}" class="ev-resend-form">
+                    {% csrf_token %}
+                    <button type="submit" class="ev-btn ev-btn-primary">
+                      <i class="bi bi-send"></i> Resend Email
+                    </button>
+                  </form>
+                {% endif %}
+
+                <button type="button" class="ev-btn ev-btn-outline" onclick="openChangeEmail()">
+                  <i class="bi bi-pencil"></i> Change Email
+                </button>
+              </div>
+
             </li>
           {% endfor %}
         </ul>
@@ -330,6 +441,43 @@
     </div>
   </div>
 
+  <!-- Change Email Modal -->
+  <div class="ev-modal-overlay" id="changeEmailModal" onclick="closeChangeEmail(event)">
+    <div class="ev-modal">
+      <div class="ev-modal-header">
+        <h2><i class="bi bi-envelope-plus"></i> Change Email Address</h2>
+        <button class="ev-modal-close" onclick="closeChangeEmail()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="ev-modal-body">
+        <p>Enter your new email address below. We'll send a verification link to confirm it.</p>
+        <form method="post" action="{% url 'account_email' %}" id="changeEmailForm">
+          {% csrf_token %}
+          <div class="ev-field">
+            <label for="new_email">New Email Address</label>
+            <input
+              type="email"
+              id="new_email"
+              name="email"
+              placeholder="you@example.com"
+              required
+              class="ev-input"
+            >
+          </div>
+          <button type="submit" name="action_add" class="ev-btn ev-btn-primary"
+                  style="width:100%; justify-content:center; margin-top: 8px;">
+            <i class="bi bi-send"></i> Send Verification Link
+          </button>
+        </form>
+        <div class="ev-modal-notice">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>Your current email stays active until you verify the new one.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Auto-dismiss messages after 5 seconds
     setTimeout(function () {
@@ -341,51 +489,73 @@
     }, 5000);
 
     // Resend cooldown timer
-    document.addEventListener('DOMContentLoaded', function () {
-      const COOLDOWN = 300;
+document.addEventListener('DOMContentLoaded', function () {
+  const COOLDOWN = 300;
 
-      document.querySelectorAll('.ev-resend-form').forEach(function (form) {
-        const button = form.querySelector('button[name="action_send"]');
-        if (!button) return;
+  document.querySelectorAll('.ev-resend-form').forEach(function (form) {
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) return;
 
-        const email = (form.querySelector('input[name="email"]') || {}).value || 'default';
-        const key = 'resendTimer_' + email;
-        const lastSent = sessionStorage.getItem(key);
+    // Use the email shown in the parent list item as the unique key
+    const emailEl = form.closest('.ev-email-item').querySelector('.ev-email-left span');
+    const email = emailEl ? emailEl.textContent.trim() : 'default';
+    const STORAGE_KEY = 'resendTimer_' + email;
 
-        if (lastSent) {
-          const elapsed = Math.floor((Date.now() - parseInt(lastSent)) / 1000);
-          const remaining = COOLDOWN - elapsed;
-          if (remaining > 0) {
-            button.disabled = true;
-            startCountdown(button, remaining, key);
-            return;
-          } else {
-            sessionStorage.removeItem(key);
-          }
+    function startCountdown(seconds) {
+      button.disabled = true;
+      let remaining = seconds;
+
+      function tick() {
+        if (remaining <= 0) {
+          button.disabled = false;
+          button.innerHTML = '<i class="bi bi-send"></i> Resend Email';
+          sessionStorage.removeItem(STORAGE_KEY);
+          return;
         }
-
-        form.addEventListener('submit', function () {
-          sessionStorage.setItem(key, Date.now().toString());
-        });
-      });
-
-      function startCountdown(button, seconds, key) {
-        let remaining = seconds;
-        function tick() {
-          if (remaining <= 0) {
-            button.disabled = false;
-            button.innerHTML = '<i class="bi bi-send"></i> Resend Email';
-            sessionStorage.removeItem(key);
-            return;
-          }
-          const m = Math.floor(remaining / 60);
-          const s = remaining % 60;
-          button.innerHTML = 'Resend in ' + m + ':' + String(s).padStart(2, '0');
-          remaining--;
-          setTimeout(tick, 1000);
-        }
-        tick();
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        button.innerHTML = 'Resend in ' + m + ':' + String(s).padStart(2, '0');
+        remaining--;
+        setTimeout(tick, 1000);
       }
+
+      tick();
+    }
+
+    // Check existing cooldown on page load
+    const lastSent = sessionStorage.getItem(STORAGE_KEY);
+    if (lastSent) {
+      const elapsed = Math.floor((Date.now() - parseInt(lastSent)) / 1000);
+      const remaining = COOLDOWN - elapsed;
+      if (remaining > 0) {
+        startCountdown(remaining);
+      } else {
+        sessionStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    // Start cooldown on submit
+    form.addEventListener('submit', function () {
+      sessionStorage.setItem(STORAGE_KEY, Date.now().toString());
+      startCountdown(COOLDOWN);
+    });
+  });
+});
+
+    // Modal
+    function openChangeEmail() {
+      document.getElementById('changeEmailModal').classList.add('open');
+    }
+
+    function closeChangeEmail(e) {
+      if (!e || e.target === document.getElementById('changeEmailModal')) {
+        document.getElementById('changeEmailModal').classList.remove('open');
+        document.getElementById('new_email').value = '';
+      }
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeChangeEmail();
     });
   </script>
 

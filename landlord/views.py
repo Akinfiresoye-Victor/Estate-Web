@@ -12,6 +12,8 @@ from datetime import datetime, date
 from django.db.models import Sum
 from core.models import Appointments
 from members.models import User
+from allauth.account.models import EmailAddress
+
 
 
 def dashboard(request):
@@ -22,7 +24,7 @@ def dashboard(request):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         property_on_sale=PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid)
         property_on_lease=PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid)
         # Fetch each type with only 2 rows — annotate so template can identify type
@@ -76,7 +78,7 @@ def inventory(request):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         
         sales = PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid).order_by('-time_stamp')
         rentals = PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid).order_by('-time_stamp')
@@ -106,10 +108,13 @@ def profile_setup(request):
     if request.user.role != 'landlord':
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
-    
+    is_email_verified=EmailAddress.objects.filter(user=request.user).values_list('verified', flat=True).first()
+    if not is_email_verified:
+        messages.info(request, 'Email Verification Required')
+        return redirect('account_email')
     try:
         # If profile exists, redirect to dashboard
-        if LandlordInformation.objects.filter(user_id=request.user.id).exists():
+        if LandlordInformation.objects.filter(user=request.user).exists():
             return redirect('landlord:dashboard')
         if request.method == 'POST':
             form = LandlordInformationForm(request.POST, request.FILES)
@@ -117,7 +122,7 @@ def profile_setup(request):
                 with transaction.atomic():
                     landlord = form.save(commit=False)
                     landlord.users = request.user
-                    landlord.user_id = request.user.id
+                    landlord.user = request.user
                     landlord.first_name = request.user.first_name
                     landlord.last_name = request.user.last_name
                     landlord.email = request.user.email
@@ -145,7 +150,7 @@ def lanlord_profile(request):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         total_properties=PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid).count() + \
             PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid).count()
         inquiry_count=LeadInfo.objects.filter(landlord_id=landlord.landlord_uuid).count()
@@ -167,7 +172,7 @@ def landlord_inquiries(request):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         inquiries = LeadInfo.objects.filter(landlord_id=landlord.landlord_uuid)
         return render(request, 'landlord/inquiries.html', {'inquiries': inquiries, 'landlord':landlord})
     except LandlordInformation.DoesNotExist:
@@ -187,7 +192,7 @@ def delete_lead(request, lead_id):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         lead = LeadInfo.objects.get(lead_id=lead_id)
         if lead.landlord_id != landlord.landlord_uuid:
             messages.error(request, 'You are not authorized to delete this lead.')
@@ -215,7 +220,7 @@ def update_profile(request):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         if request.method == 'POST':
             form = LandlordInformationForm(request.POST, request.FILES, instance=landlord)
             if form.is_valid():
@@ -240,7 +245,7 @@ def delete_account(request):
         messages.info(request, 'Landlord Account Only')
         return redirect('landing')
     try:
-        landlord = LandlordInformation.objects.get(user_id=request.user.id)
+        landlord = LandlordInformation.objects.get(user=request.user)
         if request.method == 'POST':
             user = User.objects.get(id=request.user.id)
             property_sale = PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid)

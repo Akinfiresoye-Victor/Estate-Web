@@ -1,342 +1,410 @@
 /* ============================================
-   Agent Feedback Page — agent_feedback.css
-   Theme: Light (#f4f6f9), Gold accent (#c19b76)
-   Mobile-first
+   Company Feedback Page — company_feedback.css
+   Prefix: cf-
+   Mobile-first | Brand: #1a3c4e / #c19b76
    ============================================ */
 
-/* --- Page Shell --- */
-.feedback-page {
-  padding: 24px 16px 60px;
-  background-color: #f4f6f9;
+/* ---------- Page Shell ---------- */
+.cf-page {
+  background-color: #f0f2f5;
   min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ---------- Page Hero (dark header band) ---------- */
+.cf-hero {
+  background: linear-gradient(135deg, #1a3c4e 0%, #2d5a73 100%);
+  padding: 32px 20px 28px;
+  color: #fff;
+}
+
+.cf-hero-inner {
   max-width: 860px;
   margin: 0 auto;
-  box-sizing: border-box;
 }
 
-/* --- Page Header --- */
-.feedback-header {
-  margin-bottom: 28px;
-}
-
-.feedback-title {
+.cf-page-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 2rem;
   font-weight: 700;
-  color: #1e2329;
+  color: #fff;
   margin: 0 0 6px;
   line-height: 1.2;
 }
 
-.feedback-subtitle {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
-  font-size: 0.9rem;
-  color: #6b7280;
+.cf-page-subtitle {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.65);
   margin: 0;
 }
 
-/* --- Summary Bar --- */
-.feedback-summary {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px 24px;
+/* ---------- Content Container ---------- */
+.cf-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 0;
+}
+
+/* ---------- Summary Card ---------- */
+.cf-summary {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(26,60,78,0.08);
   display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 28px;
+  gap: 20px;
+  align-items: stretch;
   flex-wrap: wrap;
 }
 
-.summary-score {
+/* Left: Big score + stars */
+.cf-score-block {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.score-number {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 2.6rem;
-  font-weight: 700;
-  color: #1e2329;
-  line-height: 1;
-}
-
-.score-label,
-.count-label {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
-  font-size: 0.78rem;
-  color: #9ca3af;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.summary-divider {
-  width: 1px;
-  height: 48px;
-  background-color: #e5e7eb;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 100px;
+  padding-right: 20px;
+  border-right: 1px solid #e5e7eb;
   flex-shrink: 0;
 }
 
-.summary-count {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.count-number {
+.cf-score-number {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 2.6rem;
+  font-size: 3.2rem;
   font-weight: 700;
-  color: #1e2329;
+  color: #1a3c4e;
   line-height: 1;
 }
 
-/* --- Star Icons (shared) --- */
-.star {
+.cf-stars-row {
+  display: flex;
+  gap: 3px;
+}
+
+.cf-star {
   font-size: 1rem;
   line-height: 1;
 }
+.cf-star.on  { color: #c19b76; }
+.cf-star.off { color: #d1d5db; }
 
-.star.filled {
-  color: #c19b76;
+.cf-score-label {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  text-align: center;
 }
 
-.star.empty {
-  color: #d1d5db;
-}
-
-.summary-stars {
-  display: flex;
-  gap: 2px;
-}
-
-/* --- Feedback List --- */
-.feedback-list {
+/* Right: Distribution bars */
+.cf-dist-block {
+  flex: 1;
+  min-width: 160px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 7px;
+  justify-content: center;
 }
 
-/* --- Feedback Card --- */
-.feedback-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  transition: box-shadow 0.2s ease;
+.cf-dist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.feedback-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+.cf-dist-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  min-width: 18px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
-/* Card Top Row */
-.card-top {
+.cf-dist-bar-bg {
+  flex: 1;
+  height: 7px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cf-dist-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c19b76, #e8c99a);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.cf-dist-count {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  min-width: 16px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+/* Right edge: total count */
+.cf-total-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding-left: 20px;
+  border-left: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.cf-total-number {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1a3c4e;
+  line-height: 1;
+}
+
+.cf-total-label {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ---------- Section label ---------- */
+.cf-section-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+/* ---------- Feedback List ---------- */
+.cf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---------- Feedback Card ---------- */
+.cf-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 2px 8px rgba(26,60,78,0.06);
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.cf-card:hover {
+  box-shadow: 0 6px 20px rgba(26,60,78,0.10);
+  transform: translateY(-1px);
+}
+
+/* Top row: avatar + info + badge */
+.cf-card-top {
   display: flex;
   align-items: flex-start;
   gap: 14px;
   margin-bottom: 14px;
 }
 
-/* Avatar Circle */
-.client-avatar {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+/* Avatar */
+.cf-avatar {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
   border-radius: 50%;
-  background-color: #0d1117;
+  background: linear-gradient(135deg, #1a3c4e, #2d5a73);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'DM Sans', 'Poppins', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: #c19b76;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
-/* Client Name + Stars */
-.client-info {
+/* Name + stars */
+.cf-client-info {
   flex: 1;
   min-width: 0;
 }
 
-.client-name {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
+.cf-client-name {
   font-size: 0.95rem;
   font-weight: 600;
   color: #1e2329;
-  margin: 0 0 4px;
+  margin: 0 0 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.star-row {
+.cf-star-line {
   display: flex;
   align-items: center;
   gap: 2px;
 }
 
-.rating-text {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
-  font-size: 0.78rem;
+.cf-rating-text {
+  font-size: 0.75rem;
   color: #9ca3af;
-  margin-left: 6px;
+  margin-left: 5px;
 }
 
-/* Rating Badge */
-.rating-badge {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
-  font-size: 0.72rem;
+/* Badge */
+.cf-badge {
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 4px 11px;
   border-radius: 20px;
   letter-spacing: 0.03em;
   white-space: nowrap;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
-.rating-5 {
-  background-color: #d1fae5;
-  color: #065f46;
-}
+.cf-badge-5 { background: #d1fae5; color: #065f46; }
+.cf-badge-4 { background: #dbeafe; color: #1e40af; }
+.cf-badge-3 { background: #fef9c3; color: #854d0e; }
+.cf-badge-2 { background: #fee2e2; color: #991b1b; }
+.cf-badge-1 { background: #fde8e8; color: #7f1d1d; }
 
-.rating-4 {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-.rating-3 {
-  background-color: #fef9c3;
-  color: #854d0e;
-}
-
-.rating-2 {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.rating-1 {
-  background-color: #fde8e8;
-  color: #7f1d1d;
-}
-
-/* Comment Body */
-.card-comment {
+/* Comment */
+.cf-comment {
   border-top: 1px solid #f3f4f6;
-  padding-top: 14px;
+  padding-top: 12px;
+  margin-bottom: 12px;
 }
 
-.card-comment p {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
+.cf-comment-text {
   font-size: 0.9rem;
   color: #374151;
-  line-height: 1.65;
+  line-height: 1.7;
   margin: 0;
 }
 
-/* Card Footer */
-.card-footer {
-  margin-top: 12px;
+/* Footer */
+.cf-card-footer {
   padding-top: 10px;
   border-top: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.review-date {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
+.cf-date-icon {
+  font-size: 0.75rem;
+  color: #c19b76;
+}
+
+.cf-date-text {
   font-size: 0.75rem;
   color: #9ca3af;
 }
 
-/* --- Empty State --- */
-.empty-state {
-  background: #ffffff;
-  border: 1px dashed #d1d5db;
-  border-radius: 12px;
-  padding: 48px 24px;
+/* ---------- Empty State ---------- */
+.cf-empty {
+  background: #fff;
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  padding: 52px 24px;
   text-align: center;
 }
 
-.empty-icon {
-  font-size: 3rem;
+.cf-empty-icon {
+  font-size: 2.8rem;
   color: #c19b76;
   margin-bottom: 16px;
+  display: block;
   line-height: 1;
 }
 
-.empty-title {
+.cf-empty-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e2329;
+  color: #1a3c4e;
   margin: 0 0 10px;
 }
 
-.empty-message {
-  font-family: 'DM Sans', 'Poppins', sans-serif;
+.cf-empty-msg {
   font-size: 0.88rem;
   color: #6b7280;
-  line-height: 1.6;
-  max-width: 340px;
+  line-height: 1.65;
+  max-width: 320px;
   margin: 0 auto;
 }
 
 /* ============================================
-   RESPONSIVE — Tablet and up (768px+)
+   RESPONSIVE — Tablet 768px+
    ============================================ */
 @media (min-width: 768px) {
-  .feedback-page {
-    padding: 36px 28px 80px;
+  .cf-hero {
+    padding: 40px 32px 36px;
   }
 
-  .feedback-title {
+  .cf-page-title {
     font-size: 2.4rem;
   }
 
-  .feedback-card {
-    padding: 24px 28px;
+  .cf-body {
+    padding: 28px 28px 0;
   }
 
-  .client-avatar {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
+  .cf-summary {
+    padding: 28px 28px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .cf-score-number {
+    font-size: 3.6rem;
+  }
+
+  .cf-card {
+    padding: 22px 24px 20px;
+  }
+
+  .cf-avatar {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
     font-size: 0.9rem;
-  }
-
-  .card-top {
-    gap: 16px;
-  }
-
-  .star {
-    font-size: 1.05rem;
   }
 }
 
 /* ============================================
-   RESPONSIVE — Desktop (1100px+)
+   RESPONSIVE — Desktop 1100px+
    ============================================ */
 @media (min-width: 1100px) {
-  .feedback-page {
-    padding: 48px 0 100px;
+  .cf-hero {
+    padding: 48px 0 40px;
   }
 
-  .feedback-title {
+  .cf-page-title {
     font-size: 2.8rem;
   }
 
-  .feedback-summary {
-    padding: 24px 32px;
+  .cf-body {
+    padding: 32px 0 0;
   }
 
-  .feedback-list {
-    gap: 20px;
+  .cf-list {
+    gap: 16px;
   }
 
-  .feedback-card {
-    padding: 28px 32px;
+  .cf-card {
+    padding: 24px 28px 22px;
   }
 }

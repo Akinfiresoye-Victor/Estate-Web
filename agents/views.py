@@ -19,6 +19,8 @@ from django.urls import reverse
 import traceback
 from django_ratelimit.decorators import ratelimit
 import threading
+from allauth.account.models import EmailAddress
+
 
 # Create your views here.
 def calculate_agent_profile_strength(has_picture, has_listing, has_phone):
@@ -45,7 +47,7 @@ def dashboard(request):
         return redirect('landing')
 
     try:
-        agent_data = AgentInformation.objects.get(user_id=request.user.id)
+        agent_data = AgentInformation.objects.get(user=request.user)
         #Name and greeting
         agent_name = f"{agent_data.first_name} {agent_data.last_name}"
         first_name = agent_data.first_name
@@ -147,10 +149,14 @@ def agent_form(request):
     if request.user.role != 'agent':
         messages.error(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
+    is_email_verified=EmailAddress.objects.filter(user=request.user).values_list('verified', flat=True).first()
+    if not is_email_verified:
+        messages.info(request, 'Email Verification Required')
+        return redirect('account_email')
     
     try:
         # Check if agent already has a profile & redirect to Dahboard
-        if AgentInformation.objects.filter(user_id=request.user.id).exists():
+        if AgentInformation.objects.filter(user=request.user).exists():
             messages.info(request, 'Agent profile already exists. You can edit your details in settings.')
             return redirect('agent:dashboard')
         
@@ -174,7 +180,7 @@ def agent_form(request):
                     with transaction.atomic():
                         # Save the main agent form
                         agent = form.save(commit=False)
-                        agent.user_id = request.user.id
+                        agent.user = request.user
                         agent.users = request.user
                         agent.first_name = request.user.first_name
                         agent.last_name  = request.user.last_name 
@@ -255,10 +261,10 @@ def update_agent_profile(request):
         return redirect('landing')
     try:
         # Get the agent information
-        agent_information = AgentInformation.objects.get(user_id=request.user.id)
+        agent_information = AgentInformation.objects.get(user=request.user)
         
         # Authorization check
-        if request.user.id != agent_information.user_id:
+        if request.user != agent_information.user:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('agent:agent-settings')
         
@@ -285,7 +291,6 @@ def update_agent_profile(request):
                         # Save main form
                         agent = form.save(commit=False)
                         agent.user = request.user
-                        agent.user_id = request.user.id
                         agent.save()
                         
                         # Save formsets (they're already linked to agent via instance)
@@ -363,10 +368,10 @@ def lead_management(request):
         messages.error(request, "Agent's Only")
         return redirect('landing')
     try:
-        agent=AgentInformation.objects.get(user_id=request.user.id)
+        agent=AgentInformation.objects.get(user=request.user)
         
         #double checking to prevent loss of leads/clients
-        if agent.user_id != request.user.id:
+        if agent.user != request.user:
             messages.warning(request, 'Lead Belongs to another user')
             return redirect('landing')
         
@@ -407,7 +412,7 @@ def analytics(request):
         return redirect('landing')
 
     try:
-        current_agent = AgentInformation.objects.get(user_id=request.user.id)
+        current_agent = AgentInformation.objects.get(user=request.user)
 
         analytics_data, _ = AgentAnalytics.objects.get_or_create(
             agent=current_agent,
@@ -631,7 +636,7 @@ def lead_detail(request, lead_id):
         messages.error(request, "Acceied: This page is for agent accounts only.")
         return redirect('landing')
     try:
-        agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
+        agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True)
         lead=LeadInfo.objects.get(lead_id=lead_id)
         
         #preventing other agents from stealing another agents lead/data
@@ -662,7 +667,7 @@ def agent_update_lead_status(request, lead_id):
         return redirect('landing')
     try:
         try:
-            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
+            agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True)
             lead = LeadInfo.objects.get(pk=lead_id)
             if not lead.agent_id in agent_uuid:
                 messages.warning(request, 'Access denied: Unauthorized action.')
@@ -705,7 +710,7 @@ def agent_update_lead_stage(request, lead_id):
         return redirect('landing')
     try:
         try:
-            agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
+            agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True)
             lead = LeadInfo.objects.get(pk=lead_id)
             if not lead.agent_id in agent_uuid:
                 messages.warning(request, 'Access denied: Unauthorized action.')
@@ -742,8 +747,8 @@ def settings(request):
         messages.error(request, "Access denied: This page is for agent accounts only.")
         return redirect('landing')
     try:
-        agent= AgentInformation.objects.get(user_id=request.user.id)
-        if agent.user_id != request.user.id:
+        agent= AgentInformation.objects.get(user=request.user)
+        if agent.user != request.user:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         context={
@@ -766,7 +771,7 @@ def delete_lead(request, lead_id):
         messages.error(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
-        agent_uuid=AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True)
+        agent_uuid=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True)
         lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
         if not lead_to_delete.agent_id in agent_uuid:
             messages.error(request, 'Access denied: Unauthorized action.')
@@ -831,8 +836,8 @@ def delete_agent(request):
         return redirect('landing')
     
     try:
-        agent_data=AgentInformation.objects.get(user_id=request.user.id)
-        if agent_data.user_id != request.user.id:
+        agent_data=AgentInformation.objects.get(user=request.user)
+        if agent_data.user != request.user:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         user_id=User.objects.get(pk=request.user.id)
@@ -893,7 +898,7 @@ def join_via_invite(request):
         return redirect('landing')
 
     try:
-        agent = AgentInformation.objects.get(user_id=request.user.id)
+        agent = AgentInformation.objects.get(user=request.user)
     except ObjectDoesNotExist:
         messages.info(
             request,
@@ -955,7 +960,7 @@ def join_via_invite(request):
             kwargs=dict(
                 subject=f"Welcome to {company.company_name}!",
                 template_name='emails/agent_joined_notification.html',
-                context={'agent': agent.users, 'company': company, 'request': request},
+                context={'agent': agent.user, 'company': company, 'request': request},
                 recipient_list=[agent.email],
             ),
             daemon=True,
@@ -988,7 +993,7 @@ def my_company(request):
         messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
-        agent=AgentInformation.objects.get(user_id=request.user.id)
+        agent=AgentInformation.objects.get(user=request.user)
         if agent.company_uuid:
             company=CompanyInformation.objects.get(unique_company_id=agent.company_uuid)
             teamates=AgentInformation.objects.filter(company_uuid=agent.company_uuid)
@@ -1039,7 +1044,7 @@ def leave_company(request):
         messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
     try:
-        agent=AgentInformation.objects.get(user_id=request.user.id)
+        agent=AgentInformation.objects.get(user=request.user)
         if not agent.company_uuid:
             messages.error(request, 'You must be part of a company to perform this action.')
             return redirect('landing')
@@ -1053,8 +1058,8 @@ def leave_company(request):
         
         agent=AgentInformation.objects.get(agent_uuid=agent.agent_uuid)
         #handing every property and lead data back to the company
-        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None,user_id=company.user_id)
-        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None, user_id=company.user_id)
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None,user=company.user)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None, user=company.user)
         LeadInfo.objects.filter(agent_id=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_id=None)
         Appointments.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None)
         agent.company_uuid = None
@@ -1066,7 +1071,7 @@ def leave_company(request):
             kwargs=dict(
                 subject=f"Update on your status with {company.company_name}",
                 template_name='emails/agent_removed_notification.html',
-                context={'agent': agent.users, 'company': company, 'request': request},
+                context={'agent': agent.user, 'company': company, 'request': request},
                 recipient_list=[agent.email],
             ),
             daemon=True,
@@ -1094,17 +1099,31 @@ def agent_feedbacks(request):
     if request.user.role != 'agent':
         messages.info(request, 'Access denied: This page is for agent accounts only.')
         return redirect('landing')
-    
+
     try:
-        agent_uuid = AgentInformation.objects.filter(user_id=request.user.id).values_list('agent_uuid', flat=True).first()
+        agent_uuid = AgentInformation.objects.filter(
+            user=request.user
+        ).values_list('agent_uuid', flat=True).first()
+
         agent_rating = AgentRating.objects.filter(agent_uuid=agent_uuid)
         avg_rating = agent_rating.aggregate(Avg('rating'))['rating__avg'] or 0
+        total_count = agent_rating.count()
+
+        # Count how many reviews exist for each star level (1 through 5)
+        counts_qs = agent_rating.values('rating').annotate(count=Count('rating'))
+        rating_counts = {i: 0 for i in range(1, 6)}
+        for row in counts_qs:
+            rating_counts[row['rating']] = row['count']
 
         return render(request, 'agent/agent_feedbacks.html', {
             'feedback': agent_rating,
             'avg_rating': avg_rating,
+            'total_count': total_count,
+            'rating_counts': rating_counts,
+            'base_template': 'agent/base.html',
         })
-    
+
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})    
+    

@@ -23,7 +23,7 @@ from django.urls import reverse
 import threading
 import traceback
 from django_ratelimit.decorators import ratelimit
-
+from allauth.account.models import EmailAddress
 
 
 def calculate_profile_strength(has_logo, has_agent, is_verified):
@@ -50,9 +50,9 @@ def dashboard(request):
         return redirect('landing')
 
     try:
-        company= CompanyInformation.objects.get(user_id=request.user.id)
+        company= CompanyInformation.objects.get(user=request.user)
         social_links = company.social.all()
-        if company.user_id != request.user.id:
+        if company.user != request.user:
             messages.error(request, 'Error Redirecting To Dashboard....')
             return redirect('landing')
         analytics, _ = CompanyAnalytics.objects.get_or_create(
@@ -215,7 +215,7 @@ def dashboard(request):
             'competition':      top_performer,
             'market_position':  round(market_position, 1),
             'engagement_rate':  analytics.competition,
-            'is_company_admin': request.user.id == company.user_id,
+            'is_company_admin': request.user == company.user,
             'has_logo':         has_logo,
             'has_agent':        has_agent,
             'is_kyc_verified':  is_verified,
@@ -242,11 +242,15 @@ def company_form(request):
     if request.user.role != 'company':
         messages.error(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
+    is_email_verified=EmailAddress.objects.filter(user=request.user).values_list('verified', flat=True).first()
+    if not is_email_verified:
+        messages.info(request, 'Email Verification Required')
+        return redirect('account_email')
     try:
         submitted=False
         if request.method == 'POST':
             try:
-                CompanyInformation.objects.get(user_id=request.user.id)
+                CompanyInformation.objects.get(user=request.user)
                 return redirect('company:dashboard')
             except CompanyInformation.DoesNotExist:
                 comp_form=CompanyForm(request.POST or None, request.FILES or None)
@@ -254,7 +258,7 @@ def company_form(request):
                 with transaction.atomic():
                     if comp_form.is_valid() and link_form.is_valid():
                         company_form=comp_form.save(commit=False)
-                        company_form.user_id= request.user.id
+                        company_form.user= request.user
                         User.email= company_form.email
                         company_form.save()
                         link_form.instance=company_form
@@ -262,7 +266,7 @@ def company_form(request):
                         messages.success(request, 'Company profile successfully created.')
                         return HttpResponseRedirect('?submitted=True')
                 CompanyActivityLog.objects.create(
-                company=CompanyInformation.objects.get(user_id=request.user.id),
+                company=CompanyInformation.objects.get(user=request.user),
                 action='Joined Estate Web'
         )
         else:
@@ -289,8 +293,8 @@ def update_company_profile(request):
         messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     try:
-        company_information=CompanyInformation.objects.get(user_id=request.user.id)
-        if request.user.id != company_information.user_id:
+        company_information=CompanyInformation.objects.get(user=request.user)
+        if request.user != company_information.user:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         if request.method == 'POST':
@@ -299,7 +303,7 @@ def update_company_profile(request):
             if comp_form.is_valid() and link_form.is_valid():
                 with transaction.atomic():
                     company = comp_form.save(commit=False)
-                    company.user_id = request.user.id
+                    company.user = request.user
                     company.save()
                     link_form.save()
                     messages.success(request, 'Company profile updated successfully.')
@@ -335,8 +339,8 @@ def company_analytics(request):
     try:
         messages.info(request, 'Numbers might seem low since we just launched')
 
-        company = CompanyInformation.objects.get(user_id=request.user.id)
-        if company.user_id != request.user.id:
+        company = CompanyInformation.objects.get(user=request.user)
+        if company.user != request.user:
             messages.error(request, 'Unauthorized access')
             return redirect('landing')
         analytics, _ = CompanyAnalytics.objects.get_or_create(
@@ -600,8 +604,8 @@ def company_settings(request):
         return redirect('landing')
     
     try:
-        company=CompanyInformation.objects.get(user_id=request.user.id)
-        if company.user_id != request.user.id:
+        company=CompanyInformation.objects.get(user=request.user)
+        if company.user != request.user:
             messages.error(request, 'Something happned on our end')
             return redirect('landing')
         context={
@@ -624,7 +628,7 @@ def lead_management(request):
         if request.user.role != 'company':
             messages.error(request, 'Company account only')
             return redirect('landing')
-        company_uuid=CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+        company_uuid=CompanyInformation.objects.filter(user=request.user).values_list('unique_company_id', flat=True).first()
         general_leads=LeadInfo.objects.filter(company_uuid=company_uuid)
         p=Paginator(general_leads.order_by('-date_created'), 10)
         page=request.GET.get('page')
@@ -673,19 +677,19 @@ def lead_detail(request, lead_id):
         messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     try:
-        company=CompanyInformation.objects.get(user_id=request.user.id)
+        company=CompanyInformation.objects.get(user=request.user)
         client=LeadInfo.objects.get(lead_id=lead_id)
         if client.company_uuid != company.unique_company_id:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         try:
             if client.property_type =='Sale':
-                property=PropertyManagementSale.objects.get(pk=client.property_intrested)
+                properties=PropertyManagementSale.objects.get(pk=client.property_intrested)
             elif client.property_type == 'Rent':
-                property=PropertyManagementRent.objects.get(pk=client.property_intrested)
+                properties=PropertyManagementRent.objects.get(pk=client.property_intrested)
         except ObjectDoesNotExist:
-            property=None
-        return render(request, 'company/lead_detail_page.html', {'lead':client, 'property':property})
+            properties=None
+        return render(request, 'company/lead_detail_page.html', {'lead':client, 'property':properties})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -700,7 +704,7 @@ def delete_lead(request, lead_id):
         messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
-        company= CompanyInformation.objects.get(user_id=request.user.id)
+        company= CompanyInformation.objects.get(user=request.user)
         lead_to_delete=LeadInfo.objects.get(lead_id=lead_id)
         if company.unique_company_id != lead_to_delete.company_uuid:
             messages.error(request, 'Access denied: Unauthorized action.')
@@ -731,7 +735,7 @@ def update_lead_status(request, lead_id):
         return redirect('landing')
     try:
         try:
-            company= CompanyInformation.objects.get(user_id= request.user.id)
+            company= CompanyInformation.objects.get(user= request.user)
             lead=LeadInfo.objects.get(pk=lead_id)
             if lead.company_uuid != company.unique_company_id:
                 messages.error(request, 'Access denied: Unauthorized action.')
@@ -774,7 +778,7 @@ def update_lead_stage(request, lead_id):
         return redirect('landing')
     try:
         try:
-            company= CompanyInformation.objects.get(user_id= request.user.id)
+            company= CompanyInformation.objects.get(user= request.user)
             lead=LeadInfo.objects.get(pk=lead_id)
             if lead.company_uuid != company.unique_company_id:
                 messages.error(request, 'Access denied: Unauthorized action.')
@@ -814,7 +818,7 @@ def properties_by_company(request, company_uuid):
         messages.info(request, 'Access denied: This page is for customer accounts only.')
         return redirect('landing')
     try:
-        company=CompanyInformation.objects.filter(unique_company_id=company_uuid).values_list('user_id', flat=True).first()
+        company=CompanyInformation.objects.filter(unique_company_id=company_uuid).values_list('user', flat=True).first()
         on_lease=PropertyManagementRent.objects.filter(company_uuid=company_uuid)
         on_sale=PropertyManagementSale.objects.filter(company_uuid=company_uuid)
         return render(request, 'company/company_properties.html', {
@@ -853,7 +857,7 @@ def manage_applications(request):
         return redirect('landing')
     
     try:
-        company = CompanyInformation.objects.get(user_id=request.user.id)
+        company = CompanyInformation.objects.get(user=request.user)
         company_job_posts = JobPost.objects.filter(company_uuid=company.unique_company_id)
         
         today = timezone.now().date()
@@ -887,7 +891,7 @@ def manage_company(request):
         return redirect('landing')
     
     try:
-        company=CompanyInformation.objects.get(user_id=request.user.id)
+        company=CompanyInformation.objects.get(user=request.user)
 
         # Run expiry check only on currently active links
         active_links=InviteLink.objects.filter(company=company, is_active=True)
@@ -936,8 +940,8 @@ def delete_company(request):
         return redirect('landing')
     
     try:
-        company_data= CompanyInformation.objects.get(user_id=request.user.id)
-        if company_data.user_id != request.user.id:
+        company_data= CompanyInformation.objects.get(user=request.user)
+        if company_data.user != request.user:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         leads= LeadInfo.objects.filter(company_uuid=company_data.unique_company_id)
@@ -980,7 +984,7 @@ def vacancy_form(request):
         return redirect('landing')
     
     try:
-        company = CompanyInformation.objects.get(user_id=request.user.id)
+        company = CompanyInformation.objects.get(user=request.user)
         
         if request.method == 'POST':
             job_form = JobPostForm(request.POST or None, request.FILES or None)
@@ -1031,8 +1035,8 @@ def update_vacancy(request, job_id):
     if request.user.role != 'company':
         messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
-    company=CompanyInformation.objects.get(user_id= request.user.id)
-    job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
+    company=CompanyInformation.objects.get(user= request.user)
+    job = JobPost.objects.get(pk=job_id, user=request.user)
     if job.company_uuid != company.unique_company_id:
         messages.error(request, 'Access denied: You do not have permission to edit this job listing.')
         return redirect('landing')
@@ -1083,8 +1087,8 @@ def delete_vacancy(request, job_id):
         return redirect('landing')
     
     try:
-        job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
-        company=CompanyInformation.objects.get(user_id=request.user.id)
+        job = JobPost.objects.get(pk=job_id, user=request.user)
+        company=CompanyInformation.objects.get(user=request.user)
         if job.company_uuid != company.unique_company_id:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
@@ -1117,8 +1121,8 @@ def toggle_job_status(request, job_id):
         return redirect('landing')
     
     try:
-        job = JobPost.objects.get(pk=job_id, user_id=request.user.id)
-        company=CompanyInformation.objects.get(user_id=request.user.id)
+        job = JobPost.objects.get(pk=job_id, user=request.user)
+        company=CompanyInformation.objects.get(user=request.user)
         if job.company_uuid != company.unique_company_id:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
@@ -1154,8 +1158,8 @@ def onboard_agent(request, agent_uuid):
     
     try:
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
-        company=CompanyInformation.objects.get(user_id=request.user.id)
-        if company.user_id != request.user.id:
+        company=CompanyInformation.objects.get(user=request.user)
+        if company.user != request.user:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         try:
@@ -1183,7 +1187,7 @@ def onboard_agent(request, agent_uuid):
                 kwargs=dict(
                     subject=f"You've joined {company.company_name}!",
                     template_name='emails/agent_joined_notification.html',
-                    context={'agent': agent.users, 'company': company, 'request': request},
+                    context={'agent': agent.user, 'company': company, 'request': request},
                     recipient_list=[agent.email],
                 ),
                 daemon=True,
@@ -1213,8 +1217,8 @@ def generate_invite_link(request):
         return redirect('landing')
 
     try:
-        company = CompanyInformation.objects.get(user_id=request.user.id)
-        if company.user_id != request.user.id:
+        company = CompanyInformation.objects.get(user=request.user)
+        if company.user != request.user:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
 
@@ -1274,7 +1278,7 @@ def revoke_invite_link(request, token):
     
     try:
         invite_link=InviteLink.objects.get(invite_token=token)
-        company=CompanyInformation.objects.get(user_id=request.user.id)
+        company=CompanyInformation.objects.get(user=request.user)
         
         if invite_link.company!=company:
             messages.error(request, 'Access denied: Unauthorized action.')
@@ -1302,15 +1306,15 @@ def remove_agent(request, agent_uuid):
         return redirect('landing')
     
     try:
-        company=CompanyInformation.objects.get(user_id=request.user.id)
+        company=CompanyInformation.objects.get(user=request.user)
         employee=Employees.objects.get(agent_uuid=agent_uuid)
         if not employee.company == company:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
         #handing every property and lead data they got during their stay in the company back to the company
-        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None,user_id=request.user.id)
-        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None, user_id=request.user.id)
+        PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None,user=request.user)
+        PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None, user=request.user)
         LeadInfo.objects.filter(agent_id=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_id=None)
         Appointments.objects.filter(agent_uuid=agent.agent_uuid, company_uuid=company.unique_company_id).update(agent_uuid=None)
         agent.company_uuid = None
@@ -1322,7 +1326,7 @@ def remove_agent(request, agent_uuid):
             kwargs=dict(
                 subject=f"Update on your status with {company.company_name}",
                 template_name='emails/agent_removed_notification.html',
-                context={'agent': agent.users, 'company': company, 'request': request},
+                context={'agent': agent.user, 'company': company, 'request': request},
                 recipient_list=[agent.email],
             ),
             daemon=True,
@@ -1354,7 +1358,7 @@ def edit_employee(request, agent_uuid):
     if request.user.role != 'company':
         messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
-    company = get_object_or_404(CompanyInformation, user_id=request.user.id)
+    company = get_object_or_404(CompanyInformation, user=request.user)
 
     employee = get_object_or_404(Employees,agent_uuid=agent_uuid,company=company)
 
@@ -1382,7 +1386,6 @@ def edit_employee(request, agent_uuid):
         'base_template': 'company/base.html',  # matches your extends pattern
     })
 
-
 def company_feedbacks(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to continue.')
@@ -1390,17 +1393,30 @@ def company_feedbacks(request):
     if request.user.role != 'company':
         messages.info(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
-    
+
     try:
-        company_uuid = CompanyInformation.objects.filter(user_id=request.user.id).values_list('unique_company_id', flat=True).first()
+        company_uuid = CompanyInformation.objects.filter(
+            user=request.user
+        ).values_list('unique_company_id', flat=True).first()
+
         company_rating = CompanyRating.objects.filter(company_uuid=company_uuid)
         avg_rating = company_rating.aggregate(Avg('rating'))['rating__avg'] or 0
+        total_count = company_rating.count()
+
+        # Count how many reviews exist for each star level (1 through 5)
+        counts_qs = company_rating.values('rating').annotate(count=Count('rating'))
+        rating_counts = {i: 0 for i in range(1, 6)}
+        for row in counts_qs:
+            rating_counts[row['rating']] = row['count']
 
         return render(request, 'company/company_feedbacks.html', {
             'feedback': company_rating,
             'avg_rating': avg_rating,
+            'total_count': total_count,
+            'rating_counts': rating_counts,
+            'base_template': 'company/base.html',
         })
-    
+
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

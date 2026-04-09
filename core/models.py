@@ -10,8 +10,7 @@ from members.models import User
 
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
 class PropertyManagementSale(models.Model):
-    users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    user_id=models.IntegerField('Listee Users ID', blank=False, default=1)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     company_uuid=models.CharField('Company_uuid', max_length=40, default=None, blank=True, null=True, db_index=True)
     agent_uuid= models.CharField('Agent_uuid', max_length=36, default=None, blank=True, null=True, db_index=True)
     landlord_uuid= models.CharField('Landlord_uuid', max_length=36, default=None, blank=True, null=True)
@@ -46,8 +45,7 @@ class PropertyManagementSale(models.Model):
 
 #model handling the datatabase requirements cointaining all the property up for lease requirements
 class PropertyManagementRent(models.Model):
-    users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    user_id=models.IntegerField('Landlord', blank=False, default=1)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     company_uuid=models.CharField('Company', max_length=36, default=None, blank=True, null=True, db_index=True)
     agent_uuid= models.CharField('Agent', max_length=36, default=None, blank=True, null=True, db_index=True)
     landlord_uuid= models.CharField('Landlord_uuid', max_length=36, default=None, blank=True, null=True)
@@ -198,7 +196,7 @@ class Feedbacks(models.Model):
 
 
 class WishlistStorageUnit(models.Model):
-    owner=models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     user_id=models.IntegerField('Owner Of Wishlist', default=1, null=False, blank=False)
     property_id=models.IntegerField('Property In Question', default=1,null=False, blank=False)
     property_type=models.CharField('Property_type', default='Rent', null=False, blank=False)

@@ -181,18 +181,45 @@ AXES_LOCKOUT_CALLABLE = 'core.views.lockout_response'
 
 
 # =============================================================================
-# ALLAUTH & GOOGLE OAUTH
+# ALLAUTH
 # =============================================================================
 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_REDIRECT_URL = 'landing'
+ACCOUNT_EMAIL_VERIFICATION_MAX_RESEND_COUNT = 2
+ACCOUNT_EMAIL_VERIFICATION_MAX_CHANGE_COUNT = 2  # Allow up to 2 changes
 
+
+
+# settings.py
+ACCOUNT_RATE_LIMITS = {
+    # For code-based: max 1 per 10 seconds per email
+    "confirm_email": "1/10s/key",
+    
+    # For link-based: max 1 per 3 minutes per email
+    # Controlled by ACCOUNT_EMAIL_CONFIRMATION_COOLDOWN
+}
+ACCOUNT_RATE_LIMITS = {
+    "confirm_email": "1/2m/key",  # 1 confirmation per 2 minutes per key
+}
+
+
+# settings.py
+# =============================================================================
+# GOOGLE OAUTH
+# =============================================================================
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+# Add this to allow linking existing users by email
+SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_ADAPTER = 'members.adapter.MySocialAccountAdapter'
 ACCOUNT_ADAPTER = 'members.adapter.MyAccountAdapter'
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],

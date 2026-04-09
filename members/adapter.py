@@ -2,9 +2,28 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.adapter import DefaultAccountAdapter
 from django.shortcuts import resolve_url
 from core.utils import send_estate_email
+from members.models import User
 
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
+    def pre_social_login(self, request, sociallogin):
+        # Skip if already connected
+        if sociallogin.is_existing:
+            return
+
+        if sociallogin.email_addresses:
+            email_address = sociallogin.email_addresses[0]
+            email = email_address.email
+
+            # Only proceed if Google confirmed this email is verified
+            if not email_address.verified:
+                return
+
+            try:
+                user = User.objects.get(email=email)
+                sociallogin.connect(request, user)
+            except User.DoesNotExist:
+                pass
     def get_login_redirect_url(self, request):
         user = request.user
         if user.role == 'agent':
@@ -14,7 +33,6 @@ class MySocialAccountAdapter(DefaultSocialAccountAdapter):
         elif user.role == 'landlord':
             return resolve_url('landlord:dashboard')
         return resolve_url('customer:user-profile')
-
 
 
 class MyAccountAdapter(DefaultAccountAdapter):

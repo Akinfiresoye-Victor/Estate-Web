@@ -173,7 +173,7 @@ def view_property_on_sale(request, property_id):
         # ── Resolve who listed the property ──────────────────
         if prop.landlord_uuid:
             try:
-                landlord_in_charge = LandlordInformation.objects.get(user_id=prop.user_id)
+                landlord_in_charge = LandlordInformation.objects.get(user=prop.user)
                 view_id = landlord_in_charge.landlord_uuid
                 msg = (
                     f'Listed by {landlord_in_charge.first_name} [Landlord]'
@@ -185,7 +185,7 @@ def view_property_on_sale(request, property_id):
                 return redirect('landing')
         else:
             try:
-                company_in_charge = CompanyInformation.objects.get(user_id=prop.user_id)
+                company_in_charge = CompanyInformation.objects.get(user=prop.user)
                 if prop.agent_uuid:
                     agent_in_charge   = (
                         AgentInformation.objects.get(agent_uuid=prop.agent_uuid)
@@ -202,7 +202,7 @@ def view_property_on_sale(request, property_id):
                 landlord_in_charge=None
 
             except CompanyInformation.DoesNotExist:
-                agent_in_charge   = AgentInformation.objects.get(user_id=prop.user_id)
+                agent_in_charge   = AgentInformation.objects.get(user=prop.user)
                 company_in_charge = (
                     CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
                     if agent_in_charge.company_uuid else None
@@ -261,7 +261,7 @@ def view_property_on_lease(request, property_id):
         property_to_be_viewed = PropertyManagementRent.objects.get(pk=property_id)
         if property_to_be_viewed.landlord_uuid:
             try:
-                landlord_in_charge = LandlordInformation.objects.get(user_id=property_to_be_viewed.user_id)
+                landlord_in_charge = LandlordInformation.objects.get(user=property_to_be_viewed.user)
                 view_id = landlord_in_charge.landlord_uuid
                 msg = (
                     f'Listed by {landlord_in_charge.first_name} [Landlord]'
@@ -273,7 +273,7 @@ def view_property_on_lease(request, property_id):
                 return redirect('landing')
         else:
             try:
-                company_in_charge = CompanyInformation.objects.get(user_id=property_to_be_viewed.user_id)
+                company_in_charge = CompanyInformation.objects.get(user=property_to_be_viewed.user)
                 if property_to_be_viewed.agent_uuid:
                     agent_in_charge   = (
                         AgentInformation.objects.get(agent_uuid=property_to_be_viewed.agent_uuid)
@@ -290,7 +290,7 @@ def view_property_on_lease(request, property_id):
                 landlord_in_charge=None
 
             except CompanyInformation.DoesNotExist:
-                agent_in_charge   = AgentInformation.objects.get(user_id=property_to_be_viewed.user_id)
+                agent_in_charge   = AgentInformation.objects.get(user=property_to_be_viewed.user)
                 company_in_charge = (
                     CompanyInformation.objects.get(unique_company_id=agent_in_charge.company_uuid)
                     if agent_in_charge.company_uuid else None
@@ -717,7 +717,7 @@ def review_company(request, company_uuid):
                 review.save()
                 
                 # Send email notification to company owner
-                owner = company.users
+                owner = company.user
                 if owner and owner.email:
                     threading.Thread(
                         target=send_estate_email,
@@ -905,7 +905,7 @@ def inquiry_form(request, property_type, property_id):
                 if asset.company_uuid:
                     try:
                         company = CompanyInformation.objects.get(unique_company_id=asset.company_uuid)
-                        receiver_email = company.email or company.users.email
+                        receiver_email = company.email or company.user.email
                         owner_name = company.company_name
                     except ObjectDoesNotExist:
                         messages.error(request, 'Company not found.')
@@ -917,7 +917,7 @@ def inquiry_form(request, property_type, property_id):
                 elif asset.landlord_uuid:
                     try:
                         landlord = LandlordInformation.objects.get(landlord_uuid=asset.landlord_uuid)
-                        receiver_email = landlord.email or User.objects.get(pk=asset.user_id).email
+                        receiver_email = landlord.email or User.objects.get(pk=asset.user).email
                         owner_name = landlord.first_name
                     except ObjectDoesNotExist:
                         messages.error(request, 'Landlord not found.')

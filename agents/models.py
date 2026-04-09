@@ -4,7 +4,7 @@ from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
 from django.utils import timezone
-
+from django.conf import settings
 
 
 
@@ -17,8 +17,7 @@ def agent_picture_path(instance, filename):
 
 # Create your models here.
 class AgentInformation(models.Model):
-    users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    user_id = models.IntegerField(blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     first_name = models.CharField('First Name', max_length=50, blank=False, default='Unspecified')
     last_name = models.CharField('Last Name', max_length=50, blank=False, default='j')
     agent_uuid = models.CharField('Agent uuid', unique=True, max_length=36, blank=False, default=uuid.uuid4)
@@ -88,7 +87,7 @@ class SessionId(models.Model):
 
 class AgentRating(models.Model):
     agent_uuid=models.CharField('Agent UUID', max_length=255, blank=False, null=False)
-    user= models.ForeignKey(User, on_delete=models.CASCADE,related_name='agent_reviews')
+    user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='agent_reviews')
     rating= models.FloatField('Rating', blank=False, default=0.0)
     comment=models.TextField('Review Comment', blank=True, null=True)
     created_at= models.DateTimeField(auto_now_add=True)

@@ -1,105 +1,165 @@
-{% extends 'agent/base.html' %}
+{% extends base_template %}
 {% load static %}
 {% load humanize %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'company/css/company_feedback.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'company/css/company_feedback.css' %}">
-
-<section class="feedback-page">
-
-  <!-- Page Header -->
-  <div class="feedback-header">
-    <h1 class="feedback-title">Client Reviews</h1>
-    <p class="feedback-subtitle">See what your clients are saying about your service</p>
+<!-- ===== HERO BAND ===== -->
+<div class="cf-hero">
+  <div class="cf-hero-inner">
+    <h1 class="cf-page-title">Client Reviews</h1>
+    <p class="cf-page-subtitle">See what your clients are saying about your service</p>
   </div>
+</div>
 
-  <!-- Summary Bar -->
+<!-- ===== BODY ===== -->
+<div class="cf-page">
+<div class="cf-body">
+
+  <!-- ===== SUMMARY CARD ===== -->
   {% if feedback %}
-  <div class="feedback-summary">
+  <div class="cf-summary">
 
-    <div class="summary-score">
-      <span class="score-number">{{ avg_rating|floatformat:1 }}</span>
-      <div class="summary-stars">
-        {% with avg_rating|floatformat:0 as rounded %}
+    <!-- Big score -->
+    <div class="cf-score-block">
+      <span class="cf-score-number">{{ avg_rating|floatformat:1 }}</span>
+      <div class="cf-stars-row">
+        {% with avg_int=avg_rating|floatformat:0 %}
           {% for i in "12345" %}
-            {% if forloop.counter <= rounded|add:"0" %}
-              <span class="star filled">&#9733;</span>
+            {% if forloop.counter <= avg_int|add:"0" %}
+              <span class="cf-star on">&#9733;</span>
             {% else %}
-              <span class="star empty">&#9733;</span>
+              <span class="cf-star off">&#9733;</span>
             {% endif %}
           {% endfor %}
         {% endwith %}
       </div>
-      <span class="score-label">Average Rating</span>
+      <span class="cf-score-label">Avg Rating</span>
     </div>
 
-    <div class="summary-divider"></div>
+    <!-- Rating distribution bars -->
+    <!--
+      rating_counts is a dict passed from the view:
+        { 5: n, 4: n, 3: n, 2: n, 1: n }
+      total_count is also passed as an integer.
+      See updated view below.
+    -->
+    <div class="cf-dist-block">
+      {% for star in "54321" %}
+        {% with count=rating_counts|default_if_none:0 %}
+          {% with star_count=rating_counts|default:"" %}
+            <div class="cf-dist-row">
+              <span class="cf-dist-label">{{ star }}★</span>
+              <div class="cf-dist-bar-bg">
+                {% if total_count > 0 %}
+                  {% if star == "5" %}
+                    <div class="cf-dist-bar-fill" style="width: {% widthratio rating_counts.5 total_count 100 %}%"></div>
+                  {% elif star == "4" %}
+                    <div class="cf-dist-bar-fill" style="width: {% widthratio rating_counts.4 total_count 100 %}%"></div>
+                  {% elif star == "3" %}
+                    <div class="cf-dist-bar-fill" style="width: {% widthratio rating_counts.3 total_count 100 %}%"></div>
+                  {% elif star == "2" %}
+                    <div class="cf-dist-bar-fill" style="width: {% widthratio rating_counts.2 total_count 100 %}%"></div>
+                  {% else %}
+                    <div class="cf-dist-bar-fill" style="width: {% widthratio rating_counts.1 total_count 100 %}%"></div>
+                  {% endif %}
+                {% else %}
+                  <div class="cf-dist-bar-fill" style="width: 0%"></div>
+                {% endif %}
+              </div>
+              {% if star == "5" %}<span class="cf-dist-count">{{ rating_counts.5 }}</span>
+              {% elif star == "4" %}<span class="cf-dist-count">{{ rating_counts.4 }}</span>
+              {% elif star == "3" %}<span class="cf-dist-count">{{ rating_counts.3 }}</span>
+              {% elif star == "2" %}<span class="cf-dist-count">{{ rating_counts.2 }}</span>
+              {% else %}<span class="cf-dist-count">{{ rating_counts.1 }}</span>{% endif %}
+            </div>
+          {% endwith %}
+        {% endwith %}
+      {% endfor %}
+    </div>
 
-    <div class="summary-count">
-      <span class="count-number">{{ feedback|length }}</span>
-      <span class="count-label">Total Review{{ feedback|length|pluralize }}</span>
+    <!-- Total count -->
+    <div class="cf-total-block">
+      <span class="cf-total-number">{{ total_count }}</span>
+      <span class="cf-total-label">Review{{ total_count|pluralize }}</span>
     </div>
 
   </div>
   {% endif %}
 
-  <!-- Feedback Cards -->
-  <div class="feedback-list">
+
+  <!-- ===== REVIEW CARDS ===== -->
+  <p class="cf-section-label">
+    {% if feedback %}All Reviews{% endif %}
+  </p>
+
+  <div class="cf-list">
 
     {% if feedback %}
       {% for feeds in feedback %}
-      <div class="feedback-card">
+      <div class="cf-card">
 
-        <!-- Card Top: Avatar + Rating -->
-        <div class="card-top">
-          <div class="client-avatar">
-            <!-- Initials fallback — replace with feeds.client.get_full_name if available -->
-            <span>{{ feeds.user.first_name|first|upper }}{{ feeds.user.last_name|first|upper }}</span>
+        <!-- Top row -->
+        <div class="cf-card-top">
+
+          <!-- Avatar (initials) -->
+          <div class="cf-avatar">
+            {% if feeds.user.first_name %}
+              {{ feeds.user.first_name|first|upper }}{{ feeds.user.last_name|first|upper }}
+            {% else %}
+              ??
+            {% endif %}
           </div>
 
-          <div class="client-info">
-            <p class="client-name">
+          <!-- Name + stars -->
+          <div class="cf-client-info">
+            <p class="cf-client-name">
               {% if feeds.user.get_full_name %}
                 {{ feeds.user.get_full_name }}
               {% else %}
                 Anonymous Client
               {% endif %}
             </p>
-            <div class="star-row">
+            <div class="cf-star-line">
               {% for i in "12345" %}
                 {% if forloop.counter <= feeds.rating %}
-                  <span class="star filled">&#9733;</span>
+                  <span class="cf-star on">&#9733;</span>
                 {% else %}
-                  <span class="star empty">&#9733;</span>
+                  <span class="cf-star off">&#9733;</span>
                 {% endif %}
               {% endfor %}
-              <span class="rating-text">{{ feeds.rating }}/5</span>
+              <span class="cf-rating-text">{{ feeds.rating }}/5</span>
             </div>
           </div>
 
-          <!-- Rating Badge -->
-          <div class="rating-badge rating-{{ feeds.rating }}">
+          <!-- Badge -->
+          <span class="cf-badge cf-badge-{{ feeds.rating }}">
             {% if feeds.rating == 5 %}Excellent
             {% elif feeds.rating == 4 %}Very Good
             {% elif feeds.rating == 3 %}Average
             {% elif feeds.rating == 2 %}Poor
             {% else %}Bad
             {% endif %}
-          </div>
+          </span>
+
         </div>
 
         <!-- Comment -->
         {% if feeds.comment %}
-        <div class="card-comment">
-          <p>{{ feeds.comment }}</p>
+        <div class="cf-comment">
+          <p class="cf-comment-text">{{ feeds.comment }}</p>
         </div>
         {% endif %}
 
-        <!-- Card Footer: Date if available -->
+        <!-- Footer: date -->
         {% if feeds.created_at %}
-        <div class="card-footer">
-          <span class="review-date">{{ feeds.created_at|naturaltime }}</span>
+        <div class="cf-card-footer">
+          <span class="cf-date-icon bi bi-clock"></span>
+          <span class="cf-date-text">{{ feeds.created_at|naturaltime }}</span>
         </div>
         {% endif %}
 
@@ -107,11 +167,11 @@
       {% endfor %}
 
     {% else %}
-      <!-- Empty State -->
-      <div class="empty-state">
-        <div class="empty-icon">&#9734;</div>
-        <h2 class="empty-title">No Reviews Yet</h2>
-        <p class="empty-message">
+      <!-- Empty state -->
+      <div class="cf-empty">
+        <span class="cf-empty-icon bi bi-star"></span>
+        <h2 class="cf-empty-title">No Reviews Yet</h2>
+        <p class="cf-empty-msg">
           Once clients complete transactions with you, their reviews will appear here.
           Keep delivering great service!
         </p>
@@ -120,6 +180,7 @@
 
   </div>
 
-</section>
+</div>
+</div>
 
 {% endblock %}

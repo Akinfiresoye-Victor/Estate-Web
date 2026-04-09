@@ -21,6 +21,12 @@ from django.conf import settings
 from core.utils import send_estate_email
 import json
 import threading
+from allauth.account.internal.flows.email_verification import send_verification_email_to_address
+from allauth.account.views import EmailView
+from django.contrib import messages
+from django.urls import reverse_lazy
+
+
 
 
 @ratelimit(key='ip', rate='5/m', method='POST', block=True)
@@ -315,7 +321,7 @@ def register_landlord(request):
                     args=(request, confirmation),
                     kwargs={'signup': True},
                     daemon=True
-                ).start()
+                ).start()   
                 messages.success(request, 'Account created! Please check your email to verify your account.')
                 return redirect('account_email_verification_sent')
             else:
@@ -327,3 +333,51 @@ def register_landlord(request):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+
+def resend_verification(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    try:
+        email_address = EmailAddress.objects.get(user=request.user, primary=True)
+        confirmation = EmailConfirmationHMAC(email_address)
+        if not email_address.verified:
+            get_adapter(request).send_confirmation_mail(request, confirmation, signup=True)
+            messages.success(request, "Verification email sent! Check your inbox.")
+        else:
+            messages.info(request, "Your email is already verified.")
+            
+    except EmailAddress.DoesNotExist:
+        messages.error(request, "No email address found on your account.")
+    
+    return redirect('account_email')
+
+
+
+
+
+class CustomEmailView(EmailView):
+    success_url = reverse_lazy('account_email')
+
+    def post(self, request, *args, **kwargs):
+        # Only validate on action_add (the change email form)
+        # action_send is the resend button — let that pass through normally
+        if 'action_add' in request.POST:
+            new_email = request.POST.get('email', '').strip().lower()
+
+            if User.objects.filter(email__iexact=new_email).exists():
+                messages.error(
+                    request,
+                    'That email address is already linked to an account. Please use a different one.'
+                )
+                return redirect('account_email')
+            if new_email:
+                EmailAddress.objects.filter(user=request.user).update(email=new_email,primary=True)
+                User.objects.filter(id=request.user.id).update(email=new_email)
+            else:
+                messages.error(request, 'Invalid Request')
+                return redirect('account_email')
+        return super().post(request, *args, **kwargs)

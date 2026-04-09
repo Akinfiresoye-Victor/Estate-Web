@@ -5,7 +5,7 @@ import uuid
 from members.models import User
 from django.utils import timezone
 from datetime import timedelta
-
+from django.conf import settings
 
 def company_logo_path(instance, filename):
     return f"company/logo/{instance.company_name}/{filename}"
@@ -18,8 +18,7 @@ def company_file_path(instance, filename):
 
 
 class CompanyInformation(models.Model):
-    users=models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    user_id= models.IntegerField(blank=False, default=1)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     unique_company_id = models.CharField('uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
     company_name= models.CharField('Company Name', blank=False, max_length=100, unique=True)
     legal_certificate= models.FileField('Certificate of Incoperation',blank=True, null=True, upload_to=company_file_path, validators=[validate_file])
@@ -97,7 +96,7 @@ class SessionId(models.Model):
 
 class CompanyRating(models.Model):
     company_uuid = models.CharField('Companies UUID', max_length=255, blank=False, null=False)
-    user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='company_reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, related_name='company_reviews')
     rating = models.FloatField('Rating', blank=False, default=0.0)
     comment = models.TextField('Review Comment', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -211,7 +210,7 @@ class InviteLink(models.Model):
     company=models.ForeignKey(CompanyInformation, on_delete=models.CASCADE, related_name='invite_link')
     invite_token=models.CharField('Link UUID', max_length=36, default=uuid.uuid4, editable=False, unique=True)
     created_at=models.DateTimeField(auto_now_add=True)
-    def default_expiry():
+    def default_expiry(self):
         return timezone.now() + timedelta(hours=24)
     expires_at=models.DateTimeField('Date To expire', default=default_expiry)
     max_uses=models.IntegerField('Usage Possibility', default=200, null=True, blank=True)

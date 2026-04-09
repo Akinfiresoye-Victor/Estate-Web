@@ -517,32 +517,70 @@ def get_agent_company(agent):
     except CompanyInformation.DoesNotExist:
         return None
 
+# def send_estate_email(subject, template_name, context, recipient_list):
+#     """
+#     Centralized utility to send HTML emails with a plain-text fallback.
+#     - subject: Email subject
+#     - template_name: Path to HTML template (e.g., 'emails/inquiry_notification.html')
+#     - context: Dictionary of data for the template
+#     - recipient_list: List of email addresses
+#     """
+#     try:
+#         # 1. Add common context (domain, protocol)
+#         if 'domain' not in context:
+#             # Try to get from request if provided in context, else from settings or hardcoded
+#             if 'request' in context:
+#                 context['domain'] = context['request'].get_host()
+#                 context['protocol'] = 'https' if context['request'].is_secure() else 'http'
+#             else:
+#                 context['domain'] = 'estatewebng.com' if not settings.DEBUG else 'localhost:8000'
+#                 context['protocol'] = 'https' if not settings.DEBUG else 'http'
+        
+#         # 2. Render HTML
+#         html_content = render_to_string(template_name, context)
+        
+#         # 3. Create plain-text fallback
+#         text_content = strip_tags(html_content)
+        
+#         # 4. Create Email
+#         email = EmailMultiAlternatives(
+#             subject=subject,
+#             body=text_content,
+#             from_email=settings.DEFAULT_FROM_EMAIL,
+#             to=recipient_list
+#         )
+#         email.attach_alternative(html_content, "text/html")
+        
+#         # 5. Send
+#         email.send(fail_silently=False)
+#         return True
+#     except Exception as e:
+#         ErrorLog.objects.create(traceback=f"Email Error ({subject}) to {recipient_list}: {str(e)}\n{traceback.format_exc()}")
+#         return False
+
+
+
 def send_estate_email(subject, template_name, context, recipient_list):
-    """
-    Centralized utility to send HTML emails with a plain-text fallback.
-    - subject: Email subject
-    - template_name: Path to HTML template (e.g., 'emails/inquiry_notification.html')
-    - context: Dictionary of data for the template
-    - recipient_list: List of email addresses
-    """
     try:
-        # 1. Add common context (domain, protocol)
         if 'domain' not in context:
-            # Try to get from request if provided in context, else from settings or hardcoded
             if 'request' in context:
                 context['domain'] = context['request'].get_host()
                 context['protocol'] = 'https' if context['request'].is_secure() else 'http'
             else:
                 context['domain'] = 'estatewebng.com' if not settings.DEBUG else 'localhost:8000'
                 context['protocol'] = 'https' if not settings.DEBUG else 'http'
-        
-        # 2. Render HTML
+
         html_content = render_to_string(template_name, context)
+
+        # Derive the .txt template path from the .html path
+        txt_template_name = template_name.replace('.html', '.txt')
         
-        # 3. Create plain-text fallback
-        text_content = strip_tags(html_content)
-        
-        # 4. Create Email
+        try:
+            text_content = render_to_string(txt_template_name, context)
+        except Exception:
+            # Graceful fallback if .txt template doesn't exist yet
+            text_content = strip_tags(html_content)
+
         email = EmailMultiAlternatives(
             subject=subject,
             body=text_content,
@@ -550,10 +588,11 @@ def send_estate_email(subject, template_name, context, recipient_list):
             to=recipient_list
         )
         email.attach_alternative(html_content, "text/html")
-        
-        # 5. Send
         email.send(fail_silently=False)
         return True
+
     except Exception as e:
-        ErrorLog.objects.create(traceback=f"Email Error ({subject}) to {recipient_list}: {str(e)}\n{traceback.format_exc()}")
+        ErrorLog.objects.create(
+            traceback=f"Email Error ({subject}) to {recipient_list}: {str(e)}\n{traceback.format_exc()}"
+        )
         return False
