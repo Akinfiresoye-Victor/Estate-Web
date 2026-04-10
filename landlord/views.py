@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import LandlordInformation
-from .forms import LandlordInformationForm
+from .forms import LandlordInformationForm, UpdateLandlordInformationForm
 from core.models import PropertyManagementRent, PropertyManagementSale, ErrorLog, PropertyViews, WishlistStorageUnit
 from django.db import transaction
 from django.db.models import Value, CharField
@@ -121,7 +121,6 @@ def profile_setup(request):
             if form.is_valid():
                 with transaction.atomic():
                     landlord = form.save(commit=False)
-                    landlord.users = request.user
                     landlord.user = request.user
                     landlord.first_name = request.user.first_name
                     landlord.last_name = request.user.last_name
@@ -222,15 +221,20 @@ def update_profile(request):
     try:
         landlord = LandlordInformation.objects.get(user=request.user)
         if request.method == 'POST':
-            form = LandlordInformationForm(request.POST, request.FILES, instance=landlord)
+            form = UpdateLandlordInformationForm(request.POST, request.FILES, instance=landlord)
             if form.is_valid():
-                form.save()
+                landy=form.save(commit=False)
+                user=User.objects.get(pk=request.user.id)
+                user.first_name=landy.first_name
+                user.last_name=landy.last_name
+                user.save()
+                landy.save()
                 messages.success(request, 'Profile updated successfully!')
                 return redirect('landlord:profile')
             else:
                 messages.error(request, 'Please correct the errors below.')
         else:
-            form = LandlordInformationForm(instance=landlord)
+            form = UpdateLandlordInformationForm(instance=landlord)
         return render(request, 'landlord/update_profile.html', {'form': form, 'landlord': landlord})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())

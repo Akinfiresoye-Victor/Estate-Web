@@ -4,13 +4,13 @@ from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
 from django.utils import timezone
+from django.conf import settings
 
 def landlord_picture_path(instance, filename):
     return f"Landlord/{instance.first_name}/profile/{filename}"
 
 class LandlordInformation(models.Model):
-    users = models.ForeignKey(User, on_delete=models.CASCADE)
-    user_id = models.IntegerField(blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     first_name = models.CharField('First Name', max_length=50, blank=False, default='Unspecified')
     last_name = models.CharField('Last Name', max_length=50, blank=False, default='Unspecified')
     landlord_uuid = models.CharField('Landlord uuid', unique=True, max_length=36, blank=False, default=uuid.uuid4)

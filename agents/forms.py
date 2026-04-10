@@ -58,6 +58,64 @@ class AgentInformationForm(forms.ModelForm):
                 'accept': '.pdf,.jpg,.jpeg,.png'
             }),
         }
+
+
+class UpdateAgentInformationForm(forms.ModelForm):
+    """Main agent information form"""
+    
+    class Meta:
+        model = AgentInformation
+        fields = [
+            'first_name','last_name','phone_number', 'email', 'location', 
+            'language', 'work_type', 'bio', 'profile_picture', 
+            'government_id', 'certificate'
+        ]
+        widgets = {
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ahmed'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ibrahim'
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter phone number'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter email address'
+            }),
+            'location': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'language': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. English, French'
+            }),
+            'work_type': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g. Realtor, Consultant'
+            }),
+            'bio': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Tell us about yourself...',
+                'rows': 4
+            }),
+            'profile_picture': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': 'image/*'
+            }),
+            'government_id': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': '.pdf,.jpg,.jpeg,.png'
+            }),
+            'certificate': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': '.pdf,.jpg,.jpeg,.png'
+            }),
+        }
             
 
 

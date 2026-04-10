@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import AgentInformation, AgentAnalytics, AgentRating,SessionId
 from django.contrib import messages
-from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet
+from .forms import AgentInformationForm, SocialLinksFormSet, ExperienceFormSet,UpdateAgentInformationForm
 from django.db import transaction
 from members.models import User
 from django.http import HttpResponseRedirect
@@ -270,7 +270,7 @@ def update_agent_profile(request):
         
         if request.method == 'POST':
             # IMPORTANT: Pass instance for formsets even in POST
-            form = AgentInformationForm(
+            form = UpdateAgentInformationForm(
                 request.POST, 
                 request.FILES, 
                 instance=agent_information
@@ -291,6 +291,10 @@ def update_agent_profile(request):
                         # Save main form
                         agent = form.save(commit=False)
                         agent.user = request.user
+                        user=User.objects.get(pk=request.user.id)
+                        user.first_name=agent.first_name
+                        user.last_name=agent.last_name
+                        user.save()
                         agent.save()
                         
                         # Save formsets (they're already linked to agent via instance)
@@ -332,7 +336,7 @@ def update_agent_profile(request):
         
         else:
             # GET request - initialize forms with instance
-            form = AgentInformationForm(instance=agent_information)
+            form = UpdateAgentInformationForm(instance=agent_information)
             social_form = SocialLinksFormSet(instance=agent_information)
             exp_form = ExperienceFormSet(instance=agent_information)
         
@@ -354,7 +358,7 @@ def update_agent_profile(request):
         
 
 
-
+#TODO Security Info make sure the agent is in a company before he/she can add a custom email address or force him to change to a company email ojust find a way around this
 
 def lead_management(request):
     """

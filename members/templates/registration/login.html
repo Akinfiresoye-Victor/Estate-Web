@@ -130,7 +130,7 @@
                 <i class="bi bi-person"></i>
                 <div>
                   <strong>Customer</strong>
-                  <small class="d-block">Find your dream property</small>
+                  <small class="d-block">Find trusted properties with ease</small>
                 </div>
               </a>
             </li>
@@ -140,7 +140,7 @@
                 <i class="bi bi-award"></i>
                 <div>
                   <strong>Agent</strong>
-                  <small class="d-block">List and manage properties</small>
+                  <small class="d-block">List properties and grow your business</small>
                 </div>
               </a>
             </li>
@@ -150,7 +150,17 @@
                 <i class="bi bi-building"></i>
                 <div>
                   <strong>Company</strong>
-                  <small class="d-block">Corporate solutions</small>
+                  <small class="d-block">Manage properties at scale with full control</small>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="{% url 'register-landlord' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+                <i class="bi bi-building"></i>
+                <div>
+                  <strong>Landlord</strong>
+                  <small class="d-block">Secure your property and find reliable tenants</small>
                 </div>
               </a>
             </li>
