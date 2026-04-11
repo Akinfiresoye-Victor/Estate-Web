@@ -262,7 +262,9 @@ def company_form(request):
                     if comp_form.is_valid() and link_form.is_valid():
                         company_form=comp_form.save(commit=False)
                         company_form.user= request.user
-                        User.email= company_form.email
+                        user=User.objects.get(id=request.user.id)
+                        if user.email == company_form.email:
+                            company_form.is_company_email_verified=True
                         company_form.save()
                         link_form.instance=company_form
                         link_form.save()

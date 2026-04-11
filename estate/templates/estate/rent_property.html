@@ -1,5 +1,7 @@
 {% extends 'estate/base.html' %}
 {% load static humanize %}
+{% load static humanize property_extras %}
+
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'estate/css/rent.css' %}">
@@ -105,7 +107,6 @@
               <i class="bi bi-building"></i>
             </div>
           {% endif %}
-
           <span class="rent-for-lease-badge">For Lease</span>
 
           {# data-url and data-added drive the AJAX logic below #}
@@ -127,7 +128,7 @@
         <div class="rent-card-body">
           <div class="rent-price">
             ₦{{ lease.price_range|floatformat:0|intcomma }}
-            <span class="rent-price-period">/yr</span>
+            <span class="rent-price-period">/ {{ lease.rent_rate|default:"yr" }}</span>
           </div>
 
           <h3 class="rent-card-title">

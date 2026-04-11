@@ -38,6 +38,9 @@
     <div class="hero-image">
       {% if property.base_image %}
         <img src="{{ property.base_image.url }}"
+             id="heroMainImg"
+             style="cursor:pointer;"
+             onclick="openLightbox(0)"
              onerror="this.onerror=null;this.src='https://placehold.co/1200x600/eff6ff/2563eb?text=No+Image';"
              alt="Property Image">
       {% else %}
@@ -66,12 +69,12 @@
       {% endif %}
     </div>
 
-    {# Gallery strip #}
-    {% with property|get_images as images %}
-      {% if images %}
+    {# Gallery strip — clickable thumbnails #}
+    {% with property|get_images as extra_images %}
+      {% if extra_images %}
         <div class="gallery-strip">
-          {% for img in images|slice:"1:8" %}
-            <div class="gallery-thumb">
+          {% for img in extra_images|slice:"1:8" %}
+            <div class="gallery-thumb" onclick="openLightbox({{ forloop.counter }})" style="cursor:pointer;">
               <img src="{{ img.url }}"
                    onerror="this.onerror=null;this.src='https://placehold.co/400x300/eff6ff/2563eb?text=No+Image';"
                    alt="Property Image {{ forloop.counter }}">
@@ -136,9 +139,7 @@
           <div class="features-grid">
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-door-closed-fill"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-door-closed-fill"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Bedrooms</span>
                 <div class="feature-value">{{ property.bedrooms|default:"N/A" }}</div>
@@ -146,9 +147,7 @@
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-droplet-fill"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-droplet-fill"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Bathrooms</span>
                 <div class="feature-value">{{ property.bathrooms|default:"N/A" }}</div>
@@ -156,9 +155,7 @@
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-p-circle-fill"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-p-circle-fill"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Parking</span>
                 <div class="feature-value">{{ property.parking_spaces|default:"0" }}</div>
@@ -166,9 +163,7 @@
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-rulers"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-rulers"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Size</span>
                 <div class="feature-value">{{ property.size|default:"N/A" }} <small>sqft</small></div>
@@ -178,7 +173,6 @@
           </div>
         </div>
       </div>
-
 
       {# Map #}
       <div class="section-card">
@@ -222,7 +216,7 @@
         </div>
       </div>
 
-      {# ── Enhanced Safety Center ────────────────────────────────────── #}
+      {# Safety Center #}
       <div class="safety-center sidebar-section">
         <button class="safety-trigger sidebar-trigger">
           <i class="bi bi-shield-check"></i> Trust & Safety Tips
@@ -282,16 +276,12 @@
 
             <div class="contact-item">
               <span class="contact-label">Last Updated</span>
-              <span class="contact-value">
-                {{ property.last_updated|date:"M d, Y"|default:"N/A" }}
-              </span>
+              <span class="contact-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
             </div>
 
             <div class="contact-item">
               <span class="contact-label">Listed On</span>
-              <span class="contact-value">
-                {{ property.listed_date|date:"M d, Y"|default:"N/A" }}
-              </span>
+              <span class="contact-value">{{ property.listed_date|date:"M d, Y"|default:"N/A" }}</span>
             </div>
           </div>
 
@@ -303,21 +293,19 @@
               </a>
             {% endif %}
 
-            {% if property.company_uuid and property.company_uuid != 'None'%}
+            {% if property.company_uuid and property.company_uuid != 'None' %}
               <a href="{% url 'customer:company-profile' company_uuid=property.company_uuid %}"
                 class="btn-contact secondary">
                 <i class="bi bi-building"></i> View Company's Profile
               </a>
             {% endif %}
 
-            {% if property.landlord_uuid and property.landlord_uuid != 'None'%}
+            {% if property.landlord_uuid and property.landlord_uuid != 'None' %}
               <a href="{% url 'customer:landlord-profile' landlord_uuid=property.landlord_uuid %}"
                 class="btn-contact secondary">
                 <i class="bi bi-building"></i> View Landlord's Profile
               </a>
             {% endif %}
-
-            {# Landlords don't have a public profile page yet, so no button for them #}
           </div>
 
         </div>
@@ -328,96 +316,197 @@
 
   {# ── Flag / Report Listing ─────────────────────────────────────── #}
   <div class="flag-listing-bar">
-    <a href="{%url 'customer:flag-listing' property_type=property.property_type property_id=property.id%}" class="btn-flag-listing" id="flag-listing-btn">
+    <a href="{% url 'customer:flag-listing' property_type=property.property_type property_id=property.id %}" class="btn-flag-listing" id="flag-listing-btn">
       <i class="bi bi-flag-fill"></i> Report Listing
     </a>
   </div>
 
 </div>{# end detail-wrapper #}
+
+
+{# ── LIGHTBOX ─────────────────────────────────────────────────────── #}
+<div class="vps-lightbox" id="vpsLightbox">
+  <button class="vps-lb-close" onclick="closeLightbox()">&times;</button>
+  <button class="vps-lb-arrow vps-lb-prev" onclick="shiftLightbox(-1)">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  <div class="vps-lb-img-wrap">
+    <img id="vpsLightboxImg" src="" alt="Property Image">
+  </div>
+  <button class="vps-lb-arrow vps-lb-next" onclick="shiftLightbox(1)">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+  <div class="vps-lb-counter" id="vpsLbCounter"></div>
+</div>
+
 {% endblock %}
 
 
-{# at the very bottom, AFTER {% endblock %} that closes content #}
-
 {% block extra_js %}
+<style>
+.vps-lightbox {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.92);
+  z-index: 9999;
+  align-items: center; justify-content: center;
+}
+.vps-lightbox.open { display: flex; }
+.vps-lb-img-wrap {
+  max-width: 92vw; max-height: 88vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.vps-lb-img-wrap img {
+  max-width: 100%; max-height: 88vh;
+  border-radius: 8px; object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+}
+.vps-lb-close {
+  position: absolute; top: 16px; right: 20px;
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.6rem;
+  width: 42px; height: 42px; border-radius: 50%;
+  cursor: pointer; line-height: 1; transition: background .2s;
+}
+.vps-lb-close:hover { background: rgba(255,255,255,.3); }
+.vps-lb-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.3rem;
+  width: 46px; height: 46px; border-radius: 50%;
+  cursor: pointer; transition: background .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.vps-lb-arrow:hover { background: rgba(255,255,255,.3); }
+.vps-lb-prev { left: 16px; }
+.vps-lb-next { right: 16px; }
+.vps-lb-counter {
+  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.5); color: #fff;
+  padding: 4px 14px; border-radius: 20px; font-size: .75rem;
+}
+.gallery-thumb { cursor: pointer; }
+.gallery-thumb:hover img { opacity: .85; }
+</style>
+
 <script>
-/* Safety Modal JS for sidebar */
-document.addEventListener('DOMContentLoaded', function() {
-  const triggers = document.querySelectorAll('.safety-trigger');
-  triggers.forEach(trigger => {
-    const modal = trigger.closest('.safety-center')?.querySelector('.safety-modal') || document.getElementById('safetyModal');
-    const close = modal?.querySelector('.safety-close');
-    
-    if (trigger && modal) {
-      trigger.addEventListener('click', () => modal.classList.add('active'));
-    }
-    if (close) {
-      close.addEventListener('click', () => modal.classList.remove('active'));
-    }
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-      });
-    }
+/* ── Build image list from page ─────────────────── */
+var vpsImages = [];
+var vpsCurrentIndex = 0;
+
+document.addEventListener('DOMContentLoaded', function () {
+  /* Base/hero image first */
+  var heroImg = document.getElementById('heroMainImg');
+  if (heroImg) vpsImages.push(heroImg.src);
+
+  /* Then gallery thumbnails */
+  document.querySelectorAll('.gallery-thumb img').forEach(function (img) {
+    vpsImages.push(img.src);
+  });
+
+  /* Close on backdrop click */
+  document.getElementById('vpsLightbox').addEventListener('click', function (e) {
+    if (e.target === this) closeLightbox();
   });
 });
 
-(function() {
-    const csrftoken = '{{ csrf_token }}';
+function openLightbox(index) {
+  if (!vpsImages.length) return;
+  vpsCurrentIndex = index;
+  renderLightbox();
+  document.getElementById('vpsLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
-    function showToast(message, isAdded) {
-        let toast = document.getElementById('wishlist-toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'wishlist-toast';
-            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 20px;border-radius:10px;z-index:10000;display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
-            document.body.appendChild(toast);
-        }
-        toast.innerHTML = '<span>' + (isAdded ? '❤️' : '💔') + '</span><span>' + message + '</span>';
-        toast.style.display = 'flex';
-        setTimeout(function() { toast.style.display = 'none'; }, 2500);
-    }
+function closeLightbox() {
+  document.getElementById('vpsLightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
-    document.querySelectorAll('.detail-wishlist-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const url = btn.getAttribute('href');
-            const icon = btn.querySelector('i');
-            btn.style.pointerEvents = 'none';
+function shiftLightbox(dir) {
+  vpsCurrentIndex = (vpsCurrentIndex + dir + vpsImages.length) % vpsImages.length;
+  renderLightbox();
+}
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                if (data.added !== undefined) {
-                    if (data.added) {
-                        icon.classList.remove('bi-heart');
-                        icon.classList.add('bi-heart-fill');
-                        showToast('Added to wishlist!', true);
-                    } else {
-                        icon.classList.remove('bi-heart-fill');
-                        icon.classList.add('bi-heart');
-                        showToast('Removed from wishlist', false);
-                    }
-                    btn.setAttribute('data-added', data.added);
-                    btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
-                }
-            })
-            .catch(function(error) {
-                console.error('Wishlist error:', error);
-                showToast('Something went wrong. Try again.', false);
-            })
-            .finally(function() {
-                btn.style.pointerEvents = 'auto';
-            });
-        });
+function renderLightbox() {
+  document.getElementById('vpsLightboxImg').src = vpsImages[vpsCurrentIndex];
+  document.getElementById('vpsLbCounter').textContent =
+    (vpsCurrentIndex + 1) + ' / ' + vpsImages.length;
+}
+
+/* Keyboard navigation */
+document.addEventListener('keydown', function (e) {
+  var lb = document.getElementById('vpsLightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowRight') shiftLightbox(1);
+  if (e.key === 'ArrowLeft')  shiftLightbox(-1);
+  if (e.key === 'Escape')     closeLightbox();
+});
+
+/* ── Safety Modal ───────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.safety-trigger').forEach(function (trigger) {
+    var modal = trigger.closest('.safety-center')?.querySelector('.safety-modal')
+                || document.getElementById('safetyModal');
+    var close = modal?.querySelector('.safety-close');
+
+    if (trigger && modal) trigger.addEventListener('click', () => modal.classList.add('active'));
+    if (close) close.addEventListener('click', () => modal.classList.remove('active'));
+    if (modal) modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
     });
+  });
+});
+
+/* ── Wishlist ────────────────────────────────────── */
+(function() {
+  const csrftoken = '{{ csrf_token }}';
+
+  function showToast(message, isAdded) {
+    let toast = document.getElementById('wishlist-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'wishlist-toast';
+      toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 20px;border-radius:10px;z-index:10000;display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = '<span>' + (isAdded ? '❤️' : '💔') + '</span><span>' + message + '</span>';
+    toast.style.display = 'flex';
+    setTimeout(function() { toast.style.display = 'none'; }, 2500);
+  }
+
+  document.querySelectorAll('.detail-wishlist-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = btn.getAttribute('href');
+      const icon = btn.querySelector('i');
+      btn.style.pointerEvents = 'none';
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.added !== undefined) {
+          if (data.added) {
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            showToast('Added to wishlist!', true);
+          } else {
+            icon.classList.remove('bi-heart-fill');
+            icon.classList.add('bi-heart');
+            showToast('Removed from wishlist', false);
+          }
+          btn.setAttribute('data-added', data.added);
+          btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+        }
+      })
+      .catch(function() { showToast('Something went wrong. Try again.', false); })
+      .finally(function() { btn.style.pointerEvents = 'auto'; });
+    });
+  });
 })();
 </script>
 {% endblock %}

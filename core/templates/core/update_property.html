@@ -189,7 +189,7 @@
                 <i class="bi bi-exclamation-triangle-fill"></i>
                 <span>Please fix these errors</span>
               </div>
-              <ul class="error-list">
+              <ul class="error-list"> 
                 {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
               </ul>
             </div>
@@ -203,6 +203,8 @@
               <label for="{{ field.id_for_label }}" class="form-label">
                 {% if 'price' in field.name or 'price_range' in field.name %}
                   <i class="bi bi-cash-coin"></i>
+                {% elif field.name == 'rent_rate' %}
+                  <i class="bi bi-calendar-event"></i>
                 {% elif 'location' in field.name or 'address' in field.name %}
                   <i class="bi bi-geo-alt-fill"></i>
                 {% elif 'state' in field.name %}
@@ -441,15 +443,15 @@ document.addEventListener('DOMContentLoaded', function () {
   {% endif %}
 
   /* ═══════════════════════════════════════════════
-     STEP 1 — FIX: querySelector by name instead of getElementById
+     STEP 1
   ═══════════════════════════════════════════════ */
-  var catSelect = document.querySelector('[name="property_category"]');  // ← FIXED
+  var catSelect = document.querySelector('[name="property_category"]');
   var resGroup  = document.getElementById('residential-group');
   var comGroup  = document.getElementById('commercial-group');
   var lanGroup  = document.getElementById('lands-group');
-  var resSelect = document.querySelector('[name="residential"]');        // ← FIXED
-  var comSelect = document.querySelector('[name="commercial"]');         // ← FIXED
-  var lanSelect = document.querySelector('[name="lands"]');              // ← FIXED
+  var resSelect = document.querySelector('[name="residential"]');
+  var comSelect = document.querySelector('[name="commercial"]');
+  var lanSelect = document.querySelector('[name="lands"]');
   var hint1     = document.getElementById('hint-1');
   var hint1Msg  = document.getElementById('hint-1-msg');
 
@@ -460,18 +462,18 @@ document.addEventListener('DOMContentLoaded', function () {
     if (comGroup) comGroup.style.display = 'none';
     if (lanGroup) lanGroup.style.display = 'none';
 
-    if (resSelect) { resSelect.value = ''; resSelect.disabled = true; }
-    if (comSelect) { comSelect.value = ''; comSelect.disabled = true; }
-    if (lanSelect) { lanSelect.value = ''; lanSelect.disabled = true; }
+    if (resSelect) resSelect.disabled = true;
+    if (comSelect) comSelect.disabled = true;
+    if (lanSelect) lanSelect.disabled = true;
 
     if (cat === 'Residential') {
-      resGroup.style.display = 'block';
+      if (resGroup) resGroup.style.display = 'block';
       if (resSelect) resSelect.disabled = false;
     } else if (cat === 'Commercial') {
-      comGroup.style.display = 'block';
+      if (comGroup) comGroup.style.display = 'block';
       if (comSelect) comSelect.disabled = false;
     } else if (cat === 'Land') {
-      lanGroup.style.display = 'block';
+      if (lanGroup) lanGroup.style.display = 'block';
       if (lanSelect) lanSelect.disabled = false;
     }
   }
@@ -480,33 +482,33 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTypeFields();
     catSelect.addEventListener('change', function () {
       updateTypeFields();
-      hint1.classList.remove('show');
+      if (hint1) hint1.classList.remove('show');
     });
   }
 
   function validateStep1() {
     if (!catSelect || !catSelect.value) {
-      hint1Msg.textContent = 'Please select a property category to continue.';
-      hint1.classList.add('show');
+      if (hint1Msg) hint1Msg.textContent = 'Please select a property category to continue.';
+      if (hint1) hint1.classList.add('show');
       return false;
     }
     var cat = catSelect.value;
     if (cat === 'Residential' && resSelect && !resSelect.value) {
-      hint1Msg.textContent = 'Please select a residential property type.';
-      hint1.classList.add('show');
+      if (hint1Msg) hint1Msg.textContent = 'Please select a residential property type.';
+      if (hint1) hint1.classList.add('show');
       return false;
     }
     if (cat === 'Commercial' && comSelect && !comSelect.value) {
-      hint1Msg.textContent = 'Please select a commercial property type.';
-      hint1.classList.add('show');
+      if (hint1Msg) hint1Msg.textContent = 'Please select a commercial property type.';
+      if (hint1) hint1.classList.add('show');
       return false;
     }
     if (cat === 'Land' && lanSelect && !lanSelect.value) {
-      hint1Msg.textContent = 'Please select a land type.';
-      hint1.classList.add('show');
+      if (hint1Msg) hint1Msg.textContent = 'Please select a land type.';
+      if (hint1) hint1.classList.add('show');
       return false;
     }
-    hint1.classList.remove('show');
+    if (hint1) hint1.classList.remove('show');
     return true;
   }
 
@@ -516,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ═══════════════════════════════════════════════
-     STEP 2 — VALIDATION & NAVIGATION
+     STEP 2
   ═══════════════════════════════════════════════ */
   var REQUIRED_STEP2 = [
     { id: 'id_description',  label: 'Property Description' },
@@ -587,7 +589,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ═══════════════════════════════════════════════
-     STEP 3 — NAVIGATION
+     STEP 3
   ═══════════════════════════════════════════════ */
   var back3 = document.getElementById('back-3');
   if (back3) back3.addEventListener('click', function () { goToStep(2); });

@@ -11,7 +11,7 @@ class PropertyRentFilter(django_filters.FilterSet):
     end_price=NumberFilter(field_name='price_range', lookup_expr='lte',label='Maximum Price Range')
     class Meta:
         model=PropertyManagementRent
-        fields=['property_category','state']
+        fields=['property_category','state', 'rent_rate']
         
         
 class PropertySaleFilter(django_filters.FilterSet):

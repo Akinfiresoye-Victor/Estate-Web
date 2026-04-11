@@ -36,7 +36,10 @@
       {% if property.base_image %}
       <img src="{{ property.base_image.url }}"
         onerror="this.onerror=null;this.src='https://placehold.co/1200x600/f0fdf4/16a34a?text=No+Image';"
-        alt="Property Image">
+        alt="Property Image"
+        id="heroMainImg"
+        style="cursor:pointer;"
+        onclick="openLightbox(0)">
       {% else %}
       <img src="https://placehold.co/1200x600/f0fdf4/16a34a?text=No+Image" alt="Placeholder">
       {% endif %}
@@ -47,7 +50,7 @@
 
       <div class="hero-price-pill">
         ₦{{ property.price_range|default:"N/A"|floatformat:0|intcomma }}
-        <span>/yr</span>
+        <span>/ {{ property.rent_rate|default:"yr" }}</span>
       </div>
 
       {# ── Wishlist Button ─────────────────────────────────────── #}
@@ -63,12 +66,12 @@
       {% endif %}
     </div>
 
-    {# Gallery strip — scrollable thumbnails below the main image #}
-    {% with property|get_images as images %}
-    {% if images %}
+    {# Gallery strip — clickable thumbnails below the main image #}
+    {% with property|get_images as extra_images %}
+    {% if extra_images %}
     <div class="gallery-strip">
-      {% for img in images|slice:"1:8" %}
-      <div class="gallery-thumb">
+      {% for img in extra_images|slice:"1:8" %}
+      <div class="gallery-thumb" onclick="openLightbox({{ forloop.counter }})" style="cursor:pointer;">
         <img src="{{ img.url }}"
           onerror="this.onerror=null;this.src='https://placehold.co/400x300/f0fdf4/16a34a?text=No+Image';"
           alt="Property Image {{ forloop.counter }}">
@@ -103,6 +106,7 @@
       </div>
     </div>
   </div>
+
   <div class="property-card">
 
     {# ── LEFT: Main Content ──────────────────────────────────────── #}
@@ -131,9 +135,7 @@
           <div class="features-grid">
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-door-closed-fill"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-door-closed-fill"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Bedrooms</span>
                 <div class="feature-value">{{ property.bedrooms|default:"N/A" }}</div>
@@ -141,9 +143,7 @@
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-droplet-fill"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-droplet-fill"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Bathrooms</span>
                 <div class="feature-value">{{ property.bathrooms|default:"N/A" }}</div>
@@ -151,9 +151,7 @@
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-p-circle-fill"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-p-circle-fill"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Parking</span>
                 <div class="feature-value">{{ property.parking_spaces|default:"0" }}</div>
@@ -161,12 +159,18 @@
             </div>
 
             <div class="feature-item">
-              <div class="feature-icon">
-                <i class="bi bi-rulers"></i>
-              </div>
+              <div class="feature-icon"><i class="bi bi-rulers"></i></div>
               <div class="feature-content">
                 <span class="feature-label">Size</span>
                 <div class="feature-value">{{ property.size|default:"N/A" }} <small>sqft</small></div>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon"><i class="bi bi-calendar-event"></i></div>
+              <div class="feature-content">
+                <span class="feature-label">Rent Rate</span>
+                <div class="feature-value">{{ property.get_rent_rate_display|default:"N/A" }}</div>
               </div>
             </div>
 
@@ -192,16 +196,16 @@
     </div>{# end main-content #}
 
 
-    {# ── RIGHT: Sidebar — hidden on mobile (sticky CTA handles it) ─ #}
+    {# ── RIGHT: Sidebar ─────────────────────────────────────────── #}
     <div class="sidebar-content">
 
-      {# Price Card — only visible on desktop #}
+      {# Price Card #}
       <div class="price-card">
-        <span class="price-label">Annual Rent</span>
+        <span class="price-label">Rent ({{ property.rent_rate|default:"Yearly" }})</span>
         <span class="price-amount">
           ₦{{ property.price_range|default:"N/A"|floatformat:0|intcomma }}
         </span>
-        <span class="price-period">per year</span>
+        <span class="price-period">{{ property.get_rent_rate_display|default:"per year" }}</span>
 
         <div class="price-divider"></div>
 
@@ -216,7 +220,7 @@
         </div>
       </div>
 
-      {# ── Enhanced Safety Center ────────────────────────────────────── #}
+      {# Safety Center #}
       <div class="safety-center sidebar-section">
         <button class="safety-trigger sidebar-trigger">
           <i class="bi bi-shield-check"></i> Trust & Safety Tips
@@ -276,42 +280,33 @@
 
             <div class="contact-item">
               <span class="contact-label">Last Updated</span>
-              <span class="contact-value">
-                {{ property.last_updated|date:"M d, Y"|default:"N/A" }}
-              </span>
+              <span class="contact-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
             </div>
 
             <div class="contact-item">
               <span class="contact-label">Listed On</span>
-              <span class="contact-value">
-                {{ property.listed_date|date:"M d, Y"|default:"N/A" }}
-              </span>
+              <span class="contact-value">{{ property.listed_date|date:"M d, Y"|default:"N/A" }}</span>
             </div>
           </div>
 
           <div class="contact-action-btns">
             {% if property.agent_uuid and property.agent_uuid != 'None' %}
-              <a href="{% url 'customer:agent-profile' agent_uuid=property.agent_uuid %}"
-                class="btn-contact secondary">
+              <a href="{% url 'customer:agent-profile' agent_uuid=property.agent_uuid %}" class="btn-contact secondary">
                 <i class="bi bi-person-circle"></i> View Agent Profile
               </a>
             {% endif %}
 
-            {% if property.company_uuid and property.company_uuid != 'None'%}
-              <a href="{% url 'customer:company-profile' company_uuid=property.company_uuid %}"
-                class="btn-contact secondary">
+            {% if property.company_uuid and property.company_uuid != 'None' %}
+              <a href="{% url 'customer:company-profile' company_uuid=property.company_uuid %}" class="btn-contact secondary">
                 <i class="bi bi-building"></i> View Company Profile
               </a>
             {% endif %}
 
-            {% if property.landlord_uuid and property.landlord_uuid != 'None'%}
-              <a href="{% url 'customer:landlord-profile' landlord_uuid=property.landlord_uuid %}"
-                class="btn-contact secondary">
+            {% if property.landlord_uuid and property.landlord_uuid != 'None' %}
+              <a href="{% url 'customer:landlord-profile' landlord_uuid=property.landlord_uuid %}" class="btn-contact secondary">
                 <i class="bi bi-building"></i> View Landlord Profile
               </a>
             {% endif %}
-
-            {# Landlords don't have a public profile page yet, so no button for them #}
           </div>
 
         </div>
@@ -322,98 +317,199 @@
 
   {# ── Flag / Report Listing ─────────────────────────────────────── #}
   <div class="flag-listing-bar">
-    <a href="{%url 'customer:flag-listing' property_type=property.property_type property_id=property.id%}" class="btn-flag-listing" id="flag-listing-btn">
+    <a href="{% url 'customer:flag-listing' property_type=property.property_type property_id=property.id %}" class="btn-flag-listing" id="flag-listing-btn">
       <i class="bi bi-flag-fill"></i> Report Listing
     </a>
   </div>
 
 </div>{# end detail-wrapper #}
 
+
+{# ── LIGHTBOX ─────────────────────────────────────────────────────── #}
+<div class="vpr-lightbox" id="vprLightbox">
+  <button class="vpr-lb-close" onclick="closeLightbox()">&times;</button>
+  <button class="vpr-lb-arrow vpr-lb-prev" onclick="shiftLightbox(-1)">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  <div class="vpr-lb-img-wrap">
+    <img id="vprLightboxImg" src="" alt="Property Image">
+  </div>
+  <button class="vpr-lb-arrow vpr-lb-next" onclick="shiftLightbox(1)">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+  <div class="vpr-lb-counter" id="vprLbCounter"></div>
+</div>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 {% endblock %}
 
 
-{# at the very bottom, AFTER {% endblock %} that closes content #}
-
 {% block extra_js %}
+<style>
+.vpr-lightbox {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.92);
+  z-index: 9999;
+  align-items: center; justify-content: center;
+}
+.vpr-lightbox.open { display: flex; }
+.vpr-lb-img-wrap {
+  max-width: 92vw; max-height: 88vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.vpr-lb-img-wrap img {
+  max-width: 100%; max-height: 88vh;
+  border-radius: 8px; object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+}
+.vpr-lb-close {
+  position: absolute; top: 16px; right: 20px;
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.6rem;
+  width: 42px; height: 42px; border-radius: 50%;
+  cursor: pointer; line-height: 1; transition: background .2s;
+}
+.vpr-lb-close:hover { background: rgba(255,255,255,.3); }
+.vpr-lb-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.3rem;
+  width: 46px; height: 46px; border-radius: 50%;
+  cursor: pointer; transition: background .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.vpr-lb-arrow:hover { background: rgba(255,255,255,.3); }
+.vpr-lb-prev { left: 16px; }
+.vpr-lb-next { right: 16px; }
+.vpr-lb-counter {
+  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.5); color: #fff;
+  padding: 4px 14px; border-radius: 20px; font-size: .75rem;
+}
+.gallery-thumb { cursor: pointer; }
+.gallery-thumb:hover img { opacity: .85; }
+</style>
+
 <script>
-/* Safety Modal JS for sidebar */
-document.addEventListener('DOMContentLoaded', function() {
-  const triggers = document.querySelectorAll('.safety-trigger');
-  triggers.forEach(trigger => {
-    const modal = trigger.closest('.safety-center')?.querySelector('.safety-modal') || document.getElementById('safetyModal');
-    const close = modal?.querySelector('.safety-close');
-    
-    if (trigger && modal) {
-      trigger.addEventListener('click', () => modal.classList.add('active'));
-    }
-    if (close) {
-      close.addEventListener('click', () => modal.classList.remove('active'));
-    }
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-      });
-    }
+/* ── Build image list from page ─────────────────── */
+var vprImages = [];
+
+document.addEventListener('DOMContentLoaded', function () {
+  /* Base/hero image first */
+  var heroImg = document.getElementById('heroMainImg');
+  if (heroImg) vprImages.push(heroImg.src);
+
+  /* Then gallery thumbnails */
+  document.querySelectorAll('.gallery-thumb img').forEach(function (img) {
+    vprImages.push(img.src);
+  });
+
+  /* Close on backdrop click */
+  document.getElementById('vprLightbox').addEventListener('click', function (e) {
+    if (e.target === this) closeLightbox();
   });
 });
 
-(function() {
-    const csrftoken = '{{ csrf_token }}';
+var vprCurrentIndex = 0;
 
-    function showToast(message, isAdded) {
-        let toast = document.getElementById('wishlist-toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'wishlist-toast';
-            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 20px;border-radius:10px;z-index:10000;display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
-            document.body.appendChild(toast);
-        }
-        toast.innerHTML = '<span>' + (isAdded ? '❤️' : '💔') + '</span><span>' + message + '</span>';
-        toast.style.display = 'flex';
-        setTimeout(function() { toast.style.display = 'none'; }, 2500);
-    }
+function openLightbox(index) {
+  if (!vprImages.length) return;
+  vprCurrentIndex = index;
+  renderLightbox();
+  document.getElementById('vprLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
-    document.querySelectorAll('.detail-wishlist-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const url = btn.getAttribute('href');
-            const icon = btn.querySelector('i');
-            btn.style.pointerEvents = 'none';
+function closeLightbox() {
+  document.getElementById('vprLightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                if (data.added !== undefined) {
-                    if (data.added) {
-                        icon.classList.remove('bi-heart');
-                        icon.classList.add('bi-heart-fill');
-                        showToast('Added to wishlist!', true);
-                    } else {
-                        icon.classList.remove('bi-heart-fill');
-                        icon.classList.add('bi-heart');
-                        showToast('Removed from wishlist', false);
-                    }
-                    btn.setAttribute('data-added', data.added);
-                    btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
-                }
-            })
-            .catch(function(error) {
-                console.error('Wishlist error:', error);
-                showToast('Something went wrong. Try again.', false);
-            })
-            .finally(function() {
-                btn.style.pointerEvents = 'auto';
-            });
-        });
+function shiftLightbox(dir) {
+  vprCurrentIndex = (vprCurrentIndex + dir + vprImages.length) % vprImages.length;
+  renderLightbox();
+}
+
+function renderLightbox() {
+  document.getElementById('vprLightboxImg').src = vprImages[vprCurrentIndex];
+  document.getElementById('vprLbCounter').textContent =
+    (vprCurrentIndex + 1) + ' / ' + vprImages.length;
+}
+
+/* Keyboard navigation */
+document.addEventListener('keydown', function (e) {
+  var lb = document.getElementById('vprLightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowRight') shiftLightbox(1);
+  if (e.key === 'ArrowLeft')  shiftLightbox(-1);
+  if (e.key === 'Escape')     closeLightbox();
+});
+
+/* ── Safety Modal ───────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.safety-trigger').forEach(function (trigger) {
+    var modal = trigger.closest('.safety-center')?.querySelector('.safety-modal')
+                || document.getElementById('safetyModal');
+    var close = modal?.querySelector('.safety-close');
+
+    if (trigger && modal) trigger.addEventListener('click', () => modal.classList.add('active'));
+    if (close) close.addEventListener('click', () => modal.classList.remove('active'));
+    if (modal) modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
     });
+  });
+});
+
+/* ── Wishlist ────────────────────────────────────── */
+(function() {
+  const csrftoken = '{{ csrf_token }}';
+
+  function showToast(message, isAdded) {
+    let toast = document.getElementById('wishlist-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'wishlist-toast';
+      toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 20px;border-radius:10px;z-index:10000;display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = '<span>' + (isAdded ? '❤️' : '💔') + '</span><span>' + message + '</span>';
+    toast.style.display = 'flex';
+    setTimeout(function() { toast.style.display = 'none'; }, 2500);
+  }
+
+  document.querySelectorAll('.detail-wishlist-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = btn.getAttribute('href');
+      const icon = btn.querySelector('i');
+      btn.style.pointerEvents = 'none';
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.added !== undefined) {
+          if (data.added) {
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            showToast('Added to wishlist!', true);
+          } else {
+            icon.classList.remove('bi-heart-fill');
+            icon.classList.add('bi-heart');
+            showToast('Removed from wishlist', false);
+          }
+          btn.setAttribute('data-added', data.added);
+          btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+        }
+      })
+      .catch(function() { showToast('Something went wrong. Try again.', false); })
+      .finally(function() { btn.style.pointerEvents = 'auto'; });
+    });
+  });
 })();
 </script>
 {% endblock %}

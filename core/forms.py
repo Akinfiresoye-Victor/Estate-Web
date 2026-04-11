@@ -75,21 +75,22 @@ class LeaseForm(ModelForm):
         model=PropertyManagementRent
         fields=(
                 'property_category','residential','commercial','lands','description', 'state','location', 'bedrooms','bathrooms','parking_spaces','size' ,
-                'phone_number','price_range','base_image'
+                'phone_number','price_range','rent_rate','base_image'
                 )
         labels={
                 'property_category': 'Property Category',
                 'residential':'House Type',
                 'description': 'Property Description',
                 'location': 'Precise Location',
-                'price_range': 'Price (per year)',
+                'price_range': 'Price',
+                'rent_rate': 'Payment Cycle',
                 'phone_number': 'Phone Number',
                 'size': 'Size(Leave blank if not sure)',
                 'state': 'State',
                 'base_image': 'Add Overview image Of Property ',
         }
         help_texts = {
-            'price_range': 'Please enter the annual (yearly) rent amount. Tenants will see this as a yearly cost.',
+            'rent_rate': 'Enter Preferred Payment cycle for clearer description',
         }
         widgets= {
                     'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Property Description'}),

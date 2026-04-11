@@ -242,12 +242,11 @@
     {%if p.property_type == 'Rent'%}
       <div class="li-card__price">
         ₦{{ p.price_range|floatformat:"0g"|intcomma }}
-        <span class="li-card__price-suffix">/yr</span>
+        <span class="li-card__price-suffix">/ {{ p.rent_rate|default:"yr" }}</span>
       </div>
     {%else%}
       <div class="li-card__price">
         ₦{{ p.price|floatformat:"0g"|intcomma }}
-        <span class="li-card__price-suffix">/yr</span>
       </div>
     {%endif%}
       <div class="li-card__stats">

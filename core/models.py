@@ -64,6 +64,7 @@ class PropertyManagementRent(models.Model):
     residential= models.CharField(max_length=30, choices=RESIDENTIAL_PROPERTIES, default='Apartment', blank=True)
     commercial= models.CharField(max_length=30, choices=COMMERCIAL_PROPERTIES, default='Office Space', blank=True)
     lands= models.CharField(max_length=30, choices=LAND, default='Farmland', blank=True)
+    rent_rate=models.CharField(max_length=30, choices=RENT_RATE, default='yearly', blank=False, null=False)
     base_image= models.ImageField(null=True, blank=True, upload_to="images/rent", validators=[validate_image])
     listed_date=models.DateTimeField(default=timezone.now, blank=True, db_index=True)
     time_stamp=models.DateTimeField(null=True,blank=True, default=timezone.now)

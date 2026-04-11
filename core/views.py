@@ -571,43 +571,53 @@ def update_property_rent(request, property_id):
     if request.user.role == 'customer':
         messages.info(request, 'This feature is coming soon!')
         return redirect('landing')
-
-    # 2. Fetch the object safely
-    property_obj = get_object_or_404(PropertyManagementRent, pk=property_id)
-    user_role = request.user.role
-    
-    # 3. Map templates to roles (Cleaner than if/elif)
-    template_map = {
-        'company': 'company/base.html',
-        'agent': 'agent/base.html',
-        'landlord': 'landlord/base.html',
-    }
-    base_template = template_map.get(user_role, 'estate/base.html')
-
     try:
-        # 4. Centralized Authorization Logic
-        is_authorized = False
+        # 2. Fetch the object safely
+        property_obj = PropertyManagementRent.objects.get(pk=property_id)
+        user_role = request.user.role
+        
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
+        else:
+            base_template='estate/base.html'
+        
         
         if user_role == 'agent':
             agent_uuid = AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
-            is_authorized = (property_obj.agent_uuid == agent_uuid)
+            if property_obj.agent_uuid != agent_uuid:
+                messages.warning(request, 'Access denied: Unauthorized action.')
+                if 'HTTP_REFERER' in request.META:
+                    return redirect(request.META['HTTP_REFERER'])  
+                else:
+                    return redirect('landing')
             
         elif user_role == 'company':
-            company = CompanyInformation.objects.filter(user=request.user).first()
-            if company:
-                is_authorized = (property_obj.company_uuid == company.unique_company_id)
-                if is_authorized and request.method == 'POST':
-                    CompanyActivityLog.objects.create(company=company, action='Property Listing Updated')
-
+            company=CompanyInformation.objects.get(user=request.user)
+            if property_obj.company_uuid != company.unique_company_id:
+                messages.warning(request, 'Access denied: Unauthorized action.')
+                if 'HTTP_REFERER' in request.META:
+                    return redirect(request.META['HTTP_REFERER'])  
+                else:
+                    return redirect('landing')
+            CompanyActivityLog.objects.create(
+                company=company,
+                action= 'Property Listing Updated'
+            )
         elif user_role == 'landlord':
-            landlord_uuid = LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
-            is_authorized = (property_obj.landlord_uuid == landlord_uuid)
-
-        # Final check: If role isn't recognized or ownership fails
-        if not is_authorized:
-            messages.warning(request, 'Access denied: Unauthorized action.')
-            return redirect(request.META.get('HTTP_REFERER', 'landing'))
-
+            landlord_uuid=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
+            if property_obj.landlord_uuid !=landlord_uuid :
+                messages.warning(request, 'Access denied: Unauthorized action.')
+                if 'HTTP_REFERER' in request.META:
+                    return redirect(request.META['HTTP_REFERER'])  
+                else:
+                    return redirect('landing')
+        else:
+            messages.info(request, 'Access Denied')
+            return redirect('landing')
         # 5. Form Handling
         prop_form = LeaseForm(request.POST or None, request.FILES or None, instance=property_obj)
         image_form = RentImageFormSet(request.POST or None, request.FILES or None, instance=property_obj)
@@ -627,6 +637,9 @@ def update_property_rent(request, property_id):
         }
         return render(request, 'core/update_property.html', context)
 
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property Data not found')
+        return redirect('listings')
     except Exception:
         # Log the error and show the error page
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -683,7 +696,7 @@ def update_property_sale(request, property_id):
                 else:
                     return redirect('landing')
         else:
-            messages.info(request, 'Coming soon!')
+            messages.info(request, 'Access Denied')
             return redirect('landing')
         prop_form= SellForm(request.POST or None, request.FILES or None, instance=property)
         image_form = SaleImageFormSet(request.POST or None, request.FILES or None, instance=property)
@@ -693,7 +706,9 @@ def update_property_sale(request, property_id):
             messages.success(request, "Property updated successfully.")
             return redirect('listings')
         return render(request, 'core/update_property_s.html', {'property': property, 'form': prop_form,'images': image_form, 'base_template':base_template})
-        
+    except ObjectDoesNotExist:
+        messages.error(request, 'Property Data not found')
+        return redirect('listings')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

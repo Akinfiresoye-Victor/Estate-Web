@@ -876,3 +876,30 @@ body {
   background: #1a3c4e;
   color: #c19b76;
 }
+
+@media (min-width: 900px) {
+  .rent-filter-form {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+
+  .rent-filter-form > * {
+    flex: 1 1 160px;
+  }
+
+  .rent-filter-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .5rem;
+    flex: 0 0 auto;
+  }
+
+  .btn-apply,
+  .btn-reset {
+    white-space: nowrap;
+    height: 42px;
+  }
+}

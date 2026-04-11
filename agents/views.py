@@ -358,7 +358,6 @@ def update_agent_profile(request):
         
 
 
-#TODO Security Info make sure the agent is in a company before he/she can add a custom email address or force him to change to a company email ojust find a way around this
 
 def lead_management(request):
     """
