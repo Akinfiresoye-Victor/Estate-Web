@@ -181,7 +181,7 @@ def agent_form(request):
                         # Save the main agent form
                         agent = form.save(commit=False)
                         agent.user = request.user
-                        agent.users = request.user
+                        agent.email=request.user.email
                         agent.first_name = request.user.first_name
                         agent.last_name  = request.user.last_name 
                         

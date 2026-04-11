@@ -27,6 +27,8 @@ urlpatterns = [
     path('revoke_invite/<token>', views.revoke_invite_link, name='revoke-link'),
     path('remove_agent/<agent_uuid>', views.remove_agent, name='remove-agent'),
     path('employee/edit/<str:agent_uuid>', views.edit_employee, name='edit-employee'),
-    path('myfeedbacks/', views.company_feedbacks, name='view-feedbacks')
+    path('myfeedbacks/', views.company_feedbacks, name='view-feedbacks'),
+    path('send/verification_token/', views.send_verification_token, name='send-token'),
+    path('verify-company-email/<str:token>/', views.verify_company_email, name='verify-company-email')
 ]
 

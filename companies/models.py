@@ -6,11 +6,13 @@ from members.models import User
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
+from django.utils.crypto import get_random_string
+
+def generate_invite_code():
+    return get_random_string(length=8, allowed_chars='ABCDEFGHJKLMNPQRSTUVWXYZ1234567890')
 
 def company_logo_path(instance, filename):
     return f"company/logo/{instance.company_name}/{filename}"
-
-
 
 def company_file_path(instance, filename):
     return f"company/certificate/{instance.company_name}/{filename}"
@@ -34,6 +36,8 @@ class CompanyInformation(models.Model):
     company_tier= models.CharField(choices=COMPANY_TIER, default='starter')
     inventory_slots=models.IntegerField('Inventory Slots', default=50)
     listing_slots=models.IntegerField('Listing Slots', default=30)
+    is_company_email_verified=models.BooleanField('Company Email Verified?', default=False)
+    verification_token=models.CharField(max_length=8, default=generate_invite_code, unique=True, null=False, blank=False)
     verified=models.BooleanField('Verified Company',default=False)
     date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):

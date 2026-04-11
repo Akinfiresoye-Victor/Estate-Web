@@ -132,18 +132,36 @@
               {% endif %}
             </div>
 
-            <!-- Email -->
-            <div class="form-group">
+            <!-- Email — read-only with Change Email modal trigger -->
+            <div class="form-group full-width">
               <label for="{{ form.email.id_for_label }}">
                 {{ form.email.label }}
-                {% if form.email.field.required %}<span class="required">*</span>{% endif %}
               </label>
-              {{ form.email }}
+              <div style="display:flex; gap:8px; align-items:center;">
+                <div style="position:relative; flex:1;">
+                  <i class="bi bi-lock-fill"
+                    style="position:absolute; left:10px; top:50%; transform:translateY(-50%);
+                            color:var(--text-light); font-size:13px; pointer-events:none;"></i>
+                  {{ form.email }}
+                </div>
+                <button type="button"
+                        id="openEmailModal"
+                        style="white-space:nowrap; padding:0 14px; height:42px; border-radius:8px;
+                              border:1px solid var(--primary); background:transparent;
+                              color:var(--primary); font-size:13px; font-weight:500; cursor:pointer;
+                              display:flex; align-items:center; gap:6px;">
+                  <i class="bi bi-pencil-square"></i> Change Email
+                </button>
+              </div>
+              <small style="color:var(--text-light); font-size:12px; margin-top:4px; display:block;">
+                <i class="bi bi-shield-lock" style="font-size:11px;"></i>
+                Your email is used for login. You'll need to verify your password to change it.
+              </small>
               {% if form.email.errors %}
                 <span class="error-text"><i class="bi bi-exclamation-circle"></i>{{ form.email.errors.0 }}</span>
               {% endif %}
             </div>
-
+            
             <!-- Location -->
             <div class="form-group">
               <label for="{{ form.location.id_for_label }}">
@@ -446,7 +464,73 @@
       </div>
     </div>
     {% endif %}
+    <!-- ============================================
+        EMAIL CHANGE MODAL
+        ============================================ -->
+    <div class="modal fade" id="emailChangeModal" tabindex="-1" aria-labelledby="emailChangeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:12px; border:none; overflow:hidden;">
 
+          <!-- Header -->
+          <div class="modal-header" style="background:var(--primary); border:none; padding:18px 20px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <i class="bi bi-envelope-exclamation" style="color:var(--secondary); font-size:20px;"></i>
+              <h5 class="modal-title" id="emailChangeModalLabel"
+                  style="color:#fff; font-size:16px; font-weight:600; margin:0;">
+                Change Your Email Address
+              </h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <!-- Body -->
+          <div class="modal-body" style="padding:24px 20px;">
+
+            <!-- Warning notice -->
+            <div style="background:#fff8ed; border:1px solid #f6c26b; border-radius:8px;
+                        padding:12px 14px; margin-bottom:20px; display:flex; gap:10px;">
+              <i class="bi bi-exclamation-triangle-fill" style="color:#d97706; font-size:16px; flex-shrink:0; margin-top:1px;"></i>
+              <div style="font-size:13px; color:#92400e; line-height:1.5;">
+                <strong>Heads up:</strong> Changing your email will update your login credentials.
+                You'll receive a verification link at your new address before the change takes effect.
+              </div>
+            </div>
+
+            <!-- Step list -->
+            <p style="font-size:13px; color:var(--text-dark); font-weight:600; margin-bottom:10px;">
+              Here's what happens next:
+            </p>
+            <ol style="font-size:13px; color:var(--text-light); padding-left:18px; margin-bottom:0; line-height:2;">
+              <li>You'll be taken to the email change page</li>
+              <li>Add your new email address there</li>
+              <li>We'll send a verification link to the new address</li>
+              <li>Click the link — your email updates instantly</li>
+            </ol>
+
+          </div>
+
+          <!-- Footer -->
+          <div class="modal-footer" style="border:none; padding:0 20px 20px; gap:10px;">
+            <button type="button"
+                    data-bs-dismiss="modal"
+                    style="flex:1; padding:11px; border-radius:8px; border:1px solid var(--border);
+                          background:#fff; color:var(--text-dark); font-size:14px;
+                          font-weight:500; cursor:pointer;">
+              Cancel
+            </button>
+            <a href="{% url 'logout_for_email_change' %}"
+              style="flex:1; padding:11px; border-radius:8px; border:none;
+                      background:var(--primary); color:#a07d5a !important; font-size:14px;
+                      font-weight:600; cursor:pointer; display:flex;
+                      align-items:center; justify-content:center; gap:8px;
+                      text-decoration:none;">
+              <i class="bi bi-arrow-right-circle"></i> Continue
+            </a>
+          </div>
+
+        </div>
+      </div>
+</div>
   </form>
 </div><!-- /.form-container -->
 
@@ -537,6 +621,18 @@ document.addEventListener('DOMContentLoaded', function () {
   // Set initial dot state
   updateProgressDots();
 
+    // ==========================================
+    // 6. EMAIL CHANGE MODAL
+    // ==========================================
+    var emailModalEl = document.getElementById('emailChangeModal');
+    var emailModal   = emailModalEl ? new bootstrap.Modal(emailModalEl) : null;
+    var openEmailBtn = document.getElementById('openEmailModal');
+
+    if (openEmailBtn && emailModal) {
+      openEmailBtn.addEventListener('click', function () {
+        emailModal.show();
+      });
+    }
 
   // ==========================================
   // 3. FILE INPUT — show filename after pick

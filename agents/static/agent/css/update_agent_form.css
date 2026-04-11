@@ -654,3 +654,11 @@ input[type="hidden"][id*="-id"] { display: none; }
   .section-toggle { cursor: default; pointer-events: none; }
   .section-chevron { display: none; }
 }
+
+#id_email {
+  padding-left: 30px !important;
+  background: #f8fafc !important;
+  color: var(--text-light) !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}

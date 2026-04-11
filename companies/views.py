@@ -26,6 +26,7 @@ from django_ratelimit.decorators import ratelimit
 from allauth.account.models import EmailAddress
 
 
+
 def calculate_profile_strength(has_logo, has_agent, is_verified):
     """
     Lives outside the view — defined once, not recreated on every request.
@@ -51,6 +52,8 @@ def dashboard(request):
 
     try:
         company= CompanyInformation.objects.get(user=request.user)
+        if not company.is_company_email_verified:
+            messages.info(request, 'Verify company email(in settings) to access more tools')
         social_links = company.social.all()
         if company.user != request.user:
             messages.error(request, 'Error Redirecting To Dashboard....')
@@ -335,11 +338,14 @@ def company_analytics(request):
     if request.user.role != 'company':
         messages.error(request, 'Company account only')
         return redirect('landing')
+    
 
     try:
-        messages.info(request, 'Numbers might seem low since we just launched')
 
         company = CompanyInformation.objects.get(user=request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         if company.user != request.user:
             messages.error(request, 'Unauthorized access')
             return redirect('landing')
@@ -358,7 +364,7 @@ def company_analytics(request):
                 'average_reviews':       0,
             }
         )
-
+        messages.info(request, 'Numbers might seem low since we just launched')
         #30 days window for company analytics
         window_start = analytics.last_reset_date
 
@@ -678,6 +684,9 @@ def lead_detail(request, lead_id):
         return redirect('landing')
     try:
         company=CompanyInformation.objects.get(user=request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         client=LeadInfo.objects.get(lead_id=lead_id)
         if client.company_uuid != company.unique_company_id:
             messages.warning(request, 'Access denied: Unauthorized action.')
@@ -734,34 +743,36 @@ def update_lead_status(request, lead_id):
         messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
-        try:
-            company= CompanyInformation.objects.get(user= request.user)
-            lead=LeadInfo.objects.get(pk=lead_id)
-            if lead.company_uuid != company.unique_company_id:
-                messages.error(request, 'Access denied: Unauthorized action.')
-                return redirect('landing')
-            new_status= request.POST.get('new_status')
-            if not new_status:
-                messages.error(request, 'Please provide a lead status.')
-                return redirect('company:lead-management')
-            
-            from core.choices import LEAD_STATUS
-            if new_status not in [choice[0] for choice in LEAD_STATUS]:
-                messages.error(request, 'The provided status value is invalid.')
-                return redirect('company:lead-management')
-            
-            lead.status=new_status
-            lead.date_updated=timezone.now()
-            lead.save()
-            CompanyActivityLog.objects.create(
-                company=company,
-                action='Lead Status Updated'
-            )
-            messages.success(request, 'Lead status updated successfully.')
-            return redirect('company:lead-detail', lead_id=lead_id)
-        except ObjectDoesNotExist:
-            messages.error(request, 'The requested lead could not be found.')
+        company= CompanyInformation.objects.get(user= request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
+        lead=LeadInfo.objects.get(pk=lead_id)
+        if lead.company_uuid != company.unique_company_id:
+            messages.error(request, 'Access denied: Unauthorized action.')
+            return redirect('landing')
+        new_status= request.POST.get('new_status')
+        if not new_status:
+            messages.error(request, 'Please provide a lead status.')
             return redirect('company:lead-management')
+        
+        from core.choices import LEAD_STATUS
+        if new_status not in [choice[0] for choice in LEAD_STATUS]:
+            messages.error(request, 'The provided status value is invalid.')
+            return redirect('company:lead-management')
+        
+        lead.status=new_status
+        lead.date_updated=timezone.now()
+        lead.save()
+        CompanyActivityLog.objects.create(
+            company=company,
+            action='Lead Status Updated'
+        )
+        messages.success(request, 'Lead status updated successfully.')
+        return redirect('company:lead-detail', lead_id=lead_id)
+    except ObjectDoesNotExist:
+        messages.error(request, 'The requested lead could not be found.')
+        return redirect('company:lead-management')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -777,34 +788,36 @@ def update_lead_stage(request, lead_id):
         messages.info(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
     try:
-        try:
-            company= CompanyInformation.objects.get(user= request.user)
-            lead=LeadInfo.objects.get(pk=lead_id)
-            if lead.company_uuid != company.unique_company_id:
-                messages.error(request, 'Access denied: Unauthorized action.')
-                return redirect('landing')
-            new_stage = request.POST.get('new_stage')
-            if not new_stage:
-                messages.error(request, 'Please provide a lead stage.')
-                return redirect('company:lead-management')
-            
-            from core.choices import LEAD_STAGES
-            if new_stage not in [choice[0] for choice in LEAD_STAGES]:
-                messages.error(request, 'The provided stage value is invalid.')
-                return redirect('company:lead-management')
-            
-            lead.stages = new_stage
-            lead.date_updated=timezone.now()
-            lead.save()
-            CompanyActivityLog.objects.create(
-                company=company,
-                action= 'Lead Stage Updated'
-            )
-            messages.success(request, 'Lead stage updated successfully.')
-            return redirect('company:lead-detail', lead_id=lead_id)
-        except ObjectDoesNotExist:
-            messages.error(request, 'The requested lead could not be found.')
+        company= CompanyInformation.objects.get(user= request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
+        lead=LeadInfo.objects.get(pk=lead_id)
+        if lead.company_uuid != company.unique_company_id:
+            messages.error(request, 'Access denied: Unauthorized action.')
+            return redirect('landing')
+        new_stage = request.POST.get('new_stage')
+        if not new_stage:
+            messages.error(request, 'Please provide a lead stage.')
             return redirect('company:lead-management')
+        
+        from core.choices import LEAD_STAGES
+        if new_stage not in [choice[0] for choice in LEAD_STAGES]:
+            messages.error(request, 'The provided stage value is invalid.')
+            return redirect('company:lead-management')
+        
+        lead.stages = new_stage
+        lead.date_updated=timezone.now()
+        lead.save()
+        CompanyActivityLog.objects.create(
+            company=company,
+            action= 'Lead Stage Updated'
+        )
+        messages.success(request, 'Lead stage updated successfully.')
+        return redirect('company:lead-detail', lead_id=lead_id)
+    except ObjectDoesNotExist:
+        messages.error(request, 'The requested lead could not be found.')
+        return redirect('company:lead-management')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -892,7 +905,9 @@ def manage_company(request):
     
     try:
         company=CompanyInformation.objects.get(user=request.user)
-
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         # Run expiry check only on currently active links
         active_links=InviteLink.objects.filter(company=company, is_active=True)
         for link in active_links:
@@ -1159,6 +1174,9 @@ def onboard_agent(request, agent_uuid):
     try:
         agent=AgentInformation.objects.get(agent_uuid=agent_uuid)
         company=CompanyInformation.objects.get(user=request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         if company.user != request.user:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
@@ -1218,6 +1236,9 @@ def generate_invite_link(request):
 
     try:
         company = CompanyInformation.objects.get(user=request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         if company.user != request.user:
             messages.warning(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
@@ -1279,7 +1300,9 @@ def revoke_invite_link(request, token):
     try:
         invite_link=InviteLink.objects.get(invite_token=token)
         company=CompanyInformation.objects.get(user=request.user)
-        
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         if invite_link.company!=company:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
@@ -1307,6 +1330,9 @@ def remove_agent(request, agent_uuid):
     
     try:
         company=CompanyInformation.objects.get(user=request.user)
+        if not company.is_company_email_verified:
+            messages.error(request, 'To access Verify Company Email via settings')
+            return redirect('landing')
         employee=Employees.objects.get(agent_uuid=agent_uuid)
         if not employee.company == company:
             messages.warning(request, 'Access denied: Unauthorized action.')
@@ -1359,6 +1385,9 @@ def edit_employee(request, agent_uuid):
         messages.warning(request, 'Access denied: This page is for company accounts only.')
         return redirect('landing')
     company = get_object_or_404(CompanyInformation, user=request.user)
+    if not company.is_company_email_verified:
+        messages.error(request, 'To access Verify Company Email via settings')
+        return redirect('landing')
 
     employee = get_object_or_404(Employees,agent_uuid=agent_uuid,company=company)
 
@@ -1417,6 +1446,72 @@ def company_feedbacks(request):
             'base_template': 'company/base.html',
         })
 
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+def send_verification_token(request):
+    try:
+        if not request.user.is_authenticated:
+            messages.info(request, 'Login Required')
+            return redirect('login')
+        if request.user.role != 'company':
+            messages.info(request, 'Company Account Only')
+            return redirect('landing')
+        # Send email to agent (background thread)
+        company=CompanyInformation.objects.get(user=request.user)
+        if company.is_company_email_verified:
+            messages.success(request, 'Email Already Verified')
+            return redirect('dashboard')
+        relative_url = reverse('company:verify-company-email', kwargs={'token': company.verification_token})
+        target_url = request.build_absolute_uri(relative_url)
+        threading.Thread(
+            target=send_estate_email,
+            kwargs=dict(
+                subject=f"Email verification for {company.company_name}",
+                template_name='emails/company_email.html',
+                context={'activate_url': target_url, 'company': company, 'request': request},
+                recipient_list=[company.email],
+            ),
+            daemon=True,
+        ).start()
+        messages.success(request, 'Verification Link Sent')
+        return redirect('company:company-settings')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Account Not found')
+        return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+
+def verify_company_email(request, token):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log in required')
+        return redirect('login')
+    if request.user.role != 'company':
+        messages.warning(request, 'Companies Only')
+        return redirect('landing')
+    try:
+        company=CompanyInformation.objects.get(user=request.user)
+        if company.verification_token != token:
+            messages.error(request, 'Invalid Token')
+        company.is_company_email_verified = True
+        company.verification_token = None # Clear the token
+        company.save()
+        messages.success(request, "Your professional company email is now verified!")
+        CompanyActivityLog.objects.create(
+        company=CompanyInformation.objects.get(user=request.user),
+        action='Company Email Verified'
+        )
+        return redirect('company:dashboard')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Company Not Found')
+        return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

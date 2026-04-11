@@ -16,7 +16,7 @@ class AgentInformationForm(forms.ModelForm):
     class Meta:
         model = AgentInformation
         fields = [
-            'phone_number', 'email', 'location', 
+            'phone_number', 'location', 
             'language', 'work_type', 'bio', 'profile_picture', 
             'government_id', 'certificate'
         ]
@@ -24,10 +24,6 @@ class AgentInformationForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter phone number'
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter email address'
             }),
             'location': forms.Select(attrs={
                 'class': 'form-control'
@@ -84,6 +80,7 @@ class UpdateAgentInformationForm(forms.ModelForm):
                 'placeholder': 'Enter phone number'
             }),
             'email': forms.EmailInput(attrs={
+                'readonly':'readonly',
                 'class': 'form-control',
                 'placeholder': 'Enter email address'
             }),

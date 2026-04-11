@@ -25,7 +25,8 @@ from allauth.account.internal.flows.email_verification import send_verification_
 from allauth.account.views import EmailView
 from django.contrib import messages
 from django.urls import reverse_lazy
-
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -381,3 +382,10 @@ class CustomEmailView(EmailView):
                 messages.error(request, 'Invalid Request')
                 return redirect('account_email')
         return super().post(request, *args, **kwargs)
+
+@login_required
+def logout_for_email_change(request):
+    logout(request)
+    return HttpResponseRedirect(
+        reverse('login') + '?next=' + reverse('account_email')
+    )

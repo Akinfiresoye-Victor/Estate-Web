@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings 
 from allauth.account.views import EmailView
 from django.urls import reverse_lazy
-from members.views import resend_verification, CustomEmailView
+from members.views import resend_verification, CustomEmailView,logout_for_email_change
 
 
 urlpatterns = [
@@ -20,6 +20,7 @@ urlpatterns = [
     path('agent/', include('agents.urls', namespace='agent')),
     path('company/', include('companies.urls', namespace='company')),
     path('landlord/', include('landlord.urls', namespace='landlord')),
+    path('accounts/email/change/', logout_for_email_change, name='logout_for_email_change'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

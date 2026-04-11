@@ -134,11 +134,21 @@
               </div>
             </div>
             <div class="col-md-6">
-              <div class="form-group">
-                <label for="emailAddress">Email Address</label>
-                <input type="email" class="form-control" id="emailAddress" value="{{ company.email }}" readonly>
-              </div>
+            <div class="form-group">
+              <label for="emailAddress">Email Address</label>
+              <input type="email" class="form-control" id="emailAddress" value="{{ company.email }}" readonly>
+              {% if company.is_company_email_verified %}
+                <small style="color:#16a34a; font-size:12px; margin-top:4px; display:flex; align-items:center; gap:4px;">
+                  <i class="bi bi-check-circle-fill"></i> Email verified
+                </small>
+              {% else %}
+                <small style="color:#dc2626; font-size:12px; margin-top:4px; display:flex; align-items:center; gap:4px;">
+                  <i class="bi bi-exclamation-circle-fill"></i> Email not verified
+                </small>
+              {% endif %}
             </div>
+          </div>
+
           </div>
 
           <div class="form-group">
@@ -232,14 +242,30 @@
         </div>
         <div class="card-body-settings">
 
-          <div class="security-item verified">
-            <div class="security-icon"><i class="bi bi-envelope-check"></i></div>
+        <div class="security-item {% if company.is_company_email_verified %}verified{% endif %}">
+            <div class="security-icon">
+              <i class="bi bi-{% if company.is_company_email_verified %}envelope-check{% else %}envelope-exclamation{% endif %}"></i>
+            </div>
             <div class="security-content">
-              <h4>Email Verification</h4>
-              <p>Your email address is verified</p>
+              <h4>Company Email Verification</h4>
+              {% if company.is_company_email_verified %}
+                <p>Your company email address is verified</p>
+              {% else %}
+                <p>Your company email address has not been verified yet</p>
+              {% endif %}
             </div>
             <div class="security-status">
-              <span class="status-badge verified"><i class="bi bi-check-circle"></i> Verified</span>
+              {% if company.is_company_email_verified %}
+                <span class="status-badge verified">
+                  <i class="bi bi-check-circle"></i> Verified
+                </span>
+              {% else %}
+                <a href="{% url 'company:send-token' %}"
+                  class="btn-change-password"
+                  style="background:#dc2626; border-color:#dc2626;">
+                  <i class="bi bi-envelope-arrow-up-fill"></i> Verify Email
+                </a>
+              {% endif %}
             </div>
           </div>
 
