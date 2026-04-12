@@ -132,7 +132,6 @@ class UpdateUserForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
-
     #function to check if the username is valid 
     def clean_username(self):
         username = self.cleaned_data.get('username')

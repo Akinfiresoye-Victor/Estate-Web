@@ -118,12 +118,12 @@
                 <p style="margin: 8px 0; font-size: 15px;"><strong>Phone:</strong> {{ lead.phone_number }}</p>
                 <p style="margin: 8px 0; font-size: 15px;"><strong>Contact Preference:</strong> {{ lead.contact_type }}</p>
 
-                {% if lead.is_tour %}
+                {% if lead.schedule_tour %}
                     <p style="margin: 12px 0 0 0; font-size: 15px; color: #2563eb; font-weight: 600;">✨ This lead has requested a property tour.</p>
                 {% endif %}
 
                 <p style="margin: 16px 0 0 0; font-style: italic; color: #4b5563; background: #ffffff; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #1a3c4e; line-height: 1.6;">
-                    "{{ lead.message }}"
+                    "{{ lead.inquiry_message }}"
                 </p>
             </div>
 

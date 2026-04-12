@@ -191,7 +191,6 @@
                 {% endif %}
               </div>
 
-              <!-- Email -->
               <div class="form-group">
                 <label for="{{ form.email.id_for_label }}">
                   {{ form.email.label }}
@@ -200,6 +199,12 @@
                   <i class="bi bi-envelope"></i>
                   {{ form.email }}
                 </div>
+                
+                <small class="form-text text-muted" style="display: block; margin-top: 5px; font-size: 0.85rem;">
+                  <i class="bi bi-info-circle"></i> 
+                  Changing your email will require a new verification to maintain your status.
+                </small>
+
                 {% if form.email.errors %}
                   <span class="invalid-feedback">{{ form.email.errors.0 }}</span>
                 {% endif %}

@@ -17,6 +17,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from landlord.models import LandlordInformation
 from django_ratelimit.decorators import ratelimit
 from django.core.mail import send_mail
+import threading
+
 
 def landing_page(request):
     if not request.user.is_authenticated:
@@ -866,7 +868,18 @@ def partner_with_us(request):
             partnership = form.save(commit=False)
             partnership.save()           # writes the main row to the database
             form.save_m2m()              # now writes the M2M
-
+            threading.Thread(
+                target=send_estate_email,
+                kwargs=dict(
+                    subject="New Partnership Application Received",
+                    template_name='emails/simple_notification.html',
+                    context={
+                        'message': f"A new partnership application was submitted by {form.cleaned_data['company_name']} ({form.cleaned_data['email']}). Log in to review it."
+                    },
+                    recipient_list=['contact@estatewebng.com'],
+                ),
+                daemon=True,
+            ).start()
             messages.success(
                 request,
                 "Thank you for applying! Our partnerships team will review your application "

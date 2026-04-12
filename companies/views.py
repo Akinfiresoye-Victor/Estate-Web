@@ -309,6 +309,17 @@ def update_company_profile(request):
                 with transaction.atomic():
                     company = comp_form.save(commit=False)
                     company.user = request.user
+                    emails=User.objects.values_list('email', flat=True)
+                    if request.user.email != company.email and company.email not in emails:
+                        company.is_company_email_verified=False
+                        company.verification_token=generate_invite_code()
+                    elif company.email in emails:
+                        messages.error(request, 'Error, That Email is linked to an account')
+                        if 'HTTP_REFERER' in request.META:
+                            return redirect(request.META['HTTP_REFERER'])  
+                        else:
+                            messages.error(request, 'Unable to redirect. Please try again.')
+                            return redirect('landing')
                     company.save()
                     link_form.save()
                     messages.success(request, 'Company profile updated successfully.')
@@ -1500,8 +1511,9 @@ def verify_company_email(request, token):
         return redirect('landing')
     try:
         company=CompanyInformation.objects.get(user=request.user)
-        if company.verification_token != token:
+        if company.verification_token != token or token==None:
             messages.error(request, 'Invalid Token')
+            return redirect('company:company-settings')
         company.is_company_email_verified = True
         company.verification_token = None # Clear the token
         company.save()

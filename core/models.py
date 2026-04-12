@@ -197,7 +197,6 @@ class Feedbacks(models.Model):
 
 
 class WishlistStorageUnit(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     user_id=models.IntegerField('Owner Of Wishlist', default=1, null=False, blank=False)
     property_id=models.IntegerField('Property In Question', default=1,null=False, blank=False)
     property_type=models.CharField('Property_type', default='Rent', null=False, blank=False)

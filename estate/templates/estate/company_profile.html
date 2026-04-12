@@ -169,11 +169,12 @@
                 <span class="cp-info-val">{{ company.address }}</span>
               </div>
             </div>
-
-              <a href="mailto:{{ company.email }}?subject=Property Inquiry - Estate Web&body=Hello, I am interested in your properties. Please provide more details." 
+{%if company.email%}
+              <a href="mailto:{{ company.email }}?subject=Property%20Inquiry%20-%20Estate%20Web&body=Hello,%20I%20am%20interested%20in%20your%20properties."
                 class="cp-btn-msg text-decoration-none">
                   <i class="bi bi-send-fill"></i> Send Message
               </a>
+{%endif%}
 
           </div>
         </div>

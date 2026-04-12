@@ -4,6 +4,24 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'company/css/lead_detail.css' %}">
+<style>
+  /* ── Two-column layout fix ──────────────────────────────────────────
+     Ensures sidebar sits on the right on desktop.
+     Add these rules to lead_detail.css and remove this style block.
+  ─────────────────────────────────────────────────────────────────── */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .content-grid {
+      grid-template-columns: 1fr 360px;
+      align-items: start;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -86,7 +104,7 @@
 <div class="container-fluid content-wrapper">
   <div class="content-grid">
 
-    {# ── Main column ────────────────────────────────────────────────── #}
+    {# ── Main column ──────────────────────────────────────────────── #}
     <div class="main-column">
 
       {# Contact Preference Notice #}
@@ -219,9 +237,10 @@
         </div>
       </div>
 
-    </main>
+    </div>
+    {# ── END main-column ─────────────────────────────────────────── #}
 
-    {# ── Right: Sidebar ───────────────────────────────────────────── #}
+    {# ── Sidebar ──────────────────────────────────────────────────── #}
     <aside class="sidebar-column">
 
       {# Lead Status — status/stage selects must remain exactly as-is #}
@@ -336,6 +355,7 @@
       </div>
 
     </aside>
+    {# ── END sidebar-column ──────────────────────────────────────── #}
 
   </div>
 </div>
@@ -356,7 +376,7 @@
     const el = document.getElementById('lead_id_data');
     if (!el) { alert('Error: Lead ID not found'); return; }
 
-    const url       = el.getAttribute('data-update-url');
+    const url  = el.getAttribute('data-update-url');
     const CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
     if (!url) { alert('Error: Update URL not configured'); return; }
 
@@ -383,9 +403,9 @@
     const el = document.getElementById('lead_id_data');
     if (!el) return;
 
-    const leadId    = el.getAttribute('data-lead-id');
-    const CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const url       = `/company/lead/update_stage/${leadId}`;
+    const leadId = el.getAttribute('data-lead-id');
+    const CSRF   = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const url    = `/company/lead/update_stage/${leadId}`;
 
     fetch(url, {
       method: 'POST',
@@ -410,9 +430,9 @@
   };
 
   /* ── Misc stubs (coming soon) ───────────────────────────────────── */
-  window.scheduleFollowUp = function () { alert('Schedule follow-up feature coming soon'); };
-  window.createTask       = function () { alert('Create task feature coming soon'); };
-  window.sendDocument     = function () { alert('Send document feature coming soon'); };
+  window.scheduleFollowUp  = function () { alert('Schedule follow-up feature coming soon'); };
+  window.createTask        = function () { alert('Create task feature coming soon'); };
+  window.sendDocument      = function () { alert('Send document feature coming soon'); };
   window.openReassignModal = function () { alert('Reassign feature coming soon'); };
 
 }());

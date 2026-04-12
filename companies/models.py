@@ -37,7 +37,7 @@ class CompanyInformation(models.Model):
     inventory_slots=models.IntegerField('Inventory Slots', default=50)
     listing_slots=models.IntegerField('Listing Slots', default=30)
     is_company_email_verified=models.BooleanField('Company Email Verified?', default=False)
-    verification_token=models.CharField(max_length=8, default=generate_invite_code, unique=True, null=False, blank=False)
+    verification_token=models.CharField(max_length=8, default=generate_invite_code, unique=True, null=True, blank=True)
     verified=models.BooleanField('Verified Company',default=False)
     date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):
