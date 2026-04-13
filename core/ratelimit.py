@@ -67,7 +67,8 @@ def ratelimit(rate='30/m', methods=('POST',), key_prefix=None):
                     else:
                         cache.incr(cache_key)
                 except Exception as e:
-                    logger.error("Rate limit cache error", exc_info=True)
+                    import traceback
+                    traceback.print_exc()
                     # cache unavailable — fail open, allow the request
 
             return view_func(request, *args, **kwargs)
