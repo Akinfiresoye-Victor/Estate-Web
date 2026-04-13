@@ -764,3 +764,6 @@ Users see updated site (~60 seconds total)
 ---
 
 *Estate Web — Deployment Guide v1.0*
+
+
+github token - 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
