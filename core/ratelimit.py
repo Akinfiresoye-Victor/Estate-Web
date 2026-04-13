@@ -1,8 +1,11 @@
 import functools
+import logging
+import re
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import render
 
+logger = logging.getLogger(__name__)
 
 def _get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -21,11 +24,24 @@ def ratelimit(rate='30/m', methods=('POST',), key_prefix=None):
         @ratelimit(rate='30/m', methods=('POST',))
         def my_view(request):
             ...
+        
+        @ratelimit(rate='5/10m')
+        def my_view(request):
+            ...
     """
-    count_str, period_str = rate.split('/')
+    count_str, raw_period = rate.split('/')
     max_requests = int(count_str)
+    
+    # Parse period (e.g. 'm', '10m', '1h')
+    match = re.match(r'^(\d*)([smhd])$', raw_period.lower())
+    if not match:
+        raise ValueError(f"Invalid rate period: {raw_period}")
+    
+    multiplier_str, period_char = match.groups()
+    multiplier = int(multiplier_str) if multiplier_str else 1
+    
     period_map = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}
-    window_seconds = period_map[period_str.lower()]
+    window_seconds = multiplier * period_map[period_char]
 
     def decorator(view_func):
         prefix = key_prefix or view_func.__name__
@@ -50,8 +66,9 @@ def ratelimit(rate='30/m', methods=('POST',), key_prefix=None):
                         return render(request, 'core/429.html', status=429)
                     else:
                         cache.incr(cache_key)
-                except Exception:
-                    pass  # cache unavailable — fail open, allow the request
+                except Exception as e:
+                    logger.error("Rate limit cache error", exc_info=True)
+                    # cache unavailable — fail open, allow the request
 
             return view_func(request, *args, **kwargs)
         return wrapped

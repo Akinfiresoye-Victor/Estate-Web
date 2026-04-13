@@ -362,7 +362,7 @@ def resend_verification(request):
 
 
 
-@ratelimit(rate='3/h', key_prefix='email_reset')
+@method_decorator(ratelimit(rate='3/h', key_prefix='email_reset'), name='dispatch')
 class CustomEmailView(EmailView):
     success_url = reverse_lazy('account_email')
 
