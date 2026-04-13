@@ -468,79 +468,83 @@ def toggle_listing(request, property_id, property_type):
     Toggles a property between inventory (private) and listed(public).
     Supports AJAX
     """
-    is_ajax=request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    
-    Model=PropertyManagementSale if property_type == 'sale' else PropertyManagementRent
     try:
-        #making the user who posted have access to the property
-        if request.user.role == 'company':
-            company=CompanyInformation.objects.filter(user=request.user).values_list('unique_company_id', flat=True).first()
-            prop=Model.objects.get(pk=property_id, company_uuid=company)
-        elif request.user.role == 'landlord':
-            from landlord.models import LandlordInformation
-            landlord=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
-            prop=Model.objects.get(pk=property_id, landlord_uuid=landlord)
-        else:
-            agent=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
-            prop=Model.objects.get(pk=property_id, agent_uuid=agent)
-    except:
-        if is_ajax:
-            return JsonResponse({'error':'Not found'}, status=404)
-        messages.error(request, 'The requested property could not be found.')
-        return redirect('listings')
-
-    if prop.is_listed:
-        prop.is_listed = False
-        prop.save(update_fields=['is_listed'])
-        msg = 'Property moved to inventory.'
-        if is_ajax:
-            # Calculate new live count based on user role
-            try:
-                if request.user.role == 'landlord':
-                    from landlord.models import LandlordInformation
-                    landlord_obj = LandlordInformation.objects.get(user=request.user)
-                    live_count = get_listing_count(None, None, landlord_obj)
-                elif request.user.role == 'company':
-                    company_obj = CompanyInformation.objects.get(user=request.user)
-                    live_count = get_listing_count(None, company_obj)
-                else: # agent
-                    agent_obj = AgentInformation.objects.get(user=request.user)
-                    live_count = get_listing_count(agent_obj)
-            except Exception:
-                live_count = 0  # Fallback
-            return JsonResponse({'is_listed': False, 'message': msg, 'live_count': live_count})
-        messages.success(request, msg)
-    else:
-        # Determine roles for can_go_live check
-        agent_obj = None
-        company_obj = None
-        landlord_obj = None
-
-        if request.user.role == 'agent':
-            agent_obj = AgentInformation.objects.get(user=request.user)
-            company_obj = get_agent_company(agent_obj)
-        elif request.user.role == 'company':
-            company_obj = CompanyInformation.objects.get(user=request.user)
-        elif request.user.role == 'landlord':
-            from landlord.models import LandlordInformation
-            landlord_obj = LandlordInformation.objects.get(user=request.user)
+        is_ajax=request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         
-        allowed, reason = can_go_live(agent=agent_obj, company=company_obj, landlord=landlord_obj)
-        if not allowed:
+        Model=PropertyManagementSale if property_type == 'sale' else PropertyManagementRent
+        try:
+            #making the user who posted have access to the property
+            if request.user.role == 'company':
+                company=CompanyInformation.objects.filter(user=request.user).values_list('unique_company_id', flat=True).first()
+                prop=Model.objects.get(pk=property_id, company_uuid=company)
+            elif request.user.role == 'landlord':
+                from landlord.models import LandlordInformation
+                landlord=LandlordInformation.objects.filter(user=request.user).values_list('landlord_uuid', flat=True).first()
+                prop=Model.objects.get(pk=property_id, landlord_uuid=landlord)
+            else:
+                agent=AgentInformation.objects.filter(user=request.user).values_list('agent_uuid', flat=True).first()
+                prop=Model.objects.get(pk=property_id, agent_uuid=agent)
+        except:
             if is_ajax:
-                return JsonResponse({'error': reason}, status=403)
-            messages.error(request, reason)
+                return JsonResponse({'error':'Not found'}, status=404)
+            messages.error(request, 'The requested property could not be found.')
             return redirect('listings')
 
-        prop.is_listed = True
-        prop.save(update_fields=['is_listed'])
-        msg = 'Your property is now live!'
-        if is_ajax:
-            live_count = get_listing_count(agent_obj, company_obj, landlord_obj)
-            return JsonResponse({'is_listed': True, 'message': msg, 'live_count': live_count})
-        messages.success(request, msg)
-    return redirect('listings')
+        if prop.is_listed:
+            prop.is_listed = False
+            prop.save(update_fields=['is_listed'])
+            msg = 'Property moved to inventory.'
+            if is_ajax:
+                # Calculate new live count based on user role
+                try:
+                    if request.user.role == 'landlord':
+                        from landlord.models import LandlordInformation
+                        landlord_obj = LandlordInformation.objects.get(user=request.user)
+                        live_count = get_listing_count(None, None, landlord_obj)
+                    elif request.user.role == 'company':
+                        company_obj = CompanyInformation.objects.get(user=request.user)
+                        live_count = get_listing_count(None, company_obj)
+                    else: # agent
+                        agent_obj = AgentInformation.objects.get(user=request.user)
+                        live_count = get_listing_count(agent_obj)
+                except Exception:
+                    live_count = 0  # Fallback
+                return JsonResponse({'is_listed': False, 'message': msg, 'live_count': live_count})
+            messages.success(request, msg)
+        else:
+            # Determine roles for can_go_live check
+            agent_obj = None
+            company_obj = None
+            landlord_obj = None
 
+            if request.user.role == 'agent':
+                agent_obj = AgentInformation.objects.get(user=request.user)
+                company_obj = get_agent_company(agent_obj)
+            elif request.user.role == 'company':
+                company_obj = CompanyInformation.objects.get(user=request.user)
+            elif request.user.role == 'landlord':
+                from landlord.models import LandlordInformation
+                landlord_obj = LandlordInformation.objects.get(user=request.user)
+            
+            allowed, reason = can_go_live(agent=agent_obj, company=company_obj, landlord=landlord_obj)
+            if not allowed:
+                if is_ajax:
+                    return JsonResponse({'error': reason}, status=403)
+                messages.error(request, reason)
+                return redirect('listings')
+
+            prop.is_listed = True
+            prop.save(update_fields=['is_listed'])
+            msg = 'Your property is now live!'
+            if is_ajax:
+                live_count = get_listing_count(agent_obj, company_obj, landlord_obj)
+                return JsonResponse({'is_listed': True, 'message': msg, 'live_count': live_count})
+            messages.success(request, msg)
+        return redirect('listings')
+    except Exception:
+        # Log the error and show the error page
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
 '''News Blog Automation'''
