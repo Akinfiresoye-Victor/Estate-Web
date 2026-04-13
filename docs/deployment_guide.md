@@ -1,1032 +1,766 @@
-# Estate Web — Complete VPS Deployment Guide
-### Django + PostgreSQL + Gunicorn + Nginx + HTTPS + Email
-> Written for intermediate Python developers who are new to DevOps.
-> Every step explains the *why*, not just the *what*.
+# Estate Web — Hetzner VPS Deployment Guide
+## Full Setup: Ubuntu 22.04 + Gunicorn + Nginx + GitHub Actions CI/CD
 
 ---
 
-## Before You Start — Hosting Options Explained
+## Overview
 
-### Should You Use a VPS or a Free Platform?
+This guide will take your Estate Web Django project from your local machine
+to a live Hetzner VPS server, with automatic deployments every time you push
+to GitHub. You won't need to SSH into the server to deploy updates — GitHub
+Actions handles that automatically.
 
-This is one of the most important decisions for your project. Let's break it down honestly.
+**What you'll have at the end:**
+- Live site on your Namecheap domain (e.g. `estateweb.ng`)
+- SSL certificate (HTTPS — the padlock in the browser)
+- Auto-deploy: push to `main` branch → site updates in ~60 seconds
+- Gunicorn serving Django, Nginx sitting in front of it
+- PostgreSQL (Supabase) as your database
 
----
-
-### Option A: Free/Cheap Platforms (Vercel, Supabase, Render, Railway)
-
-| Platform | What It Does | Free Tier | Django Friendly? |
-|---|---|---|---|
-| **Vercel** | Hosts frontend/serverless functions | Yes | ❌ Not for Django |
-| **Supabase** | Managed PostgreSQL database only | Yes (limited) | ✅ For DB only |
-| **Render** | Hosts Django apps + PostgreSQL | Yes (sleeps after 15min) | ✅ Yes |
-| **Railway** | Hosts Django + DB together | $5/month credit | ✅ Yes |
-| **PythonAnywhere** | Beginner-friendly Django hosting | Yes (limited) | ✅ Yes |
-
-**The Risk You Heard About** — Hosting an entire app on one *free* platform means:
-- If that platform has downtime, your app goes down completely.
-- Free tiers spin down when inactive (Render free tier sleeps — users get a 30-second wait).
-- You lose control over server configuration, environment, and performance.
-
-**Recommended Strategy for You Right Now:**
-
-Since Estate Web is in early stage (2025–2026 phase), here is the smart path:
-
-```
-Phase 1 (Now → First 100 users): Use Render FREE + Supabase FREE
-Phase 2 (First revenue):         Move to a cheap VPS ($5–$6/month)
-Phase 3 (Growth):                Upgrade VPS or use managed hosting
-```
-
-**Why Render + Supabase for now?**
-- Render hosts your Django app for free (with sleep limitation).
-- Supabase gives you a real PostgreSQL database for free.
-- You focus on building features, not managing servers.
-- Zero cost while you're still getting traction.
+**Rough time to complete:** 2–4 hours if everything goes smoothly.
 
 ---
 
-### Best Free/Cheap Hosting Combinations
+## PART 1 — Hetzner Server Setup
 
-#### 🥇 Best Free Combo: Render + Supabase
-- **Render** → Hosts your Django app (free, sleeps after 15 min idle)
-- **Supabase** → Free PostgreSQL database (500MB, plenty for early stage)
-- **Cloudflare** → Free CDN + DNS management + free SSL
-- **Total cost: ₦0/month**
+### Step 1.1 — Create Your Server
 
-#### 🥈 Best Paid Starter: Railway (~$5/month)
-- Hosts Django + PostgreSQL together
-- Doesn't sleep. Always on.
-- Simple GitHub deploy pipeline
-- **Total cost: ~₦7,500/month**
-
-#### 🥉 Full Control VPS: Hetzner / DigitalOcean / Vultr
-- Hetzner CX11 (Germany): **€3.29/month** (~₦5,000) — best value in the world
-- DigitalOcean Droplet: **$4/month** (~₦6,000)
-- Vultr: **$2.50/month** (~₦4,000) — cheapest
-- **You get full server control. This guide covers this path.**
-
----
-
-> **My Recommendation for You:** Start on **Render (free) + Supabase (free)** today.
-> Follow this VPS guide when you have your first paying users or ₦5,000/month budget.
-> The VPS guide below uses **Hetzner** (cheapest and reliable).
-
----
-
-## Part 1 — The VPS Deployment Guide (Full Production Setup)
-
-### What We're Building
-
-```
-Your Users (Browser/Phone)
-        ↓ HTTPS (port 443)
-    [Nginx] ← Reverse Proxy (the "gatekeeper")
-        ↓ HTTP (internal, port 8000)
-   [Gunicorn] ← Application Server (runs Django)
-        ↓
-    [Django] ← Your actual web app
-        ↓
-  [PostgreSQL] ← Database (stores all data)
-```
-
-**Plain English Explanation of Each Layer:**
-- **Nginx** = The bouncer at the door. It receives all web traffic and decides where to send it.
-- **Gunicorn** = The actual worker. It runs your Django app and handles multiple users at once.
-- **Django** = Your code. Business logic, views, models — everything you wrote.
-- **PostgreSQL** = The database where properties, users, agents are stored.
-
----
-
-## Step 1 — Get Your VPS (Server)
-
-### Where to Buy
-
-Go to **[Hetzner Cloud](https://www.hetzner.com/cloud)** (cheapest reliable option):
-1. Create an account
-2. Create a new project
-3. Create a Server:
-   - **Location:** Helsinki or Nuremberg (fastest to Nigeria surprisingly)
+1. Go to [hetzner.com](https://hetzner.com) → Cloud → New Project → "Estate Web"
+2. Click **Add Server**
+3. Choose these settings:
+   - **Location:** Falkenstein or Helsinki (closer to Nigeria than US servers)
    - **Image:** Ubuntu 22.04
-   - **Type:** CX11 (2GB RAM, 1 CPU) — plenty for Estate Web early stage
-   - **SSH Key:** Generate one (covered below)
+   - **Type:** CX22 (2 vCPU, 4GB RAM) → ~€4.49/month. This is enough for launch.
+   - **SSH Keys:** Add your SSH public key (explained below)
+   - **Firewall:** Skip for now, we'll set it up manually
+4. Click **Create & Buy**
 
-### Generate an SSH Key (on YOUR laptop/PC)
+**Getting your SSH public key (if you don't have one):**
 
-SSH is how you connect to your server securely — like a password, but more secure.
+Run this on your local machine (Windows PowerShell or Mac/Linux terminal):
 
-**On Windows (PowerShell or Git Bash):**
 ```bash
-ssh-keygen -t ed25519 -C "estateweb@yourmail.com"
+ssh-keygen -t ed25519 -C "estateweb"
 ```
 
-**On Mac/Linux:**
-```bash
-ssh-keygen -t ed25519 -C "estateweb@yourmail.com"
-```
+Press Enter through all prompts (use defaults). Then view your public key:
 
-When asked where to save: press Enter (saves to `~/.ssh/id_ed25519`).
-When asked for passphrase: choose one or leave empty.
-
-**Get your public key to paste into Hetzner:**
 ```bash
+# On Mac/Linux:
 cat ~/.ssh/id_ed25519.pub
+
+# On Windows PowerShell:
+type $env:USERPROFILE\.ssh\id_ed25519.pub
 ```
-Copy that output and paste it when Hetzner asks for your SSH key.
+
+Copy that entire line (starts with `ssh-ed25519 ...`) and paste it into
+Hetzner's SSH key field.
 
 ---
 
-## Step 2 — First Login & Initial Server Setup
+### Step 1.2 — Connect to Your Server
 
-### Connect to Your Server
+Once Hetzner creates your server, you'll see an IP address (e.g. `49.12.34.56`).
 
 ```bash
 ssh root@YOUR_SERVER_IP
 ```
 
-Replace `YOUR_SERVER_IP` with the IP address Hetzner gives you (e.g., `65.21.150.44`).
-
-You should see a terminal prompt like `root@ubuntu-2gb-hel1-1:~#`
+Accept the fingerprint prompt by typing `yes`. You're now inside your server.
 
 ---
 
-### 2A — Update the Server
+### Step 1.3 — Create a Deploy User
 
-**WHY:** Your server comes with software that may be months old. Running updates closes security holes.
+Running everything as `root` is dangerous. We create a dedicated user:
 
 ```bash
-apt update && apt upgrade -y
+adduser deploy
 ```
 
-- `apt update` = Fetches the latest list of available software versions.
-- `apt upgrade -y` = Installs the newer versions. `-y` means "yes to all prompts."
+Fill in a password when prompted. Then give it sudo (admin) access:
+
+```bash
+usermod -aG sudo deploy
+```
+
+Copy your SSH key to this user so you can log in as them:
+
+```bash
+rsync --archive --chown=deploy:deploy ~/.ssh /home/deploy
+```
+
+Test it — open a new terminal and try:
+
+```bash
+ssh deploy@YOUR_SERVER_IP
+```
+
+If it works, from now on use the `deploy` user, not `root`.
 
 ---
 
-### 2B — Create a Non-Root User
+### Step 1.4 — System Updates and Required Packages
 
-**WHY:** The `root` user has unlimited power — if someone hacks in as root, they own your server. A regular user with `sudo` (limited root power) is much safer.
+Log in as `deploy` and run:
 
 ```bash
-adduser estateadmin
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install -y \
+    python3 python3-pip python3-venv \
+    nginx \
+    git \
+    curl \
+    postgresql-client \
+    build-essential \
+    libpq-dev \
+    python3-dev
 ```
 
-You'll be asked to set a password. Choose a strong one. Skip the other questions with Enter.
-
-**Give this user sudo power (ability to run admin commands):**
-```bash
-usermod -aG sudo estateadmin
-```
-
-`-aG sudo` means "add to the sudo group."
-
-**Copy your SSH key to the new user so you can log in as them:**
-```bash
-rsync --archive --chown=estateadmin:estateadmin ~/.ssh /home/estateadmin
-```
-
-This copies the `~/.ssh` folder (with your authorized keys) to the new user's home directory.
-
-**Test this before you lock out root:**
-```bash
-# Open a NEW terminal window and try:
-ssh estateadmin@YOUR_SERVER_IP
-```
-
-If it works, great. If not, DO NOT close the root session yet — fix it first.
+**What each package does:**
+- `python3-venv` — creates isolated Python environments (so your project's
+  packages don't clash with system packages)
+- `nginx` — the web server that sits in front of Django
+- `postgresql-client` — tools to talk to your Supabase PostgreSQL database
+- `libpq-dev` / `python3-dev` — needed to compile `psycopg2` (Django's
+  PostgreSQL connector)
 
 ---
 
-### 2C — Configure the Firewall
+## PART 2 — Project Setup on the Server
 
-**WHY:** By default, all ports on your server are open. That's like leaving every door and window in your house open. We only want to allow traffic on specific ports.
+### Step 2.1 — Clone Your Repository
 
 ```bash
-ufw allow OpenSSH        # Port 22 — for you to log in via SSH
-ufw allow 'Nginx Full'   # Port 80 (HTTP) and 443 (HTTPS) — for web traffic
-ufw enable               # Turn the firewall on
-ufw status               # Confirm it's working
+cd /home/deploy
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git estateweb
+cd estateweb
 ```
 
-You should see this output:
-```
-Status: active
-To                         Action      From
---                         ------      ----
-OpenSSH                    ALLOW       Anywhere
-Nginx Full                 ALLOW       Anywhere
-```
+Replace `YOUR_USERNAME` and `YOUR_REPO_NAME` with your actual GitHub details.
 
 ---
 
-### 2D — Disable Root Login (Important Security Step)
+### Step 2.2 — Create Python Virtual Environment
 
-**WHY:** Hackers constantly try to brute-force the `root` user. If you disable root login via SSH, they can't even try.
-
-```bash
-nano /etc/ssh/sshd_config
-```
-
-Find this line:
-```
-PermitRootLogin yes
-```
-
-Change it to:
-```
-PermitRootLogin no
-```
-
-Save with `Ctrl+X`, then `Y`, then `Enter`.
-
-Restart SSH to apply the change:
-```bash
-systemctl restart sshd
-```
-
-**⚠ WARNING:** Make sure you can log in as `estateadmin` before doing this. Test in a separate terminal first.
-
----
-
-## Step 3 — Install Python, pip, and Virtualenv
-
-**From now on, log in as `estateadmin`:**
-```bash
-ssh estateadmin@YOUR_SERVER_IP
-```
-
-### Install Python
-
-Ubuntu 22.04 comes with Python 3.10. Check it:
-```bash
-python3 --version
-```
-
-Install pip (Python's package manager) and virtualenv:
-```bash
-sudo apt install python3-pip python3-venv python3-dev -y
-```
-
-- `python3-pip` = Tool to install Python packages.
-- `python3-venv` = Creates isolated Python environments (so packages don't conflict).
-- `python3-dev` = Python header files needed to compile some packages like `psycopg2`.
-
----
-
-## Step 4 — Install and Configure PostgreSQL
-
-**WHY PostgreSQL instead of SQLite?**
-SQLite is a file-based database — great for development and testing on your laptop. But on a production server with multiple users hitting your site at once, SQLite can get corrupted or locked. PostgreSQL is built for this — it handles many users simultaneously.
-
-### Install PostgreSQL
+A virtual environment is like a clean, isolated box for your project's
+Python packages. It means the packages you install here don't affect
+anything else on the server.
 
 ```bash
-sudo apt install postgresql postgresql-contrib -y
-```
-
-- `postgresql` = The actual database software.
-- `postgresql-contrib` = Extra tools and extensions.
-
-### Start and Enable PostgreSQL
-
-```bash
-sudo systemctl start postgresql
-sudo systemctl enable postgresql  # Makes it auto-start when server reboots
-```
-
-### Create a Database and User for Estate Web
-
-```bash
-sudo -u postgres psql
-```
-
-This logs you into PostgreSQL as the `postgres` superuser. Your prompt changes to `postgres=#`.
-
-Now run these SQL commands:
-
-```sql
-CREATE DATABASE estateweb_db;
-CREATE USER estateweb_user WITH PASSWORD 'your_strong_password_here';
-ALTER ROLE estateweb_user SET client_encoding TO 'utf8';
-ALTER ROLE estateweb_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE estateweb_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE estateweb_db TO estateweb_user;
-\q
-```
-
-**What each line does:**
-- `CREATE DATABASE` = Creates your database called `estateweb_db`.
-- `CREATE USER` = Creates a database user (not a Linux user — different thing).
-- `ALTER ROLE ... SET` = Performance and encoding settings Django recommends.
-- `GRANT ALL PRIVILEGES` = Gives your user full access to the database.
-- `\q` = Quit PostgreSQL.
-
-**⚠ IMPORTANT:** Replace `your_strong_password_here` with a real password. Save it somewhere safe.
-
----
-
-## Step 5 — Clone Your Django Project
-
-### Install Git
-
-```bash
-sudo apt install git -y
-```
-
-### Create a Directory for Your App
-
-```bash
-sudo mkdir -p /var/www/estateweb
-sudo chown estateadmin:estateadmin /var/www/estateweb
-```
-
-- `/var/www/` = Traditional location for web apps on Linux.
-- `chown` = Changes the owner of that folder to your `estateadmin` user.
-
-### Clone From GitHub
-
-```bash
-cd /var/www/estateweb
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
-```
-
-The `.` at the end means "clone into this current folder, not a subfolder."
-
----
-
-## Step 6 — Set Up Virtual Environment and Install Dependencies
-
-```bash
-cd /var/www/estateweb
+cd /home/deploy/estateweb
 python3 -m venv venv
-```
-
-This creates a folder called `venv/` — your isolated Python environment.
-
-**Activate it:**
-```bash
 source venv/bin/activate
 ```
 
-Your prompt will change to `(venv) estateadmin@...` — this means the virtual environment is active.
+After running `source venv/bin/activate`, your terminal prompt changes
+to show `(venv)` at the start. That means the virtual environment is active.
 
-**Install your project dependencies:**
+Install your project's dependencies:
+
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
+pip install gunicorn
 ```
-
-**Make sure these are in your requirements.txt:**
-```
-django
-gunicorn
-psycopg2-binary
-python-decouple
-whitenoise
-```
-
-- `gunicorn` = The production application server.
-- `psycopg2-binary` = Lets Django talk to PostgreSQL.
-- `python-decouple` = Manages environment variables from a `.env` file.
-- `whitenoise` = Serves your static files (CSS, JS) efficiently without Nginx involvement.
 
 ---
 
-## Step 7 — Configure Environment Variables Securely
+### Step 2.3 — Create Your .env File
 
-**WHY `.env` files?**
-Your `settings.py` should NEVER have your database password, secret key, or email credentials written directly in it. If you push to GitHub, the world can see them. An `.env` file keeps secrets out of your code.
-
-### Create the `.env` File
+Your Django project needs environment variables (secret settings that should
+never go in your Git repository). Create the file on the server:
 
 ```bash
-nano /var/www/estateweb/.env
+nano /home/deploy/estateweb/.env
 ```
 
-Paste this (fill in your actual values):
+Paste in your environment variables. Here's the template — fill in your
+actual values:
 
 ```env
 SECRET_KEY=your-django-secret-key-here
 DEBUG=False
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,YOUR_SERVER_IP
+ALLOWED_HOSTS=your-domain.com,www.your-domain.com,YOUR_SERVER_IP
 
-# PostgreSQL
-DB_NAME=estateweb_db
-DB_USER=estateweb_user
-DB_PASSWORD=your_strong_password_here
-DB_HOST=localhost
+# Supabase PostgreSQL connection
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres
+
+# Or individual DB settings if you use them separately:
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=your-supabase-password
+DB_HOST=db.YOUR_PROJECT.supabase.co
 DB_PORT=5432
 
-# Email (Zeptomail — fill in after Step 13)
-ZEPTOMAIL_API_TOKEN=your_zeptomail_api_token_here
-DEFAULT_FROM_EMAIL=Estate Web <no-reply@yourdomain.com>
+# Email (when you set it up)
+# EMAIL_HOST=smtp-relay.brevo.com
+# EMAIL_PORT=587
+# EMAIL_HOST_USER=your@email.com
+# EMAIL_HOST_PASSWORD=your-brevo-key
 ```
 
-Save with `Ctrl+X`, `Y`, `Enter`.
+Save with `Ctrl+O`, Enter, then `Ctrl+X` to exit nano.
 
-**Lock down the file permissions so only your user can read it:**
-```bash
-chmod 600 /var/www/estateweb/.env
-```
-
-`600` means: owner can read and write, nobody else can do anything.
-
-### Update `settings.py` to Use `.env`
-
-In your `settings.py`, use `python-decouple`:
-
-```python
-from decouple import config
-
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-    }
-}
-
-# Email
-EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
-ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
-ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Estate Web <no-reply@yourdomain.com>')
-```
-
-**Add Whitenoise for static files (in settings.py):**
-
-```python
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this right after SecurityMiddleware
-    # ... rest of middleware
-]
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-```
+**Important:** Make sure your Django `settings.py` reads from environment
+variables (using `os.environ.get(...)` or the `python-dotenv` package).
 
 ---
 
-## Step 8 — Run Migrations and Collect Static Files
-
-Make sure your virtual environment is active:
+### Step 2.4 — Django Setup Commands
 
 ```bash
-cd /var/www/estateweb
+cd /home/deploy/estateweb
 source venv/bin/activate
-```
 
-**Run migrations** (creates all your database tables):
-```bash
+# Collect static files
+python manage.py collectstatic --noinput
+
+# Run database migrations
 python manage.py migrate
-```
 
-**Create a superuser** (your admin account):
-```bash
+# Create superuser (admin account)
 python manage.py createsuperuser
 ```
 
-**Collect static files** (copies all CSS, JS, images to one folder Nginx can serve):
-```bash
-python manage.py collectstatic --noinput
-```
-
-This creates a `staticfiles/` folder with everything in it.
+**What `collectstatic` does:** Django in production mode (`DEBUG=False`)
+doesn't serve your CSS/JS/images directly. `collectstatic` copies all static
+files into one folder (`/static/`) that Nginx will serve instead. This is
+much faster.
 
 ---
 
-## Step 9 — Set Up Gunicorn
+### Step 2.5 — Test Gunicorn Works
 
-**WHY Gunicorn?**
-Django's built-in server (`python manage.py runserver`) is only for development — it can only handle one request at a time and is not secure. Gunicorn is a production-grade server that can handle many users simultaneously.
-
-### Test Gunicorn Manually First
+Before setting up the automatic service, test it manually:
 
 ```bash
-cd /var/www/estateweb
+cd /home/deploy/estateweb
 source venv/bin/activate
-gunicorn --bind 0.0.0.0:8000 estateweb.wsgi:application
+gunicorn --bind 0.0.0.0:8000 your_project_name.wsgi:application
 ```
 
-Replace `estateweb` with your Django project name (the folder that has `wsgi.py` inside it).
+Replace `your_project_name` with your actual Django project folder name
+(the folder that contains `settings.py`, `wsgi.py`, `urls.py`).
 
-If you see `[INFO] Listening at: http://0.0.0.0:8000` — it works! Press `Ctrl+C` to stop it.
+If you see `[INFO] Listening at: http://0.0.0.0:8000` — it works. Press
+`Ctrl+C` to stop it.
 
-### Create a Gunicorn Systemd Service
+---
 
-**WHY systemd?** You don't want to manually start Gunicorn every time the server reboots. Systemd is Linux's service manager — it starts, stops, and automatically restarts services.
+## PART 3 — Gunicorn as a System Service
+
+We want Gunicorn to start automatically when the server boots, and restart
+if it crashes. We use `systemd` (Ubuntu's service manager) for this.
+
+### Step 3.1 — Create the Gunicorn Socket File
+
+A "socket" is like a pipe between Nginx and Gunicorn — Nginx passes requests
+through the socket to Gunicorn. This is faster than using a port number.
 
 ```bash
-sudo nano /etc/systemd/system/gunicorn.service
+sudo nano /etc/systemd/system/gunicorn.socket
 ```
 
 Paste this:
 
 ```ini
 [Unit]
+Description=Gunicorn socket for Estate Web
+
+[Socket]
+ListenStream=/run/gunicorn.sock
+
+[Install]
+WantedBy=sockets.target
+```
+
+Save and exit (`Ctrl+O`, Enter, `Ctrl+X`).
+
+---
+
+### Step 3.2 — Create the Gunicorn Service File
+
+```bash
+sudo nano /etc/systemd/system/gunicorn.service
+```
+
+Paste this (replace `your_project_name` with your Django project folder name):
+
+```ini
+[Unit]
 Description=Gunicorn daemon for Estate Web
+Requires=gunicorn.socket
 After=network.target
 
 [Service]
-User=estateadmin
+User=deploy
 Group=www-data
-WorkingDirectory=/var/www/estateweb
-EnvironmentFile=/var/www/estateweb/.env
-ExecStart=/var/www/estateweb/venv/bin/gunicorn \
+WorkingDirectory=/home/deploy/estateweb
+EnvironmentFile=/home/deploy/estateweb/.env
+ExecStart=/home/deploy/estateweb/venv/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
-          --bind unix:/var/www/estateweb/gunicorn.sock \
-          estateweb.wsgi:application
+          --bind unix:/run/gunicorn.sock \
+          your_project_name.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-**What each part means:**
-- `After=network.target` = Only start after the network is available.
-- `User=estateadmin` = Run as your user (not root — safer).
-- `EnvironmentFile` = Load your `.env` variables.
-- `--workers 3` = Run 3 worker processes. Rule of thumb: `(2 × CPU cores) + 1`. For 1 CPU = 3 workers.
-- `--bind unix:...gunicorn.sock` = Communicate via a Unix socket (faster than TCP for local communication).
-- `estateweb.wsgi:application` = The entry point to your Django app.
+**What `--workers 3` means:** Gunicorn runs 3 worker processes. Each worker
+can handle one request at a time. 3 workers means you can handle 3 simultaneous
+requests. For a fresh launch with moderate traffic, this is fine.
 
-**Enable and start the service:**
+Save and exit.
+
+---
+
+### Step 3.3 — Enable and Start Gunicorn
 
 ```bash
-sudo systemctl daemon-reload       # Reload systemd to see the new service file
-sudo systemctl start gunicorn      # Start Gunicorn
-sudo systemctl enable gunicorn     # Auto-start on reboot
-sudo systemctl status gunicorn     # Check it's running
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
 ```
 
-You should see `Active: active (running)` in green.
+Test that the socket was created:
 
-**Check logs if something's wrong:**
 ```bash
-sudo journalctl -u gunicorn -n 50
+sudo systemctl status gunicorn.socket
+```
+
+You should see `active (listening)`. Now trigger it:
+
+```bash
+curl --unix-socket /run/gunicorn.sock localhost
+```
+
+You should get HTML back. Then check the service status:
+
+```bash
+sudo systemctl status gunicorn
 ```
 
 ---
 
-## Step 10 — Set Up Nginx as a Reverse Proxy
+## PART 4 — Nginx Configuration
 
-**WHY Nginx?**
-Gunicorn is great at running Python code, but it's not optimized for:
-- Serving static files (images, CSS, JS)
-- Handling HTTPS/SSL
-- Handling many simultaneous connections
+Nginx is the "front door" of your server. It receives all incoming web
+traffic and passes it to Gunicorn through the socket.
 
-Nginx is a specialist at all of these. So: **users talk to Nginx, Nginx talks to Gunicorn**.
-
-### Install Nginx
-
-```bash
-sudo apt install nginx -y
-```
-
-### Create an Nginx Config for Estate Web
+### Step 4.1 — Create Nginx Config for Estate Web
 
 ```bash
 sudo nano /etc/nginx/sites-available/estateweb
 ```
 
-Paste this:
+Paste this (replace `your-domain.com` with your actual domain):
 
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name your-domain.com www.your-domain.com;
 
-    client_max_body_size 10M;  # Max file upload size
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-
+    # Where your static files are collected to
     location /static/ {
-        root /var/www/estateweb/staticfiles;
+        alias /home/deploy/estateweb/staticfiles/;
     }
 
+    # Where uploaded media files are (if you have file uploads)
     location /media/ {
-        root /var/www/estateweb;
+        alias /home/deploy/estateweb/media/;
     }
 
+    # Everything else goes to Gunicorn
     location / {
         include proxy_params;
-        proxy_pass http://unix:/var/www/estateweb/gunicorn.sock;
+        proxy_pass http://unix:/run/gunicorn.sock;
     }
 }
 ```
 
-**What each block does:**
-- `listen 80` = Accept traffic on port 80 (regular HTTP).
-- `server_name` = Only respond to requests for your domain.
-- `location /static/` = Serve static files directly — Nginx is fast at this, no need to involve Gunicorn.
-- `location /media/` = Serve uploaded files (property images, etc.) directly.
-- `location /` = Everything else goes to Gunicorn via the socket file.
+**Note:** The `/static/` path should match your `STATIC_ROOT` setting in
+Django. If you set `STATIC_ROOT = BASE_DIR / 'staticfiles'`, the alias
+above is correct. Adjust if yours is different.
 
-### Enable the Site
+---
+
+### Step 4.2 — Enable the Site
 
 ```bash
-# Create a symbolic link to enable the site
+# Create a symlink (shortcut) to enable the site
 sudo ln -s /etc/nginx/sites-available/estateweb /etc/nginx/sites-enabled/
 
-# Remove the default Nginx welcome page
+# Remove the default Nginx page
 sudo rm /etc/nginx/sites-enabled/default
 
-# Test the config for syntax errors
+# Test that Nginx config has no errors
 sudo nginx -t
-```
 
-You should see:
-```
-nginx: configuration file /etc/nginx/nginx.conf test is successful
-```
-
-```bash
+# Restart Nginx
 sudo systemctl restart nginx
 sudo systemctl enable nginx
 ```
 
 ---
 
-## Step 11 — Configure Your Domain
+### Step 4.3 — Configure Firewall
 
-**WHY do this?**
-Right now your server has an IP address like `65.21.150.44`. Users can't remember IPs — they need a domain like `estateweb.ng`.
-
-### Steps on Namecheap (or wherever you bought the domain):
-
-1. Log into Namecheap → Go to your domain → **Advanced DNS**
-2. Delete any existing A records
-3. Add these records:
-
-| Type | Host | Value | TTL |
-|------|------|-------|-----|
-| A Record | @ | YOUR_SERVER_IP | Automatic |
-| A Record | www | YOUR_SERVER_IP | Automatic |
-
-**WHY two records?** `@` covers `yourdomain.com` and `www` covers `www.yourdomain.com`.
-
-**How long does it take?** DNS changes take 15 minutes to 48 hours to propagate globally. Usually under 30 minutes.
-
-**Test if it's working:**
 ```bash
-ping yourdomain.com
+sudo ufw allow 'Nginx Full'
+sudo ufw allow OpenSSH
+sudo ufw enable
 ```
 
-If it shows your server's IP, it's working.
+`ufw` is Ubuntu's firewall. We allow Nginx (ports 80 and 443) and SSH
+(port 22). Everything else is blocked.
+
+At this point, visiting `http://YOUR_SERVER_IP` in a browser should show
+your Django site (without HTTPS yet).
 
 ---
 
-## Step 12 — Install SSL Certificate (HTTPS with Certbot)
+## PART 5 — Domain and SSL
 
-**WHY HTTPS?**
-Without HTTPS, all data (passwords, form submissions) travels the internet in plain text — anyone on the same network can read it. HTTPS encrypts everything. Also, browsers now show a "Not Secure" warning for HTTP sites, which kills user trust.
+### Step 5.1 — Point Your Namecheap Domain to Hetzner
 
-Let's Encrypt gives you a FREE, trusted SSL certificate that auto-renews.
+In Namecheap's DNS settings for your domain, add these A records:
 
-### Install Certbot
+| Type | Host | Value | TTL |
+|------|------|-------|-----|
+| A    | @    | YOUR_SERVER_IP | Auto |
+| A    | www  | YOUR_SERVER_IP | Auto |
+
+DNS changes can take anywhere from a few minutes to 48 hours to propagate
+(spread across the internet). Usually it's under an hour.
+
+---
+
+### Step 5.2 — Install SSL with Certbot
+
+Certbot is a free tool that gets you an SSL certificate from Let's Encrypt.
+SSL is what makes your site `https://` instead of `http://`.
 
 ```bash
-sudo apt install certbot python3-certbot-nginx -y
+sudo apt install -y certbot python3-certbot-nginx
+
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
 ```
 
-### Get Your Certificate
+Follow the prompts:
+- Enter your email address
+- Agree to terms
+- Choose whether to share email with EFF (your choice)
 
-```bash
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-```
+Certbot will automatically update your Nginx config to handle HTTPS.
 
-Certbot will:
-1. Verify you own the domain (by placing a file on your server and checking it via HTTP)
-2. Generate the certificate
-3. Automatically update your Nginx config to use HTTPS
-4. Set up auto-renewal
-
-When asked about HTTP redirect: choose **Option 2 (Redirect)** — this forces all HTTP traffic to HTTPS automatically.
-
-### Verify Auto-Renewal
+**Auto-renewal:** Certbot automatically renews certificates before they
+expire. Test that auto-renewal works:
 
 ```bash
 sudo certbot renew --dry-run
 ```
 
-If it says "Congratulations, all renewals succeeded" — you're good. Certbot will automatically renew every 90 days.
+---
+
+## PART 6 — GitHub Actions Auto-Deploy
+
+This is the part that makes deployment magical. Every time you push code
+to your `main` branch on GitHub, GitHub Actions will SSH into your server
+and update the live site automatically.
+
+### Step 6.1 — Create a Deploy SSH Key
+
+On your **local machine** (not the server), create a dedicated key pair
+just for deployments:
+
+```bash
+ssh-keygen -t ed25519 -C "github-actions-deploy" -f ~/.ssh/github_actions_deploy
+```
+
+This creates two files:
+- `github_actions_deploy` — the private key (GitHub Actions will use this)
+- `github_actions_deploy.pub` — the public key (the server will have this)
 
 ---
 
-## Step 13 — Set Up Email (Zeptomail)
+### Step 6.2 — Add the Public Key to Your Server
 
-**WHY Zeptomail (by Zoho)?**
-- Designed specifically for transactional emails — welcome emails, password resets, inquiry notifications.
-- API-token auth (no SMTP credentials to rotate — simpler and more secure than traditional SMTP).
-- Reliable deliverability with Zoho's infrastructure; emails rarely hit spam.
-- Free tier: 10,000 emails/month — more than enough for Estate Web at early stage.
-- Native Django backend available via `zoho-zeptomail` pip package.
-
-### Step 13A — Install the Python Package
+Copy the public key content:
 
 ```bash
-source venv/bin/activate
-pip install zoho-zeptomail
+cat ~/.ssh/github_actions_deploy.pub
 ```
 
-Add it to your `requirements.txt`:
-```
-zoho-zeptomail
-```
-
-### Step 13B — Create a Zeptomail Account
-
-1. Go to [zeptomail.zoho.com](https://zeptomail.zoho.com) and sign up for a free account.
-2. Under **Send Mail → Mail Agents**, create a new Mail Agent for Estate Web.
-3. Configure your verified **Sender Domain** (`estatewebng.com`) under **Mail Settings → Sender Domains** — you'll add a DNS TXT record to verify it.
-4. Once the domain is verified, go to your Mail Agent → **API Token** → Generate a token.
-
-> **Sender Domain Verification:** Add the TXT record Zeptomail gives you to your domain's DNS (same panel where you added A records in Step 11). It takes a few minutes to verify.
-
-### Step 13C — Configure `settings.py`
-
-Your `settings.py` already has the correct config. Make sure it reads:
-
-```python
-# Email — Zoho Zeptomail
-EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
-ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
-ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Estate Web <no-reply@estatewebng.com>')
-```
-
-### Step 13D — Set the Environment Variable
-
-In your `.env` file on the server:
-
-```env
-ZEPTOMAIL_API_TOKEN=your_zeptomail_api_token_here
-DEFAULT_FROM_EMAIL=Estate Web <no-reply@estatewebng.com>
-```
-
-### Step 13E — Test Email in Django Shell
+Then on your server, add it to the deploy user's authorized keys:
 
 ```bash
-cd /var/www/estateweb
-source venv/bin/activate
-python manage.py shell
+# On the server:
+nano /home/deploy/.ssh/authorized_keys
 ```
 
-```python
-from django.core.mail import send_mail
-send_mail(
-    'Test Email from Estate Web',
-    'This is a test message from Zeptomail.',
-    'no-reply@estatewebng.com',
-    ['youremail@gmail.com'],
-    fail_silently=False,
-)
-```
-
-If no error is raised, your email pipeline is working.
-
-> **Troubleshooting:** If you get an `AuthenticationError`, double-check that your `ZEPTOMAIL_API_TOKEN` in `.env` matches the one generated in the Zeptomail dashboard exactly (no extra spaces).
+Paste the public key on a new line. Save and exit.
 
 ---
 
-## Step 14 — Security Best Practices
+### Step 6.3 — Add Secrets to GitHub
 
-### A — Django Security Settings
+In your GitHub repository, go to:
+**Settings → Secrets and variables → Actions → New repository secret**
 
-Add these to `settings.py` (only active when `DEBUG=False`):
+Add these secrets one by one:
+
+| Secret Name | Value |
+|-------------|-------|
+| `HETZNER_HOST` | Your server IP (e.g. `49.12.34.56`) |
+| `HETZNER_USER` | `deploy` |
+| `HETZNER_SSH_KEY` | The **private** key content (from `cat ~/.ssh/github_actions_deploy`) |
+| `HETZNER_PORT` | `22` |
+
+For `HETZNER_SSH_KEY`, copy the entire content of the private key file,
+including the `-----BEGIN OPENSSH PRIVATE KEY-----` and `-----END OPENSSH PRIVATE KEY-----` lines.
+
+---
+
+### Step 6.4 — Create the GitHub Actions Workflow File
+
+In your project on your **local machine**, create this folder structure:
+
+```
+your-project/
+  .github/
+    workflows/
+      deploy.yml
+```
+
+Create the file `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy Estate Web to Hetzner
+
+on:
+  push:
+    branches:
+      - main   # Only runs when you push to 'main' branch
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Hetzner VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: ${{ secrets.HETZNER_PORT }}
+          script: |
+            # Go to project directory
+            cd /home/deploy/estateweb
+
+            # Pull latest code from GitHub
+            git pull origin main
+
+            # Activate virtual environment
+            source venv/bin/activate
+
+            # Install any new dependencies
+            pip install -r requirements.txt
+
+            # Apply any new database migrations
+            python manage.py migrate --noinput
+
+            # Collect static files
+            python manage.py collectstatic --noinput
+
+            # Restart Gunicorn to load new code
+            sudo systemctl restart gunicorn
+
+            echo "Deployment complete!"
+```
+
+**What this workflow does, step by step:**
+1. Triggers whenever you push to the `main` branch
+2. GitHub spins up a temporary Ubuntu machine
+3. It SSHes into your Hetzner server using the secrets you added
+4. On the server, it pulls new code, installs new packages, runs migrations,
+   collects static files, and restarts Gunicorn
+5. Your site is now running the new code
+
+---
+
+### Step 6.5 — Allow Deploy User to Restart Gunicorn Without Password
+
+By default, `sudo` commands require a password. But GitHub Actions can't type
+a password. We need to allow the `deploy` user to restart Gunicorn without one.
+
+On the server:
+
+```bash
+sudo visudo
+```
+
+This opens the sudoers file safely. Add this line at the **bottom**:
+
+```
+deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart gunicorn
+```
+
+Save and exit (in nano: `Ctrl+O`, Enter, `Ctrl+X`).
+
+---
+
+### Step 6.6 — Push and Test
+
+Commit your workflow file and push to GitHub:
+
+```bash
+git add .github/
+git commit -m "Add GitHub Actions deployment workflow"
+git push origin main
+```
+
+Then go to your GitHub repository → **Actions** tab. You'll see the workflow
+running. Click on it to watch the logs in real time.
+
+If it shows a green checkmark ✅ — your deployment pipeline is working!
+
+---
+
+## PART 7 — Maintenance and Troubleshooting
+
+### Checking logs when something breaks
+
+```bash
+# Gunicorn logs (your Django errors will appear here)
+sudo journalctl -u gunicorn --no-pager -n 50
+
+# Nginx access logs (every request)
+sudo tail -f /var/log/nginx/access.log
+
+# Nginx error logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+### Restarting services manually
+
+```bash
+sudo systemctl restart gunicorn
+sudo systemctl restart nginx
+```
+
+### Making a manual deployment (SSH in and run it yourself)
+
+```bash
+ssh deploy@YOUR_SERVER_IP
+cd /home/deploy/estateweb
+git pull origin main
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate --noinput
+python manage.py collectstatic --noinput
+sudo systemctl restart gunicorn
+```
+
+### If the site shows 502 Bad Gateway
+
+This means Nginx can't reach Gunicorn. Check Gunicorn:
+
+```bash
+sudo systemctl status gunicorn
+sudo journalctl -u gunicorn -n 30
+```
+
+### If static files (CSS/images) aren't loading
+
+Make sure:
+1. `python manage.py collectstatic` ran successfully
+2. The `STATIC_ROOT` path in `settings.py` matches the `alias` in your Nginx config
+3. The `deploy` user owns the files: `ls -la /home/deploy/estateweb/staticfiles/`
+
+### If GitHub Actions fails at the "restart gunicorn" step
+
+Make sure the sudoers line was added correctly:
+
+```bash
+sudo visudo -c   # Check for syntax errors in sudoers
+sudo cat /etc/sudoers | grep deploy
+```
+
+---
+
+## PART 8 — Your settings.py Checklist
+
+Before going live, confirm these are correct in `settings.py`:
 
 ```python
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Read from environment
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # Where collectstatic puts files
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Security settings for production
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_SSL_REDIRECT = True          # Force HTTPS
-SESSION_COOKIE_SECURE = True        # Send cookies only over HTTPS
-CSRF_COOKIE_SECURE = True           # Same for CSRF token cookie
-SECURE_HSTS_SECONDS = 3600          # Tell browsers to always use HTTPS
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-```
-
-**What these do in plain English:**
-- `XSS_FILTER` = Tells browsers to block cross-site scripting attacks.
-- `SSL_REDIRECT` = Anyone visiting via HTTP gets automatically sent to HTTPS.
-- `SESSION_COOKIE_SECURE` = Your login cookies can't be stolen over HTTP.
-- `HSTS` = Tells browsers "this site is HTTPS only for the next 3600 seconds."
-
-### B — Keep Software Updated
-
-```bash
-# Run this monthly (or set up automatic updates)
-sudo apt update && sudo apt upgrade -y
-```
-
-### C — Set Up Fail2Ban (Block Brute Force Attacks)
-
-**WHY:** Hackers run automated scripts that try thousands of passwords on SSH. Fail2Ban automatically bans IPs that fail too many times.
-
-```bash
-sudo apt install fail2ban -y
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
-```
-
-Default config is fine for now — it will ban IPs after 5 failed SSH attempts for 10 minutes.
-
----
-
-## Step 15 — How to Restart Services and Debug Common Errors
-
-### Quick Reference — Service Commands
-
-```bash
-# Gunicorn
-sudo systemctl status gunicorn      # Check if running
-sudo systemctl restart gunicorn     # Restart
-sudo systemctl stop gunicorn        # Stop
-sudo journalctl -u gunicorn -n 100  # View last 100 log lines
-
-# Nginx
-sudo systemctl status nginx
-sudo systemctl restart nginx
-sudo nginx -t                       # Test config for errors
-sudo tail -f /var/log/nginx/error.log   # Watch errors live
-
-# PostgreSQL
-sudo systemctl status postgresql
-sudo systemctl restart postgresql
-```
-
-### Common Error: 502 Bad Gateway
-
-**Meaning:** Nginx is running but Gunicorn is not (or the socket file is missing/wrong path).
-
-**Fix:**
-```bash
-sudo systemctl restart gunicorn
-sudo journalctl -u gunicorn -n 50   # Check what's wrong
-```
-
-### Common Error: Static Files Not Loading (404)
-
-**Meaning:** CSS/JS not found. Usually `collectstatic` wasn't run.
-
-**Fix:**
-```bash
-cd /var/www/estateweb
-source venv/bin/activate
-python manage.py collectstatic --noinput
-sudo systemctl restart nginx
-```
-
-### Common Error: 500 Internal Server Error
-
-**Meaning:** Django crashed. Could be a code error, missing env variable, or migration issue.
-
-**Fix:**
-```bash
-sudo journalctl -u gunicorn -n 100   # Read the actual Python traceback here
-```
-
-### Common Error: Permission Denied on Socket
-
-**Fix:**
-```bash
-sudo usermod -aG www-data estateadmin
-sudo chown -R estateadmin:www-data /var/www/estateweb
-sudo chmod -R 775 /var/www/estateweb
-sudo systemctl restart gunicorn nginx
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_SSL_REDIRECT = True              # Redirect HTTP to HTTPS
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000         # Tell browsers to always use HTTPS
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 ```
 
 ---
 
-## Step 16 — How to Update Your App (Deploy New Code)
-
-Every time you push new code to GitHub and want it live on the server, follow this process:
-
-```bash
-# 1. SSH into your server
-ssh estateadmin@YOUR_SERVER_IP
-
-# 2. Navigate to your project
-cd /var/www/estateweb
-
-# 3. Activate virtual environment
-source venv/bin/activate
-
-# 4. Pull latest code from GitHub
-git pull origin main
-
-# 5. Install any new dependencies (if requirements.txt changed)
-pip install -r requirements.txt
-
-# 6. Run any new migrations
-python manage.py migrate
-
-# 7. Collect static files (if CSS/JS changed)
-python manage.py collectstatic --noinput
-
-# 8. Restart Gunicorn to load the new code
-sudo systemctl restart gunicorn
-```
-
-### Pro Tip: Create a Deploy Script
-
-Create a file called `deploy.sh`:
-
-```bash
-nano /var/www/estateweb/deploy.sh
-```
-
-Paste:
-```bash
-#!/bin/bash
-echo "=== Pulling latest code ==="
-git pull origin main
-
-echo "=== Installing dependencies ==="
-source /var/www/estateweb/venv/bin/activate
-pip install -r requirements.txt
-
-echo "=== Running migrations ==="
-python manage.py migrate
-
-echo "=== Collecting static files ==="
-python manage.py collectstatic --noinput
-
-echo "=== Restarting Gunicorn ==="
-sudo systemctl restart gunicorn
-
-echo "=== Deployment complete! ==="
-```
-
-Make it executable:
-```bash
-chmod +x /var/www/estateweb/deploy.sh
-```
-
-Now deploying is just:
-```bash
-cd /var/www/estateweb && ./deploy.sh
-```
-
----
-
-## Final Checklist
-
-Before going live, confirm all of these:
-
-- [ ] Server is on Ubuntu 22.04
-- [ ] Non-root user created (`estateadmin`)
-- [ ] UFW firewall enabled (OpenSSH, Nginx Full)
-- [ ] Root login disabled
-- [ ] Python virtual environment set up
-- [ ] PostgreSQL installed, database and user created
-- [ ] Django connected to PostgreSQL via `.env`
-- [ ] Gunicorn running as a systemd service
-- [ ] Nginx configured and pointing to Gunicorn socket
-- [ ] Domain A records pointing to server IP
-- [ ] SSL certificate installed via Certbot
-- [ ] HTTPS redirect working
-- [ ] Email tested via Django shell (Zeptomail)
-- [ ] Security settings in `settings.py` confirmed
-- [ ] Fail2Ban installed
-- [ ] `collectstatic` run successfully
-- [ ] `createsuperuser` done
-
----
-
-## Summary — The Full Stack
+## Summary — What You've Built
 
 ```
 Internet
-   │
-   ▼  Port 443 (HTTPS)
-[Certbot SSL] ──encrypts──▶ [Nginx]
-                                │
-                                │ via Unix socket
-                                ▼
-                          [Gunicorn] (3 workers)
-                                │
-                                ▼
-                          [Django App]
-                                │
-                                ▼
-                         [PostgreSQL DB]
+   ↓
+Nginx (port 443, handles HTTPS, serves static files)
+   ↓ (passes dynamic requests)
+Gunicorn (runs Django application, 3 workers)
+   ↓
+Django (your Estate Web code)
+   ↓
+Supabase PostgreSQL (your database)
 ```
 
-Congrats — you've built a production-grade Django deployment from scratch.
-This is the same architecture used by real SaaS companies.
+**Auto-deploy flow:**
+```
+You push to GitHub main branch
+   ↓
+GitHub Actions triggers
+   ↓
+GitHub SSHes into Hetzner server
+   ↓
+Pulls new code, runs migrations, collects static files
+   ↓
+Restarts Gunicorn
+   ↓
+Users see updated site (~60 seconds total)
+```
 
 ---
 
-*Guide prepared for Estate Web — Nigeria's intelligent real estate platform.*
-*Keep this document safe. You'll refer to it many times.*
+*Estate Web — Deployment Guide v1.0*
