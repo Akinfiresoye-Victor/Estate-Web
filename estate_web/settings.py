@@ -283,11 +283,11 @@ else:
 # CACHE
 # =============================================================================
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache_table", 
     }
 }
-
 RATELIMIT_VIEW = 'core.views.ratelimit_error'
 
 

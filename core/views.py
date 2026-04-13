@@ -1477,8 +1477,14 @@ def partnership_terms(request):
 def estate_web_guide(request):
     return render(request, 'core/faq.html')
 
-
 def ratelimit_error(request, exception=None):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    if is_ajax:
+        return JsonResponse(
+            {'error': 'Too many requests. Please slow down and try again.'},
+            status=429
+        )
     return render(request, 'core/429.html', status=429)
 
 def lockout_response(request, credentials, *args, **kwargs):
