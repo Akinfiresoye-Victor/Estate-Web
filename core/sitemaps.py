@@ -8,13 +8,14 @@ class PropertyManagementRentSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return PropertyManagementRent.objects.filter(is_listed=True)  # only show listed properties
+        return PropertyManagementRent.objects.filter(is_listed=True).order_by('-listed_date')
 
     def location(self, item):
-        return reverse('customer:view-property-s', args=[item.id])  # ✅ changed slug → id
+        # ✅ matches → /property_view/rent/<property_id>/
+        return reverse('customer:view-property-r', args=[item.id])
 
     def lastmod(self, item):
-        return item.last_updated  # ✅ correct field name from your model
+        return item.last_updated
 
 
 class PropertyManagementSaleSitemap(Sitemap):
@@ -22,13 +23,14 @@ class PropertyManagementSaleSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return PropertyManagementSale.objects.filter(is_listed=True)  # only show listed properties
+        return PropertyManagementSale.objects.filter(is_listed=True).order_by('-listed_date')
 
     def location(self, item):
-        return reverse('customer:view-property-r', args=[item.id])  # ✅ changed slug → id
+        # ✅ matches → /property_view/sale/<property_id>/
+        return reverse('customer:view-property-s', args=[item.id])
 
     def lastmod(self, item):
-        return item.last_updated  # ✅ correct field name from your model
+        return item.last_updated
 
 
 class StaticSitemap(Sitemap):
@@ -36,7 +38,15 @@ class StaticSitemap(Sitemap):
     priority = 0.6
 
     def items(self):
-        return ['landing', 'about']  # adjust to your actual url names
+        return [
+            'landing',
+            'about',
+            'faq',
+            'articles',
+            'estate-blog',
+            'partner-with-us',
+            'feedback',
+        ]
 
     def location(self, item):
         return reverse(item)
