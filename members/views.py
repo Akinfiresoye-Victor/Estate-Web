@@ -15,6 +15,7 @@ from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress
 from allauth.account.models import EmailConfirmationHMAC
 from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -338,6 +339,7 @@ def register_landlord(request):
 
 
 
+@ratelimit(key='user', rate='3/h', method='ALL', block=True)
 def resend_verification(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -360,6 +362,7 @@ def resend_verification(request):
 
 
 
+@method_decorator(ratelimit(key='user', rate='3/h', method='POST', block=True), name='post')
 class CustomEmailView(EmailView):
     success_url = reverse_lazy('account_email')
 

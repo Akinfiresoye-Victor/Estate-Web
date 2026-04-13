@@ -416,13 +416,9 @@ DB_PASSWORD=your_strong_password_here
 DB_HOST=localhost
 DB_PORT=5432
 
-# Email (Brevo or Postmark — fill in later)
-EMAIL_HOST=smtp-relay.brevo.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=your_brevo_login@email.com
-EMAIL_HOST_PASSWORD=your_brevo_smtp_password
-EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL=noreply@yourdomain.com
+# Email (Zeptomail — fill in after Step 13)
+ZEPTOMAIL_API_TOKEN=your_zeptomail_api_token_here
+DEFAULT_FROM_EMAIL=Estate Web <no-reply@yourdomain.com>
 ```
 
 Save with `Ctrl+X`, `Y`, `Enter`.
@@ -457,13 +453,10 @@ DATABASES = {
 }
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
+ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
+ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Estate Web <no-reply@yourdomain.com>')
 ```
 
 **Add Whitenoise for static files (in settings.py):**
@@ -729,27 +722,58 @@ If it says "Congratulations, all renewals succeeded" — you're good. Certbot wi
 
 ---
 
-## Step 13 — Set Up Email (Brevo SMTP)
+## Step 13 — Set Up Email (Zeptomail)
 
-**WHY Brevo (formerly Sendinblue)?**
-- Free tier: 300 emails/day — enough for Estate Web early stage
-- Reliable delivery (emails won't go to spam as often as direct SMTP)
-- Easy setup
+**WHY Zeptomail (by Zoho)?**
+- Designed specifically for transactional emails — welcome emails, password resets, inquiry notifications.
+- API-token auth (no SMTP credentials to rotate — simpler and more secure than traditional SMTP).
+- Reliable deliverability with Zoho's infrastructure; emails rarely hit spam.
+- Free tier: 10,000 emails/month — more than enough for Estate Web at early stage.
+- Native Django backend available via `zoho-zeptomail` pip package.
 
-### Set Up Brevo
+### Step 13A — Install the Python Package
 
-1. Go to [brevo.com](https://www.brevo.com) and create a free account
-2. Go to **SMTP & API** settings
-3. Generate an SMTP key (password)
-4. Your credentials will be:
-   - **Host:** `smtp-relay.brevo.com`
-   - **Port:** `587`
-   - **Username:** Your Brevo account email
-   - **Password:** The SMTP key you generated
+```bash
+source venv/bin/activate
+pip install zoho-zeptomail
+```
 
-Update your `.env` file with these values (you should have already added them in Step 7).
+Add it to your `requirements.txt`:
+```
+zoho-zeptomail
+```
 
-### Test Email in Django Shell
+### Step 13B — Create a Zeptomail Account
+
+1. Go to [zeptomail.zoho.com](https://zeptomail.zoho.com) and sign up for a free account.
+2. Under **Send Mail → Mail Agents**, create a new Mail Agent for Estate Web.
+3. Configure your verified **Sender Domain** (`estatewebng.com`) under **Mail Settings → Sender Domains** — you'll add a DNS TXT record to verify it.
+4. Once the domain is verified, go to your Mail Agent → **API Token** → Generate a token.
+
+> **Sender Domain Verification:** Add the TXT record Zeptomail gives you to your domain's DNS (same panel where you added A records in Step 11). It takes a few minutes to verify.
+
+### Step 13C — Configure `settings.py`
+
+Your `settings.py` already has the correct config. Make sure it reads:
+
+```python
+# Email — Zoho Zeptomail
+EMAIL_BACKEND = 'zoho_zeptomail.backend.zeptomail_backend.ZohoZeptoMailEmailBackend'
+ZOHO_ZEPTOMAIL_API_KEY_TOKEN = config('ZEPTOMAIL_API_TOKEN')
+ZOHO_ZEPTOMAIL_HOSTED_REGION = 'zeptomail.zoho.com'
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Estate Web <no-reply@estatewebng.com>')
+```
+
+### Step 13D — Set the Environment Variable
+
+In your `.env` file on the server:
+
+```env
+ZEPTOMAIL_API_TOKEN=your_zeptomail_api_token_here
+DEFAULT_FROM_EMAIL=Estate Web <no-reply@estatewebng.com>
+```
+
+### Step 13E — Test Email in Django Shell
 
 ```bash
 cd /var/www/estateweb
@@ -761,14 +785,16 @@ python manage.py shell
 from django.core.mail import send_mail
 send_mail(
     'Test Email from Estate Web',
-    'This is a test message.',
-    'noreply@yourdomain.com',
+    'This is a test message from Zeptomail.',
+    'no-reply@estatewebng.com',
     ['youremail@gmail.com'],
     fail_silently=False,
 )
 ```
 
-If no error is raised, your email is working.
+If no error is raised, your email pipeline is working.
+
+> **Troubleshooting:** If you get an `AuthenticationError`, double-check that your `ZEPTOMAIL_API_TOKEN` in `.env` matches the one generated in the Zeptomail dashboard exactly (no extra spaces).
 
 ---
 
@@ -970,7 +996,7 @@ Before going live, confirm all of these:
 - [ ] Domain A records pointing to server IP
 - [ ] SSL certificate installed via Certbot
 - [ ] HTTPS redirect working
-- [ ] Email tested via Django shell
+- [ ] Email tested via Django shell (Zeptomail)
 - [ ] Security settings in `settings.py` confirmed
 - [ ] Fail2Ban installed
 - [ ] `collectstatic` run successfully

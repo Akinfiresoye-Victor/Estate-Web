@@ -24,7 +24,7 @@ class CompanyInformation(models.Model):
     unique_company_id = models.CharField('uuid', max_length=36, default=uuid.uuid4, editable=False, unique=True)
     company_name= models.CharField('Company Name', blank=False, max_length=100, unique=True)
     legal_certificate= models.FileField('Certificate of Incoperation',blank=True, null=True, upload_to=company_file_path, validators=[validate_file])
-    year_established= models.IntegerField('Year Established',blank=False,)
+    year_established= models.IntegerField('Year Established',blank=False)
     phone_number=models.CharField('Phone Number',blank=False, max_length=11)
     email=models.EmailField('Company Email', blank=False, max_length=40, unique=True)
     address=models.CharField('Company Adress', blank=False, max_length=100)

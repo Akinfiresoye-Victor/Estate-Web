@@ -78,9 +78,6 @@
       <a href="{% url 'logout' %}" class="btn-logout">
         <i class="bi bi-box-arrow-right"></i> Logout
       </a>
-      <a href="{%url 'company:delete-company'%}" class="btn-danger-outline">
-        <i class="bi bi-trash"></i> Delete Account
-      </a>
     </div>
   </div>
 </nav>
@@ -595,6 +592,106 @@ document.addEventListener('DOMContentLoaded', function () {
     goToStep(3, true);
   }
 });
+/* ── Email availability check ───────────────────────────────────────
+   Fires on blur (when user leaves the email field).
+   Blocks goToStep(2) if the email is already taken.
+   Skips the check if the user typed their own registered email.
+─────────────────────────────────────────────────────────────────── */
+(function () {
+  var emailField  = document.getElementById('{{ form.email.id_for_label }}');
+  var emailTaken  = false;   /* flag that goToStep reads */
+  var checkUrl    = '{% url "company:check_company_email" %}';
+  var CSRF        = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  if (!emailField) return;
+
+  function getOrCreateEmailMsg() {
+    var parent = emailField.closest('.form-group') || emailField.parentElement;
+    var msg = parent.querySelector('.email-check-msg');
+    if (!msg) {
+      msg = document.createElement('span');
+      msg.className = 'email-check-msg';
+      parent.appendChild(msg);
+    }
+    return msg;
+  }
+
+  function clearEmailMsg() {
+    var msg = getOrCreateEmailMsg();
+    msg.textContent = '';
+    msg.className = 'email-check-msg';
+    emailField.classList.remove('field-error', 'field-ok');
+    emailTaken = false;
+  }
+
+  function showEmailError(text) {
+    var msg = getOrCreateEmailMsg();
+    msg.textContent = text;
+    msg.className = 'email-check-msg email-check-error';
+    emailField.classList.add('field-error');
+    emailField.classList.remove('field-ok');
+    emailTaken = true;
+  }
+
+  function showEmailOk(text) {
+    var msg = getOrCreateEmailMsg();
+    msg.textContent = text;
+    msg.className = 'email-check-msg email-check-ok';
+    emailField.classList.remove('field-error');
+    emailField.classList.add('field-ok');
+    emailTaken = false;
+  }
+
+  emailField.addEventListener('blur', function () {
+    var val = emailField.value.trim();
+    if (!val) { clearEmailMsg(); return; }
+
+    /* Show a checking state so user knows something is happening */
+    var msg = getOrCreateEmailMsg();
+    msg.textContent = 'Checking…';
+    msg.className = 'email-check-msg email-check-pending';
+
+    fetch(checkUrl, {
+      method: 'POST',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      credentials: 'same-origin',
+      body: 'email=' + encodeURIComponent(val)
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.exists) {
+        showEmailError('This email is already registered to another account.');
+      } else {
+        showEmailOk('Email is available.');
+      }
+    })
+    .catch(function () {
+      /* On network error, silently clear — don't block the user */
+      clearEmailMsg();
+    });
+  });
+
+  /* Clear message when user starts editing again */
+  emailField.addEventListener('input', function () {
+    clearEmailMsg();
+  });
+
+  /* ── Patch goToStep to block step 2 if email is taken ── */
+  var _originalGoToStep = window.goToStep;
+  window.goToStep = function (n, skipValidation) {
+    if (n === 2 && !skipValidation && emailTaken) {
+      showEmailError('This email is already registered. Please use a different email.');
+      emailField.focus();
+      return;   /* block */
+    }
+    _originalGoToStep(n, skipValidation);
+  };
+
+}());
 </script>
 
 {% endif %}{# end submitted #}

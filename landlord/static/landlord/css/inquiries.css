@@ -918,3 +918,50 @@
 .inq-coming-soon strong {
     color: var(--iq-mid);
 }
+
+/* ── FIX 1: list panel must be allowed to shrink ── */
+.inbox-list-panel {
+    border-right: 1px solid var(--iq-border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    /* ← ADD THIS */
+}
+
+/* ── FIX 2: detail panel same problem ── */
+.inbox-detail-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+    /* ← ADD THIS */
+}
+
+/* ── FIX 3: detail-content is a flex child that also needs this ── */
+.detail-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    /* ← ADD THIS */
+}
+
+/* ── FIX 4: tighten the max-height calculation ──
+   64px navbar + ~90px page header + 32px page padding = ~190px
+   Using 200px gives a small safety margin                      */
+.inbox-layout {
+    display: grid;
+    grid-template-columns: var(--list-w) 1fr;
+    gap: 0;
+    background: var(--iq-surface);
+    border: 1px solid var(--iq-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    min-height: 600px;
+    max-height: calc(100vh - 200px);
+    /* ← was 160px, now 200px */
+}

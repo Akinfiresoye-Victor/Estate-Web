@@ -263,8 +263,13 @@ def company_form(request):
                         company_form=comp_form.save(commit=False)
                         company_form.user= request.user
                         user=User.objects.get(id=request.user.id)
+                        emails=User.objects.values_list('email', flat=True)
                         if user.email == company_form.email:
                             company_form.is_company_email_verified=True
+                            company_form.verification_token=None
+                        elif company_form.email in emails:
+                            messages.error(request, 'Email already exists.')
+                            return redirect('company:company_form')
                         company_form.save()
                         link_form.instance=company_form
                         link_form.save()
@@ -290,6 +295,27 @@ def company_form(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
+from django.http import JsonResponse
+
+def check_company_email(request):
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    email = request.POST.get('email', '').strip().lower()
+    if not email:
+        return JsonResponse({'exists': False})
+
+    # If they typed their own registered account email, it's fine
+    if email == request.user.email.lower():
+        return JsonResponse({'exists': False})
+
+    # Check both User table and CompanyInformation table
+    exists_in_users   = User.objects.filter(email__iexact=email).exists()
+    exists_in_company = CompanyInformation.objects.filter(email__iexact=email).exists()
+
+    return JsonResponse({'exists': exists_in_users or exists_in_company})
+
+
 def update_company_profile(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to continue.')
@@ -310,10 +336,14 @@ def update_company_profile(request):
                     company = comp_form.save(commit=False)
                     company.user = request.user
                     emails=User.objects.values_list('email', flat=True)
-                    if request.user.email != company.email and company.email not in emails:
+                    company_emails=CompanyInformation.objects.values_list('email', flat=True)
+                    if request.user.email == company.email:
+                        company.is_company_email_verified=True
+                        company.verification_token=None
+                    elif request.user.email != company.email and company.email not in emails and company.email not in company_emails:
                         company.is_company_email_verified=False
                         company.verification_token=generate_invite_code()
-                    elif company.email in emails:
+                    elif company.email in emails or company.email in company_emails:
                         messages.error(request, 'Error, That Email is linked to an account')
                         if 'HTTP_REFERER' in request.META:
                             return redirect(request.META['HTTP_REFERER'])  

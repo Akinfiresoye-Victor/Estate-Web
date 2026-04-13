@@ -78,9 +78,6 @@
       <a href="{% url 'logout' %}" class="btn-logout">
         <i class="bi bi-box-arrow-right"></i> Logout
       </a>
-      <a href="{%url 'agent:delete-agent' %}" class="btn-danger-outline">
-        <i class="bi bi-trash"></i> Delete Account
-      </a>
     </div>
   </div>
 </nav>
@@ -167,25 +164,6 @@
               </div>
             </div>
 
-            <div class="col-sm-6">
-              <div class="form-group">
-                <label class="form-label">
-                  Email Address <span class="required">*</span>
-                </label>
-                <input type="email"
-                       name="{{ form.email.name }}"
-                       id="{{ form.email.id_for_label }}"
-                       class="form-control"
-                       placeholder="Personal or company email"
-                       required>
-                {# Clarify it can be any email #}
-                <span class="field-hint">Can be your personal or company email address</span>
-                {% if form.email.errors %}
-                  <span class="error-text">{{ form.email.errors }}</span>
-                {% endif %}
-              </div>
-            </div>
-          </div>
 
           <div class="row g-3">
             <div class="col-sm-6">
@@ -520,7 +498,6 @@ var current = 1;
 var STEP_REQUIRED = {
   1: [
     '{{ form.phone_number.id_for_label }}',
-    '{{ form.email.id_for_label }}',
     '{{ form.location.id_for_label }}',
     '{{ form.language.id_for_label }}'
   ],
@@ -702,7 +679,6 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Jump to step with Django server-side errors */
   var hasStep1 = [
     '{{ form.phone_number.errors|yesno:"true,false" }}',
-    '{{ form.email.errors|yesno:"true,false" }}',
     '{{ form.location.errors|yesno:"true,false" }}',
     '{{ form.language.errors|yesno:"true,false" }}'
   ].includes('true');

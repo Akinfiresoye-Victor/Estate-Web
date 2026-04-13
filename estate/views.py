@@ -679,6 +679,7 @@ def delete_account(request):
 
 
 
+@ratelimit(key='user', rate='5/h', method='POST', block=True)
 def review_company(request, company_uuid):
     # Check if user is a customer
     if request.user.role != 'customer':
@@ -746,6 +747,7 @@ def review_company(request, company_uuid):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
+@ratelimit(key='user', rate='5/h', method='POST', block=True)
 def review_agent(request, agent_uuid):
     """Handle agent review submission"""
     # Check role
@@ -990,6 +992,7 @@ def inquiry_form(request, property_type, property_id):
 
 
 
+@ratelimit(key='user', rate='10/h', method='ALL', block=True)
 def flag_listing(request, property_id, property_type):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to report this listing.')

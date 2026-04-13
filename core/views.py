@@ -56,6 +56,7 @@ def about_page(request):
 
 
 '''Users Feedbacks'''
+@ratelimit(key='ip', rate='5/h', method='POST', block=True)
 def feedbacks(request):
     try:
         submitted = False
@@ -130,7 +131,18 @@ def submit_feedback(request):
             feedback_obj.user = request.user
 
         feedback_obj.save()
-
+        threading.Thread(
+                target=send_estate_email,
+                kwargs=dict(
+                    subject="New Feedback Received",
+                    template_name='emails/simple_notification.html',
+                    context={
+                        'message': f"A new feedback was submitted by {request.user.username} ({request.user.email}). Log in to review it."
+                    },
+                    recipient_list=['contact@estatewebng.com'],
+                ),
+                daemon=True,
+            ).start()
         messages.success(request, 'Thank you for your feedback! We value your input.')
         if 'HTTP_REFERER' in request.META:
             return redirect(request.META['HTTP_REFERER'])  
@@ -855,6 +867,7 @@ def delete_property_on_sale(request, property_id):
 
 
 
+@ratelimit(key='ip', rate='5/h', method='POST', block=True)
 def partner_with_us(request):
     """
     Renders the partnership application form.
