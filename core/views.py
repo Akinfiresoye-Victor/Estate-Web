@@ -18,6 +18,10 @@ from landlord.models import LandlordInformation
 from django_ratelimit.decorators import ratelimit
 from django.core.mail import send_mail
 import threading
+import traceback
+import logging
+logger = logging.getLogger(__name__)
+
 
 
 def landing_page(request):
@@ -541,10 +545,9 @@ def toggle_listing(request, property_id, property_type):
                 return JsonResponse({'is_listed': True, 'message': msg, 'live_count': live_count})
             messages.success(request, msg)
         return redirect('listings')
-    except Exception:
-        # Log the error and show the error page
-        error = ErrorLog.objects.create(traceback=traceback.format_exc())
-        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+    except Exception as e:
+        traceback.print_exc()
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 '''News Blog Automation'''
