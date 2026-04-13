@@ -6,7 +6,7 @@ from allauth.account.views import EmailView
 from django.urls import reverse_lazy
 from members.views import resend_verification, CustomEmailView,logout_for_email_change
 
-
+#yeah
 urlpatterns = [
     path(f'{settings.DJANGO_ADMIN_PATH}/', admin.site.urls),
     path('', include('core.urls')),
