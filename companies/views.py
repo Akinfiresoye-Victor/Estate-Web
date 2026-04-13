@@ -22,7 +22,7 @@ from agents.models import AgentInformation
 from django.urls import reverse
 import threading
 import traceback
-from django_ratelimit.decorators import ratelimit
+from core.ratelimit import ratelimit
 from allauth.account.models import EmailAddress
 
 
@@ -1167,7 +1167,7 @@ def delete_vacancy(request, job_id):
         messages.error(request, 'An unexpected error occurred while deleting the job listing.')
         return redirect('company:application-management')
 
-@ratelimit(key='ip', rate='30/m', method='POST', block=True)
+@ratelimit(rate='30/m', key_prefix='toggle_job')
 def toggle_job_status(request, job_id):
     """Toggle job active/inactive status"""
     if not request.user.is_authenticated:
@@ -1268,7 +1268,7 @@ def onboard_agent(request, agent_uuid):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+@ratelimit(rate='5/m', key_prefix='generate_invt')
 def generate_invite_link(request):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to continue.')
@@ -1495,7 +1495,7 @@ def company_feedbacks(request):
 
 
 
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+@ratelimit(rate='5/m', key_prefix='send_verif')
 def send_verification_token(request):
     try:
         if not request.user.is_authenticated:

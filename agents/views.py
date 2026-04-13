@@ -17,7 +17,7 @@ from core.utils import monthly_change, engagement_rate, total_agents_engagement_
 from companies.models import JobPost,CompanyInformation,InviteLink, CompanyActivityLog, Employees
 from django.urls import reverse
 import traceback
-from django_ratelimit.decorators import ratelimit
+from core.ratelimit import ratelimit
 import threading
 from allauth.account.models import EmailAddress
 
@@ -878,7 +878,7 @@ def delete_agent(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-@ratelimit(key='ip', rate='30/m', method='POST', block=True)
+@ratelimit(rate='30/m', key_prefix='join_invite')
 def join_via_invite(request):
     """
     Agent lands here after clicking the invite link.

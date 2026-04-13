@@ -14,7 +14,7 @@ from allauth.socialaccount.models import SocialLogin
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailAddress
 from allauth.account.models import EmailConfirmationHMAC
-from django_ratelimit.decorators import ratelimit
+from core.ratelimit import ratelimit
 from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -31,7 +31,7 @@ from django.contrib.auth.decorators import login_required
 
 
 
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+@ratelimit(rate='5/m', key_prefix='login_protection')
 def agent_google_login(request):
     # 1. Tag the session so we remember this is an Agent
     request.session['user_role'] = 'agent'
@@ -40,7 +40,7 @@ def agent_google_login(request):
     # This URL is usually '/accounts/google/login/'
     return redirect('/accounts/google/login/')
 
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+@ratelimit(rate='5/m', key_prefix='login_protection')
 def company_google_login(request):
     # 1. Tag the session so we remember this is an Agent
     request.session['user_role'] = 'company'
@@ -49,7 +49,7 @@ def company_google_login(request):
     # This URL is usually '/accounts/google/login/'
     return redirect('/accounts/google/login/')
 
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+@ratelimit(rate='5/m', key_prefix='login_protection')
 def landlord_google_login(request):
     # 1. Tag the session so we remember this is a Landlord
     request.session['user_role'] = 'landlord'
@@ -58,7 +58,7 @@ def landlord_google_login(request):
     return redirect('/accounts/google/login/')
 
 
-@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+@ratelimit(rate='5/m', key_prefix='login_protection')
 def login_user(request):
     # 1. Guard clause for already logged-in users
     if request.user.is_authenticated:
@@ -128,7 +128,7 @@ def logout_user(request):
 
 
 # ─── register_customer ───────────────────────────────────────────────────────
-@ratelimit(key='ip', rate='3/m', method='POST', block=True)
+@ratelimit(rate='3/m', key_prefix='login_protection')
 def register_customer(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -186,7 +186,7 @@ def register_customer(request):
 
 
 # ─── register_agent ───────────────────────────────────────────────────────────
-@ratelimit(key='ip', rate='3/m', method='POST', block=True)
+@ratelimit(rate='3/m', key_prefix='login_protection')
 def register_agent(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -236,7 +236,7 @@ def register_agent(request):
 
 
 # ─── register_company ─────────────────────────────────────────────────────────
-@ratelimit(key='ip', rate='3/m', method='POST', block=True)
+@ratelimit(rate='3/m', key_prefix='login_protection')
 def register_company(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -287,7 +287,7 @@ def register_company(request):
 
 
 # ─── register_landlord ────────────────────────────────────────────────────────
-@ratelimit(key='ip', rate='3/m', method='POST', block=True)
+@ratelimit(rate='3/m', key_prefix='login_protection')
 def register_landlord(request):
     if request.user.is_authenticated:
         return redirect('landing')
@@ -339,7 +339,7 @@ def register_landlord(request):
 
 
 
-@ratelimit(key='user', rate='3/h', method='ALL', block=True)
+@ratelimit(rate='3/h', key_prefix='email_reset')
 def resend_verification(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -362,7 +362,7 @@ def resend_verification(request):
 
 
 
-@method_decorator(ratelimit(key='user', rate='3/h', method='POST', block=True), name='post')
+@ratelimit(rate='3/h', key_prefix='email_reset')
 class CustomEmailView(EmailView):
     success_url = reverse_lazy('account_email')
 

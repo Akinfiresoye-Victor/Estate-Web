@@ -8,7 +8,7 @@ import time
 from datetime import date, timedelta
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django_ratelimit.decorators import ratelimit
+from core.ratelimit import ratelimit
 
 from .decorators import admin_required
 from .forms import AdminLoginForm
@@ -29,7 +29,7 @@ def get_client_ip(request):
         return x_forwarded_for.split(',')[0].strip()
     return request.META.get('REMOTE_ADDR')
 
-@ratelimit(key='ip', rate='5/10m', block=False)
+@ratelimit(rate='5/10m', key_prefix='admin_login')
 def admin_login(request):
     if getattr(request, 'limited', False):
         from django.http import HttpResponse

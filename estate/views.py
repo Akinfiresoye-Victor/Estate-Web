@@ -22,7 +22,7 @@ from core.utils import refresh_activity_score, send_estate_email
 from django.urls import reverse
 import traceback
 from landlord.models import LandlordInformation
-from django_ratelimit.decorators import ratelimit
+from core.ratelimit import ratelimit
 from django.utils import timezone
 import threading
 
@@ -377,7 +377,7 @@ def listed_properties(request):
 
 
 
-@ratelimit(key='ip', rate='30/m', method='POST', block=True)
+@ratelimit(rate='30/m', key_prefix='toggle_protect')
 def toggle_wishlist_rent(request, property_id):
     """
     Toggle wishlist for a rent property.
@@ -432,7 +432,7 @@ def toggle_wishlist_rent(request, property_id):
  
  
 # ─── toggle_wishlist_buy ──────────────────────────────────────────────────────
-@ratelimit(key='ip', rate='30/m', method='POST', block=True)
+@ratelimit(rate='30/m', key_prefix='toggle_protect')
 def toggle_wishlist_buy(request, property_id):
     """
     Toggle wishlist for a sale property.
@@ -558,7 +558,7 @@ def update_profile(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-@ratelimit(key='ip', rate='3/h', method='POST', block=True)
+@ratelimit(rate='3/h', key_prefix='pw_reset')
 def change_password(request):
     """
     Change User Passwords with precise lines of code
@@ -679,7 +679,7 @@ def delete_account(request):
 
 
 
-@ratelimit(key='user', rate='5/h', method='POST', block=True)
+@ratelimit(rate='5/h', key_prefix='comment_spam')
 def review_company(request, company_uuid):
     # Check if user is a customer
     if request.user.role != 'customer':
@@ -747,7 +747,7 @@ def review_company(request, company_uuid):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-@ratelimit(key='user', rate='5/h', method='POST', block=True)
+@ratelimit(rate='5/h', key_prefix='comment_spam')
 def review_agent(request, agent_uuid):
     """Handle agent review submission"""
     # Check role
@@ -821,7 +821,7 @@ def review_agent(request, agent_uuid):
 
 
 
-@ratelimit(key='ip', rate='10/h', method='POST', block=True)
+@ratelimit(rate='10/h', key_prefix='submit_form')
 def inquiry_form(request, property_type, property_id):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to send an inquiry.')
@@ -992,7 +992,7 @@ def inquiry_form(request, property_type, property_id):
 
 
 
-@ratelimit(key='user', rate='10/h', method='ALL', block=True)
+@ratelimit(rate='10/h', key_prefix='submit_form')
 def flag_listing(request, property_id, property_type):
     if not request.user.is_authenticated:
         messages.info(request, 'Please sign in to report this listing.')
@@ -1048,7 +1048,7 @@ def flag_listing(request, property_id, property_type):
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
-@ratelimit(key='ip', rate='30/m', method='POST', block=True)
+@ratelimit(rate='10/h', key_prefix='submit_form')
 def toggle_compare(request, property_type, property_id):
     """
     Adds or removes a property from the compare session list.

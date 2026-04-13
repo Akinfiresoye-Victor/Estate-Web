@@ -1,26 +1,21 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from .forms import *
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.db import transaction
 from companies.models import CompanyInformation, CompanyActivityLog
 from . import news_scrape as ns
 from agents.models import AgentInformation
 from estate.models import LeadInfo
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from core.utils import *
 from .models import ErrorLog
-import traceback
 from django.utils.http import url_has_allowed_host_and_scheme
 from landlord.models import LandlordInformation
-from django_ratelimit.decorators import ratelimit
+from core.ratelimit import ratelimit
 from django.core.mail import send_mail
-import threading
-import traceback
-import logging
-logger = logging.getLogger(__name__)
+import traceback, threading
 
 
 
@@ -60,7 +55,7 @@ def about_page(request):
 
 
 '''Users Feedbacks'''
-@ratelimit(key='ip', rate='5/h', method='POST', block=True)
+@ratelimit(rate='5/h', key_prefix='feedback')
 def feedbacks(request):
     try:
         submitted = False
@@ -91,7 +86,7 @@ def feedbacks(request):
 
 
 '''New Multi-Channel Feedback System — receives AJAX POST from the feedback modal'''
-@ratelimit(key='ip', rate='10/m', method='POST', block=True)
+@ratelimit(rate='10/m', key_prefix='feedback_ajax')
 @require_POST
 def submit_feedback(request):
     try:
@@ -466,7 +461,7 @@ def lease_property(request):
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})        
 
 
-@ratelimit(key='ip', rate='30/m', method='POST', block=True)
+@ratelimit(rate='30/m', key_prefix='toggle_list')
 def toggle_listing(request, property_id, property_type):
     """
     Toggles a property between inventory (private) and listed(public).
@@ -874,7 +869,7 @@ def delete_property_on_sale(request, property_id):
 
 
 
-@ratelimit(key='ip', rate='5/h', method='POST', block=True)
+@ratelimit(rate='5/h', key_prefix='partner_form')
 def partner_with_us(request):
     """
     Renders the partnership application form.
@@ -1477,15 +1472,7 @@ def partnership_terms(request):
 def estate_web_guide(request):
     return render(request, 'core/faq.html')
 
-def ratelimit_error(request, exception=None):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    if is_ajax:
-        return JsonResponse(
-            {'error': 'Too many requests. Please slow down and try again.'},
-            status=429
-        )
-    return render(request, 'core/429.html', status=429)
 
 def lockout_response(request, credentials, *args, **kwargs):
     return render(request, 'core/lockout.html', status=403)
