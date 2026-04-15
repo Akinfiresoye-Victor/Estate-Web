@@ -30,6 +30,29 @@ import threading
 
 '''Algorithms Start👇'''
 
+
+
+# add this helper at the top of your views file
+def check_wishlist_limit(user):
+    """
+    Returns (allowed, reason).
+    Standard plan = 5 slots. VIP Hunter = unlimited.
+    """
+    try:
+        limit = user.subscription.get_limit('wishlist_slots')
+    except Exception:
+        limit = 5  # fallback to free limit
+
+    if limit is None:
+        return True, 'ok'  # unlimited
+
+    current_count = WishlistStorageUnit.objects.filter(user_id=user.id).count()
+    if current_count >= limit:
+        return False, f'Wishlist full ({current_count}/{limit}). Upgrade to VIP Hunter for unlimited saves.'
+    return True, 'ok'
+
+
+
 def wishlist_generator(properties_list, user_id):
     """
     Takes a list of property objects and returns a list of booleans
@@ -398,6 +421,8 @@ def toggle_wishlist_rent(request, property_id):
         return redirect('landing')
  
     try:
+        # only check limit when ADDING (not removing)
+        # we check inside the else branch of wishlist_qs.exists()
         wishlist_qs = WishlistStorageUnit.objects.filter(
             user_id=request.user.id,
             property_id=property_id,
@@ -411,6 +436,14 @@ def toggle_wishlist_rent(request, property_id):
             prop.save(update_fields=['total_likes'])
             added = False
         else:
+            # check limit before adding
+            allowed, reason = check_wishlist_limit(request.user)
+            if not allowed:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'error': reason}, status=403)
+                messages.error(request, reason)
+                return redirect('pricing_page')
+
             WishlistStorageUnit.objects.create(
                 user_id=request.user.id,
                 property_id=property_id,
@@ -1048,56 +1081,71 @@ def flag_listing(request, property_id, property_type):
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
-@ratelimit(rate='10/h', key_prefix='submit_form')
 def toggle_compare(request, property_type, property_id):
     """
-    Adds or removes a property from the compare session list.
-    property_type: 'sale' or 'rent'
-    Max 3 properties allowed.
-    AJAX only — returns JSON.
+    Fixed: enforces a single combined limit of 3 across both sale and rent.
+    Also respects VIP Hunter limit of 6 for customers.
     """
     try:
-        key = f'compare_{property_type}'
-        ids = request.session.get(key, [])
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-        if property_id in ids:
-            ids.remove(property_id)
+        # get customer compare limit from subscription
+        max_compare = 2  # default for free customer (Standard plan)
+        if request.user.is_authenticated and request.user.role == 'customer':
+            try:
+                limit = request.user.subscription.get_limit('compare_slots')
+                if limit is not None:
+                    max_compare = limit
+            except Exception:
+                max_compare = 2
+
+        # single list holds dicts: {'id': x, 'type': 'sale'/'rent'}
+        compare_list = request.session.get('compare_list', [])
+
+        # check if already in list
+        existing = next((i for i, p in enumerate(compare_list)
+                         if p['id'] == property_id and p['type'] == property_type), None)
+
+        if existing is not None:
+            compare_list.pop(existing)
             action = 'removed'
         else:
-            if len(ids) >= 3:
-                return JsonResponse({'error': 'max_reached',
-                                    'message': 'You can only compare up to 3 properties.'}, status=400)
-            ids.append(property_id)
+            if len(compare_list) >= max_compare:
+                return JsonResponse({
+                    'error': 'max_reached',
+                    'message': f'You can only compare up to {max_compare} properties. Upgrade to VIP Hunter for more.'
+                }, status=400)
+            compare_list.append({'id': property_id, 'type': property_type})
             action = 'added'
 
-        request.session[key] = ids
+        request.session['compare_list'] = compare_list
         request.session.modified = True
 
         return JsonResponse({
-            'action':  action,
-            'count':   len(ids),
-            'type':    property_type,
+            'action': action,
+            'count': len(compare_list),
+            'type': property_type,
         })
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 
-
 def compare_properties(request):
     try:
-        sale_ids  = request.session.get('compare_sale', [])
-        rent_ids  = request.session.get('compare_rent', [])
+        compare_list = request.session.get('compare_list', [])
+
+        sale_ids = [p['id'] for p in compare_list if p['type'] == 'sale']
+        rent_ids = [p['id'] for p in compare_list if p['type'] == 'rent']
 
         sale_props = list(PropertyManagementSale.objects.filter(id__in=sale_ids, is_listed=True))
         rent_props = list(PropertyManagementRent.objects.filter(id__in=rent_ids, is_listed=True))
 
-        # Combine — you compare across types
         all_props = sale_props + rent_props
 
         return render(request, 'estate/compare_page.html', {
-            'properties':  all_props,
-            'base_template': 'estate/base.html',  # adjust per role
+            'properties': all_props,
+            'base_template': 'estate/base.html',
         })
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
@@ -1106,12 +1154,12 @@ def compare_properties(request):
 
 def clear_compare(request):
     try:
-        request.session.pop('compare_sale', None)
-        request.session.pop('compare_rent', None)
+        request.session.pop('compare_list', None)
         return JsonResponse({'success': True})
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
 
 
 

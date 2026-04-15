@@ -66,6 +66,27 @@
 
 </div>
 
+{# ── Subscription Warning Banner ── #}
+{% widthratio used_slots total_limit 100 as inv_pct %}
+{% if used_slots >= total_limit %}
+<div style="background:#fef2f2; border:1px solid #f87171; border-radius:10px; padding:12px 18px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+  <span style="font-size:0.875rem; color:#991b1b; font-weight:500;">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    You've reached your inventory limit ({{ used_slots }}/{{ total_limit }}).
+    Upgrade your plan to add more properties.
+  </span>
+  <a href="{% url 'pricing_page' %}" style="background:#991b1b; color:white; padding:6px 14px; border-radius:6px; font-size:0.82rem; font-weight:500; text-decoration:none;">Upgrade Plan</a>
+</div>
+{% elif inv_pct >= 90 %}
+<div style="background:#fffbeb; border:1px solid #fbbf24; border-radius:10px; padding:12px 18px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+  <span style="font-size:0.875rem; color:#92400e; font-weight:500;">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    You're almost at your inventory limit ({{ used_slots }}/{{ total_limit }}). Consider upgrading soon.
+  </span>
+  <a href="{% url 'pricing_page' %}" style="background:#d97706; color:white; padding:6px 14px; border-radius:6px; font-size:0.82rem; font-weight:500; text-decoration:none;">View Plans</a>
+</div>
+{% endif %}
+
 {# ── Toolbar: Filter tabs ── #}
 {% if sales or rentals %}
 <div class="li-toolbar">

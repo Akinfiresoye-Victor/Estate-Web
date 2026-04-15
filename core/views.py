@@ -19,6 +19,17 @@ import traceback, threading
 
 
 
+# NEW - reads from subscription
+def _get_limit_display(user, key):
+    """Returns the limit value or '∞' if unlimited (None)."""
+    try:
+        val = user.subscription.get_limit(key)
+        return '∞' if val is None else val
+    except Exception:
+        return 0
+
+
+
 def landing_page(request):
     if not request.user.is_authenticated:
         return render(request, 'core/landing.html')
@@ -1126,6 +1137,8 @@ def manage_listings(request):
             property_on_lease=PropertyManagementRent.objects.filter(company_uuid=company.unique_company_id)
             property_on_sale=PropertyManagementSale.objects.filter(company_uuid=company.unique_company_id)
             role='company'
+            inv_limit = _get_limit_display(company.user, 'inventory_slots')
+            live_limit = _get_limit_display(company.user, 'listing_slots')
         elif user_role == 'agent':
             agent=AgentInformation.objects.get(user=request.user)
             company=None
@@ -1134,20 +1147,13 @@ def manage_listings(request):
             property_on_lease=PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid)
             property_on_sale=PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid)
             role='agent'
+            inv_limit = _get_limit_display(agent.user, 'inventory_slots')
+            live_limit = _get_limit_display(agent.user, 'listing_slots')
         else:
             messages.error(request, 'An unexpected error occurred.')
             return redirect('landing')
         inv_used=get_inventory_count(agent, company)
         live_used= get_listing_count(agent,company)
-        if company and company.company_tier == 'enterprise':
-            inv_limit='∞'
-            live_limit='∞'
-        elif company:
-            inv_limit=company.inventory_slots
-            live_limit=company.listing_slots
-        else:
-            inv_limit=agent.inventory_slot
-            live_limit=agent.listing_slots
         context={
             'on_lease':property_on_lease,
             'role':role,

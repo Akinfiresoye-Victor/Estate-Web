@@ -494,13 +494,6 @@
     </div>{# end feedback-overlay #}
 
     {# --- 3. Post-Action Toast --------------------------------------- #}
-    {#
-      HOW TO TRIGGER FROM ANY ADMIN PAGE:
-      After a major admin action, call:
-          showFeedbackToast("How was managing that listing?");
-      The toast shows 1–5 quick rating. Tapping opens modal with that
-      rating pre-selected.
-    #}
     <div class="feedback-toast" id="feedbackToast" style="display: none;" role="status" aria-live="polite">
       <div class="feedback-toast-inner">
         <span class="feedback-toast-msg" id="feedbackToastMsg">How was the experience?</span>

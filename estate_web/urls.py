@@ -47,6 +47,7 @@ urlpatterns = [
     path('accounts/email/change/', logout_for_email_change, name='logout_for_email_change'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', robots_txt, name='robots_txt'),
+    path("payments/", include("payments.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

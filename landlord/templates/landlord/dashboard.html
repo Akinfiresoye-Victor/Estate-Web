@@ -1,6 +1,7 @@
 {% extends 'landlord/base.html' %}
 {% load static %}
 {%load static humanize%}
+{% load property_extras %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'landlord/css/dashboard.css' %}">
 {% endblock %}
@@ -48,6 +49,12 @@
           </span>
           My Profile
         </a>
+        <a href="{% url 'pricing_page' %}" class="sidebar-link">
+          <span class="sidebar-icon" style="color:var(--gold);">
+            <i class="bi bi-star-fill"></i>
+          </span>
+          Manage Subscription
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -70,6 +77,37 @@
           <p class="welcome-sub">Here's what's happening with your properties today.</p>
         </div>
       </div>
+
+      <!-- SUBSCRIPTION WIDGET -->
+      <section class="subscription-section" style="margin-bottom: 2rem;">
+        <div style="background: var(--white); border: 1px solid {% if not request.user.subscription.is_active %}#f87171{% else %}var(--border){% endif %}; border-radius: 12px; padding: 20px; box-shadow: var(--card-shadow); display: flex; flex-direction: column; gap: 15px; {% if not request.user.subscription.is_active %}background: #fef2f2;{% endif %}">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h3 style="font-size: 1.1rem; color: {% if not request.user.subscription.is_active %}#991b1b{% else %}var(--navy){% endif %}; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-star-fill" style="color: var(--gold);"></i>
+                {{ request.user.subscription.plan|plan_display }} Plan
+                {% if request.user.subscription.is_active %}
+                <span style="font-size: 0.7rem; background: #16a34a; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 500; letter-spacing: 0.5px;">Active</span>
+                {% endif %}
+              </h3>
+              <p style="font-size: 0.85rem; color: {% if not request.user.subscription.is_active %}#b91c1c{% else %}var(--muted){% endif %}; margin: 0;">
+                {% if request.user.subscription.is_active %}
+                  {% if request.user.subscription.expiry_date %}
+                    Renews on {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+                  {% else %}
+                    No expiry
+                  {% endif %}
+                {% else %}
+                  <i class="bi bi-exclamation-triangle-fill"></i> Subscription Expired
+                {% endif %}
+              </p>
+            </div>
+            <a href="{% url 'pricing_page' %}" style="background: var(--navy); color: white; padding: 7px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: background 0.2s;">
+              Manage Plan
+            </a>
+          </div>
+        </div>
+      </section>
 
       <!-- Quick Stats -->
       <section class="stats-row">
@@ -127,10 +165,10 @@
               </p>
               <p class="listing-price">
                 {%if property.property_type == 'Rent'%}
-                  ₦{{ property.price_range|floatformat:"0"|intcomma }}
+                  â‚¦{{ property.price_range|floatformat:"0"|intcomma }}
                   <span class="listing-period">/year (On Lease)</span>
                 {%else%}
-                  ₦{{ property.price|floatformat:"0"|intcomma }}
+                  â‚¦{{ property.price|floatformat:"0"|intcomma }}
                   <span class="listing-period">(On Sale)</span>
                 {%endif%}
               </p>
@@ -188,7 +226,7 @@
             <p class="inquiry-name">{{ inquiry.name }}</p>
             <p class="inquiry-text">{{ inquiry.inquiry_message }}</p>
             <p class="inquiry-meta">
-              {{ inquiry.property_name }} &nbsp;·&nbsp; {{ inquiry.date_created|timesince }} ago
+              {{ inquiry.property_name }} &nbsp;Â·&nbsp; {{ inquiry.date_created|timesince }} ago
             </p>
           </div>
         </div>
@@ -201,10 +239,10 @@
     </section>
       <!-- Help Tip -->
       <section class="tip-box">
-        <div class="tip-icon">💡</div>
+        <div class="tip-icon">ðŸ’¡</div>
         <div class="tip-content">
           <p class="tip-title">Make your listing stand out</p>
-          <p class="tip-text">Properties with clear photos and complete descriptions get up to 3x more inquiries. <a href="{%url 'landlord:dashboard'%}" class="tip-link">Update your listing →</a></p>
+          <p class="tip-text">Properties with clear photos and complete descriptions get up to 3x more inquiries. <a href="{%url 'landlord:dashboard'%}" class="tip-link">Update your listing â†’</a></p>
         </div>
       </section>
 

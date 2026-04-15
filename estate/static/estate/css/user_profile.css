@@ -1,5 +1,9 @@
 /* ═══════════════════════════════════════════════════
    user_profile.css — Customer Profile
+   Priority layout (tester feedback):
+     1. Dashboard cards  (top, most-used)
+     2. Edit Profile     (prominent secondary)
+     3. Change Password  (smaller — rarely used)
    Mobile-first. Same palette as rest of Estate Web.
    ═══════════════════════════════════════════════════ */
 
@@ -34,6 +38,9 @@ body {
 
 /* ═══════════════════════════════════════════════════
    PAGE WRAPPER
+   Order: header → section-label → cards → news
+   The cards (dashboard) are now the FIRST thing after
+   the compact profile header, not buried below.
    ═══════════════════════════════════════════════════ */
 .cp-page {
   max-width: 680px;
@@ -46,8 +53,8 @@ body {
 
 
 /* ═══════════════════════════════════════════════════
-   PROFILE HEADER
-   Cover gradient → overlapping avatar → info below
+   PROFILE HEADER  (compact — secondary priority)
+   Cover is shorter. Info + action buttons are inline.
    ═══════════════════════════════════════════════════ */
 .cp-profile-header {
   background: var(--white);
@@ -56,13 +63,13 @@ body {
   overflow: hidden;
 }
 
+/* Shorter cover than before — profile is secondary now */
 .cp-cover {
-  height: 110px;
+  height: 80px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   position: relative;
 }
 
-/* Subtle pattern on cover */
 .cp-cover::before {
   content: '';
   position: absolute;
@@ -76,24 +83,26 @@ body {
   );
 }
 
+/* header-body: avatar + meta (info + buttons) in one row */
 .cp-header-body {
-  padding: 0 20px 24px;
+  padding: 0 18px 20px;
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 14px;
 }
 
 /* Avatar overlaps the cover */
 .cp-avatar-wrap {
-  margin-top: -46px;
-  margin-bottom: 12px;
+  margin-top: -36px;
+  flex-shrink: 0;
 }
 
 .cp-avatar {
-  width: 88px;
-  height: 88px;
-  border-radius: 20px;
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
   border: 4px solid var(--white);
   box-shadow: var(--shadow-md);
   object-fit: cover;
@@ -105,117 +114,106 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
+  font-size: 1.9rem;
   font-weight: 800;
   color: var(--white);
 }
 
-.cp-user-info { margin-bottom: 16px; }
+/* meta = text info + action buttons, stacked on mobile */
+.cp-user-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 10px;   /* a bit of breathing room below avatar overlap */
+}
 
 .cp-name {
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--primary);
   line-height: 1.2;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .cp-username {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--secondary);
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .cp-email {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-light);
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
-.cp-email i { color: var(--secondary); font-size: 13px; }
+.cp-email i { color: var(--secondary); font-size: 12px; }
 
-/* Edit button */
+
+/* ── Header action buttons ───────────────────────── */
+/*
+  Two buttons side-by-side:
+  - Edit Profile   → solid primary (prominent)
+  - Change Password → ghost / smaller (rarely used)
+*/
+.cp-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Edit Profile — solid, prominent */
 .cp-edit-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
+  gap: 5px;
+  padding: 8px 16px;
   background: var(--primary);
   color: var(--white);
   border-radius: var(--radius-sm);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-decoration: none;
   transition: var(--ease);
+  white-space: nowrap;
 }
 .cp-edit-btn:hover {
   background: var(--primary-lt);
   color: var(--white);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-
-/* ═══════════════════════════════════════════════════
-   NEWS BANNER
-   ═══════════════════════════════════════════════════ */
-.cp-news {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 16px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 0 16px;
-  border-left: 4px solid var(--secondary);
-}
-
-.cp-news-left { flex: 1; min-width: 0; }
-
-.cp-news-pill {
+/*
+  Change Password — ghost style, noticeably smaller.
+  Smaller font-size and lighter weight communicate
+  "this is here but you won't need it often".
+*/
+.cp-pw-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 9px;
-  background: rgba(193,155,118,.12);
-  color: var(--accent);
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 6px;
-}
-
-.cp-news-text {
-  font-size: 0.85rem;
+  gap: 4px;
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--text-light);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;      /* intentionally smaller */
   font-weight: 600;
-  color: var(--text-dark);
-  line-height: 1.45;
-  margin: 0;
-  /* clamp to 2 lines */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.cp-news-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  white-space: nowrap;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--secondary);
   text-decoration: none;
   transition: var(--ease);
-  flex-shrink: 0;
+  white-space: nowrap;
 }
-.cp-news-link:hover { color: var(--accent); }
-.cp-news-link i { font-size: 1.1rem; }
+.cp-pw-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(26,60,78,.04);
+}
+.cp-pw-btn i { font-size: 11px; }
 
 
 /* ═══════════════════════════════════════════════════
@@ -232,8 +230,10 @@ body {
 
 
 /* ═══════════════════════════════════════════════════
-   CARDS GRID
-   Single column on mobile, 2-col on tablet+
+   CARDS GRID  (PRIMARY — top of page)
+   Single column on mobile, 2-col on tablet+.
+   "Saved Properties" is full-width on mobile
+   to emphasise it as the #1 action.
    ═══════════════════════════════════════════════════ */
 .cp-grid {
   padding: 0 16px;
@@ -275,6 +275,16 @@ body {
   border-color: rgba(193,155,118,.25);
 }
 .cp-card:hover::before { opacity: 1; }
+
+/*
+  Primary card — the most important action on the page.
+  Slightly larger icon + bolder border treatment on mobile.
+*/
+.cp-card-primary {
+  border: 1.5px solid rgba(220,38,38,.15);
+  background: linear-gradient(to right, rgba(220,38,38,.03), var(--white));
+}
+.cp-card-primary::before { opacity: 1; }   /* accent bar always visible */
 
 /* ── Card icon ── */
 .cp-card-icon {
@@ -320,37 +330,42 @@ body {
 .cp-card:hover .cp-card-caret { transform: translateX(3px); color: var(--secondary); }
 
 .locked-icon { color: #d1d5db; }
-.locked-icon:hover { transform: none; }
 
 
-/* ── Wishlist card ── */
+/* ── Card colour themes ── */
+.cp-card-plan .cp-card-icon {
+  background: rgba(193,155,118,.12);
+  color: var(--secondary);
+}
+.cp-card-plan::before { 
+  background: var(--secondary); 
+}
 .cp-card-wishlist .cp-card-icon {
   background: rgba(220,38,38,.08);
   color: #dc2626;
 }
+
 .cp-card-wishlist::before { background: #dc2626; }
 
-/* ── Feedback card ── */
 .cp-card-feedback .cp-card-icon {
   background: rgba(8,145,178,.08);
   color: #0891b2;
 }
 .cp-card-feedback::before { background: #0891b2; }
 
-/* ── Settings card ── */
 .cp-card-settings .cp-card-icon {
   background: rgba(26,60,78,.08);
   color: var(--primary);
 }
 .cp-card-settings::before { background: var(--primary); }
 
-/* ── Listings card (locked) ── */
 .cp-card-listings .cp-card-icon {
   background: rgba(107,114,128,.08);
   color: #9ca3af;
 }
 .cp-card-listings::before { background: #d1d5db; }
 
+/* Locked cards: greyed out, no pointer */
 .cp-card-locked {
   opacity: 0.7;
   cursor: not-allowed;
@@ -375,27 +390,88 @@ body {
 
 
 /* ═══════════════════════════════════════════════════
+   NEWS BANNER  (lowest priority — sits at the bottom)
+   ═══════════════════════════════════════════════════ */
+.cp-news {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 16px;
+  border-left: 4px solid var(--secondary);
+}
+
+.cp-news-left { flex: 1; min-width: 0; }
+
+.cp-news-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  background: rgba(193,155,118,.12);
+  color: var(--accent);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 5px;
+}
+
+.cp-news-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.45;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cp-news-badge {
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-light);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════
    TABLET  600px+
    ═══════════════════════════════════════════════════ */
 @media (min-width: 600px) {
 
   .cp-page { padding-bottom: 56px; }
 
-  .cp-cover { height: 140px; }
-  .cp-avatar-wrap { margin-top: -54px; }
-  .cp-avatar { width: 104px; height: 104px; }
-  .cp-avatar-initial { font-size: 2.6rem; }
-  .cp-name { font-size: 1.55rem; }
+  .cp-cover { height: 100px; }
+  .cp-avatar-wrap { margin-top: -42px; }
+  .cp-avatar { width: 88px; height: 88px; }
+  .cp-avatar-initial { font-size: 2.2rem; }
 
   .cp-header-body {
-    padding: 0 28px 28px;
+    padding: 0 24px 22px;
+    gap: 18px;
+  }
+
+  .cp-name { font-size: 1.25rem; }
+
+  /* Info + actions side-by-side */
+  .cp-user-meta {
     flex-direction: row;
     align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 16px;
   }
-  .cp-avatar-wrap { margin-bottom: 0; margin-right: 16px; }
-  .cp-user-info { flex: 1; margin-bottom: 0; }
 
   .cp-news { margin: 0 20px; }
 
@@ -408,15 +484,21 @@ body {
     gap: 14px;
   }
 
-  /* Listings card spans full width so the 3 active cards + 1 locked look balanced */
+  /* Saved Properties spans full width on tablet — still the hero card */
+  .cp-card-primary { grid-column: 1 / -1; }
+
+  /* Listings card spans full width too so the 2-col grid stays clean */
   .cp-card-listings { grid-column: 1 / -1; }
 
+  .cp-news { margin: 0 20px; }
 }
 
 
 /* ═══════════════════════════════════════════════════
    DESKTOP  900px+
-   Two-column: sidebar (profile) left, content right
+   Two-column layout:
+     LEFT  → compact profile sidebar (sticky)
+     RIGHT → section-label + cards + news
    ═══════════════════════════════════════════════════ */
 @media (min-width: 900px) {
 
@@ -425,98 +507,128 @@ body {
     padding: 32px 32px 56px;
     gap: 0;
 
-    /* Two-column grid */
     display: grid;
-    grid-template-columns: 300px 1fr;
-    grid-template-rows: auto auto 1fr;
+    grid-template-columns: 280px 1fr;
+    /*
+      Rows:
+        row 1 — section-label
+        row 2 — cards
+        row 3 — news
+      Profile header spans all rows as the left sidebar.
+    */
+    grid-template-rows: auto 1fr auto;
     column-gap: 28px;
     row-gap: 20px;
     align-items: start;
   }
 
-  /* ── Left sidebar: profile header ── */
+  /* ── LEFT: profile sidebar ── */
   .cp-profile-header {
     grid-column: 1;
-    grid-row: 1 / -1;         /* spans all rows — full height sidebar */
+    grid-row: 1 / -1;
     border-radius: var(--radius);
     position: sticky;
-    top: 24px;                 /* stays visible while scrolling right col */
+    top: 24px;
   }
 
-  .cp-cover { height: 120px; border-radius: var(--radius) var(--radius) 0 0; }
+  .cp-cover {
+    height: 110px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
 
   .cp-header-body {
-    padding: 0 22px 28px;
-    flex-direction: column;    /* stack vertically inside sidebar */
+    padding: 0 20px 26px;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
 
-  .cp-avatar-wrap { margin-top: -52px; margin-right: 0; margin-bottom: 4px; }
-  .cp-avatar { width: 96px; height: 96px; border-radius: 18px; }
-  .cp-avatar-initial { font-size: 2.4rem; }
+  .cp-avatar-wrap { margin-top: -44px; }
+  .cp-avatar { width: 88px; height: 88px; border-radius: 18px; }
+  .cp-avatar-initial { font-size: 2.2rem; }
 
-  .cp-name { font-size: 1.35rem; }
-  .cp-user-info { margin-bottom: 4px; }
+  .cp-name { font-size: 1.2rem; }
 
-  .cp-edit-btn { width: 100%; justify-content: center; }
-
-
-  /* ── Right column: news ── */
-  .cp-news {
-    grid-column: 2;
-    grid-row: 1;
-    margin: 0;
-    padding: 20px 24px;
+  /* In sidebar: meta stacks vertically */
+  .cp-user-meta {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-top: 0;
   }
 
-  /* ── Right column: section label ── */
+  /* Buttons stack vertically, full width */
+  .cp-header-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .cp-edit-btn {
+    justify-content: center;
+    padding: 9px 16px;
+    font-size: 0.82rem;
+  }
+
+  .cp-pw-btn {
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 0.72rem;
+  }
+
+
+  /* ── RIGHT: section label ── */
   .cp-section-label {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 1;
     padding: 0 4px;
     font-size: 12px;
   }
 
-  /* ── Right column: cards ── */
+  /* ── RIGHT: cards grid ── */
   .cp-grid {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: 2;
     padding: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
 
-  /* All 4 cards in 2×2 — no spanning */
+  /*
+    On desktop the sidebar is prominent enough — Saved Properties
+    no longer needs to span the full width.
+    All 4 cards sit in a 2×2 grid.
+  */
+  .cp-card-primary  { grid-column: auto; }
   .cp-card-listings { grid-column: auto; }
 
+  /* Cards flip to vertical layout (icon top, text below) */
   .cp-card {
-    padding: 24px 20px;
-    flex-direction: column;    /* icon top, text below on desktop */
+    padding: 22px 18px;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 14px;
+    gap: 12px;
   }
 
-  /* Arrow moves to top-right corner on desktop */
   .cp-card-caret {
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: 16px;
+    right: 16px;
   }
 
-  .cp-card-icon {
-    width: 56px;
-    height: 56px;
-    font-size: 1.4rem;
-    border-radius: 14px;
+  .cp-card-icon { width: 52px; height: 52px; font-size: 1.3rem; }
+  .cp-card-content h3 { font-size: 0.95rem; }
+  .cp-card-content p  { font-size: 0.83rem; margin-top: 3px; }
+
+  .cp-card:hover { transform: translateY(-4px); }
+
+
+  /* ── RIGHT: news banner ── */
+  .cp-news {
+    grid-column: 2;
+    grid-row: 3;
+    margin: 0;
   }
-
-  .cp-card-content h3 { font-size: 1rem; }
-  .cp-card-content p  { font-size: 0.85rem; margin-top: 4px; }
-
-  .cp-card:hover { transform: translateY(-5px); }
-
 }
 
 
@@ -526,17 +638,17 @@ body {
 @media (min-width: 1280px) {
   .cp-page {
     max-width: 1380px;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 300px 1fr;
     padding: 36px 48px 64px;
   }
 
-  .cp-cover { height: 130px; }
-  .cp-avatar { width: 106px; height: 106px; }
-  .cp-name { font-size: 1.45rem; }
+  .cp-cover { height: 120px; }
+  .cp-avatar { width: 96px; height: 96px; }
+  .cp-name { font-size: 1.3rem; }
 
-  .cp-grid { gap: 20px; }
-  .cp-card { padding: 28px 24px; }
-  .cp-card-icon { width: 62px; height: 62px; font-size: 1.5rem; }
-  .cp-card-content h3 { font-size: 1.05rem; }
-  .cp-card-content p  { font-size: 0.88rem; }
+  .cp-grid { gap: 18px; }
+  .cp-card { padding: 24px 20px; }
+  .cp-card-icon { width: 56px; height: 56px; font-size: 1.4rem; }
+  .cp-card-content h3 { font-size: 1rem; }
+  .cp-card-content p  { font-size: 0.85rem; }
 }

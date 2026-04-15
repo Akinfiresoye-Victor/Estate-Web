@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment Successful — Estate Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy: #1a3c4e;
+    --gold: #c19b76;
+    --gold-dark: #8b7355;
+    --cream: #f9f5f0;
+    --white: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2d9ce;
+    --success: #16a34a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .success-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(26,60,78,0.10);
+    animation: fadeUp 0.45s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .success-icon {
+    width: 68px;
+    height: 68px;
+    background: rgba(22,163,74,0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    animation: pop 0.4s 0.3s cubic-bezier(.175,.885,.32,1.275) both;
+  }
+
+  @keyframes pop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .success-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--success);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  /* Plan detail box */
+  .plan-detail {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .plan-detail .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+  }
+
+  .plan-detail .row:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+
+  .plan-detail .key {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .plan-detail .val {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: capitalize;
+  }
+
+  .plan-detail .val.green { color: var(--success); }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    background: #1e4a60;
+    transform: translateY(-1px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--navy);
+    background: rgba(26,60,78,0.04);
+  }
+
+  /* Manage subscription link */
+  .manage-link {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .manage-link a {
+    color: var(--gold-dark);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .manage-link a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-card">
+
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <h1>Payment Successful</h1>
+  <p class="subtitle">Your plan is now active. You have full access to everything included in your subscription.</p>
+
+  {% if request.user.subscription %}
+  <div class="plan-detail">
+    <div class="row">
+      <span class="key">Plan</span>
+      <span class="val">{{ request.user.subscription.plan|title }}</span>
+    </div>
+    <div class="row">
+      <span class="key">Status</span>
+      <span class="val green">Active ✓</span>
+    </div>
+    {% if request.user.subscription.expiry_date %}
+    <div class="row">
+      <span class="key">Renews on</span>
+      <span class="val">{{ request.user.subscription.expiry_date|date:"M d, Y" }}</span>
+    </div>
+    {% endif %}
+    <div class="row">
+      <span class="key">Account type</span>
+      <span class="val">{{ request.user.role|title }}</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="actions">
+    <a href="{% url 'landing' %}" class="btn btn-primary">Go to Dashboard</a>
+    <a href="{% url 'pricing_page' %}" class="btn btn-outline">Manage Subscription</a>
+  </div>
+
+  <div class="manage-link">
+    Need help? <a href="mailto:support@estateweb.com">Contact support</a>
+  </div>
+
+</div>
+{% endblock %}

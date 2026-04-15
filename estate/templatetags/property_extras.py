@@ -31,3 +31,9 @@ def get_images(prop):
     
     return image_list
 
+@register.filter
+def plan_display(value):
+    """Convert plan slug to human-readable title. 'active_agent' → 'Active Agent'"""
+    if not value:
+        return 'Free'
+    return str(value).replace('_', ' ').title()

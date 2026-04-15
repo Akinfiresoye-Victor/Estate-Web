@@ -6,12 +6,13 @@ from agents.models import Experience, SocialLinks, AgentInformation, AgentAnalyt
 from agents.models import SessionId as agent_session
 from estate.models import LeadInfo
 from landlord.models import LandlordInformation
+from payments.models import Subscription
 
 #registering all our models to our admin site
 admin.site.register([PropertyManagementSale, PropertyManagementRent, Feedbacks, AgentInformation,
                     Experience, SocialLinks, PropertyRentImage, PropertySaleImage, User, CompanyInformation,
                     CompanyAnalytics, LeadInfo,WishlistStorageUnit, SessionId, PropertyViews,Appointments, 
                     AgentAnalytics, agent_session, CompanyRating,JobPost, CompanyActivityLog,Employees, InviteLink,
-                    Partnership,PartnershipGoal,ErrorLog, LandlordInformation
+                    Partnership,PartnershipGoal,ErrorLog, LandlordInformation, Subscription
                     ])
 

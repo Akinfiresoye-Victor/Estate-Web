@@ -644,7 +644,6 @@ def reports(request):
     pass
 
 def company_settings(request):
-    
     if not request.user.is_authenticated:
         messages.info(request, 'Login Required')
         return redirect('login')
@@ -653,21 +652,58 @@ def company_settings(request):
         return redirect('landing')
     
     try:
-        company=CompanyInformation.objects.get(user=request.user)
+        company = CompanyInformation.objects.get(user=request.user)
         if company.user != request.user:
-            messages.error(request, 'Something happned on our end')
+            messages.error(request, 'Something happened on our end')
             return redirect('landing')
-        context={
-            'company':company,
+
+        # get subscription — safe fallback if it doesn't exist yet
+        try:
+            subscription = request.user.subscription
+            inv_limit = subscription.get_limit('inventory_slots')
+            live_limit = subscription.get_limit('listing_slots')
+            inv_limit_display = '∞' if inv_limit is None else inv_limit
+            live_limit_display = '∞' if live_limit is None else live_limit
+        except Exception:
+            subscription = None
+            inv_limit_display = 0
+            live_limit_display = 0
+
+        # current slot usage
+        from core.views import get_inventory_count, get_listing_count
+        inv_used = get_inventory_count(None, company)
+        live_used = get_listing_count(None, company)
+
+        PLAN_PRICES = {
+            'starter': 'Free',
+            'growth': '₦15,000 / month',
+            'enterprise': '₦40,000 / month',
+        }
+        PLAN_LABELS = {
+            'starter': 'Starter',
+            'growth': 'Growth',
+            'enterprise': 'Enterprise',
+        }
+
+        context = {
+            'company': company,
+            'subscription': subscription,
+            'inv_used': inv_used,
+            'live_used': live_used,
+            'inv_limit': inv_limit_display,
+            'live_limit': live_limit_display,
+            'plan_price': PLAN_PRICES.get(subscription.plan if subscription else 'starter', 'Free'),
+            'plan_label': PLAN_LABELS.get(subscription.plan if subscription else 'starter', 'Starter'),
+            'plan_is_expired': subscription.is_expired() if subscription else False,  # ← add this
         }
         return render(request, 'company/company_settings.html', context)
+
     except ObjectDoesNotExist:
-        messages.error(request, 'Error Company Info Missing')
+        messages.error(request, 'Error: Company Info Missing')
         return redirect('landing')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
-
 
 def lead_management(request):
     try:

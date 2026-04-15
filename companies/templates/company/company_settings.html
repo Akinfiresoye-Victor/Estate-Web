@@ -1,5 +1,6 @@
 {% extends 'company/base.html' %}
 {% load static %}
+{% load property_extras %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'company/css/company_settings.css' %}">
@@ -379,63 +380,209 @@
       </div>
     </div>
 
-    {# ── Billing ──────────────────────────────────────────────────── #}
+    {# ── Billing ──────────────────────────────────────────────────────── #}
     <div class="settings-section" id="billing">
       <div class="settings-card">
         <div class="card-header-settings">
           <div>
-            <h3><i class="bi bi-credit-card"></i>Billing & Subscription</h3>
+            <h3><i class="bi bi-credit-card"></i> Billing & Subscription</h3>
             <p>Manage your subscription and payment methods</p>
           </div>
         </div>
         <div class="card-body-settings">
 
-          <div class="current-plan">
-            <div class="plan-info">
-              <h4>Professional Plan</h4>
-              <p>Unlimited listings · Team collaboration · Priority support</p>
-              <div class="plan-price">
-                <span class="price">₦###</span>
-                <span class="period">/month</span>
+          {% if subscription %}
+
+            {# ── Expired warning banner ── #}
+            {% if subscription.expiry_date and subscription.is_active == False %}
+            <div style="background:#fef2f2; border:1.5px solid #fca5a5; border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.75rem;">
+              <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626; font-size:1.2rem; flex-shrink:0;"></i>
+              <div>
+                <strong style="color:#dc2626; font-size:0.88rem;">Your plan has expired.</strong>
+                <p style="margin:2px 0 0; font-size:0.8rem; color:#6b7280;">Renew your plan to restore full access to your listing slots and features.</p>
+              </div>
+              <a href="{% url 'pricing_page' %}" style="margin-left:auto; background:#dc2626; color:#fff; padding:0.5rem 1rem; border-radius:8px; font-size:0.8rem; font-weight:700; text-decoration:none; white-space:nowrap;">Renew Now</a>
+            </div>
+            {% endif %}
+
+            {# ── Current plan card ── #}
+            <div class="current-plan">
+              <div class="plan-info">
+
+                <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
+                  <h4 style="margin:0;">{{ plan_label }} Plan</h4>
+                  {% if subscription.plan == 'starter' %}
+                    <span style="background:rgba(22,163,74,0.15); color:#16a34a; font-size:0.68rem; font-weight:700; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">Free</span>
+                  {% else %}
+                    <span style="background:rgba(193,155,118,0.2); color:#8b7355; font-size:0.68rem; font-weight:700; padding:2px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em;">Paid</span>
+                  {% endif %}
+                  {% if subscription.is_active %}
+                    <span style="background:rgba(22,163,74,0.12); color:#16a34a; font-size:0.68rem; font-weight:700; padding:2px 10px; border-radius:20px;">● Active</span>
+                  {% else %}
+                    <span style="background:rgba(220,38,38,0.12); color:#dc2626; font-size:0.68rem; font-weight:700; padding:2px 10px; border-radius:20px;">● Expired</span>
+                  {% endif %}
+                </div>
+
+                <p>
+                  {% if subscription.plan == 'starter' %}
+                    10 inventory slots · 8 live listings · 2 agent invites/month
+                  {% elif subscription.plan == 'growth' %}
+                    100 inventory slots · 55 live listings · 15 agent invites · 3 boost credits
+                  {% elif subscription.plan == 'enterprise' %}
+                    Unlimited inventory · Unlimited live · Unlimited invites · AI summaries
+                  {% endif %}
+                </p>
+
+                <div class="plan-price">
+                  <span class="price">
+                    {% if subscription.plan == 'starter' %}Free{% else %}{{ plan_price }}{% endif %}
+                  </span>
+                </div>
+
+                {% if subscription.expiry_date %}
+                  <p style="font-size:0.78rem; opacity:0.8; margin-top:0.5rem;">
+                    {% if subscription.is_active %}
+                      <i class="bi bi-calendar-check"></i> Renews: {{ subscription.expiry_date|date:"M d, Y" }}
+                    {% else %}
+                      <i class="bi bi-calendar-x"></i> Expired: {{ subscription.expiry_date|date:"M d, Y" }}
+                    {% endif %}
+                  </p>
+                {% else %}
+                  <p style="font-size:0.78rem; opacity:0.8; margin-top:0.5rem;">
+                    <i class="bi bi-infinity"></i> Free plan — no expiry
+                  </p>
+                {% endif %}
+
+              </div>
+              <a href="{% url 'pricing_page' %}" class="btn-upgrade">
+                <i class="bi bi-arrow-up-circle"></i>
+                {% if subscription.plan == 'enterprise' %}Manage Plan{% else %}Upgrade Plan{% endif %}
+              </a>
+            </div>
+
+            {# ── Slot usage ── #}
+            <div style="margin-bottom:1.5rem;">
+              <h4 style="font-size:0.88rem; font-weight:700; color:#1a3c4e; margin-bottom:0.85rem;">
+                <i class="bi bi-bar-chart-fill" style="color:#c19b76;"></i> Current Slot Usage
+              </h4>
+
+              {# Inventory bar #}
+              <div style="margin-bottom:1rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                  <span style="font-size:0.78rem; color:#6b7280;"><i class="bi bi-archive-fill"></i> Inventory Used</span>
+                  <span style="font-size:0.78rem; font-weight:700; color:#1a3c4e;">{{ inv_used }} / {{ inv_limit }}</span>
+                </div>
+                <div style="background:#e5e7eb; border-radius:20px; height:8px; overflow:hidden;">
+                  {% if inv_limit == '∞' %}
+                    <div style="width:25%; height:100%; background:#c19b76; border-radius:20px;"></div>
+                  {% else %}
+                    {% widthratio inv_used inv_limit 100 as inv_pct %}
+                    <div style="width:{{ inv_pct }}%; height:100%; background:{% if inv_pct >= 90 %}#dc2626{% elif inv_pct >= 70 %}#f59e0b{% else %}#c19b76{% endif %}; border-radius:20px; transition:width 0.5s ease;"></div>
+                  {% endif %}
+                </div>
+                {% if inv_limit != '∞' %}
+                  {% widthratio inv_used inv_limit 100 as inv_pct %}
+                  {% if inv_pct >= 90 %}
+                    <p style="font-size:0.75rem; color:#dc2626; margin-top:4px;"><i class="bi bi-exclamation-circle"></i> Almost full — consider upgrading</p>
+                  {% endif %}
+                {% endif %}
+              </div>
+
+              {# Live listings bar #}
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                  <span style="font-size:0.78rem; color:#6b7280;"><i class="bi bi-broadcast"></i> Live Listings</span>
+                  <span style="font-size:0.78rem; font-weight:700; color:#1a3c4e;">{{ live_used }} / {{ live_limit }}</span>
+                </div>
+                <div style="background:#e5e7eb; border-radius:20px; height:8px; overflow:hidden;">
+                  {% if live_limit == '∞' %}
+                    <div style="width:25%; height:100%; background:#1a3c4e; border-radius:20px;"></div>
+                  {% else %}
+                    {% widthratio live_used live_limit 100 as live_pct %}
+                    <div style="width:{{ live_pct }}%; height:100%; background:{% if live_pct >= 90 %}#dc2626{% elif live_pct >= 70 %}#f59e0b{% else %}#1a3c4e{% endif %}; border-radius:20px; transition:width 0.5s ease;"></div>
+                  {% endif %}
+                </div>
+                {% if live_limit != '∞' %}
+                  {% widthratio live_used live_limit 100 as live_pct %}
+                  {% if live_pct >= 90 %}
+                    <p style="font-size:0.75rem; color:#dc2626; margin-top:4px;"><i class="bi bi-exclamation-circle"></i> Almost full — consider upgrading</p>
+                  {% endif %}
+                {% endif %}
               </div>
             </div>
-            <button class="btn-upgrade" type="button">
-              <i class="bi bi-arrow-up-circle"></i> Upgrade Plan
-            </button>
-          </div>
 
-          <div class="form-section">
-            <h4 class="section-title">Billing History</h4>
-            <div class="billing-history">
-              <div class="billing-item">
-                <div class="billing-info">
-                  <h5>Professional Plan</h5>
-                  <p>Invoice #INV-2024-001</p>
+          {% else %}
+            {# no subscription found #}
+            <div style="text-align:center; padding:2rem 1rem; color:#6b7280;">
+              <i class="bi bi-credit-card" style="font-size:2rem; margin-bottom:0.75rem; display:block; color:#c19b76;"></i>
+              <p style="font-size:0.88rem;">No subscription found for your account.</p>
+              <a href="{% url 'pricing_page' %}" style="display:inline-block; margin-top:1rem; background:#1a3c4e; color:#fff; padding:0.7rem 1.5rem; border-radius:8px; font-weight:700; font-size:0.85rem; text-decoration:none;">View Plans</a>
+            </div>
+          {% endif %}
+
+          {# ── Billing History ─────────────────────────────────────────── #}
+          <div class="content-card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="bi bi-receipt"></i> Billing History</h3>
+            </div>
+            <div class="card-content">
+
+              {% if subscription and subscription.paystack_reference %}
+                <div class="billing-list">
+                  <div class="billing-row">
+
+                    <div class="billing-icon">
+                      <i class="bi bi-file-earmark-text"></i>
+                    </div>
+
+                    <div class="billing-info">
+                      <h4>{{ plan_label }} Plan</h4>
+                      <p>Ref: {{ subscription.paystack_reference }}</p>
+                    </div>
+
+                    <div class="billing-meta">
+                      <span class="billing-date">{{ subscription.start_date|date:"M d, Y" }}</span>
+                      <span class="billing-amount">{{ plan_price }}</span>
+                      {% if plan_is_expired %}
+                        <span class="status-tag expired">
+                          <i class="bi bi-x-circle-fill"></i> Expired
+                        </span>
+                      {% else %}
+                        <span class="status-tag paid">
+                          <i class="bi bi-check-circle-fill"></i> Successfull
+                        </span>
+                      {% endif %}
+                    </div>
+
+                  </div>
                 </div>
-                <div class="billing-details">
-                  <span class="billing-date">Jan 15, 2024</span>
-                  <span class="billing-amount">₦###</span>
-                  <span class="billing-status paid">Paid</span>
+
+                {% if subscription.expiry_date %}
+                  <p style="padding: 0.75rem 1.25rem; font-size: 0.78rem; color: var(--text-light); border-top: 1px solid var(--border);">
+                    <i class="bi bi-calendar-event"></i>
+                    {% if plan_is_expired %}
+                      Expired on {{ subscription.expiry_date|date:"M d, Y" }}
+                    {% else %}
+                      Renews on {{ subscription.expiry_date|date:"M d, Y" }}
+                    {% endif %}
+                    &nbsp;·&nbsp;
+                    <i class="bi bi-info-circle"></i> Full invoice history coming soon.
+                  </p>
+                {% endif %}
+
+              {% else %}
+                <div class="empty-state">
+                  <i class="bi bi-receipt"></i>
+                  <p>No payment records yet — you're on a free plan.</p>
                 </div>
-              </div>
-              <div class="billing-item">
-                <div class="billing-info">
-                  <h5>Professional Plan</h5>
-                  <p>Invoice #INV-2023-012</p>
-                </div>
-                <div class="billing-details">
-                  <span class="billing-date">Dec 15, 2023</span>
-                  <span class="billing-amount">₦####</span>
-                  <span class="billing-status paid">Paid</span>
-                </div>
-              </div>
+              {% endif %}
+
             </div>
           </div>
 
         </div>
       </div>
     </div>
-
     {# ── Danger Zone ──────────────────────────────────────────────── #}
     <div class="settings-section" id="danger">
       <div class="settings-card danger-card">
@@ -448,12 +595,12 @@
         <div class="card-body-settings">
           <div class="danger-item">
             <div class="danger-info">
-              <h4>Delete Account</h4>
-              <p>Permanently delete your account and all associated data. This cannot be undone.</p>
+              <h4>Close Account</h4>
+              <p>Permanently Close your account and all associated data. This cannot be undone.</p>
             </div>
             {# ✅ FIX: This is the TRIGGER button that opens the modal — id must be deleteAccountBtn #}
             <button class="btn-danger-action critical" type="button" id="deleteAccountBtn">
-              <i class="bi bi-trash"></i> Delete Account
+              <i class="bi bi-trash"></i> Close Account
             </button>
           </div>
         </div>

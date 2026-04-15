@@ -20,7 +20,6 @@
 </div>
 
 {# ── Pill Nav — visible on mobile only, hidden on desktop ───────── #}
-{# Lets users tap to jump to any section without scrolling endlessly #}
 <div class="settings-pill-nav">
   <div class="pill-nav-inner">
     <button class="pill-nav-btn active" onclick="scrollToSection('section-info')">
@@ -32,8 +31,9 @@
     <button class="pill-nav-btn" onclick="scrollToSection('section-actions')">
       <i class="fas fa-sliders-h"></i> Actions
     </button>
+    {# CHANGE 1: "Danger" → "Close Account" with softer icon #}
     <button class="pill-nav-btn" onclick="scrollToSection('section-danger')">
-      <i class="fas fa-exclamation-triangle"></i> Danger
+      <i class="fas fa-user-times"></i> Close Account
     </button>
   </div>
 </div>
@@ -57,8 +57,9 @@
         <button class="sidebar-link" onclick="scrollToSection('section-actions')">
           <i class="fas fa-sliders-h"></i> Actions
         </button>
-        <button class="sidebar-link" onclick="scrollToSection('section-danger')">
-          <i class="fas fa-exclamation-triangle"></i> Danger Zone
+        {# CHANGE 1: Sidebar label updated #}
+        <button class="sidebar-link sidebar-link--close" onclick="scrollToSection('section-danger')">
+          <i class="fas fa-user-times"></i> Close Account
         </button>
       </nav>
     </aside>
@@ -172,33 +173,55 @@
           </p>
         </div>
 
+        {# CHANGE 4: Priority order — Update Profile first, Dashboard second, Change Password last (smaller) #}
+        {# CHANGE 3: Change Password is now .btn-sm to visually de-emphasise it #}
         <div class="action-buttons">
           <a href="{% url 'customer:update-profile' %}" class="btn btn-primary">
             <i class="fas fa-user-edit"></i> Update Profile
           </a>
-          <a href="{% url 'customer:user-profile' %}" class="btn btn-outline">
+<a href="{% url 'customer:user-profile' %}" class="btn btn-outline">
             <i class="fas fa-home"></i> Dashboard
           </a>
-          <a href="{% url 'customer:change-password' %}" class="btn btn-outline">
+
+          <!-- Current Plan Summary -->
+          {% if request.user.subscription %}
+          <div class="plan-summary" style="background:var(--cream, #f8f9fa); border:1px solid var(--border, #e9ecef); border-radius:8px; padding:12px 16px; margin:12px 0; font-size:0.88rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <span style="font-weight:600; color:var(--primary, #1a3c4e);">
+                {{ request.user.subscription.plan|title|default:"Free" }} Plan
+                {% if not request.user.subscription.is_active %}<span style="color:#dc2626;"> (Expired)</span>{% endif %}
+              </span>
+              {% if request.user.subscription.expiry_date %}
+              <span style="color:var(--text-light, #6b7280);">
+                Renews {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <a href="{% url 'pricing_page' %}" class="btn btn-primary">
+            <i class="fas fa-credit-card"></i> Manage Subscription
+          </a>
+          <a href="{% url 'customer:change-password' %}" class="btn btn-outline btn-sm">
             <i class="fas fa-key"></i> Change Password
           </a>
         </div>
       </div>
 
-      {# ── 4. Danger Zone ───────────────────────────────────────── #}
-      <div class="danger-card" id="section-danger">
-        <div class="danger-header">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Danger Zone</h3>
-        </div>
-        <div class="danger-content">
-          <div class="danger-info">
-            <h4>Delete Account</h4>
-            <p>This action is <strong>permanent and irreversible</strong>. All your listings, saved properties, and profile data will be permanently deleted.</p>
+      {# ── 4. Close Account (formerly Danger Zone) ──────────────── #}
+      {# CHANGE 1 & 2: Renamed + made compact — less alarming, less space #}
+      <div class="close-account-card" id="section-danger">
+        <div class="close-account-inner">
+          <div class="close-account-info">
+            <span class="close-account-label">
+              <i class="fas fa-user-times"></i> Close Account
+            </span>
+            <p>Permanently deletes your profile, listings, and all saved data. This cannot be undone.</p>
           </div>
-          <button type="button" class="btn-danger"
+          <button type="button" class="btn-close-account"
                   data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-            <i class="fas fa-trash-alt"></i> Delete My Account
+            Close Account
           </button>
         </div>
       </div>
@@ -216,7 +239,7 @@
 
       <div class="modal-header bg-danger text-white border-0">
         <h5 class="modal-title" id="deleteAccountModalLabel">
-          <i class="fas fa-exclamation-triangle me-2"></i>Delete Account Confirmation
+          <i class="fas fa-exclamation-triangle me-2"></i>Close Account Confirmation
         </h5>
         <button type="button" class="btn-close btn-close-white"
                 data-bs-dismiss="modal" aria-label="Close"></button>
@@ -266,7 +289,7 @@
           {% csrf_token %}
           <button type="submit" class="btn btn-danger"
                   id="confirmDeleteBtn" disabled>
-            <i class="fas fa-trash-alt me-2"></i>Yes, Delete My Account
+            <i class="fas fa-trash-alt me-2"></i>Yes, Close My Account
           </button>
         </form>
       </div>
@@ -283,7 +306,6 @@
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // Update active state on whichever nav is visible
     document.querySelectorAll('.pill-nav-btn, .sidebar-link').forEach(function(btn) {
       btn.classList.remove('active');
     });

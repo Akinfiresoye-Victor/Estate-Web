@@ -1,5 +1,6 @@
 {% extends 'agent/base.html' %}
 {% load static %}
+{% load property_extras %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'agent/css/dashboard.css' %}">
@@ -7,9 +8,9 @@
 
 {% block content %}
 
-<!-- ═══════════════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      PROFILE HEADER
-     ═══════════════════════════════════════════ -->
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="profile-header">
   <div class="profile-cover"></div>
   <div class="profile-content">
@@ -37,9 +38,9 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      PROGRESS TRACKER
-     ═══════════════════════════════════════════ -->
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="progress-tracker-bar">
   <div class="page-pad">
     <button class="progress-tracker-inner" id="progressBtn"
@@ -106,30 +107,55 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════
-     MAIN CONTENT WRAPPER
-     On mobile: single column top-to-bottom.
-     On desktop: two columns — main + sidebar.
-     ═══════════════════════════════════════════ -->
 <div class="page-pad main-content">
 
-  <!-- TIP BANNER — full width on both layouts -->
+  <!-- TIP BANNER â€” full width on both layouts -->
   <div class="tip-banner">
     <div class="tip-icon"><i class="bi bi-lightbulb-fill"></i></div>
     <div class="tip-body">
       <p class="tip-text">"{{ tips }}"</p>
-      <span class="tip-author">— {{ by }}</span>
+      <span class="tip-author">â€” {{ by }}</span>
     </div>
   </div>
 
 
-  <!-- ─────────────────────────────────────────
-       LEFT COLUMN — the four main sections
-       On mobile these just stack normally.
-       On desktop they go in the left column.
-       ───────────────────────────────────────── -->
   <div class="content-main">
 
+<!-- SUBSCRIPTION WIDGET -->
+<section class="subscription-section">
+  <div class="subscription-widget {% if not request.user.subscription.is_active %}expired{% endif %}">
+    <div class="subscription-widget-left">
+      <div class="subscription-plan-icon">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <div class="subscription-plan-info">
+        <span class="subscription-plan-name">
+          {{ request.user.subscription.plan|plan_display }} Plan
+          {% if request.user.subscription.is_active %}
+            <span class="subscription-status-badge active">Active</span>
+          {% else %}
+            <span class="subscription-status-badge expired">Expired</span>
+          {% endif %}
+        </span>
+        <span class="subscription-plan-expiry">
+          {% if request.user.subscription.is_active %}
+            {% if request.user.subscription.expiry_date %}
+              <i class="bi bi-calendar3"></i>
+              Renews {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+            {% else %}
+              <i class="bi bi-infinity"></i> No expiry
+            {% endif %}
+          {% else %}
+            <i class="bi bi-exclamation-triangle-fill"></i> Subscription expired
+          {% endif %}
+        </span>
+      </div>
+    </div>
+    <a href="{% url 'pricing_page' %}" class="subscription-manage-btn">
+      Manage Plan
+    </a>
+  </div>
+</section>
     <!-- SECTION 1: OVERVIEW STATS -->
     <section class="section-block">
       <div class="section-header">
@@ -181,7 +207,7 @@
         <div class="stat-card">
           <div class="stat-icon gold"><i class="bi bi-cash-coin"></i></div>
           <div class="stat-data">
-            <h3 class="commission-val">₦{{ potential_commission|floatformat:"0" }}</h3>
+            <h3 class="commission-val">â‚¦{{ potential_commission|floatformat:"0" }}</h3>
             <p>Potential Commission</p>
             <span class="stat-sub">From active listings</span>
           </div>
@@ -366,11 +392,11 @@
   </div><!-- end .content-main -->
 
 
-  <!-- ─────────────────────────────────────────
-       RIGHT SIDEBAR — info cards
+  <!-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+       RIGHT SIDEBAR â€” info cards
        On mobile these appear below the sections.
        On desktop they live in the right column.
-       ───────────────────────────────────────── -->
+       â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <aside class="content-sidebar">
 
     <!-- YOUR INFORMATION -->
@@ -416,7 +442,7 @@
     </div>
 
 
-    <!-- COMPANY ANNOUNCEMENTS — COMING SOON -->
+    <!-- COMPANY ANNOUNCEMENTS â€” COMING SOON -->
     <div class="coming-soon-feature">
       <div class="csf-header">
         <div class="csf-icon-wrap">
@@ -430,10 +456,10 @@
         </div>
       </div>
       <p class="csf-desc">
-        Stay updated with messages from your company admin — property updates,
+        Stay updated with messages from your company admin â€” property updates,
         team news, and event reminders all in one place.
       </p>
-      <!-- Preview of what it will look like — greyed out -->
+      <!-- Preview of what it will look like â€” greyed out -->
       <div class="csf-preview" aria-hidden="true">
         <div class="csf-preview-item">
           <div class="csf-preview-dot"></div>
@@ -468,9 +494,9 @@
 </div><!-- end .main-content -->
 
 
-<!-- ═══════════════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      MOBILE POST POPUP
-     ═══════════════════════════════════════════ -->
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div class="post-backdrop" id="postBackdrop" onclick="closePostPopup()"></div>
 <div class="post-popup" id="postPopup">
   <p class="post-popup-label">What would you like to post?</p>
@@ -493,9 +519,9 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      MOBILE BOTTOM NAV
-     ═══════════════════════════════════════════ -->
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <nav class="mobile-bottom-nav">
   <a href="#" class="nav-tab active">
     <i class="bi bi-house-fill"></i><span>Home</span>
@@ -516,9 +542,9 @@
 </nav>
 
 
-<!-- ═══════════════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      JAVASCRIPT
-     ═══════════════════════════════════════════ -->
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <script>
 (function () {
   'use strict';
@@ -559,7 +585,7 @@
     document.body.style.overflow = '';
   };
 
-  /* WhatsApp one-tap — Nigerian number format */
+  /* WhatsApp one-tap â€” Nigerian number format */
   window.openWhatsApp = function (el) {
     var raw      = (el.getAttribute('data-phone') || '').replace(/\D/g, '');
     var name     = el.getAttribute('data-name')     || '';
@@ -570,7 +596,7 @@
     var msg = encodeURIComponent(
       'Hello ' + name + ', I\'m ' + agent + ' from Estate Web. ' +
       'You asked about the ' + property + '. ' +
-      'I\'d love to help — when is a good time to talk?'
+      'I\'d love to help â€” when is a good time to talk?'
     );
     window.open('https://wa.me/' + raw + '?text=' + msg, '_blank');
   };

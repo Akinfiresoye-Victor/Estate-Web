@@ -610,6 +610,11 @@
               <i class="bi bi-building"></i> My Properties
             </a>
           </li>
+          <li>
+            <a href="{% url 'pricing_page' %}" class="dropdown-item">
+              <i class="bi bi-star-fill" style="color:var(--gold);"></i> Manage Subscription
+            </a>
+          </li>
           <li><hr class="dropdown-divider"></li>
           <li>
             <a href="{% url 'logout' %}" class="dropdown-item danger">
@@ -663,6 +668,9 @@
       </a>
       <a href="#" class="drawer-link">
         <i class="bi bi-person"></i> My Profile
+      </a>
+      <a href="{% url 'pricing_page' %}" class="drawer-link">
+        <i class="bi bi-star-fill" style="color:var(--gold);"></i> Manage Subscription
       </a>
 
       <p class="drawer-section-label">Add Property</p>

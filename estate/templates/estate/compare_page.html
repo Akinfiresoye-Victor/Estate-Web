@@ -26,6 +26,31 @@
 </div>
 
 
+
+
+<!-- ── SUBSCRIPTION STATUS BAR ── -->
+{% if request.user.is_authenticated %}
+<div style="max-width:1200px; margin:0 auto 18px; padding:0 16px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 18px; font-size:0.85rem;">
+    <span style="color:#64748b;">
+      <i class="bi bi-bar-chart-steps" style="color:#1a3c4e;"></i>
+      Comparing <strong>{{ properties|length }}</strong>
+      {% if request.user.subscription.plan == 'standard' %}
+        / 2 properties &nbsp;&bull;&nbsp; Standard Plan
+      {% else %}
+        properties &nbsp;&bull;&nbsp; {{ request.user.subscription.plan|title }} Plan (up to 6)
+      {% endif %}
+    </span>
+    {% if request.user.subscription.plan == 'standard' %}
+    <a href="{% url 'pricing_page' %}" style="background:#1a3c4e; color:white; padding:5px 13px; border-radius:6px; font-size:0.8rem; font-weight:500; text-decoration:none;">
+      <i class="bi bi-star-fill" style="color:#c19b76;"></i> Upgrade for 6-Property Compare
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+
 {% if not properties %}
 <!-- ── EMPTY STATE ── -->
 <div class="cmp-empty-wrap">

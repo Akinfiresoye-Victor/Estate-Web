@@ -1,0 +1,669 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Plans & Pricing — Estate Web{% endblock %}
+
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy: #1a3c4e;
+    --navy-light: #1e4a60;
+    --gold: #c19b76;
+    --gold-dark: #8b7355;
+    --cream: #f9f5f0;
+    --white: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2d9ce;
+    --success: #16a34a;
+    --card-shadow: 0 4px 24px rgba(26,60,78,0.10);
+    --gold-glow: 0 0 0 3px rgba(193,155,118,0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Page Header ── */
+  .pricing-header {
+    background: var(--navy);
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pricing-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 0%, rgba(193,155,118,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .pricing-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 0.01em;
+    margin-bottom: 0.5rem;
+  }
+
+  .pricing-header h1 span { color: var(--gold); }
+
+  .pricing-header p {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem;
+    font-weight: 300;
+  }
+
+  .role-badge {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 4px 16px;
+    border-radius: 20px;
+    background: rgba(193,155,118,0.15);
+    border: 1px solid rgba(193,155,118,0.35);
+    color: var(--gold);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Main Container ── */
+  .pricing-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  /* ── Current Plan Banner ── */
+  .current-plan-banner {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .current-plan-banner .label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 2px;
+  }
+
+  .current-plan-banner .plan-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: capitalize;
+  }
+
+  .current-plan-banner .expiry {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* ── Grid ── */
+  .plans-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  /* ── Plan Card ── */
+  .plan-card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    box-shadow: var(--card-shadow);
+  }
+
+  .plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(26,60,78,0.14);
+  }
+
+  .plan-card.featured {
+    border-color: var(--gold);
+    box-shadow: var(--gold-glow), var(--card-shadow);
+  }
+
+  .plan-card.current-active {
+    border-color: var(--navy);
+    background: linear-gradient(135deg, #f0f6fa 0%, var(--white) 100%);
+  }
+
+  .plan-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    width: fit-content;
+  }
+
+  .badge-popular { background: rgba(26,60,78,0.08); color: var(--navy); }
+  .badge-free { background: rgba(22,163,74,0.1); color: #16a34a; }
+  .badge-active { background: rgba(193,155,118,0.15); color: var(--gold-dark); }
+
+  .plan-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.4rem;
+  }
+
+  .plan-price {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.2rem;
+    line-height: 1;
+  }
+
+  .plan-price sup {
+    font-size: 1rem;
+    font-weight: 400;
+    vertical-align: super;
+  }
+
+  .plan-price .period {
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 2px;
+  }
+
+  .plan-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.2rem 0;
+  }
+
+  /* ── Feature Rows ── */
+  .feature-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 5px 0;
+    gap: 8px;
+  }
+
+  .feature-label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    flex: 1;
+  }
+
+  .feature-val {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-align: right;
+    flex: 1;
+  }
+
+  .feature-val.yes { color: var(--success); }
+  .feature-val.no { color: #cbd5e1; }
+
+  /* ── CTA Button ── */
+  .plan-cta {
+    margin-top: auto;
+    padding-top: 1.25rem;
+  }
+
+  .btn-subscribe {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-subscribe.primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .btn-subscribe.primary:hover {
+    background: var(--navy-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-subscribe.gold {
+    background: var(--gold);
+    color: var(--white);
+  }
+
+  .btn-subscribe.gold:hover {
+    background: var(--gold-dark);
+    transform: translateY(-1px);
+  }
+
+  .btn-subscribe.outline {
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid var(--navy);
+  }
+
+  .btn-subscribe.outline:hover {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .btn-subscribe.disabled {
+    background: #f1f5f9;
+    color: var(--muted);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ── Coming Soon Notice ── */
+  .coming-soon-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    background: rgba(193,155,118,0.08);
+    border: 1px solid rgba(193,155,118,0.30);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: var(--gold-dark);
+    line-height: 1.45;
+  }
+
+  .coming-soon-notice svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Note ── */
+  .pricing-note {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .plans-grid { grid-template-columns: 1fr; }
+    .current-plan-banner { flex-direction: column; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="pricing-header">
+  <h1>Your <span>Estate Web</span> Plan</h1>
+  <p>Choose the plan that fits your needs. Upgrade or downgrade anytime.</p>
+  <div class="role-badge">{{ role }} account</div>
+</div>
+
+<div class="pricing-wrapper">
+
+  <!-- Current Plan Banner -->
+  <div class="current-plan-banner">
+    <div>
+      <div class="label">Current Plan</div>
+      <div class="plan-name">{{ request.user.subscription.plan|default:"Free"|title }}</div>
+    </div>
+    {% if request.user.subscription.expiry_date %}
+    <div class="expiry">Renews {{ request.user.subscription.expiry_date|date:"M d, Y" }}</div>
+    {% endif %}
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       COMPANY PLANS
+  ══════════════════════════════════════════ -->
+  {% if role == "company" %}
+  <div class="plans-grid">
+
+    <!-- Starter (Free) -->
+    <div class="plan-card {% if request.user.subscription.plan == 'starter' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'starter' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-free">Free</span>
+      {% endif %}
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">Free</div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Inventory slots</span><span class="feature-val">10</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">8</span></div>
+      <div class="feature-row"><span class="feature-label">Agent invite links</span><span class="feature-val">2 / month</span></div>
+      <div class="feature-row"><span class="feature-label">Employee insights</span><span class="feature-val">Basic view</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Property alerts</span><span class="feature-val">App only</span></div>
+      <div class="feature-row"><span class="feature-label">Competitor tracking</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">AI features</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Lead import (CSV)</span><span class="feature-val no">—</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'starter' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          <a href="{% url 'initiate_payment' 'starter' %}" class="btn-subscribe outline">Downgrade to Free</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Growth (Most Popular — default free plan) -->
+    <div class="plan-card featured {% if request.user.subscription.plan == 'growth' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'growth' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-popular">Most Popular</span>
+      {% endif %}
+      <div class="plan-name">Growth</div>
+      <div class="plan-price"><sup>₦</sup>15,000<span class="period">/ month</span></div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Inventory slots</span><span class="feature-val">100</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">55</span></div>
+      <div class="feature-row"><span class="feature-label">Agent invite links</span><span class="feature-val">15 (7-day expiry)</span></div>
+      <div class="feature-row"><span class="feature-label">Employee insights</span><span class="feature-val">Full activity</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val yes">3 included</span></div>
+      <div class="feature-row"><span class="feature-label">Property alerts</span><span class="feature-val">Email alerts</span></div>
+      <div class="feature-row"><span class="feature-label">Competitor tracking</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">AI features</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Lead import (CSV)</span><span class="feature-val no">—</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'growth' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          {% comment %} <a href="{% url 'initiate_payment' 'growth' %}" class="btn-subscribe primary">Get Growth</a> {% endcomment %}
+          <a href="{% url 'claim-plan'%}" class="btn-subscribe primary">Claim 3-Free months</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="plan-card {% if request.user.subscription.plan == 'enterprise' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'enterprise' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-active">Enterprise</span>
+      {% endif %}
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price"><sup>₦</sup>40,000<span class="period">/ month</span></div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Inventory slots</span><span class="feature-val">Unlimited</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">Unlimited</span></div>
+      <div class="feature-row"><span class="feature-label">Agent invite links</span><span class="feature-val">Unlimited</span></div>
+      <div class="feature-row"><span class="feature-label">Employee insights</span><span class="feature-val">Advanced + export</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val yes">10 included</span></div>
+      <div class="feature-row"><span class="feature-label">Property alerts</span><span class="feature-val">Email + SMS</span></div>
+      <div class="feature-row"><span class="feature-label">Competitor tracking</span><span class="feature-val yes">Track up to 10</span></div>
+      <div class="feature-row"><span class="feature-label">AI features</span><span class="feature-val yes">AI summaries</span></div>
+      <div class="feature-row"><span class="feature-label">Lead import (CSV)</span><span class="feature-val yes">Bulk import</span></div>
+      <div class="plan-cta">
+        <span class="btn-subscribe disabled">{% if request.user.subscription.plan == 'enterprise' %}Current Plan{% else %}Coming Soon{% endif %}</span>
+        {% if request.user.subscription.plan != 'enterprise' %}
+        <div class="coming-soon-notice">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Enterprise launches in <strong>June 2026</strong>. We'll notify you when it's ready.</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+  <div class="pricing-note">Company agents draw from the company's shared slot pool — no personal limits apply. Downgrading does not auto-unlist properties, but blocks new listings until slots free up.</div>
+
+
+  <!-- ══════════════════════════════════════════
+       AGENT PLANS
+  ══════════════════════════════════════════ -->
+  {% elif role == "agent" %}
+  <div class="plans-grid">
+
+    <!-- Basic (Free) -->
+    <div class="plan-card {% if request.user.subscription.plan == 'basic' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'basic' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-free">Free</span>
+      {% endif %}
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">Free</div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Inventory slots</span><span class="feature-val">5</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">3</span></div>
+      <div class="feature-row"><span class="feature-label">Analytics</span><span class="feature-val">Total views only</span></div>
+      <div class="feature-row"><span class="feature-label">Lead CRM</span><span class="feature-val">App only</span></div>
+      <div class="feature-row"><span class="feature-label">Profile boost</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">AI writer</span><span class="feature-val no">—</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'basic' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          <a href="{% url 'initiate_payment' 'basic' %}" class="btn-subscribe outline">Downgrade to Free</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Active Agent (Most Popular — default free plan) -->
+    <div class="plan-card featured {% if request.user.subscription.plan == 'active_agent' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'active_agent' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-popular">Most Popular</span>
+      {% endif %}
+      <div class="plan-name">Active Agent</div>
+      <div class="plan-price"><sup>₦</sup>5,000<span class="period">/ month</span></div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Inventory slots</span><span class="feature-val">30</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">15</span></div>
+      <div class="feature-row"><span class="feature-label">Analytics</span><span class="feature-val">Demographics + CTR</span></div>
+      <div class="feature-row"><span class="feature-label">Lead CRM</span><span class="feature-val">Email alerts</span></div>
+      <div class="feature-row"><span class="feature-label">Profile boost</span><span class="feature-val">Standard</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val yes">1 included</span></div>
+      <div class="feature-row"><span class="feature-label">AI writer</span><span class="feature-val no">—</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'active_agent' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          {% comment %} <a href="{% url 'initiate_payment' 'active_agent' %}" class="btn-subscribe primary">Get Active Agent</a> {% endcomment %}
+          <a href="{% url 'claim-plan'%}" class="btn-subscribe primary">Claim 3-Free months</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Top Producer -->
+    <div class="plan-card {% if request.user.subscription.plan == 'top_producer' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'top_producer' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-active">Premium</span>
+      {% endif %}
+      <div class="plan-name">Top Producer</div>
+      <div class="plan-price"><sup>₦</sup>12,000<span class="period">/ month</span></div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Inventory slots</span><span class="feature-val">100</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">40</span></div>
+      <div class="feature-row"><span class="feature-label">Analytics</span><span class="feature-val">Deep + lead score</span></div>
+      <div class="feature-row"><span class="feature-label">Lead CRM</span><span class="feature-val">Email + priority SMS</span></div>
+      <div class="feature-row"><span class="feature-label">Profile boost</span><span class="feature-val">Featured (company view)</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val yes">4 included</span></div>
+      <div class="feature-row"><span class="feature-label">AI writer</span><span class="feature-val yes">AI writer + summary</span></div>
+      <div class="plan-cta">
+        <span class="btn-subscribe disabled">{% if request.user.subscription.plan == 'top_producer' %}Current Plan{% else %}Coming Soon{% endif %}</span>
+        {% if request.user.subscription.plan != 'top_producer' %}
+        <div class="coming-soon-notice">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Top Producer launches in <strong>June 2026</strong>. We'll notify you when it's ready.</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+  <div class="pricing-note">Solo agent limits only. Agents under a company use the company's shared slot pool instead.</div>
+
+
+  <!-- ══════════════════════════════════════════
+       LANDLORD PLANS
+  ══════════════════════════════════════════ -->
+  {% elif role == "landlord" %}
+  <div class="plans-grid" style="max-width:640px;">
+
+    <!-- Landlord Basic (Free) -->
+    <div class="plan-card {% if request.user.subscription.plan == 'landlord_basic' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'landlord_basic' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-free">Free</span>
+      {% endif %}
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">Free</div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Property listings</span><span class="feature-val">3</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">2</span></div>
+      <div class="feature-row"><span class="feature-label">Enquiry inbox</span><span class="feature-val">App only</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Verified badge</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Analytics</span><span class="feature-val no">—</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'landlord_basic' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          <a href="{% url 'initiate_payment' 'landlord_basic' %}" class="btn-subscribe outline">Downgrade to Free</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Landlord Pro -->
+    <div class="plan-card featured {% if request.user.subscription.plan == 'landlord_pro' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'landlord_pro' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-popular">Best Value</span>
+      {% endif %}
+      <div class="plan-name">Pro</div>
+      <div class="plan-price"><sup>₦</sup>3,000<span class="period">/ month</span></div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Property listings</span><span class="feature-val">6</span></div>
+      <div class="feature-row"><span class="feature-label">Live slots</span><span class="feature-val">5</span></div>
+      <div class="feature-row"><span class="feature-label">Enquiry inbox</span><span class="feature-val">Email + App</span></div>
+      <div class="feature-row"><span class="feature-label">Boost credits</span><span class="feature-val yes">2 included</span></div>
+      <div class="feature-row"><span class="feature-label">Verified badge</span><span class="feature-val yes">✓ Included</span></div>
+      <div class="feature-row"><span class="feature-label">Analytics</span><span class="feature-val yes">Views + enquiry stats</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'landlord_pro' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          {% comment %} <a href="{% url 'initiate_payment' 'landlord_pro' %}" class="btn-subscribe gold">Get Pro</a> {% endcomment %}
+          <a href="{% url 'claim-plan' %}" class="btn-subscribe gold">Claim 3-Free months</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+  <div class="pricing-note">Landlord Pro gives you a verified badge that builds trust with potential tenants and buyers.</div>
+
+
+  <!-- ══════════════════════════════════════════
+       CUSTOMER PLANS
+  ══════════════════════════════════════════ -->
+  {% elif role == "customer" %}
+  <div class="plans-grid" style="max-width:640px;">
+
+    <!-- Standard (Free) -->
+    <div class="plan-card {% if request.user.subscription.plan == 'standard' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'standard' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-free">Free</span>
+      {% endif %}
+      <div class="plan-name">Standard</div>
+      <div class="plan-price">Free</div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Wishlist slots</span><span class="feature-val">Up to 5</span></div>
+      <div class="feature-row"><span class="feature-label">Compare slots</span><span class="feature-val">2 properties</span></div>
+      <div class="feature-row"><span class="feature-label">Property alerts</span><span class="feature-val no">—</span></div>
+      <div class="feature-row"><span class="feature-label">Smart filters</span><span class="feature-val">Basic filters</span></div>
+      <div class="feature-row"><span class="feature-label">Recommendations</span><span class="feature-val">3 per state</span></div>
+      <div class="feature-row"><span class="feature-label">Listing access</span><span class="feature-val">Standard view</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'standard' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          <a href="{% url 'initiate_payment' 'standard' %}" class="btn-subscribe outline">Downgrade to Free</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- VIP Hunter -->
+    <div class="plan-card featured {% if request.user.subscription.plan == 'vip_hunter' %}current-active{% endif %}">
+      {% if request.user.subscription.plan == 'vip_hunter' %}
+      <span class="plan-badge badge-active" style="background:var(--navy);color:white;">Current Plan</span>
+      {% else %}
+      <span class="plan-badge badge-popular">Best Value</span>
+      {% endif %}
+      <div class="plan-name">VIP Hunter</div>
+      <div class="plan-price"><sup>₦</sup>1,500<span class="period">/ 30 days</span></div>
+      <hr class="plan-divider">
+      <div class="feature-row"><span class="feature-label">Wishlist slots</span><span class="feature-val">Unlimited</span></div>
+      <div class="feature-row"><span class="feature-label">Compare slots</span><span class="feature-val">Up to 6 properties</span></div>
+      <div class="feature-row"><span class="feature-label">Property alerts</span><span class="feature-val yes">Instant match email</span></div>
+      <div class="feature-row"><span class="feature-label">Smart filters</span><span class="feature-val yes">Featured, verified + more</span></div>
+      <div class="feature-row"><span class="feature-label">Recommendations</span><span class="feature-val yes">10, cheapest first</span></div>
+      <div class="feature-row"><span class="feature-label">Listing access</span><span class="feature-val yes">24hr early access</span></div>
+      <div class="plan-cta">
+        {% if request.user.subscription.plan == 'vip_hunter' %}
+          <span class="btn-subscribe disabled">Current Plan</span>
+        {% else %}
+          {% comment %} <a href="{% url 'initiate_payment' 'vip_hunter' %}" class="btn-subscribe gold">Get VIP Hunter</a> {% endcomment %}
+          <a href="{% url 'claim-plan' %}" class="btn-subscribe gold">Claim 3-Free months</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+  <div class="pricing-note">Smart recommendations scan the same state as the property being viewed and surface similar listings — free users see 3, VIP users see 10 sorted cheapest first.</div>
+
+  {% endif %}
+
+</div>
+{% endblock %}

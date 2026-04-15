@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'companies',
     'landlord',
     'core',
+    'payments',
 
     # Third-party
     'widget_tweaks',

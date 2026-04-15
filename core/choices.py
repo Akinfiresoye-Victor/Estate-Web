@@ -283,9 +283,23 @@ ESTIMATED_ANNUAL_REVENUE=[
 ]
 
 COMPANY_TIER=[
-    ('starter', 'Starter'), #50 inventory/ 30 live
-    ('growth', 'Growth'), # 200 inventory / 120 live
+    ('starter', 'Starter'), #10 inventory/ 8 live
+    ('growth', 'Growth'), # 100 inventory / 55 live
     ('enterprise', 'Enterprise') # unlimited
+]
+AGENT_TIER=[
+    ('basic', 'Basic'), #5 inventory/ 3 live
+    ('active', 'Active Agent'), # 30 inventory / 15 live
+    ('producer', 'Top Producer') # 100 inventory / 40 live
+]
+CUSTOMER_TIER=[ 
+    ('standard', 'standard'),
+    ('vip', 'Vip Hunter'),
+]
+
+LANDLORD_TIER=[ 
+    ('basic', 'Basic'),
+    ('aggressive', 'Aggressive Landlord'),
 ]
 
 PARTNERSHIP_STATUS=[

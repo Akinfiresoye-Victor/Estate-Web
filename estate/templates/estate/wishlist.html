@@ -27,6 +27,32 @@
 
   <div class="wl-content">
 
+    <!-- ── SUBSCRIPTION STATUS BAR ── -->
+    {% if request.user.is_authenticated %}
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 18px; margin-bottom:18px; font-size:0.85rem;">
+      <span style="color:#64748b;">
+        <i class="bi bi-heart-fill" style="color:#ef4444;"></i>
+        Wishlist: <strong>{{ total_saved }}</strong>
+        {% if request.user.subscription.plan == 'standard' %}
+          / 5 slots &nbsp;&bull;&nbsp; Standard Plan
+        {% else %}
+          saved &nbsp;&bull;&nbsp; {{ request.user.subscription.plan|title }} Plan
+        {% endif %}
+      </span>
+      {% if request.user.subscription.plan == 'standard' %}
+        {% if total_saved >= 5 %}
+        <a href="{% url 'pricing_page' %}" style="background:#b91c1c; color:white; padding:5px 13px; border-radius:6px; font-size:0.8rem; font-weight:500; text-decoration:none;">
+          <i class="bi bi-lock-fill"></i> Wishlist Full — Upgrade to VIP
+        </a>
+        {% elif total_saved >= 4 %}
+        <a href="{% url 'pricing_page' %}" style="background:#d97706; color:white; padding:5px 13px; border-radius:6px; font-size:0.8rem; font-weight:500; text-decoration:none;">
+          <i class="bi bi-star-fill"></i> 1 Slot Left — Go VIP for Unlimited
+        </a>
+        {% endif %}
+      {% endif %}
+    </div>
+    {% endif %}
+
     <!-- ── STATS ── -->
     {% if rent_list or sale_list %}
     <div class="wl-stats" id="wlStats">

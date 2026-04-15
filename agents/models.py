@@ -1,5 +1,5 @@
 from django.db import models
-from core.choices import STATES, AGENT_SOCIAL_LINKS, YEARS_OF_EXPERINCE
+from core.choices import STATES, AGENT_SOCIAL_LINKS,AGENT_TIER
 from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
@@ -31,8 +31,6 @@ class AgentInformation(models.Model):
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=agent_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='agent/ID', validators=[validate_file])
     certificate = models.FileField('Professional Certificate', blank=True, null=True, upload_to='agent/certificates', validators=[validate_file])
-    inventory_slot=models.IntegerField('Inventory Slots', default=10)
-    listing_slots=models.IntegerField('Listing Slots', default=6)
     verified = models.BooleanField('Verified agent', default=False)
     date_joined=models.DateTimeField(default=timezone.now)
     def __str__(self):

@@ -1,5 +1,5 @@
 from django.db import models
-from core.choices import STATES
+from core.choices import STATES, LANDLORD_TIER
 from core.validators import validate_image, validate_file
 import uuid
 from members.models import User
@@ -17,10 +17,9 @@ class LandlordInformation(models.Model):
     phone_number = models.CharField('Phone.No', blank=False, max_length=12)
     email = models.EmailField('Email', blank=True, max_length=75)
     location = models.CharField('Base City', blank=False, choices=STATES, default='Lagos')
+    landlord_tier= models.CharField(choices=LANDLORD_TIER, default='aggressive')
     profile_picture = models.ImageField('Profile Picture', blank=True, upload_to=landlord_picture_path, validators=[validate_image], null=True)
     government_id = models.FileField('Government ID', blank=True, null=True, upload_to='landlord/ID', validators=[validate_file])
-    inventory_slots = models.IntegerField('Inventory Slots', default=3)
-    listing_slots = models.IntegerField('Listing Slots', default=2)
     verified = models.BooleanField('Verified landlord', default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 

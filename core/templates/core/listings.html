@@ -21,6 +21,26 @@
         <p>Manage your full property inventory in one place</p>
       </div>
       <div class="ls-hero-actions">
+        <!-- ── SUB STATUS BANNER ── -->
+        <div style="background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 10px 15px; margin-right: 15px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--card-shadow);">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <strong style="font-size: 0.9rem; color: var(--navy); text-transform: capitalize;">{{ request.user.subscription.plan|title }} Plan</strong>
+            {% if request.user.subscription.is_active %}
+            <span style="font-size: 0.7rem; background: #16a34a; color: white; padding: 2px 6px; border-radius: 12px; font-weight: 500;">Active</span>
+            {% else %}
+            <span style="font-size: 0.7rem; background: #dc2626; color: white; padding: 2px 6px; border-radius: 12px; font-weight: 500;">Expired</span>
+            {% endif %}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--muted);">
+            {% if request.user.subscription.expiry_date %}
+            Renews: {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+            {% else %}
+            No expiry
+            {% endif %}
+            · <a href="{% url 'pricing_page' %}" style="color: var(--navy); font-weight: 500; text-decoration: underline;">Upgrade</a>
+          </div>
+        </div>
+
         <a href="{% url 'lease-property' %}" class="ls-btn-add lease">
           <i class="bi bi-house-add-fill"></i> Lease
         </a>
@@ -32,6 +52,12 @@
   </div>
 </div>
 
+{% if inv_limit != '∞' and inv_used >= inv_limit %}
+<div style="background: #fef2f2; border: 1px solid #f87171; color: #991b1b; padding: 12px 20px; border-radius: 8px; margin: 20px auto; max-width: 1100px; display: flex; justify-content: space-between; align-items: center;">
+  <span><i class="bi bi-exclamation-triangle-fill"></i> <strong>Slot limit reached.</strong> Upgrade your plan to add more properties.</span>
+  <a href="{% url 'pricing_page' %}" style="background: #dc2626; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 500;">Upgrade to Add</a>
+</div>
+{% endif %}
 
 <!-- ── SLOT COUNTERS ─────────────────────────── -->
 <div class="ls-slots">
@@ -53,6 +79,14 @@
       <strong>{{ inv_used }}</strong> / {{ inv_limit }}
       <span class="ls-slot-sub">stored</span>
     </div>
+    {% if inv_limit != '∞' %}
+      {% widthratio inv_used inv_limit 100 as inv_pct_check %}
+      {% if inv_pct_check >= 90 and inv_used < inv_limit %}
+      <div style="font-size: 0.75rem; color: #b45309; margin-top: 6px;">
+        <i class="bi bi-exclamation-circle-fill"></i> You're almost out of slots. <a href="{% url 'pricing_page' %}" style="color: #b45309; text-decoration: underline;">Consider upgrading your plan.</a>
+      </div>
+      {% endif %}
+    {% endif %}
   </div>
 
   <div class="ls-slot-divider"></div>
@@ -72,8 +106,16 @@
     </div>
     <div class="ls-slot-nums">
       <strong>{{ live_used }}</strong> / {{ live_limit }}
-      <span class="ls-slot-sub">public</span>
+      <span class="ls-slot-sub">live</span>
     </div>
+    {% if live_limit != '∞' %}
+      {% widthratio live_used live_limit 100 as live_pct_check %}
+      {% if live_pct_check >= 90 and live_used < live_limit %}
+      <div style="font-size: 0.75rem; color: #b45309; margin-top: 6px;">
+        <i class="bi bi-exclamation-circle-fill"></i> You're almost out of live slots. <a href="{% url 'pricing_page' %}" style="color: #b45309; text-decoration: underline;">Consider upgrading your plan.</a>
+      </div>
+      {% endif %}
+    {% endif %}
   </div>
 
   <div class="ls-slot-divider"></div>

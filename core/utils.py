@@ -469,43 +469,87 @@ def get_listing_count(agent, company=None, landlord=None):
             PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid,is_listed=True).count() + 
             PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid,is_listed=True).count()
         )
-    return 0
+    return 
+def get_subscription_limit(user, key):
+    """
+    Reads a limit from the user's Subscription model.
+    Returns None if unlimited, 0 if no subscription found.
+    """
+    try:
+        return user.subscription.get_limit(key)
+    except Exception:
+        return 0
+
+
 def can_add_to_inventory(agent, company=None, landlord=None):
     """
-    Can this agent/company/landlord store one more property?
+    Can this agent/company/landlord store one more property in inventory?
+    Now reads limits from Subscription model instead of profile model.
     """
-    
-    if company and company.company_tier =='enterprise':
-        return True, 'ok'
-    
-    if landlord:
-        limit = landlord.inventory_slots
+    if company:
+        user = company.user
+        limit = get_subscription_limit(user, 'inventory_slots')
+        used = get_inventory_count(None, company)
+    elif agent:
+        # if agent is under a company, use the company's subscription
+        company_obj = get_agent_company(agent)
+        if company_obj:
+            user = company_obj.user
+            limit = get_subscription_limit(user, 'inventory_slots')
+            used = get_inventory_count(None, company_obj)
+        else:
+            # solo agent uses their own subscription
+            user = agent.user
+            limit = get_subscription_limit(user, 'inventory_slots')
+            used = get_inventory_count(agent, None)
+    elif landlord:
+        user = landlord.user
+        limit = get_subscription_limit(user, 'inventory_slots')
         used = get_inventory_count(None, None, landlord)
     else:
-        limit=company.inventory_slots if company else agent.inventory_slot
-        used=get_inventory_count(agent, company)
-    
+        return False, 'No valid role found.'
+
+    # None means unlimited (enterprise / landlord_pro)
+    if limit is None:
+        return True, 'ok'
+
     if used >= limit:
-        return False, f'Inventory full {used}/{limit} slots used. Upgrade to add more'
-    return True,'ok'
+        return False, f'Inventory full ({used}/{limit} slots used). Upgrade your plan to add more.'
+    return True, 'ok'
+
+
 def can_go_live(agent, company=None, landlord=None):
     """
     Can this agent/company/landlord make one more property live?
+    Now reads limits from Subscription model instead of profile model.
     """
-    if company and company.company_tier == 'enterprise':
-        return True, 'ok'
-    
-    if landlord:
-        limit = landlord.listing_slots
+    if company:
+        user = company.user
+        limit = get_subscription_limit(user, 'listing_slots')
+        used = get_listing_count(None, company)
+    elif agent:
+        company_obj = get_agent_company(agent)
+        if company_obj:
+            user = company_obj.user
+            limit = get_subscription_limit(user, 'listing_slots')
+            used = get_listing_count(None, company_obj)
+        else:
+            user = agent.user
+            limit = get_subscription_limit(user, 'listing_slots')
+            used = get_listing_count(agent, None)
+    elif landlord:
+        user = landlord.user
+        limit = get_subscription_limit(user, 'listing_slots')
         used = get_listing_count(None, None, landlord)
     else:
-        limit= company.listing_slots if company else agent.listing_slots
-        used= get_listing_count(agent, company)
-    
-    if used >= limit:
-        return False, f'Listing limit reached ({used}/{limit} live) Unlist another property first or upgrade'
-    return True, 'ok'
+        return False, 'No valid role found.'
 
+    if limit is None:
+        return True, 'ok'
+
+    if used >= limit:
+        return False, f'Listing limit reached ({used}/{limit} live). Unlist a property or upgrade your plan.'
+    return True, 'ok'
 def get_agent_company(agent):
     """
     Returns CompanyInformation object if aent is in a company, else None

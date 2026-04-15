@@ -1,6 +1,7 @@
 {% extends 'company/base.html' %}
 
 {% load static %}
+{% load property_extras %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'company/css/dashboard.css' %}">
@@ -35,7 +36,7 @@
             <i class="bi bi-geo-alt-fill"></i>
             {{ company.service_areas }}
           </span>
-          <span class="meta-divider">•</span>
+          <span class="meta-divider">â€¢</span>
           <span class="meta-item">
             <i class="bi bi-calendar-check"></i>
             Since {{ company.year_established }}
@@ -61,7 +62,7 @@
 
 <!-- ============================================================
      SETUP PROGRESS TRACKER
-     Slim bar under header — tap to expand mission checklist
+     Slim bar under header â€” tap to expand mission checklist
      ============================================================ -->
 <div class="progress-tracker-bar">
   <div class="container">
@@ -130,14 +131,49 @@
 </div>
 
 
-<!-- ============================================================
-     DASHBOARD BODY
-     ============================================================ -->
-<div class="container dashboard-container">
-  <div class="dashboard-grid">
+    <!-- ============================================================
+        DASHBOARD BODY
+        ============================================================ -->
+    <div class="container dashboard-container">
+      <div class="dashboard-grid">
 
-    <main class="main-content">
+        <main class="main-content">
 
+    <!-- SUBSCRIPTION WIDGET -->
+    <section class="subscription-section">
+      <div class="subscription-widget {% if not request.user.subscription.is_active %}expired{% endif %}">
+        <div class="subscription-widget-left">
+          <div class="subscription-plan-icon">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <div class="subscription-plan-info">
+            <span class="subscription-plan-name">
+              {{ request.user.subscription.plan|plan_display }} Plan
+              {% if request.user.subscription.is_active %}
+                <span class="subscription-status-badge active">Active</span>
+              {% else %}
+                <span class="subscription-status-badge expired">Expired</span>
+              {% endif %}
+            </span>
+            <span class="subscription-plan-expiry">
+              {% if request.user.subscription.is_active %}
+                {% if request.user.subscription.expiry_date %}
+                  <i class="bi bi-calendar3"></i>
+                  Renews {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+                {% else %}
+                  <i class="bi bi-infinity"></i> No expiry
+                {% endif %}
+              {% else %}
+                <i class="bi bi-exclamation-triangle-fill"></i> Subscription expired
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        <a href="{% url 'pricing_page' %}" class="subscription-manage-btn">
+          Manage Plan
+        </a>
+      </div>
+    </section>
       <!-- QUICK ACTIONS -->
       <section class="actions-section">
         <h2 class="section-title">Quick Actions</h2>
@@ -510,7 +546,7 @@
 </div>
 
 
-<!-- FAB — desktop only -->
+<!-- FAB â€” desktop only -->
 <div class="fab-wrapper desktop-fab">
   <div class="fab-menu" id="fabMenu">
     <a href="{% url 'lease-property' %}" class="fab-item">

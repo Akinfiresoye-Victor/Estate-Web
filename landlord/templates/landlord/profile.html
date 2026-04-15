@@ -77,6 +77,9 @@
         <a href="#section-password" class="card-nav-link" data-section="section-password">
           <i class="bi bi-lock"></i> Change Password
         </a>
+        <a href="#section-billing" class="card-nav-link" data-section="section-billing">
+          <i class="bi bi-credit-card"></i> Billing
+        </a>
         <a href="#section-danger" class="card-nav-link danger-link" data-section="section-danger">
           <i class="bi bi-shield-exclamation"></i> Danger Zone
         </a>
@@ -178,6 +181,48 @@
         <div class="profile-form">
           <div class="form-footer">
             <a href="{%url 'customer:change-password'%}" class="btn-save">Change Password</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Billing Section -->
+      <section class="form-section" id="section-billing">
+        <div class="section-head">
+          <div class="section-head-icon"><i class="bi bi-credit-card"></i></div>
+          <div>
+            <h2 class="section-title">Billing & Subscription</h2>
+            <p class="section-sub">Manage your current plan and billing information.</p>
+          </div>
+        </div>
+        <div class="profile-form">
+          <div class="subscription-widget {% if not request.user.subscription.is_active %}expired{% endif %}" style="padding:16px; border-radius:12px; margin-bottom:16px; background:var(--white); border:1px solid var(--border);">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:40px; height:40px; background:linear-gradient(135deg, #c19b76, #8b7355); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-star-fill" style="color:white; font-size:1.1rem;"></i>
+                </div>
+                <div>
+                  <div style="font-weight:600; font-size:1rem; margin-bottom:2px;">
+                    {{ request.user.subscription.plan|default:"starter"|title }} Plan
+                  </div>
+                  <div style="font-size:0.85rem; opacity:0.8;">
+                    {% if request.user.subscription %}
+                      {% if request.user.subscription.is_active %}
+                        Active 
+                        {% if request.user.subscription.expiry_date %}
+                          · Renews {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+                        {% endif %}
+                      {% else %}
+                        <span style="color:#dc2626;">Expired</span>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <a href="{% url 'pricing_page' %}" class="btn-save" style="margin-left:auto; white-space:nowrap;">
+                Manage Plan
+              </a>
+            </div>
           </div>
         </div>
       </section>

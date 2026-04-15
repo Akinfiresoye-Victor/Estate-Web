@@ -13,8 +13,14 @@ from django.db.models import Sum
 from core.models import Appointments
 from members.models import User
 from allauth.account.models import EmailAddress
-
-
+# NEW - reads from subscription
+def _get_limit_display(user, key):
+    """Returns the limit value or '∞' if unlimited (None)."""
+    try:
+        val = user.subscription.get_limit(key)
+        return '∞' if val is None else val
+    except Exception:
+        return 0
 
 def dashboard(request):
     if not request.user.is_authenticated:
@@ -83,15 +89,20 @@ def inventory(request):
         sales = PropertyManagementSale.objects.filter(landlord_uuid=landlord.landlord_uuid).order_by('-time_stamp')
         rentals = PropertyManagementRent.objects.filter(landlord_uuid=landlord.landlord_uuid).order_by('-time_stamp')
         
+# NEW - full updated context
         context = {
             'landlord': landlord,
             'sales': sales,
             'rentals': rentals,
-            'total_limit': landlord.inventory_slots,
+            'total_limit': _get_limit_display(landlord.user, 'inventory_slots'),
+            'live_limit': _get_limit_display(landlord.user, 'listing_slots'),
             'live_count': sales.filter(is_listed=True).count() + rentals.filter(is_listed=True).count(),
-            'live_limit': landlord.listing_slots,
-            'used_slots': sales.count() + rentals.count()
-        }
+            'used_slots': sales.count() + rentals.count(),
+            # map to the same names your listings.html expects
+            'inv_used': sales.count() + rentals.count(),
+            'inv_limit': _get_limit_display(landlord.user, 'inventory_slots'),
+            'live_used': sales.filter(is_listed=True).count() + rentals.filter(is_listed=True).count(),
+        } 
         return render(request, 'landlord/inventory.html', context)
         
     except LandlordInformation.DoesNotExist:

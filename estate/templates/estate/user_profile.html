@@ -9,7 +9,7 @@
 
 <div class="cp-page">
 
-  <!-- ── PROFILE HEADER ───────────────────────────── -->
+  <!-- ── PROFILE HEADER (compact) ─────────────────── -->
   <div class="cp-profile-header">
     <div class="cp-cover"></div>
     <div class="cp-header-body">
@@ -24,37 +24,32 @@
         {% endif %}
       </div>
 
-      <div class="cp-user-info">
-        <h1 class="cp-name">
+      <div class="cp-user-meta">
+        <div class="cp-user-info">
+          <h1 class="cp-name">
+            {% if user.first_name and user.last_name %}
+              {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+              {{ user.username }}
+            {% endif %}
+          </h1>
           {% if user.first_name and user.last_name %}
-            {{ user.first_name }} {{ user.last_name }}
-          {% else %}
-            {{ user.username }}
+            <p class="cp-username">@{{ user.username }}</p>
           {% endif %}
-        </h1>
-        {% if user.first_name and user.last_name %}
-          <p class="cp-username">@{{ user.username }}</p>
-        {% endif %}
-        <p class="cp-email">
-          <i class="bi bi-envelope-fill"></i> {{ user.email }}
-        </p>
+          <p class="cp-email">
+            <i class="bi bi-envelope-fill"></i> {{ user.email }}
+          </p>
+        </div>
+
+        <!-- Action buttons live beside the info on tablet+, below on mobile -->
+        <div class="cp-header-actions">
+          <a href="{% url 'customer:settings' %}" class="cp-edit-btn">
+            <i class="bi bi-pencil-fill"></i> Edit Profile
+          </a>
+        </div>
       </div>
 
-      <a href="{% url 'customer:settings' %}" class="cp-edit-btn">
-        <i class="bi bi-pencil-fill"></i> Edit Profile
-      </a>
-
     </div>
-  </div>
-
-
-  <!-- ── NEWS BANNER ──────────────────────────────── -->
-  <div class="cp-news cp-card-locked">
-    <div class="cp-news-left">
-      <span class="cp-news-pill"><i class="bi bi-newspaper"></i> News</span>
-      <p class="cp-news-text">Latest real estate updates and market insights</p>
-    </div>
-    <div class="cp-news-badge">Coming Soon</div>
   </div>
 
 
@@ -63,10 +58,17 @@
 
 
   <!-- ── CARDS GRID ───────────────────────────────── -->
+  <!--
+    Priority order (tester feedback):
+    1. Saved Properties  — most used
+    2. Feedback          — secondary
+    3. Account & Privacy — secondary
+    4. My Listings       — locked/coming soon, least important
+  -->
   <div class="cp-grid">
 
-    <!-- Saved Properties -->
-    <a href="{% url 'customer:wishlist' %}" class="cp-card cp-card-wishlist">
+    <!-- 1 · Saved Properties (PRIMARY — full width on mobile) -->
+    <a href="{% url 'customer:wishlist' %}" class="cp-card cp-card-wishlist cp-card-primary">
       <div class="cp-card-icon">
         <i class="bi bi-heart-fill"></i>
       </div>
@@ -77,45 +79,64 @@
       <i class="bi bi-chevron-right cp-card-caret"></i>
     </a>
 
-    <!-- Feedback -->
+
+    <!-- Current Plan -->
+    <a href="{% url 'pricing_page' %}" class="cp-card cp-card-plan cp-card-primary">
+      <div class="cp-card-icon">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <div class="cp-card-content">
+        <h3>Current Plan</h3>
+        <p>
+          {{ request.user.subscription.plan|default:"Free"|title }}
+          {% if request.user.subscription %}
+            {% if request.user.subscription.expiry_date %}
+              · Renews {{ request.user.subscription.expiry_date|date:"M d, Y" }}
+            {% endif %}
+            {% if not request.user.subscription.is_active %}
+              <span style="color: var(--danger);"> (Expired)</span>
+            {% endif %}
+          {% endif %}
+        </p>
+      </div>
+      <i class="bi bi-chevron-right cp-card-caret"></i>
+    </a>
+
+
     <a href="{% url 'feedback' %}" class="cp-card cp-card-feedback">
       <div class="cp-card-icon">
         <i class="bi bi-chat-square-text-fill"></i>
       </div>
       <div class="cp-card-content">
         <h3>Send Feedback</h3>
-        <p>Help us improve Estate Web by sharing your experience or complaints.</p>
+        <p>Help us improve Estate Web by sharing your experience.</p>
       </div>
       <i class="bi bi-chevron-right cp-card-caret"></i>
     </a>
 
-    <!-- Account Settings -->
+    <!-- 3 · Account & Privacy -->
     <a href="{% url 'customer:settings' %}" class="cp-card cp-card-settings">
       <div class="cp-card-icon">
         <i class="bi bi-gear-fill"></i>
       </div>
       <div class="cp-card-content">
         <h3>Account &amp; Privacy</h3>
-        <p>Update your details, change your password, and manage privacy options.</p>
+        <p>Update your details and manage privacy options.</p>
       </div>
       <i class="bi bi-chevron-right cp-card-caret"></i>
     </a>
 
-    <!-- Landlord Listings (coming soon) -->
-    <div class="cp-card cp-card-listings cp-card-locked">
-      <div class="cp-card-icon">
-        <i class="bi bi-house-door-fill"></i>
-      </div>
-      <div class="cp-card-content">
-        <h3>
-          My Listings
-          <span class="cp-coming-soon">Coming Soon</span>
-        </h3>
-        <p>List your own properties for rent or sale — landlord tools launching soon.</p>
-      </div>
-      <i class="bi bi-lock-fill cp-card-caret locked-icon"></i>
-    </div>
 
+  </div>
+
+
+  <!-- ── NEWS BANNER (lowest priority — moved to bottom) ── -->
+  <div class="cp-news cp-card-locked">
+    <div class="cp-news-left">
+      <span class="cp-news-pill"><i class="bi bi-newspaper"></i> News</span>
+      <p class="cp-news-text">Latest real estate updates and market insights</p>
+    </div>
+    <div class="cp-news-badge">Coming Soon</div>
   </div>
 
 </div>

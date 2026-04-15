@@ -589,96 +589,150 @@
 
 
 
-    <div class="tab-pane" id="subscription">
-      <div class="content-grid">
+<div class="tab-pane" id="subscription">
+  <div style="display:flex; flex-direction:column; gap:1.25rem; padding:.25rem 0;">
 
-        {# Current plan #}
-        <div class="content-card plan-card">
-          <div class="plan-badge">Current Plan</div>
-          <div class="card-content">
-            <div class="plan-details">
-              <h3 class="plan-name">Professional Agent</h3>
-              <p class="plan-description">Unlimited listings · Advanced analytics · Priority support</p>
-              <div class="plan-pricing">
-                <span class="price-amount">₦####</span>
-                <span class="price-period">/ month</span>
-              </div>
-              <button class="upgrade-btn">
-                <i class="bi bi-arrow-up-circle-fill"></i> Upgrade to Premium
-              </button>
-            </div>
-          </div>
+    {# ── Plan Hero Card ──────────────────────────────────────────── #}
+    <div class="sub-hero-card">
+
+      <div class="sub-hero-body">
+        <div>
+          {% if subscription %}
+            {% if plan_is_expired %}
+              <span class="sub-status-pill expired"><i class="bi bi-x-circle-fill"></i> Expired</span>
+            {% else %}
+              <span class="sub-status-pill active"><i class="bi bi-check-circle-fill"></i> Active</span>
+            {% endif %}
+          {% else %}
+            <span class="sub-status-pill free">Free Plan</span>
+          {% endif %}
+
+          <p class="sub-plan-name">{{ plan_label }}</p>
+
+          <p class="sub-plan-meta">
+            {% if subscription %}
+              Member since {{ subscription.start_date|date:"M d, Y" }}
+              {% if subscription.expiry_date %}
+                &nbsp;·&nbsp;
+                {% if plan_is_expired %}
+                  Expired {{ subscription.expiry_date|date:"M d, Y" }}
+                {% else %}
+                  Renews {{ subscription.expiry_date|date:"M d, Y" }}
+                {% endif %}
+              {% else %}
+                &nbsp;·&nbsp; No expiry
+              {% endif %}
+            {% else %}
+              No active subscription
+            {% endif %}
+          </p>
         </div>
 
-        {# Payment method #}
-        <div class="content-card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="bi bi-credit-card"></i> Payment Method</h3>
-            <button class="add-btn"><i class="bi bi-plus-circle"></i> Add Card</button>
-          </div>
-          <div class="card-content">
-            <div class="payment-method-item">
-              <div class="card-icon visa"><i class="bi bi-credit-card-fill"></i></div>
-              <div class="card-details">
-                <h4>Visa •••• 4242</h4>
-                <p>Expires 12/2025</p>
-              </div>
-              <span class="default-badge">Default</span>
-              <button class="icon-btn"><i class="bi bi-three-dots-vertical"></i></button>
-            </div>
-          </div>
+        <div class="sub-price-block">
+          <p class="sub-price-amount">{{ plan_price }}</p>
+          {% if plan_price != 'Free' %}
+            <p class="sub-price-period">per month</p>
+          {% endif %}
         </div>
-
-        {# Billing history #}
-        <div class="content-card">
-          <div class="card-header">
-            <h3 class="card-title"><i class="bi bi-receipt"></i> Billing History</h3>
-            <button class="text-btn">View All <i class="bi bi-arrow-right"></i></button>
-          </div>
-          <div class="card-content">
-            <div class="billing-list">
-
-              <div class="billing-row">
-                <div class="billing-info">
-                  <h4>Professional Plan</h4>
-                  <p>Invoice #INV-2024-0045</p>
-                </div>
-                <div class="billing-meta">
-                  <span class="billing-date">Jan 15, 2024</span>
-                  <span class="billing-amount">₦####</span>
-                  <span class="status-tag paid">Paid</span>
-                  <button class="icon-btn"><i class="bi bi-download"></i></button>
-                </div>
-              </div>
-
-              <div class="billing-row">
-                <div class="billing-info">
-                  <h4>Professional Plan</h4>
-                  <p>Invoice #INV-2023-0234</p>
-                </div>
-                <div class="billing-meta">
-                  <span class="billing-date">Dec 15, 2023</span>
-                  <span class="billing-amount">₦####</span>
-                  <span class="status-tag paid">Paid</span>
-                  <button class="icon-btn"><i class="bi bi-download"></i></button>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <div class="section-actions">
-        <button class="action-btn secondary">
-          <i class="bi bi-question-circle"></i> Billing Support
-        </button>
-        <button class="action-btn primary">
-          <i class="bi bi-arrow-clockwise"></i> Manage Subscription
-        </button>
+      {# ── Slot stat grid ─────────────────────────────────────── #}
+      <div class="sub-stat-grid">
+        <div class="sub-stat-cell">
+          <p class="sub-stat-label">Inventory</p>
+          <p class="sub-stat-value">{{ inv_limit }}</p>
+          <p class="sub-stat-sub">slots stored</p>
+        </div>
+        <div class="sub-stat-cell">
+          <p class="sub-stat-label">Live slots</p>
+          <p class="sub-stat-value">{{ live_limit }}</p>
+          <p class="sub-stat-sub">live at once</p>
+        </div>
+        <div class="sub-stat-cell">
+          <p class="sub-stat-label">Boosts</p>
+          <p class="sub-stat-value">{{ boost_limit }}</p>
+          <p class="sub-stat-sub">per cycle</p>
+        </div>
       </div>
-    </div>{# end subscription #}
+
+      {# ── Upgrade nudge strip ───────────────────────────────── #}
+      <div class="sub-nudge-strip">
+        <span class="sub-nudge-text">Need more capacity? View available plans.</span>
+        <a href="{% url 'pricing_page' %}" class="sub-nudge-link">
+          {% if subscription and subscription.plan == 'top_producer' or subscription.plan == 'enterprise' %}
+            You're on the top plan
+          {% else %}
+            Upgrade plan <i class="bi bi-arrow-right"></i>
+          {% endif %}
+        </a>
+      </div>
+
+    </div>
+
+    {# ── Payment Reference Card ───────────────────────────────── #}
+    {% if subscription and subscription.paystack_reference %}
+    <div class="sub-ref-card">
+      <div class="sub-ref-icon"><i class="bi bi-receipt-cutoff"></i></div>
+      <div style="flex:1; min-width:0;">
+        <p class="sub-ref-label">Payment Reference</p>
+        <span class="sub-ref-code">{{ subscription.paystack_reference }}</span>
+      </div>
+      <div class="sub-ref-right">
+        <p class="sub-ref-date">Paid {{ subscription.start_date|date:"M d, Y" }}</p>
+        {% if plan_is_expired %}
+          <span class="sub-hist-status expired"><i class="bi bi-x-circle-fill"></i> Expired</span>
+        {% else %}
+          <span class="sub-hist-status active"><i class="bi bi-check-circle-fill"></i> Active</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# ── Billing History Card ─────────────────────────────────── #}
+    <div class="sub-history-card">
+      <div class="sub-history-header">
+        <i class="bi bi-clock-history"></i>
+        <span>Billing History</span>
+      </div>
+
+      {% if subscription and subscription.paystack_reference %}
+        <div class="sub-history-row">
+          <div class="sub-hist-icon"><i class="bi bi-file-earmark-text"></i></div>
+          <div class="sub-hist-info">
+            <p class="sub-hist-plan">{{ plan_label }} Plan</p>
+            <p class="sub-hist-ref">{{ subscription.paystack_reference }}</p>
+          </div>
+          <div class="sub-hist-right">
+            <p class="sub-hist-amount">{{ plan_price }}</p>
+            <p class="sub-hist-date">{{ subscription.start_date|date:"M d, Y" }}</p>
+            {% if plan_is_expired %}
+              <span class="sub-hist-status expired"><i class="bi bi-x-circle-fill"></i> Expired</span>
+            {% else %}
+              <span class="sub-hist-status active"><i class="bi bi-check-circle-fill"></i> Successfull</span>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <div class="sub-history-empty">
+          <i class="bi bi-receipt"></i>
+          <p>No payment records yet — you're on the free plan.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {# ── Actions ─────────────────────────────────────────────── #}
+    <div class="sub-actions" style="padding-bottom:.5rem;">
+      <button class="sub-action-ghost">
+        <i class="bi bi-question-circle"></i> Billing support
+      </button>
+      <a href="{% url 'pricing_page' %}" class="sub-action-primary">
+        <i class="bi bi-arrow-clockwise"></i> Manage subscription
+      </a>
+    </div>
+
+  </div>
+</div>{# end subscription #}
+
 
 
     <div class="tab-pane" id="account-actions">
@@ -697,7 +751,7 @@
             <div class="danger-action-item critical">
               <div class="danger-icon"><i class="bi bi-trash-fill"></i></div>
               <div class="danger-info">
-                <h4>Delete Account Permanently</h4>
+                <h4>Close Account Permanently</h4>
                 <p>Completely removes your account and all associated data. This is irreversible.</p>
                 <ul class="consequence-list">
                   <li>All your listings will be deleted</li>
@@ -730,7 +784,7 @@
       <div class="delete-modal-icon">
         <i class="bi bi-exclamation-triangle-fill"></i>
       </div>
-      <h2>Delete Account Permanently?</h2>
+      <h2>Close Account Permanently?</h2>
       <p>This action cannot be undone. Please read carefully.</p>
     </div>
 

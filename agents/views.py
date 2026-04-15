@@ -22,6 +22,17 @@ import threading
 from allauth.account.models import EmailAddress
 
 
+
+# NEW - reads from subscription
+def _get_limit_display(user, key):
+    """Returns the limit value or '∞' if unlimited (None)."""
+    try:
+        val = user.subscription.get_limit(key)
+        return '∞' if val is None else val
+    except Exception:
+        return 0
+
+
 # Create your views here.
 def calculate_agent_profile_strength(has_picture, has_listing, has_phone):
     """
@@ -750,14 +761,49 @@ def settings(request):
         messages.error(request, "Access denied: This page is for agent accounts only.")
         return redirect('landing')
     try:
-        agent= AgentInformation.objects.get(user=request.user)
+        agent = AgentInformation.objects.get(user=request.user)
         if agent.user != request.user:
             messages.error(request, 'Access denied: Unauthorized action.')
             return redirect('landing')
-        context={
-            'agent':agent
+
+        # ── Subscription ────────────────────────────────────────────
+        PLAN_PRICES = {
+            'basic':        'Free',
+            'active_agent': '₦5,000 / month',
+            'top_producer': '₦12,000 / month',
+        }
+        PLAN_LABELS = {
+            'basic':        'Basic',
+            'active_agent': 'Active Agent',
+            'top_producer': 'Top Producer',
+        }
+
+        try:
+            subscription = request.user.subscription
+            inv_limit = subscription.get_limit('inventory_slots')
+            live_limit = subscription.get_limit('listing_slots')
+            boost_limit = subscription.get_limit('boost_credits')
+            inv_limit_display  = '∞' if inv_limit  is None else inv_limit
+            live_limit_display = '∞' if live_limit is None else live_limit
+            boost_display      = '∞' if boost_limit is None else boost_limit
+        except Exception:
+            subscription       = None
+            inv_limit_display  = 0
+            live_limit_display = 0
+            boost_display      = 0
+
+        context = {
+            'agent': agent,
+            'subscription':     subscription,
+            'inv_limit':        inv_limit_display,
+            'live_limit':       live_limit_display,
+            'boost_limit':      boost_display,
+            'plan_price':       PLAN_PRICES.get(subscription.plan if subscription else 'basic', 'Free'),
+            'plan_label':       PLAN_LABELS.get(subscription.plan if subscription else 'basic', 'Basic'),
+            'plan_is_expired':  subscription.is_expired() if subscription else False,
         }
         return render(request, 'agent/settings.html', context)
+
     except ObjectDoesNotExist:
         messages.error(request, 'Agent information is missing.')
         return redirect('landing')
@@ -1004,8 +1050,8 @@ def my_company(request):
             company_property_rent=PropertyManagementRent.objects.filter(company_uuid=agent.company_uuid)
             inventory_used=get_inventory_count(agent, company)
             live_used=get_listing_count(agent, company)
-            inv_limit=company.inventory_slots if company.company_tier != 'enterprise' else '∞'
-            live_limit=company.listing_slots if company.company_tier != 'enterprise' else '∞'
+            inv_limit = _get_limit_display(company.user, 'inventory_slots')
+            live_limit = _get_limit_display(company.user, 'listing_slots')
             my_listing_count=PropertyManagementRent.objects.filter(agent_uuid=agent.agent_uuid).count() + PropertyManagementSale.objects.filter(agent_uuid=agent.agent_uuid).count()
         else:
             company=None
