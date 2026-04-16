@@ -1,21 +1,15 @@
-# Add Manage Subscription Button ✅
+# Fix Missing hero_bg.jpg Staticfiles Error ✅
 
-## Progress Update
-Billing sections improved:
-- [x] estate/user_profile.html: Dynamic plan card added.
-- [x] estate/settings.html: Plan summary box + Manage button.
-- [ ] landlord/profile.html: Replace hardcoded billing.
-- [x] agent dashboard.html: Already good widget.
-- [x] Listings (inventory/company_properties): Good slots/stats.
+**Status: Local Fix Complete**
 
-## Next Steps
-4. Update landlord/profile.html
-5. Polish agent/company settings if needed.
-6. Test all pages.
+## Steps:
+- ✅ 1. Create TODO.md
+- ✅ 2. Edit `core/templates/core/landing.html` → Replaced `{% static "estate/images/hero_bg.jpg" %}` with pure CSS gradient fallback
+- [ ] 3. Test locally: `python manage.py runserver`, visit landing page, confirm no console errors and hero looks good
+- [ ] 4. In production: `cd /home/deploy/estateweb && python manage.py collectstatic --noinput`
+- [ ] 5. Verify prod landing page loads without traceback
+- [ ] 6. Mark complete and cleanup TODO.md
 
-No further white boxes - all visible, dynamic, styled.
-**Customer settings** (`estate/templates/estate/settings.html`): "Manage Subscription" button added in #section-actions.
+**Next:** Run `python manage.py runserver` locally and check `/` (landing page). Hero section should render with smooth dark gradient (no image errors). Confirm in browser dev tools (F12 → no 404s for hero_bg.jpg).
 
-**Landlord profile** (`landlord/templates/landlord/profile.html`): New "Billing" nav/section with current plan info and "Explore Plans" button (href="#").
-
-Agent/Company already had subscription features. Task complete - buttons added for landlord/customer as requested.
+**Production:** After local test, deploy changes to `/home/deploy/estateweb` and run collectstatic.

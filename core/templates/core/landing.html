@@ -72,9 +72,14 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--display); font-weight: 600; line-hei
 /* ── HERO ── */
 .hero {
   min-height: 100svh;
-  background:
-    linear-gradient(160deg, rgba(13,17,23,.95) 0%, rgba(13,17,23,.80) 55%, rgba(28,39,51,.92) 100%),
-    url('{% static "estate/images/hero_bg.jpg" %}') no-repeat center center / cover;
+    background:
+      linear-gradient(160deg, rgba(13,17,23,.95) 0%, rgba(13,17,23,.80) 55%, rgba(28,39,51,.92) 100%),
+      radial-gradient(ellipse 120% 80% at 30% 20%, rgba(35,52,78,.6) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 60% at 80% 70%, rgba(20,30,45,.5) 0%, transparent 50%),
+      linear-gradient(135deg, rgba(15,25,40,.9) 0%, rgba(10,20,35,.98) 100%);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
   display: flex; align-items: center;
   color: var(--white);
   padding: 6rem 0 4rem;
