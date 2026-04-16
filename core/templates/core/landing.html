@@ -59,9 +59,9 @@ h1,h2,h3,h4,h5,h6{font-family:var(--display);font-weight:600;line-height:1.15}
 .alert{border-radius:10px;padding:0.85rem 1.1rem;box-shadow:var(--shadow-dark);animation:slideRight 0.35s ease both;border:none;display:flex;align-items:center;gap:0.65rem;font-size:0.88rem;font-family:var(--body)}
 @keyframes slideRight{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* HERO */
-.hero{min-height:100svh;background:linear-gradient(160deg,rgba(13,17,23,.95) 0%,rgba(13,17,23,.80) 55%,rgba(28,39,51,.92) 100%) no-repeat center center/cover;display:flex;align-items:center;color:var(--white);padding:5rem 0 4rem;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 70% 20%,rgba(193,155,118,.12) 0%,transparent 45%),radial-gradient(circle at 10% 80%,rgba(193,155,118,.06) 0%,transparent 40%);pointer-events:none}
+/* HERO – IMPROVED WITH REAL BACKGROUND */
+.hero{min-height:100svh;background:linear-gradient(160deg,rgba(13,17,23,.88) 0%,rgba(13,17,23,.75) 55%,rgba(28,39,51,.88) 100%), url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&h=1080&fit=crop&auto=format') no-repeat center center/cover;display:flex;align-items:center;color:var(--white);padding:5rem 0 4rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(193,155,118,.15) 0%,transparent 45%),radial-gradient(circle at 10% 80%,rgba(193,155,118,.08) 0%,transparent 40%);pointer-events:none}
 .hero::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,transparent 0%,var(--gold) 35%,var(--gold-dk) 70%,transparent 100%);pointer-events:none}
 .hero-inner{position:relative;z-index:2}
 .hero-index{font-family:var(--display);font-size:clamp(5rem,20vw,14rem);font-weight:700;color:rgba(193,155,118,.05);line-height:1;position:absolute;top:-1.5rem;right:-1rem;pointer-events:none;user-select:none;letter-spacing:-5px}
@@ -125,7 +125,7 @@ h1,h2,h3,h4,h5,h6{font-family:var(--display);font-weight:600;line-height:1.15}
 .trust-title{font-family:var(--display);font-size:0.95rem;font-weight:600;color:var(--ink);margin-bottom:0.15rem}
 .trust-desc{font-size:0.78rem;color:var(--slate);line-height:1.6;margin:0}
 
-/* PREVIEW SECTION */
+/* PREVIEW SECTION – REAL IMAGES */
 .preview-section{background:var(--ivory);padding:5rem 0}
 .section-header{margin-bottom:2.5rem}
 .section-header h2{font-size:clamp(1.8rem,4vw,3rem);color:var(--ink);margin-bottom:0.5rem}
@@ -134,10 +134,8 @@ h1,h2,h3,h4,h5,h6{font-family:var(--display);font-weight:600;line-height:1.15}
 .preview-banner i{font-size:0.85rem}
 .preview-grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
 .preview-card{background:var(--white);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);position:relative}
-.preview-card-img-wrap{height:190px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--mist) 0%,#e8e4de 100%);display:flex;align-items:center;justify-content:center}
-.preview-card-img-placeholder{display:flex;flex-direction:column;align-items:center;gap:0.5rem;color:var(--slate);opacity:0.4}
-.preview-card-img-placeholder i{font-size:2.5rem}
-.preview-card-img-placeholder span{font-size:0.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.preview-card-img-wrap{height:190px;position:relative;overflow:hidden}
+.preview-card-img-wrap img{width:100%;height:100%;object-fit:cover}
 .preview-type-badge{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:20px;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--body)}
 .preview-type-badge.sale{background:rgba(37,99,235,.15);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
 .preview-type-badge.rent{background:rgba(22,163,74,.15);color:#16a34a;border:1px solid rgba(22,163,74,.25)}
@@ -551,7 +549,7 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
   </div>
 </div>
 
-<!-- COMING LISTINGS PREVIEW -->
+<!-- COMING LISTINGS PREVIEW – REAL IMAGES -->
 <section class="preview-section">
   <div class="container">
     <div class="section-header">
@@ -572,14 +570,14 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
 
       <div class="preview-card">
         <div class="preview-card-img-wrap">
-          <div class="preview-card-img-placeholder"><i class="bi bi-houses"></i><span>Listing Preview</span></div>
+          <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop&auto=format" alt="4 Bedroom Detached Duplex in Lekki Phase 1, Lagos" loading="lazy">
           <span class="preview-type-badge sale">For Sale</span>
           <span class="preview-sample-tag">Sample</span>
         </div>
         <div class="preview-card-body">
           <div class="preview-card-title">4 Bedroom Detached Duplex</div>
           <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> Lekki Phase 1, Lagos</div>
-          <div class="preview-card-price">&pound;85,000,000</div>
+          <div class="preview-card-price">&#8358;85,000,000</div>
           <div class="preview-card-specs">
             <div class="preview-spec"><i class="bi bi-door-open"></i> 4 beds</div>
             <div class="preview-spec"><i class="bi bi-water"></i> 3 baths</div>
@@ -591,7 +589,7 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
 
       <div class="preview-card">
         <div class="preview-card-img-wrap">
-          <div class="preview-card-img-placeholder"><i class="bi bi-building"></i><span>Listing Preview</span></div>
+          <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop&auto=format" alt="3 Bedroom Flat, Fully Serviced in Maitama, Abuja" loading="lazy">
           <span class="preview-type-badge rent">For Rent</span>
           <span class="preview-sample-tag">Sample</span>
         </div>
@@ -610,7 +608,7 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
 
       <div class="preview-card">
         <div class="preview-card-img-wrap">
-          <div class="preview-card-img-placeholder"><i class="bi bi-map"></i><span>Listing Preview</span></div>
+          <img src="https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=600&h=400&fit=crop&auto=format" alt="Residential Land 600sqm in Ajah, Lagos" loading="lazy">
           <span class="preview-type-badge sale">For Sale</span>
           <span class="preview-sample-tag">Sample</span>
         </div>
@@ -628,7 +626,7 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
 
       <div class="preview-card">
         <div class="preview-card-img-wrap">
-          <div class="preview-card-img-placeholder"><i class="bi bi-houses"></i><span>Listing Preview</span></div>
+          <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&h=400&fit=crop&auto=format" alt="2 Bedroom Apartment in GRA, Port Harcourt" loading="lazy">
           <span class="preview-type-badge rent">For Rent</span>
           <span class="preview-sample-tag">Sample</span>
         </div>
@@ -647,7 +645,7 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
 
       <div class="preview-card">
         <div class="preview-card-img-wrap">
-          <div class="preview-card-img-placeholder"><i class="bi bi-building-fill"></i><span>Listing Preview</span></div>
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop&auto=format" alt="Office Space 500sqm in Victoria Island, Lagos" loading="lazy">
           <span class="preview-type-badge sale">For Sale</span>
           <span class="preview-sample-tag">Sample</span>
         </div>
@@ -665,7 +663,7 @@ footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1p
 
       <div class="preview-card">
         <div class="preview-card-img-wrap">
-          <div class="preview-card-img-placeholder"><i class="bi bi-house-heart"></i><span>Listing Preview</span></div>
+          <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&h=400&fit=crop&auto=format" alt="5 Bedroom Detached House in Bodija, Ibadan" loading="lazy">
           <span class="preview-type-badge rent">For Rent</span>
           <span class="preview-sample-tag">Sample</span>
         </div>
@@ -979,20 +977,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { threshold: 0.4 });
     obs.observe(bar);
   }
-});
 
-/* Smooth scroll + focus for "Notify Me When Live" preview card buttons */
-document.querySelectorAll('a[href="#waitlist-section"]').forEach(function (btn) {
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
-    var target = document.getElementById('waitlist-section');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(function () {
-        var input = target.querySelector('input[type="email"]');
-        if (input) input.focus();
-      }, 600);
-    }
+  /* Smooth scroll + focus for "Notify Me When Live" preview card buttons */
+  document.querySelectorAll('a[href="#waitlist-section"]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = document.getElementById('waitlist-section');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(function () {
+          var input = target.querySelector('input[type="email"]');
+          if (input) input.focus();
+        }, 600);
+      }
+    });
   });
 });
 </script>

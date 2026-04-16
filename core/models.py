@@ -45,6 +45,7 @@ class PropertyManagementSale(models.Model):
     featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False, db_index=True)
     flagged=models.BooleanField('Flagged', default=False, blank=False, null=False, db_index=True)
     is_flagged = models.BooleanField(default=False)
+    property_features=models.ManyToManyField(PropertyFeatures, blank=True)
 
 
 
@@ -83,6 +84,7 @@ class PropertyManagementRent(models.Model):
     featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False, db_index=True)
     flagged=models.BooleanField('Flagged', default=False, blank=False, null=False, db_index=True)
     is_flagged = models.BooleanField(default=False)
+    property_features=models.ManyToManyField(PropertyFeatures, blank=True)
 
 
 #To avoid mass Report

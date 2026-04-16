@@ -73,9 +73,15 @@ class LeaseForm(ModelForm):
 
     class Meta:
         model=PropertyManagementRent
+        property_features=forms.ModelMultipleChoiceField(
+            queryset=PropertyFeatures.objects.all(),
+            widget=forms.CheckboxSelectMultiple,
+            required=False,
+            label='Select Property Features'
+        )
         fields=(
                 'property_category','residential','commercial','lands','description', 'state','location', 'bedrooms','bathrooms','parking_spaces','size' ,
-                'phone_number','price_range','rent_rate','base_image'
+                'phone_number','property_features','price_range','rent_rate','base_image'
                 )
         labels={
                 'property_category': 'Property Category',
@@ -129,9 +135,16 @@ class SellForm(ModelForm):
         })
 
     class Meta:
+    
         model=PropertyManagementSale
+        property_features=forms.ModelMultipleChoiceField(
+            queryset=PropertyFeatures.objects.all(),
+            widget=forms.CheckboxSelectMultiple,
+            required=False,
+            label='Select Property Features'
+        )
         fields=('property_category','residential','commercial','lands','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
-                'phone_number','size', 'price', 'base_image')
+                'phone_number','size','property_features', 'price', 'base_image')
         labels={
                 'property_category': 'Property Category',
                 'residential':'House Type',
