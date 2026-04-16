@@ -8,6 +8,12 @@ from django.conf import settings
 from members.models import User
 
 
+class PropertyFeatures(models.Model):
+    name=models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.name
+
 #model handling the datatabase requirements cointaining all the property up for sale requirements.
 class PropertyManagementSale(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -39,6 +45,8 @@ class PropertyManagementSale(models.Model):
     featured_listings=models.BooleanField('Featured Lising',default=False, blank=False, null=False, db_index=True)
     flagged=models.BooleanField('Flagged', default=False, blank=False, null=False, db_index=True)
     is_flagged = models.BooleanField(default=False)
+
+
 
 
 
@@ -300,3 +308,6 @@ class ErrorLog(models.Model):
             self.ref_id = str(uuid.uuid4())[:8].upper()
         super().save(*args, **kwargs)
 
+
+class Waitlist(models.Model):
+    email=models.EmailField('Persons Email', null=False, blank=False, max_length=50)

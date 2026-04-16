@@ -15,6 +15,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from landlord.models import LandlordInformation
 from core.ratelimit import ratelimit
 from django.core.mail import send_mail
+from .models import Waitlist
+
 import traceback, threading
 
 
@@ -33,23 +35,34 @@ def _get_limit_display(user, key):
 
 def landing_page(request):
     try:
-        featured_sale = PropertyManagementSale.objects.filter(
-            is_listed=True
-        ).order_by('-listing_score', '-listed_date')[:6]
+        if not request.user.is_authenticated:
+            featured_sale = PropertyManagementSale.objects.filter(
+                is_listed=True
+            ).order_by('-listing_score', '-listed_date')[:6]
 
-        featured_rent = PropertyManagementRent.objects.filter(
-            is_listed=True
-        ).order_by('-listing_score', '-listed_date')[:6]
+            featured_rent = PropertyManagementRent.objects.filter(
+                is_listed=True
+            ).order_by('-listing_score', '-listed_date')[:6]
 
-        context = {
-            'featured_sale':        featured_sale,
-            'featured_rent':        featured_rent,
-            'total_sale_listings':  PropertyManagementSale.objects.filter(is_listed=True).count(),
-            'total_rent_listings':  PropertyManagementRent.objects.filter(is_listed=True).count(),
-            'total_agents':         AgentInformation.objects.filter(verified=True).count(),
-            'total_companies':      CompanyInformation.objects.count(),
-        }
-        return render(request, 'core/landing.html', context)
+            context = {
+                'featured_sale':        featured_sale,
+                'featured_rent':        featured_rent,
+                'total_sale_listings':  PropertyManagementSale.objects.filter(is_listed=True).count(),
+                'total_rent_listings':  PropertyManagementRent.objects.filter(is_listed=True).count(),
+                'total_agents':         AgentInformation.objects.filter(verified=True).count(),
+                'total_companies':      CompanyInformation.objects.count(),
+            }
+            return render(request, 'core/landing.html', context)
+        else:
+            user_role=request.user.role
+            if user_role == 'company':
+                return redirect('company:dashboard')
+            elif user_role == 'agent':
+                return redirect('agent:dashboard')
+            elif user_role == 'landlord':
+                return redirect('landlord:dashboard')
+            else:
+                return redirect('customer:user-profile')
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
@@ -1477,5 +1490,30 @@ def estate_web_guide(request):
 
 def lockout_response(request, credentials, *args, **kwargs):
     return render(request, 'core/lockout.html', status=403)
+
+
+@ratelimit(rate='10/m', key_prefix='waitlist')
+def waitlist_signup(request):
+    try:
+        if request.method == 'POST':
+            email = request.POST.get('email', '').strip()
+            source = request.POST.get('source', 'unknown').strip()
+            
+            if not email:
+                messages.error(request, 'Please enter a valid email address.')
+                return redirect(request.META.get('HTTP_REFERER', 'landing'))
+            
+            if Waitlist.objects.filter(email__iexact=email).exists():
+                messages.info(request, "You're already on our early access list!")
+                return redirect(request.META.get('HTTP_REFERER', 'landing'))
+            
+            Waitlist.objects.create(email=email)
+            messages.success(request, f'Thanks for joining early access from {source}! You\'ll be notified when listings go live.')
+            return redirect(request.META.get('HTTP_REFERER', 'landing'))
+    
+        return redirect('landing')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
 
 

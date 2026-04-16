@@ -2,6 +2,8 @@ from django.urls import path
 from core import views as core_views
 
 urlpatterns = [
+    path('waitlist-signup/', core_views.waitlist_signup, name='waitlist-signup'),
+
     path('', core_views.landing_page, name='landing'),
     path('about/', core_views.about_page, name='about'),
     path('feedback/', core_views.feedbacks, name='feedback'),

@@ -1,15 +1,54 @@
-# Fix Missing hero_bg.jpg Staticfiles Error ✅
+# Waitlist Signup Implementation
+Current Working Directory: c:/Users/VICT6OR/Desktop/home/home/Estate Web
 
-**Status: Local Fix Complete**
+## Completed: 3/5 ✓
 
-## Steps:
-- ✅ 1. Create TODO.md
-- ✅ 2. Edit `core/templates/core/landing.html` → Replaced `{% static "estate/images/hero_bg.jpg" %}` with pure CSS gradient fallback
-- [ ] 3. Test locally: `python manage.py runserver`, visit landing page, confirm no console errors and hero looks good
-- [ ] 4. In production: `cd /home/deploy/estateweb && python manage.py collectstatic --noinput`
-- [ ] 5. Verify prod landing page loads without traceback
-- [ ] 6. Mark complete and cleanup TODO.md
+### ☑️ 1. Add URL pattern to core/urls.py
+- Added `path('waitlist-signup/', core_views.waitlist_signup, name='waitlist-signup'),`
 
-**Next:** Run `python manage.py runserver` locally and check `/` (landing page). Hero section should render with smooth dark gradient (no image errors). Confirm in browser dev tools (F12 → no 404s for hero_bg.jpg).
+### ☑️ 2. Create waitlist_signup view in core/views.py
+- Handle POST from landing.html forms
+- Save to Waitlist model
+- Deduplicate emails
+- Success/error messages
+- Redirect back to landing
 
-**Production:** After local test, deploy changes to `/home/deploy/estateweb` and run collectstatic.
+### ☑️ 3. Add Waitlist import to core/views.py
+- `from .models import Waitlist`
+
+### ☐ 4. Test form submissions
+- Hero waitlist form (source=hero)
+- Waitlist section form (source=waitlist_section)
+- Verify database records
+- Test duplicate emails
+
+### ☐ 5. Verify functionality
+- Check messages display
+- Confirm redirects work
+- Test on mobile/desktop
+
+**Next Action:** Test forms → Update Step 4 complete
+
+### ☐ 2. Create waitlist_signup view in core/views.py
+- Handle POST from landing.html forms
+- Save to Waitlist model
+- Deduplicate emails
+- Success/error messages
+- Redirect back to landing
+
+### ☐ 3. Add Waitlist import to core/views.py
+- `from .models import Waitlist`
+
+### ☐ 4. Test form submissions
+- Hero waitlist form (source=hero)
+- Waitlist section form (source=waitlist_section)
+- Verify database records
+- Test duplicate emails
+
+### ☐ 5. Verify functionality
+- Check messages display
+- Confirm redirects work
+- Test on mobile/desktop
+
+**Next Action:** Update Step 1 complete → Proceed to Step 2
+
