@@ -31,34 +31,39 @@ def _get_limit_display(user, key):
 
 
 def landing_page(request):
-    if not request.user.is_authenticated:
-        return render(request, 'core/landing.html')
-    
-    # 1. Grab the potential redirect URL
-    next_url = request.GET.get('next') or request.POST.get('next')
-    
-    # 2. Run the security check ONCE
-    is_safe = url_has_allowed_host_and_scheme(
-        url=next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ) if next_url else False
+    try:
+        if not request.user.is_authenticated:
+            return render(request, 'core/landing.html')
+        
+        # 1. Grab the potential redirect URL
+        next_url = request.GET.get('next') or request.POST.get('next')
+        
+        # 2. Run the security check ONCE
+        is_safe = url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ) if next_url else False
 
-    # 3. Handle role-based redirects
-    if request.user.role == 'company':
-        return redirect(next_url if is_safe else 'company:dashboard')
+        # 3. Handle role-based redirects
+        if request.user.role == 'company':
+            return redirect(next_url if is_safe else 'company:dashboard')
+            
+        elif request.user.role == 'agent':
+            return redirect(next_url if is_safe else 'agent:dashboard')
+            
+        elif request.user.role == 'customer':
+            return redirect(next_url if is_safe else 'customer:user-profile')
         
-    elif request.user.role == 'agent':
-        return redirect(next_url if is_safe else 'agent:dashboard')
-        
-    elif request.user.role == 'customer':
-        return redirect(next_url if is_safe else 'customer:user-profile')
-    
-    elif request.user.role == 'landlord':
-        return redirect(next_url if is_safe else 'landlord:dashboard')
-        
-    else:
-        return render(request, 'core/landing.html')
+        elif request.user.role == 'landlord':
+            return redirect(next_url if is_safe else 'landlord:dashboard')
+            
+        else:
+            return render(request, 'core/landing.html')
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
 
 def about_page(request):
     return render(request, 'core/about.html')
