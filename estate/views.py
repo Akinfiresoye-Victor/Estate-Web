@@ -111,6 +111,16 @@ def buy_property(request):
         sale_qs = PropertyManagementSale.objects.filter(is_listed=True).order_by(
             '-listing_score', '-listed_date'
         )
+        
+        state    = request.GET.get('state', '')
+        category = request.GET.get('category', '')
+        
+        if state:
+            qs = sale_qs.filter(state__iexact=state)
+        if category:
+            qs = sale_qs.filter(property_category__iexact=category)
+        
+
  
         myfilter = PropertySaleFilter(request.GET, queryset=sale_qs)
         sale_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementSale.objects.none()
@@ -148,7 +158,14 @@ def rent_property(request):
         rent_qs = PropertyManagementRent.objects.filter(is_listed=True).order_by(
             '-listing_score', '-listed_date'
         )
- 
+        state    = request.GET.get('state', '')
+        category = request.GET.get('category', '')
+        
+        if state:
+            qs = rent_qs.filter(state__iexact=state)
+        if category:
+            qs = rent_qs.filter(property_category__iexact=category)
+        
         myfilter = PropertyRentFilter(request.GET, queryset=rent_qs)
         rent_qs  = myfilter.qs if myfilter.qs.exists() else PropertyManagementRent.objects.none()
  
