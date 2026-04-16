@@ -683,21 +683,39 @@
 
 <script>
 (function () {
-  const allNavBtns = document.querySelectorAll('.pill-nav-btn, .nav-item');
 
-  allNavBtns.forEach(function (btn) {
+  function switchSection(sectionId) {
+    // Step 1: hide every section div, show only the target
+    document.querySelectorAll('.settings-section').forEach(function (sec) {
+      sec.classList.remove('active');
+    });
+    var target = document.getElementById(sectionId);
+    if (target) target.classList.add('active');
+
+    // Step 2: update pill nav highlights
+    document.querySelectorAll('.pill-nav-btn').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.section === sectionId);
+    });
+
+    // Step 3: update sidebar nav highlights
+    document.querySelectorAll('.nav-item').forEach(function (item) {
+      item.classList.toggle('active', item.dataset.section === sectionId);
+    });
+  }
+
+  // Attach to both pill nav AND sidebar so they share the same logic
+  document.querySelectorAll('.pill-nav-btn, .nav-item').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      const section = this.dataset.section;
-
-      document.querySelectorAll('.pill-nav-btn').forEach(function (b) {
-        b.classList.toggle('active', b.dataset.section === section);
-      });
-
-      document.querySelectorAll('.nav-item').forEach(function (b) {
-        b.classList.toggle('active', b.dataset.section === section);
-      });
+      switchSection(this.dataset.section);
     });
   });
+
+  // Ensure the correct section is shown on page load
+  var firstActive = document.querySelector('.nav-item.active, .pill-nav-btn.active');
+  if (firstActive && firstActive.dataset.section) {
+    switchSection(firstActive.dataset.section);
+  }
+
 }());
 </script>
 {% endblock %}

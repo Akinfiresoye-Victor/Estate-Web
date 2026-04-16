@@ -1,11 +1,11 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Estate Web — Your Premium Property Partner</title>
+  <title>Estate Web — Find Verified Properties Across Nigeria</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+/* ── TOKENS ── */
 :root {
   --ink:        #0d1117;
   --ink-soft:   #1c2733;
@@ -23,6 +24,8 @@
   --mist:       #f0ede8;
   --slate:      #8a8f98;
   --white:      #ffffff;
+  --sale:       #2563eb;
+  --lease:      #16a34a;
   --border:     rgba(193,155,118,.22);
   --border-lt:  rgba(255,255,255,.12);
   --shadow-gold: 0 8px 40px rgba(193,155,118,.22);
@@ -45,7 +48,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--display); font-weight: 600; line-hei
 .eyebrow-light { color: rgba(193,155,118,.9); }
 .gold-rule { display: inline-block; width: 40px; height: 2px; background: var(--gold); vertical-align: middle; margin-right: 10px; }
 
-/* NAVBAR */
+/* ── NAVBAR ── */
 .navbar { background: rgba(13,17,23,.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 0.9rem 0; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-lt); }
 .navbar-brand { font-family: var(--display); font-size: 1.5rem; font-weight: 700; color: var(--white) !important; letter-spacing: 0.3px; display: flex; align-items: center; gap: 0.55rem; }
 .logo { height: 48px; width: auto; object-fit: contain; border-radius: 6px; }
@@ -61,32 +64,117 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--display); font-weight: 600; line-hei
 .dropdown-item i { font-size: 1.1rem; color: var(--gold); }
 .dropdown-item small { color: rgba(255,255,255,.45) !important; font-size: 0.75rem; }
 
-/* ALERTS */
+/* ── ALERTS ── */
 .messages-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; max-width: 360px; display: flex; flex-direction: column; gap: 0.5rem; }
 .alert { border-radius: 10px; padding: 0.85rem 1.1rem; box-shadow: var(--shadow-dark); animation: slideRight 0.35s ease both; border: none; display: flex; align-items: center; gap: 0.65rem; font-size: 0.88rem; font-family: var(--body); }
 @keyframes slideRight { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-/* HERO */
-.hero { min-height: 100svh; background: linear-gradient(160deg, rgba(13,17,23,.95) 0%, rgba(13,17,23,.82) 60%, rgba(28,39,51,.92) 100%), url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center / cover; display: flex; align-items: center; color: var(--white); padding: 6rem 0 4rem; position: relative; overflow: hidden; }
+/* ── HERO ── */
+.hero {
+  min-height: 100svh;
+  background:
+    linear-gradient(160deg, rgba(13,17,23,.95) 0%, rgba(13,17,23,.80) 55%, rgba(28,39,51,.92) 100%),
+    url('{% static "estate/images/hero_bg.jpg" %}') no-repeat center center / cover;
+  display: flex; align-items: center;
+  color: var(--white);
+  padding: 6rem 0 4rem;
+  position: relative; overflow: hidden;
+}
 .hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 70% 20%, rgba(193,155,118,.12) 0%, transparent 45%), radial-gradient(circle at 10% 80%, rgba(193,155,118,.06) 0%, transparent 40%); pointer-events: none; }
 .hero::after { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(to bottom, transparent 0%, var(--gold) 35%, var(--gold-dk) 70%, transparent 100%); pointer-events: none; }
 .hero-inner { position: relative; z-index: 2; width: 100%; }
 .hero-index { font-family: var(--display); font-size: clamp(5rem, 20vw, 14rem); font-weight: 700; color: rgba(193,155,118,.06); line-height: 1; position: absolute; top: -1.5rem; right: -1rem; pointer-events: none; user-select: none; letter-spacing: -5px; }
 .hero h1 { font-size: clamp(2.4rem, 7vw, 5.5rem); font-weight: 700; color: var(--white); margin-bottom: 1.25rem; letter-spacing: -0.5px; animation: fadeUp 0.9s ease both; }
 .hero h1 em { font-style: italic; color: var(--gold); }
-.hero-sub { font-size: clamp(0.9rem, 1.8vw, 1.1rem); color: rgba(255,255,255,.68); font-weight: 300; max-width: 540px; margin-bottom: 3rem; line-height: 1.85; animation: fadeUp 0.9s 0.12s ease both; }
-.hero-cta-strip { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 3.5rem; animation: fadeUp 0.9s 0.22s ease both; }
+.hero-sub { font-size: clamp(0.9rem, 1.8vw, 1.1rem); color: rgba(255,255,255,.68); font-weight: 300; max-width: 540px; margin-bottom: 2.5rem; line-height: 1.85; animation: fadeUp 0.9s 0.12s ease both; }
+
+/* ── HERO SEARCH BOX ── */
+.hero-search-box {
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 2.5rem;
+  max-width: 680px;
+  animation: fadeUp 0.9s 0.2s ease both;
+}
+.search-tabs {
+  display: flex; gap: 4px;
+  background: rgba(0,0,0,.25);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 1rem;
+  width: fit-content;
+}
+.search-tab {
+  padding: 0.4rem 1.1rem;
+  border-radius: 6px;
+  font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; border: none;
+  background: transparent;
+  color: rgba(255,255,255,.55);
+  transition: var(--ease);
+  font-family: var(--body);
+  letter-spacing: 0.3px;
+}
+.search-tab.active-sale { background: var(--sale); color: var(--white); }
+.search-tab.active-rent { background: var(--lease); color: var(--white); }
+.search-row {
+  display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: flex-end;
+}
+.search-field { flex: 1; min-width: 140px; }
+.search-field label {
+  display: block; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: rgba(255,255,255,.45); margin-bottom: 0.35rem;
+}
+.search-field select,
+.search-field input {
+  width: 100%;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-family: var(--body); font-size: 0.85rem;
+  padding: 0.6rem 0.9rem;
+  appearance: none; -webkit-appearance: none;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.search-field select:focus,
+.search-field input:focus {
+  border-color: var(--gold);
+}
+.search-field select option { background: var(--ink-soft); color: var(--white); }
+.btn-search {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 0.65rem 1.6rem;
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 700; font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  border: none; cursor: pointer;
+  font-family: var(--body);
+  transition: var(--ease);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-search:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: var(--shadow-gold); }
+
+/* ── HERO CTA ── */
+.hero-cta-strip { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 3.5rem; animation: fadeUp 0.9s 0.32s ease both; }
 .btn-hero-primary { display: inline-flex; align-items: center; gap: 8px; padding: 0.85rem 2rem; background: var(--gold); color: var(--ink); font-weight: 700; font-size: 0.88rem; border-radius: var(--radius-sm); text-decoration: none; border: none; cursor: pointer; font-family: var(--body); letter-spacing: 0.3px; transition: var(--ease); }
 .btn-hero-primary:hover { background: var(--gold-lt); transform: translateY(-3px); box-shadow: var(--shadow-gold); color: var(--ink); }
 .btn-hero-outline { display: inline-flex; align-items: center; gap: 8px; padding: 0.85rem 1.75rem; background: transparent; color: rgba(255,255,255,.85); font-weight: 600; font-size: 0.88rem; border-radius: var(--radius-sm); text-decoration: none; border: 1.5px solid rgba(255,255,255,.28); font-family: var(--body); transition: var(--ease); }
 .btn-hero-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); }
 
-/* ACCOUNT CARDS */
-.account-strip { animation: fadeUp 0.9s 0.35s ease both; }
+/* ── ACCOUNT CARDS ── */
+.account-strip { animation: fadeUp 0.9s 0.45s ease both; }
 .account-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: block; }
 .account-cards { display: flex; gap: 0.75rem; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
 .account-cards::-webkit-scrollbar { display: none; }
-
 .account-card { flex-shrink: 0; background: rgba(255,255,255,.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius); padding: 1.25rem 1.5rem; text-decoration: none; color: var(--white); transition: var(--ease); min-width: 160px; display: flex; flex-direction: column; gap: 0.5rem; }
 .account-card:hover { background: rgba(193,155,118,.18); border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 12px 32px rgba(193,155,118,.2); color: var(--white); }
 .account-card-icon { font-size: 1.8rem; line-height: 1; }
@@ -94,51 +182,254 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--display); font-weight: 600; line-hei
 .account-card p { font-size: 0.72rem; color: rgba(255,255,255,.55); margin: 0; line-height: 1.45; }
 .account-card-arrow { margin-top: auto; font-size: 0.75rem; color: var(--gold); opacity: 0; transition: opacity 0.2s; }
 .account-card:hover .account-card-arrow { opacity: 1; }
-
-/* ── INVESTOR — COMING SOON ── */
-.account-card-soon {
-  position: relative;
-  cursor: default;
-  opacity: 0.7;
-  border: 1px dashed rgba(193,155,118,.4) !important;
-  background: rgba(193,155,118,.04) !important;
-}
-.account-card-soon:hover {
-  transform: none !important;
-  box-shadow: none !important;
-  background: rgba(193,155,118,.06) !important;
-  border-color: rgba(193,155,118,.4) !important;
-}
+.account-card-soon { position: relative; cursor: default; opacity: 0.7; border: 1px dashed rgba(193,155,118,.4) !important; background: rgba(193,155,118,.04) !important; }
+.account-card-soon:hover { transform: none !important; box-shadow: none !important; background: rgba(193,155,118,.06) !important; border-color: rgba(193,155,118,.4) !important; }
 .account-card-soon h3 { color: rgba(255,255,255,.5); }
 .account-card-soon p  { color: rgba(255,255,255,.32); }
-
-.account-card-soon-badge {
-  position: absolute;
-  top: 10px; right: 10px;
-  padding: 3px 8px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-dk));
-  color: var(--ink);
-  border-radius: 20px;
-  font-size: 0.6rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-family: var(--body);
-}
+.account-card-soon-badge { position: absolute; top: 10px; right: 10px; padding: 3px 8px; background: linear-gradient(135deg, var(--gold), var(--gold-dk)); color: var(--ink); border-radius: 20px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; font-family: var(--body); }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
-/* TICKER */
+/* ── BROWSE STRIP ── */
+.browse-strip { background: var(--ink-soft); border-bottom: 1px solid rgba(193,155,118,.15); padding: 0.75rem 0; }
+.browse-strip-inner { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; text-align: center; }
+.browse-strip-text { display: flex; align-items: center; gap: 0.55rem; font-size: 0.82rem; color: rgba(255,255,255,.6); }
+.browse-strip-text i { color: var(--gold); font-size: 0.88rem; flex-shrink: 0; }
+.browse-strip-text strong { color: rgba(255,255,255,.85); }
+.browse-strip-btns { display: flex; gap: 0.6rem; }
+.browse-btn { display: inline-flex; align-items: center; gap: 6px; padding: 0.45rem 1.1rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; text-decoration: none; transition: var(--ease); border: 1.5px solid transparent; }
+.browse-btn.sale { background: rgba(37,99,235,.18); border-color: rgba(37,99,235,.35); color: #93c5fd; }
+.browse-btn.sale:hover { background: rgba(37,99,235,.3); color: #bfdbfe; transform: translateY(-1px); }
+.browse-btn.lease { background: rgba(22,163,74,.18); border-color: rgba(22,163,74,.35); color: #86efac; }
+.browse-btn.lease:hover { background: rgba(22,163,74,.3); color: #bbf7d0; transform: translateY(-1px); }
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  background: var(--white);
+  border-bottom: 1px solid var(--mist);
+  padding: 2rem 0;
+}
+.stats-inner {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  text-align: center;
+}
+.stat-item {}
+.stat-num {
+  font-family: var(--display);
+  font-size: 2.2rem; font-weight: 700;
+  color: var(--ink); line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.stat-num span { color: var(--gold); }
+.stat-label {
+  font-size: 0.75rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--slate);
+}
+
+/* ── TICKER ── */
 .ticker-wrap { background: var(--gold); padding: 0.7rem 0; overflow: hidden; white-space: nowrap; }
 .ticker-track { display: inline-flex; gap: 0; animation: ticker 28s linear infinite; }
 .ticker-item { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); padding: 0 2.5rem; }
 .ticker-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ink); opacity: 0.4; }
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-/* FEATURES */
-.features-section { background: var(--ivory); padding: 6rem 0; }
-.features-header { margin-bottom: 4rem; }
-.features-header h2 { font-size: clamp(2rem, 5vw, 3.8rem); color: var(--ink); margin-bottom: 1rem; }
+/* ── FEATURED PROPERTIES ── */
+.featured-section {
+  background: var(--ivory);
+  padding: 5rem 0;
+}
+.section-header { margin-bottom: 2.5rem; }
+.section-header h2 { font-size: clamp(1.8rem, 4vw, 3rem); color: var(--ink); margin-bottom: 0.5rem; }
+.section-header .section-sub { font-size: 0.9rem; color: var(--slate); }
+
+/* Tab switcher */
+.fp-tabs {
+  display: flex; gap: 4px;
+  background: var(--mist);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  width: fit-content;
+  margin-bottom: 2rem;
+}
+.fp-tab {
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; border: none;
+  background: transparent;
+  color: var(--slate);
+  transition: var(--ease);
+  font-family: var(--body);
+}
+.fp-tab.active { background: var(--white); color: var(--ink); box-shadow: var(--shadow-sm); }
+.fp-tab-panel { display: none; }
+.fp-tab-panel.active { display: block; }
+
+/* Property cards grid */
+.prop-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+.prop-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: var(--ease);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.prop-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(13,17,23,.10);
+  border-color: rgba(193,155,118,.4);
+  color: inherit;
+}
+.prop-img-wrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: var(--mist);
+}
+.prop-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.prop-card:hover .prop-img { transform: scale(1.04); }
+.prop-badge {
+  position: absolute; top: 10px; left: 10px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 0.7rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  font-family: var(--body);
+}
+.prop-badge.sale { background: var(--sale); color: var(--white); }
+.prop-badge.rent { background: var(--lease); color: var(--white); }
+.prop-badge.residential { background: rgba(13,17,23,.75); color: var(--white); }
+.prop-badge.commercial  { background: rgba(139,115,85,.85); color: var(--white); }
+.prop-badge.land        { background: rgba(22,163,74,.85); color: var(--white); }
+.prop-no-img {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--slate);
+}
+.prop-no-img i { font-size: 2.5rem; opacity: 0.35; }
+.prop-body { padding: 1rem 1.1rem 1.2rem; }
+.prop-title {
+  font-family: var(--display);
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+.prop-location {
+  font-size: 0.78rem; color: var(--slate);
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 0.85rem;
+}
+.prop-price {
+  font-family: var(--display);
+  font-size: 1.35rem; font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+.prop-price small {
+  font-family: var(--body);
+  font-size: 0.7rem; font-weight: 500;
+  color: var(--slate);
+}
+.prop-specs {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+.prop-spec {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.78rem; color: var(--slate); font-weight: 500;
+}
+.prop-spec i { color: var(--gold-dk); font-size: 0.85rem; }
+.no-listings-msg {
+  grid-column: 1/-1;
+  text-align: center; padding: 3rem 1rem;
+  color: var(--slate); font-size: 0.9rem;
+}
+.no-listings-msg i { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; opacity: 0.35; }
+.view-all-wrap { text-align: center; margin-top: 2rem; }
+.btn-view-all {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0.8rem 2rem;
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  font-weight: 700; font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-family: var(--body);
+  transition: var(--ease);
+}
+.btn-view-all:hover { background: var(--ink); color: var(--gold); transform: translateY(-2px); }
+
+/* ── POPULAR LOCATIONS ── */
+.locations-section {
+  background: var(--white);
+  padding: 5rem 0;
+  border-top: 1px solid var(--mist);
+}
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.location-card {
+  background: var(--ivory);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.1rem;
+  text-decoration: none;
+  color: inherit;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem;
+  transition: var(--ease);
+}
+.location-card:hover {
+  background: var(--ink);
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-dark);
+  color: var(--white);
+}
+.location-card:hover .loc-icon { background: rgba(193,155,118,.2); color: var(--gold); }
+.location-card:hover .loc-name { color: var(--white); }
+.location-card:hover .loc-count { color: rgba(255,255,255,.5); }
+.location-card:hover .loc-arrow { color: var(--gold); opacity: 1; }
+.loc-left { display: flex; align-items: center; gap: 0.85rem; }
+.loc-icon {
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: rgba(193,155,118,.1);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: var(--gold-dk);
+  transition: var(--ease);
+}
+.loc-name { font-family: var(--display); font-size: 1rem; font-weight: 600; color: var(--ink); transition: var(--ease); }
+.loc-count { font-size: 0.72rem; color: var(--slate); margin-top: 1px; transition: var(--ease); }
+.loc-arrow { color: var(--slate); opacity: 0; font-size: 0.9rem; transition: var(--ease); }
+
+/* ── FEATURES ── */
+.features-section { background: var(--ivory); padding: 5rem 0; }
+.features-header { margin-bottom: 3rem; }
+.features-header h2 { font-size: clamp(1.8rem, 4vw, 3rem); color: var(--ink); margin-bottom: 0.5rem; }
 .feature-grid { display: grid; grid-template-columns: 1fr; gap: 0; border: 1px solid rgba(13,17,23,.10); border-radius: var(--radius); overflow: hidden; }
 .feature-row { display: grid; grid-template-columns: 60px 1fr; border-bottom: 1px solid rgba(13,17,23,.08); transition: var(--ease); background: var(--white); }
 .feature-row:last-child { border-bottom: none; }
@@ -156,23 +447,92 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--display); font-weight: 600; line-hei
 .feat-desc { font-size: 0.82rem; color: var(--slate); line-height: 1.65; margin: 0; transition: var(--ease); }
 .feat-arrow { color: var(--slate); opacity: 0; font-size: 0.9rem; transition: var(--ease); flex-shrink: 0; margin-top: 2px; }
 
-/* PROMISE */
-.promise-section { background: var(--ink); padding: 6rem 0; position: relative; overflow: hidden; }
+/* ── AGENT / LANDLORD CTA ── */
+.list-cta-section {
+  background: var(--ink);
+  padding: 5rem 0;
+  position: relative; overflow: hidden;
+}
+.list-cta-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 85% 50%, rgba(193,155,118,.08) 0%, transparent 50%),
+    radial-gradient(circle at 15% 50%, rgba(193,155,118,.05) 0%, transparent 40%);
+  pointer-events: none;
+}
+.list-cta-inner { position: relative; z-index: 1; }
+.list-cta-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+.list-cta-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius);
+  padding: 2rem 1.75rem;
+  transition: var(--ease);
+}
+.list-cta-card:hover {
+  background: rgba(193,155,118,.08);
+  border-color: rgba(193,155,118,.25);
+  transform: translateY(-4px);
+}
+.list-cta-icon {
+  width: 52px; height: 52px;
+  background: rgba(193,155,118,.12);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: var(--gold);
+  margin-bottom: 1.25rem;
+}
+.list-cta-card h3 {
+  font-family: var(--display); font-size: 1.4rem;
+  color: var(--white); margin-bottom: 0.6rem;
+}
+.list-cta-card p {
+  font-size: 0.85rem; color: rgba(255,255,255,.5);
+  line-height: 1.75; margin-bottom: 1.5rem;
+}
+.list-cta-bullets {
+  list-style: none; padding: 0; margin-bottom: 1.75rem;
+}
+.list-cta-bullets li {
+  font-size: 0.82rem; color: rgba(255,255,255,.6);
+  padding: 0.3rem 0;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.list-cta-bullets li i { color: var(--gold); font-size: 0.75rem; flex-shrink: 0; }
+.btn-list-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0.75rem 1.6rem;
+  background: var(--gold); color: var(--ink);
+  font-weight: 700; font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-family: var(--body);
+  transition: var(--ease);
+}
+.btn-list-cta:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: var(--shadow-gold); color: var(--ink); }
+
+/* ── PROMISE ── */
+.promise-section { background: var(--ink); padding: 5rem 0; position: relative; overflow: hidden; }
 .promise-section::before { content: 'EW'; position: absolute; font-family: var(--display); font-size: 32vw; font-weight: 700; color: rgba(255,255,255,.02); top: 50%; left: 50%; transform: translate(-50%, -50%); letter-spacing: -10px; pointer-events: none; white-space: nowrap; }
-.promise-header h2 { font-size: clamp(2rem, 5vw, 3.6rem); color: var(--white); margin-bottom: 1rem; }
-.promise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 3.5rem; border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); overflow: hidden; }
-.promise-item { padding: 2rem 1.75rem; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); transition: var(--ease); }
+.promise-header h2 { font-size: clamp(1.8rem, 4vw, 3.2rem); color: var(--white); margin-bottom: 1rem; }
+.promise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 3rem; border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); overflow: hidden; }
+.promise-item { padding: 1.75rem; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); transition: var(--ease); }
 .promise-item:hover { background: rgba(193,155,118,.07); border-color: rgba(193,155,118,.2); }
 .promise-num { font-family: var(--display); font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 0.75rem; opacity: 0.8; }
-.promise-item h4 { font-size: 1.05rem; color: var(--white); margin-bottom: 0.5rem; }
-.promise-item p  { font-size: 0.82rem; color: rgba(255,255,255,.48); line-height: 1.7; margin: 0; }
+.promise-item h4 { font-size: 1rem; color: var(--white); margin-bottom: 0.4rem; }
+.promise-item p  { font-size: 0.8rem; color: rgba(255,255,255,.45); line-height: 1.7; margin: 0; }
 
-/* CTA */
-.cta-section { background: var(--gold); padding: 5.5rem 0; position: relative; overflow: hidden; }
+/* ── CTA ── */
+.cta-section { background: var(--gold); padding: 5rem 0; position: relative; overflow: hidden; }
 .cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 90% 50%, rgba(255,255,255,.12) 0%, transparent 50%), radial-gradient(circle at 10% 50%, rgba(0,0,0,.08) 0%, transparent 50%); pointer-events: none; }
 .cta-inner { position: relative; z-index: 1; text-align: center; }
-.cta-inner h2 { font-size: clamp(2rem, 5vw, 4rem); color: var(--ink); margin-bottom: 1rem; letter-spacing: -0.5px; }
-.cta-inner p { font-size: clamp(0.9rem, 1.5vw, 1.1rem); color: rgba(13,17,23,.68); margin-bottom: 2.5rem; max-width: 560px; margin-left: auto; margin-right: auto; line-height: 1.8; }
+.cta-inner h2 { font-size: clamp(1.8rem, 4vw, 3.5rem); color: var(--ink); margin-bottom: 1rem; letter-spacing: -0.5px; }
+.cta-inner p { font-size: clamp(0.9rem, 1.5vw, 1rem); color: rgba(13,17,23,.68); margin-bottom: 2.5rem; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.8; }
 .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 .btn-cta-dark { display: inline-flex; align-items: center; gap: 8px; padding: 0.95rem 2.2rem; background: var(--ink); color: var(--white); font-weight: 700; font-size: 0.88rem; border-radius: var(--radius-sm); text-decoration: none; border: none; cursor: pointer; font-family: var(--body); transition: var(--ease); letter-spacing: 0.3px; }
 .btn-cta-dark:hover { background: var(--ink-soft); color: var(--gold); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(13,17,23,.3); }
@@ -184,7 +544,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--display); font-weight: 600; line-hei
 .cta-dropdown-menu .dropdown-item { color: rgba(255,255,255,.8); }
 .cta-dropdown-menu .dropdown-item:hover { background: rgba(193,155,118,.15); color: var(--gold); }
 
-/* FOOTER */
+/* ── FOOTER ── */
 footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; border-top: 1px solid rgba(255,255,255,.05); }
 .footer-brand { font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: var(--gold); margin-bottom: 0.85rem; display: block; }
 .footer-about { color: rgba(255,255,255,.42); font-size: 0.85rem; line-height: 1.85; margin-bottom: 0; max-width: 300px; }
@@ -204,31 +564,40 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
 .footer-bottom a { color: rgba(255,255,255,.28); text-decoration: none; transition: color 0.2s; }
 .footer-bottom a:hover { color: var(--gold); }
 
-
-/* ══════════════════════════════════════════════════════
-   640px+ — 4 cards in a row
-   ══════════════════════════════════════════════════════ */
-@media (min-width: 640px) {
-  .account-cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    overflow-x: unset;
-  }
+/* ── RESPONSIVE ── */
+@media (min-width: 580px) {
+  .account-cards { display: grid; grid-template-columns: repeat(3, 1fr); overflow-x: unset; }
   .account-card { min-width: unset; }
+  .stats-inner { grid-template-columns: repeat(4, 1fr); }
+  .prop-grid { grid-template-columns: repeat(2, 1fr); }
+  .locations-grid { grid-template-columns: repeat(3, 1fr); }
+  .list-cta-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 640px) {
+  .account-cards { grid-template-columns: repeat(4, 1fr); }
   .promise-grid { grid-template-columns: repeat(2, 1fr); }
+  .browse-strip-inner { flex-direction: row; justify-content: center; }
 }
 
 @media (min-width: 900px) {
   .hero { padding: 0; }
+  .account-cards { grid-template-columns: repeat(5, 1fr); }
+  .prop-grid { grid-template-columns: repeat(3, 1fr); }
+  .locations-grid { grid-template-columns: repeat(3, 1fr); }
   .feature-row { grid-template-columns: 80px 1fr; }
   .feat-num { font-size: 0.78rem; padding: 1.75rem 0 0; }
   .feat-body { padding: 1.75rem 2rem; }
   .promise-grid { grid-template-columns: repeat(4, 1fr); }
-  .promise-num { font-size: 3.5rem; }
-  .features-section { padding: 8rem 0; }
-  .promise-section  { padding: 8rem 0; }
-  .cta-section      { padding: 8rem 0; }
+  .promise-num { font-size: 3.2rem; }
+  .featured-section { padding: 6rem 0; }
+  .locations-section { padding: 6rem 0; }
+  .features-section { padding: 6rem 0; }
+  .promise-section  { padding: 6rem 0; }
+  .cta-section      { padding: 6rem 0; }
+  .list-cta-section { padding: 6rem 0; }
   footer            { padding: 6rem 0 2rem; }
+  .search-field { min-width: 160px; }
 }
 
 @media (max-width: 991px) {
@@ -236,74 +605,6 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   .btn-nav { display: block; width: 100%; text-align: center; margin-top: 0.5rem; }
   .dropdown-menu { background: rgba(255,255,255,.04); box-shadow: none; border: 1px solid rgba(255,255,255,.08); }
   .messages-container { top: 0.75rem; right: 0.75rem; left: 0.75rem; max-width: none; }
-}
-
-/* ── BROWSE STRIP ── */
-.browse-strip {
-  background: var(--ink-soft);
-  border-bottom: 1px solid rgba(193,155,118,.15);
-  padding: 0.75rem 0;
-}
-
-.browse-strip-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  text-align: center;
-}
-
-.browse-strip-text {
-  display: flex; align-items: center; gap: 0.55rem;
-  font-size: 0.82rem; color: rgba(255,255,255,.6);
-}
-.browse-strip-text i { color: var(--gold); font-size: 0.88rem; flex-shrink: 0; }
-.browse-strip-text strong { color: rgba(255,255,255,.85); }
-
-.browse-strip-btns {
-  display: flex; gap: 0.6rem;
-}
-
-.browse-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 0.45rem 1.1rem;
-  border-radius: 20px; font-size: 0.78rem; font-weight: 700;
-  text-decoration: none; transition: var(--ease);
-  border: 1.5px solid transparent;
-}
-.browse-btn.sale {
-  background: rgba(37,99,235,.18);
-  border-color: rgba(37,99,235,.35);
-  color: #93c5fd;
-}
-.browse-btn.sale:hover {
-  background: rgba(37,99,235,.3);
-  color: #bfdbfe;
-  transform: translateY(-1px);
-}
-.browse-btn.lease {
-  background: rgba(22,163,74,.18);
-  border-color: rgba(22,163,74,.35);
-  color: #86efac;
-}
-.browse-btn.lease:hover {
-  background: rgba(22,163,74,.3);
-  color: #bbf7d0;
-  transform: translateY(-1px);
-}
-
-@media (min-width: 640px) {
-  .browse-strip-inner {
-    flex-direction: row;
-    justify-content: center;
-    text-align: left;
-  }
-}
-
-@media (min-width: 900px) {
-  .browse-strip { padding: 0.85rem 0; }
-  .browse-strip-text { font-size: 0.88rem; }
-  .browse-btn { font-size: 0.82rem; padding: 0.5rem 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -314,7 +615,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- ══════════ NAVBAR ══════════ -->
 <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand" href="#">
@@ -327,7 +628,6 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center">
         <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About Us</a></li>
-
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="browseDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Browse</a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="browseDropdown">
@@ -346,7 +646,6 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
             </li>
           </ul>
         </li>
-
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Register</a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
@@ -367,14 +666,13 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
             <li>
               <a class="dropdown-item" href="{% url 'register-company' %}">
                 <i class="bi bi-building"></i>
-                <div><strong>Company</strong><small class="d-block">Manage properties at scale with full control</small></div>
+                <div><strong>Company</strong><small class="d-block">Manage properties at scale</small></div>
               </a>
             </li>
             <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
-
             <li>
               <a class="dropdown-item" href="{% url 'register-landlord' %}">
-                <i class="bi bi-shield-shaded text-success"></i>
+                <i class="bi bi-shield-shaded"></i>
                 <div><strong>Landlord</strong><small class="d-block">Secure your property and find reliable tenants</small></div>
               </a>
             </li>
@@ -386,8 +684,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   </div>
 </nav>
 
-
-<!-- ALERTS -->
+<!-- ══════════ ALERTS ══════════ -->
 <div class="messages-container">
   {% if messages %}
     {% for message in messages %}
@@ -416,19 +713,59 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   {% endif %}
 </div>
 
-
-<!-- HERO -->
+<!-- ══════════ HERO ══════════ -->
 <section class="hero" id="hero">
   <div class="hero-index" aria-hidden="true">EW</div>
   <div class="container">
     <div class="hero-inner">
-    <h1 class="hero-title">
-      Estate Web: Bringing <em>Trust</em> to Real Estate in Nigeria
-    </h1>
+      <h1>Find <em>Verified</em> Properties<br>Across Nigeria</h1>
       <p class="hero-sub">
-        A smarter platform that reduces hidden fees, verifies listings, and make  renting simpler for everyone
+        Buy, rent, and list real estate with confidence. Verified agents, transparent listings, and tools built for how Nigerians actually use property.
       </p>
 
+      <!-- SEARCH BOX -->
+      <div class="hero-search-box">
+        <div class="search-tabs">
+          <button class="search-tab active-sale" id="tabSale" onclick="switchSearchTab('sale')">
+            <i class="bi bi-house-fill"></i> For Sale
+          </button>
+          <button class="search-tab" id="tabRent" onclick="switchSearchTab('rent')">
+            <i class="bi bi-key-fill"></i> For Rent
+          </button>
+        </div>
+        <div class="search-row">
+          <div class="search-field">
+            <label for="searchState">State</label>
+            <select id="searchState">
+              <option value="">Any State</option>
+              <option value="Lagos">Lagos</option>
+              <option value="Abuja">Abuja (FCT)</option>
+              <option value="Rivers">Rivers</option>
+              <option value="Ogun">Ogun</option>
+              <option value="Oyo">Oyo</option>
+              <option value="Kano">Kano</option>
+              <option value="Anambra">Anambra</option>
+              <option value="Delta">Delta</option>
+              <option value="Enugu">Enugu</option>
+              <option value="Kaduna">Kaduna</option>
+            </select>
+          </div>
+          <div class="search-field">
+            <label for="searchCategory">Property Type</label>
+            <select id="searchCategory">
+              <option value="">Any Type</option>
+              <option value="Residential">Residential</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Land">Land</option>
+            </select>
+          </div>
+          <button class="btn-search" id="searchBtn" onclick="doSearch()">
+            <i class="bi bi-search"></i> Search
+          </button>
+        </div>
+      </div>
+
+      <!-- SIGN IN + LEARN MORE -->
       <div class="hero-cta-strip">
         <a href="{% url 'login' %}" class="btn-hero-primary">
           <i class="bi bi-box-arrow-in-right"></i> Sign In
@@ -438,56 +775,49 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         </a>
       </div>
 
+      <!-- ACCOUNT CARDS -->
       <div class="account-strip">
         <span class="account-label">
           <span class="gold-rule"></span> Get Started — Choose Your Account
         </span>
         <div class="account-cards">
-
           <a href="{% url 'register-customer' %}" class="account-card">
             <div class="account-card-icon">👤</div>
             <h3>Customer</h3>
             <p>Find trusted properties with ease</p>
             <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
           </a>
-
           <a href="{% url 'register-agent' %}" class="account-card">
             <div class="account-card-icon">🏅</div>
             <h3>Agent</h3>
             <p>List properties and grow your business</p>
             <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
           </a>
-
           <a href="{% url 'register-company' %}" class="account-card">
             <div class="account-card-icon">🏢</div>
             <h3>Company</h3>
             <p>Manage properties at scale with full control</p>
             <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
           </a>
-
           <a href="{% url 'register-landlord' %}" class="account-card">
             <div class="account-card-icon">🤵</div>
             <h3>Landlord</h3>
             <p>Secure your property and find reliable tenants</p>
             <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
           </a>
-
-          <!-- Investor — coming soon -->
           <div class="account-card account-card-soon">
-            <div class="account-card-soon-badge">Coming Soon</div>
+            <div class="account-card-soon-badge">Soon</div>
             <div class="account-card-icon">💼</div>
             <h3>Investor</h3>
             <p>Real estate investment opportunities</p>
           </div>
-
         </div>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- BROWSE STRIP — no account needed -->
+<!-- ══════════ BROWSE STRIP ══════════ -->
 <div class="browse-strip">
   <div class="container">
     <div class="browse-strip-inner">
@@ -497,20 +827,41 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
       </div>
       <div class="browse-strip-btns">
         <a href="{% url 'customer:buy-property' %}" class="browse-btn sale">
-          <i class="bi bi-house-fill"></i>
-          <span>For Sale</span>
+          <i class="bi bi-house-fill"></i><span>For Sale</span>
         </a>
         <a href="{% url 'customer:rent-property' %}" class="browse-btn lease">
-          <i class="bi bi-key-fill"></i>
-          <span>For Rent</span>
+          <i class="bi bi-key-fill"></i><span>For Rent</span>
         </a>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ══════════ STATS STRIP ══════════ -->
+<div class="stats-strip">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-num">{{ total_sale_listings|default:"0" }}<span>+</span></div>
+        <div class="stat-label">Properties For Sale</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ total_rent_listings|default:"0" }}<span>+</span></div>
+        <div class="stat-label">Properties For Rent</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ total_agents|default:"0" }}<span>+</span></div>
+        <div class="stat-label">Verified Agents</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">{{ total_companies|default:"0" }}<span>+</span></div>
+        <div class="stat-label">Listed Companies</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<!-- TICKER -->
+<!-- ══════════ TICKER ══════════ -->
 <div class="ticker-wrap" aria-hidden="true">
   <div class="ticker-track">
     <span class="ticker-item">Verified Listings<span class="ticker-dot"></span></span>
@@ -530,8 +881,226 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   </div>
 </div>
 
+<!-- ══════════ FEATURED PROPERTIES ══════════ -->
+<section class="featured-section">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+      <div class="section-header" style="margin-bottom:0">
+        <span class="eyebrow"><span class="gold-rule"></span>Featured Properties</span>
+        <h2>Top listings right now</h2>
+        <p class="section-sub">Highest-ranked properties based on verification and activity</p>
+      </div>
+      <!-- Tab switcher aligned to right on desktop -->
+      <div class="fp-tabs" style="align-self:flex-end">
+        <button class="fp-tab active" id="fpTabSale" onclick="switchFPTab('sale')">
+          <i class="bi bi-house-fill" style="color:#2563eb"></i> For Sale
+        </button>
+        <button class="fp-tab" id="fpTabRent" onclick="switchFPTab('rent')">
+          <i class="bi bi-key-fill" style="color:#16a34a"></i> For Rent
+        </button>
+      </div>
+    </div>
 
-<!-- FEATURES -->
+    <!-- SALE PANEL -->
+    <div class="fp-tab-panel active" id="fpPanelSale">
+      <div class="prop-grid">
+        {% for prop in featured_sale %}
+          <a href="{% url 'customer:view-property-s' prop.id %}" class="prop-card">
+            <div class="prop-img-wrap">
+              {% if prop.base_image %}
+                <img src="{{ prop.base_image.url }}" alt="Property image" class="prop-img" loading="lazy">
+              {% else %}
+                <div class="prop-no-img"><i class="bi bi-image"></i></div>
+              {% endif %}
+              <span class="prop-badge sale">For Sale</span>
+              <span class="prop-badge residential" style="left:auto;right:10px;">
+                {{ prop.property_category }}
+              </span>
+            </div>
+            <div class="prop-body">
+              <div class="prop-title">
+                {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+                {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+                {% else %}{{ prop.lands }}{% endif %}
+              </div>
+              <div class="prop-location">
+                <i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i>
+                {{ prop.location }}{% if prop.state %}, {{ prop.state }}{% endif %}
+              </div>
+              <div class="prop-price">
+                ₦{% if prop.price %}{{ prop.price|floatformat:0 }}{% else %}{{ prop.price_range }}{% endif %}
+              </div>
+              <div class="prop-specs">
+                {% if prop.bedrooms %}
+                  <div class="prop-spec"><i class="bi bi-door-open"></i> {{ prop.bedrooms }} bed</div>
+                {% endif %}
+                {% if prop.bathrooms %}
+                  <div class="prop-spec"><i class="bi bi-water"></i> {{ prop.bathrooms }} bath</div>
+                {% endif %}
+                {% if prop.size %}
+                  <div class="prop-spec"><i class="bi bi-arrows-angle-expand"></i> {{ prop.size }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% empty %}
+          <div class="no-listings-msg">
+            <i class="bi bi-house"></i>
+            No featured sale listings yet. Check back soon.
+          </div>
+        {% endfor %}
+      </div>
+      {% if featured_sale %}
+        <div class="view-all-wrap">
+          <a href="{% url 'customer:buy-property' %}" class="btn-view-all">
+            View All Sale Properties <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- RENT PANEL -->
+    <div class="fp-tab-panel" id="fpPanelRent">
+      <div class="prop-grid">
+        {% for prop in featured_rent %}
+          <a href="{% url 'customer:view-property-r' prop.id %}" class="prop-card">
+            <div class="prop-img-wrap">
+              {% if prop.base_image %}
+                <img src="{{ prop.base_image.url }}" alt="Property image" class="prop-img" loading="lazy">
+              {% else %}
+                <div class="prop-no-img"><i class="bi bi-image"></i></div>
+              {% endif %}
+              <span class="prop-badge rent">For Rent</span>
+              <span class="prop-badge residential" style="left:auto;right:10px;">
+                {{ prop.property_category }}
+              </span>
+            </div>
+            <div class="prop-body">
+              <div class="prop-title">
+                {% if prop.property_category == 'Residential' %}{{ prop.residential }}
+                {% elif prop.property_category == 'Commercial' %}{{ prop.commercial }}
+                {% else %}{{ prop.lands }}{% endif %}
+              </div>
+              <div class="prop-location">
+                <i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i>
+                {{ prop.location }}{% if prop.state %}, {{ prop.state }}{% endif %}
+              </div>
+              <div class="prop-price">
+                ₦{% if prop.price %}{{ prop.price|floatformat:0 }}{% else %}{{ prop.price_range }}{% endif %}
+                <small>/yr</small>
+              </div>
+              <div class="prop-specs">
+                {% if prop.bedrooms %}
+                  <div class="prop-spec"><i class="bi bi-door-open"></i> {{ prop.bedrooms }} bed</div>
+                {% endif %}
+                {% if prop.bathrooms %}
+                  <div class="prop-spec"><i class="bi bi-water"></i> {{ prop.bathrooms }} bath</div>
+                {% endif %}
+                {% if prop.size %}
+                  <div class="prop-spec"><i class="bi bi-arrows-angle-expand"></i> {{ prop.size }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% empty %}
+          <div class="no-listings-msg">
+            <i class="bi bi-key"></i>
+            No featured rent listings yet. Check back soon.
+          </div>
+        {% endfor %}
+      </div>
+      {% if featured_rent %}
+        <div class="view-all-wrap">
+          <a href="{% url 'customer:rent-property' %}" class="btn-view-all">
+            View All Rent Properties <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ POPULAR LOCATIONS ══════════ -->
+<section class="locations-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow"><span class="gold-rule"></span>Browse By Location</span>
+      <h2>Popular property markets</h2>
+      <p class="section-sub">Search active listings in Nigeria's top real estate locations</p>
+    </div>
+    <div class="locations-grid">
+
+      <a href="{% url 'customer:buy-property' %}?state=Lagos" class="location-card">
+        <div class="loc-left">
+          <div class="loc-icon"><i class="bi bi-buildings"></i></div>
+          <div>
+            <div class="loc-name">Lagos</div>
+            <div class="loc-count">Lekki · VI · Ikoyi · Ikeja</div>
+          </div>
+        </div>
+        <i class="bi bi-arrow-right loc-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:buy-property' %}?state=Abuja" class="location-card">
+        <div class="loc-left">
+          <div class="loc-icon"><i class="bi bi-bank"></i></div>
+          <div>
+            <div class="loc-name">Abuja</div>
+            <div class="loc-count">Maitama · Asokoro · Wuse</div>
+          </div>
+        </div>
+        <i class="bi bi-arrow-right loc-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:buy-property' %}?state=Rivers" class="location-card">
+        <div class="loc-left">
+          <div class="loc-icon"><i class="bi bi-water"></i></div>
+          <div>
+            <div class="loc-name">Port Harcourt</div>
+            <div class="loc-count">GRA · Diobu · Rumuola</div>
+          </div>
+        </div>
+        <i class="bi bi-arrow-right loc-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:buy-property' %}?state=Ogun" class="location-card">
+        <div class="loc-left">
+          <div class="loc-icon"><i class="bi bi-tree"></i></div>
+          <div>
+            <div class="loc-name">Ogun</div>
+            <div class="loc-count">Sagamu · Abeokuta · Ota</div>
+          </div>
+        </div>
+        <i class="bi bi-arrow-right loc-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:buy-property' %}?state=Oyo" class="location-card">
+        <div class="loc-left">
+          <div class="loc-icon"><i class="bi bi-geo"></i></div>
+          <div>
+            <div class="loc-name">Ibadan</div>
+            <div class="loc-count">Bodija · Ring Road · UI</div>
+          </div>
+        </div>
+        <i class="bi bi-arrow-right loc-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:buy-property' %}" class="location-card">
+        <div class="loc-left">
+          <div class="loc-icon"><i class="bi bi-map"></i></div>
+          <div>
+            <div class="loc-name">Other States</div>
+            <div class="loc-count">Enugu · Delta · Kano · More</div>
+          </div>
+        </div>
+        <i class="bi bi-arrow-right loc-arrow"></i>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PLATFORM FEATURES ══════════ -->
 <section class="features-section">
   <div class="container">
     <div class="features-header">
@@ -543,7 +1112,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <div class="feat-num">01</div>
         <div class="feat-body">
           <div class="feat-icon"><i class="bi bi-shield-check"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Verified Listings</h3><p class="feat-desc">Every property is verified for authenticity and quality — no ghost listings, no surprises.</p></div>
+          <div class="feat-content"><h3 class="feat-title">Verified Listings</h3><p class="feat-desc">Every property is checked for authenticity — no ghost listings, no surprises when you visit.</p></div>
           <i class="bi bi-arrow-right feat-arrow"></i>
         </div>
       </div>
@@ -551,7 +1120,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <div class="feat-num">02</div>
         <div class="feat-body">
           <div class="feat-icon"><i class="bi bi-search-heart"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Smart Search & Filters</h3><p class="feat-desc">Find what you're looking for fast with intelligent filters by price, location, type, and more.</p></div>
+          <div class="feat-content"><h3 class="feat-title">Smart Search & Filters</h3><p class="feat-desc">Find what you're looking for fast — filter by price, state, property type, bedrooms, and more.</p></div>
           <i class="bi bi-arrow-right feat-arrow"></i>
         </div>
       </div>
@@ -559,7 +1128,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <div class="feat-num">03</div>
         <div class="feat-body">
           <div class="feat-icon"><i class="bi bi-phone"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Direct Contact</h3><p class="feat-desc">Connect directly with owners and agents — no middlemen, no delays.</p></div>
+          <div class="feat-content"><h3 class="feat-title">Direct Contact</h3><p class="feat-desc">Connect directly with owners and agents — no middlemen, no unnecessary delays.</p></div>
           <i class="bi bi-arrow-right feat-arrow"></i>
         </div>
       </div>
@@ -567,7 +1136,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <div class="feat-num">04</div>
         <div class="feat-body">
           <div class="feat-icon"><i class="bi bi-graph-up-arrow"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Market Insights</h3><p class="feat-desc">Real-time analytics and market trends to help you make smarter property decisions.</p></div>
+          <div class="feat-content"><h3 class="feat-title">Market Insights</h3><p class="feat-desc">Real-time analytics and trends to help you make smarter property decisions.</p></div>
           <i class="bi bi-arrow-right feat-arrow"></i>
         </div>
       </div>
@@ -575,7 +1144,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <div class="feat-num">05</div>
         <div class="feat-body">
           <div class="feat-icon"><i class="bi bi-bookmark-heart"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Save Favourites</h3><p class="feat-desc">Wishlist your favourite properties and compare them side by side at your own pace.</p></div>
+          <div class="feat-content"><h3 class="feat-title">Save Favourites & Compare</h3><p class="feat-desc">Wishlist your favourite properties and compare them side by side at your own pace.</p></div>
           <i class="bi bi-arrow-right feat-arrow"></i>
         </div>
       </div>
@@ -583,15 +1152,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <div class="feat-num">06</div>
         <div class="feat-body">
           <div class="feat-icon"><i class="bi bi-tools"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Productive Tools</h3><p class="feat-desc">Built-in lead management, appointments, and analytics — everything agents and companies need.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feat-num">07</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-headset"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Dedicated Support</h3><p class="feat-desc">Our support team is always on hand to help with any questions or issues you encounter.</p></div>
+          <div class="feat-content"><h3 class="feat-title">Agent & Company Tools</h3><p class="feat-desc">Built-in lead management, appointments, and analytics — everything agents and companies need.</p></div>
           <i class="bi bi-arrow-right feat-arrow"></i>
         </div>
       </div>
@@ -599,28 +1160,76 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   </div>
 </section>
 
+<!-- ══════════ AGENT / LANDLORD CTA ══════════ -->
+<section class="list-cta-section">
+  <div class="container">
+    <div class="list-cta-inner">
+      <div style="text-align:center;margin-bottom:3rem">
+        <span class="eyebrow eyebrow-light"><span class="gold-rule"></span>For Agents & Landlords</span>
+        <h2 style="font-size:clamp(1.8rem,4vw,3rem);color:var(--white);margin-bottom:.75rem">
+          List your property<br><em style="color:var(--gold)">in minutes</em>
+        </h2>
+        <p style="color:rgba(255,255,255,.48);font-size:.88rem;max-width:480px;margin:0 auto;line-height:1.8">
+          Estate Web gives you the tools to reach more buyers and tenants. No technical knowledge required.
+        </p>
+      </div>
+      <div class="list-cta-grid">
 
-<!-- PROMISE -->
+        <div class="list-cta-card">
+          <div class="list-cta-icon"><i class="bi bi-award-fill"></i></div>
+          <h3>Individual Agents</h3>
+          <p>Build your profile, list up to 6 live properties, manage leads from your own dashboard, and get discovered by thousands of buyers.</p>
+          <ul class="list-cta-bullets">
+            <li><i class="bi bi-check-circle-fill"></i> Personal dashboard & analytics</li>
+            <li><i class="bi bi-check-circle-fill"></i> Leads, inquiries & appointments</li>
+            <li><i class="bi bi-check-circle-fill"></i> Verified agent badge</li>
+            <li><i class="bi bi-check-circle-fill"></i> Sell &amp; rent listings</li>
+          </ul>
+          <a href="{% url 'register-agent' %}" class="btn-list-cta">
+            <i class="bi bi-person-plus"></i> Register as Agent
+          </a>
+        </div>
+
+        <div class="list-cta-card">
+          <div class="list-cta-icon"><i class="bi bi-building-fill"></i></div>
+          <h3>Real Estate Companies</h3>
+          <p>Manage your entire team of agents, control a large property portfolio, and unlock company-tier analytics — all from one place.</p>
+          <ul class="list-cta-bullets">
+            <li><i class="bi bi-check-circle-fill"></i> Unlimited team members via invite</li>
+            <li><i class="bi bi-check-circle-fill"></i> Company-wide lead management</li>
+            <li><i class="bi bi-check-circle-fill"></i> Starter → Growth → Enterprise tiers</li>
+            <li><i class="bi bi-check-circle-fill"></i> Verified company badge</li>
+          </ul>
+          <a href="{% url 'register-company' %}" class="btn-list-cta">
+            <i class="bi bi-building"></i> Register Company
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PROMISE ══════════ -->
 <section class="promise-section">
   <div class="container">
     <div class="promise-header text-center">
       <span class="eyebrow eyebrow-light"><span class="gold-rule"></span>Our Promise</span>
-      <h2 style="color:var(--white)">Your smarter way to<br><em style="color:var(--gold)">find, sell, and manage</em> properties</h2>
-      <p style="color:rgba(255,255,255,.48);font-size:.9rem;max-width:500px;margin:1rem auto 0;line-height:1.8;">
+      <h2>Your smarter way to<br><em style="color:var(--gold)">find, sell, and manage</em> properties</h2>
+      <p style="color:rgba(255,255,255,.48);font-size:.88rem;max-width:500px;margin:1rem auto 0;line-height:1.8;">
         Join early adopters discovering how simple real estate can be when everything you need lives in one place.
       </p>
     </div>
     <div class="promise-grid">
       <div class="promise-item"><div class="promise-num">01</div><h4>Easy to Use</h4><p>Intuitive for everyone — first-time buyers to seasoned professionals.</p></div>
-      <div class="promise-item"><div class="promise-num">02</div><h4>Secure Platform</h4><p>Your data and transactions protected with industry-grade security.</p></div>
-      <div class="promise-item"><div class="promise-num">03</div><h4>Transparent Process</h4><p>No hidden fees. Clear pricing and straightforward transactions throughout.</p></div>
+      <div class="promise-item"><div class="promise-num">02</div><h4>Secure Platform</h4><p>Your data protected with industry-grade security and encrypted authentication.</p></div>
+      <div class="promise-item"><div class="promise-num">03</div><h4>Transparent Process</h4><p>No hidden fees. Clear pricing and straightforward listings throughout.</p></div>
       <div class="promise-item"><div class="promise-num">04</div><h4>Growing Community</h4><p>Join a thriving network of buyers, sellers, and industry professionals.</p></div>
     </div>
   </div>
 </section>
 
-
-<!-- CTA -->
+<!-- ══════════ FINAL CTA ══════════ -->
 <section class="cta-section">
   <div class="container">
     <div class="cta-inner">
@@ -639,7 +1248,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
             </a>
             <a class="dropdown-item" href="{% url 'register-agent' %}">
               <i class="bi bi-award"></i>
-              <div><strong>Agent</strong><small class="d-block">Manage listings and grow your career</small></div>
+              <div><strong>Agent</strong><small class="d-block">List properties and grow</small></div>
             </a>
             <a class="dropdown-item" href="{% url 'register-company' %}">
               <i class="bi bi-building"></i>
@@ -659,8 +1268,7 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
   </div>
 </section>
 
-
-<!-- FOOTER -->
+<!-- ══════════ FOOTER ══════════ -->
 <footer>
   <div class="container">
     <div class="row g-4">
@@ -672,6 +1280,8 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
         <h5 class="footer-heading">Company</h5>
         <ul class="footer-links">
           <li><a href="{% url 'about' %}"><i class="bi bi-arrow-right"></i> About Us</a></li>
+          <li><a href="{% url 'faq' %}"><i class="bi bi-arrow-right"></i> Help & FAQ</a></li>
+          <li><a href="{% url 'partner-with-us' %}"><i class="bi bi-arrow-right"></i> Partner With Us</a></li>
         </ul>
         <h5 class="footer-heading" style="margin-top:1.5rem">Browse Properties</h5>
         <ul class="footer-links">
@@ -694,26 +1304,82 @@ footer { background: #0a0d12; color: var(--white); padding: 4rem 0 1.5rem; borde
       </div>
     </div>
     <div class="footer-bottom">
-&copy; 2026 Estate Web. All rights reserved. | <a href="{% url 'terms-agreement' %}">Legal</a></p>
+      &copy; 2026 Estate Web. All rights reserved. |
+      <a href="{% url 'terms-agreement' %}">Legal</a>
     </div>
   </div>
 </footer>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.alert').forEach(function (alert) {
-      setTimeout(function () { alert.classList.remove('show'); setTimeout(function () { alert.remove(); }, 500); }, 5000);
-    });
+/* ── Auto-dismiss alerts ── */
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.alert').forEach(function (alert) {
+    setTimeout(function () {
+      alert.classList.remove('show');
+      setTimeout(function () { alert.remove(); }, 500);
+    }, 5000);
   });
+});
 
-  function toggleCtaMenu() { document.getElementById('ctaDropdown').classList.toggle('open'); }
+/* ── Hero search tabs ── */
+var currentSearchType = 'sale';
 
-  document.addEventListener('click', function (e) {
-    var wrap = document.querySelector('.cta-dropdown-wrap');
-    if (wrap && !wrap.contains(e.target)) { document.getElementById('ctaDropdown').classList.remove('open'); }
-  });
+function switchSearchTab(type) {
+  currentSearchType = type;
+  var saleTab = document.getElementById('tabSale');
+  var rentTab = document.getElementById('tabRent');
+  saleTab.className = 'search-tab' + (type === 'sale' ? ' active-sale' : '');
+  rentTab.className = 'search-tab' + (type === 'rent' ? ' active-rent' : '');
+}
+
+function doSearch() {
+  var state    = document.getElementById('searchState').value;
+  var category = document.getElementById('searchCategory').value;
+
+  // Build query string — your buy/rent views should filter by ?state= and ?category=
+  var params = new URLSearchParams();
+  if (state)    params.set('state', state);
+  if (category) params.set('category', category);
+
+  var baseUrl = currentSearchType === 'sale'
+    ? '{% url "customer:buy-property" %}'
+    : '{% url "customer:rent-property" %}';
+
+  var qs = params.toString();
+  window.location.href = qs ? baseUrl + '?' + qs : baseUrl;
+}
+
+/* ── Featured properties tabs ── */
+function switchFPTab(type) {
+  var saleTab    = document.getElementById('fpTabSale');
+  var rentTab    = document.getElementById('fpTabRent');
+  var salePanel  = document.getElementById('fpPanelSale');
+  var rentPanel  = document.getElementById('fpPanelRent');
+
+  if (type === 'sale') {
+    saleTab.classList.add('active');
+    rentTab.classList.remove('active');
+    salePanel.classList.add('active');
+    rentPanel.classList.remove('active');
+  } else {
+    rentTab.classList.add('active');
+    saleTab.classList.remove('active');
+    rentPanel.classList.add('active');
+    salePanel.classList.remove('active');
+  }
+}
+
+/* ── Final CTA dropdown ── */
+function toggleCtaMenu() {
+  document.getElementById('ctaDropdown').classList.toggle('open');
+}
+document.addEventListener('click', function (e) {
+  var wrap = document.querySelector('.cta-dropdown-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('ctaDropdown').classList.remove('open');
+  }
+});
 </script>
 
 </body>
