@@ -190,7 +190,7 @@
           {% for field in form %}
             {% if field.is_hidden %}
               {{ field }}
-            {% elif field.name != 'property_category' and field.name != 'residential' and field.name != 'commercial' and field.name != 'lands' %}
+            {% elif field.name != 'property_category' and field.name != 'residential' and field.name != 'commercial' and field.name != 'lands' and field.name != 'property_features' %}
             <div class="form-group">
               <label for="{{ field.id_for_label }}" class="form-label">
                 {% if 'price' in field.name %}
@@ -243,7 +243,34 @@
             </div>
             {% endif %}
           {% endfor %}
+{# ══ PROPERTY FEATURES ══════════════════════════════════════════ #}
+<div class="form-group features-group">
+  <label class="form-label">
+    <i class="bi bi-star-fill"></i> {{ form.property_features.label }}
+  </label>
 
+  <div class="features-grid" id="featuresGrid">
+    {% for checkbox in form.property_features %}
+      <label class="feature-chip">
+        {{ checkbox.tag }}
+        <span>{{ checkbox.choice_label }}</span>
+      </label>
+    {% endfor %}
+  </div>
+
+  <button type="button" class="features-toggle" id="featuresToggle">
+    <i class="bi bi-chevron-down" id="featuresToggleIcon"></i>
+    <span id="featuresToggleText">Show More</span>
+  </button>
+
+  {% if form.property_features.errors %}
+    <div class="field-error">
+      {% for e in form.property_features.errors %}
+        <i class="bi bi-exclamation-circle-fill"></i>{{ e }}
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
         </div>
 
         <div class="step-footer">
@@ -666,7 +693,35 @@ document.addEventListener('DOMContentLoaded', function () {
   cropContainer.addEventListener('click', function (e) {
     if (e.target === cropContainer) closeCrop(true);
   });
+/* ═══════════════════════════════════════════════
+   PROPERTY FEATURES — SHOW MORE / LESS
+═══════════════════════════════════════════════ */
+var featuresGrid   = document.getElementById('featuresGrid');
+var featuresToggle = document.getElementById('featuresToggle');
+var featuresIcon   = document.getElementById('featuresToggleIcon');
+var featuresText   = document.getElementById('featuresToggleText');
 
+if (featuresGrid && featuresToggle) {
+  // Only show the button if content is actually overflowing
+  // ✅ Count chips directly — always reliable
+var chips = featuresGrid ? featuresGrid.querySelectorAll('.feature-chip') : [];
+var CHIPS_PER_ROW = 4; // matches your grid (4 columns on desktop)
+var MAX_VISIBLE_ROWS = 2;
+
+if (chips.length <= CHIPS_PER_ROW * MAX_VISIBLE_ROWS) {
+    featuresToggle.style.display = 'none'; // all fit, no button needed
+} else {
+    featuresToggle.style.display = 'flex'; // there's overflow, show button
+}
+
+  featuresToggle.addEventListener('click', function () {
+    var isExpanded = featuresGrid.classList.toggle('expanded');
+    featuresText.textContent = isExpanded ? 'Show Less' : 'Show More';
+    featuresIcon.className   = isExpanded
+      ? 'bi bi-chevron-up'
+      : 'bi bi-chevron-down';
+  });
+}
 });
 </script>
 

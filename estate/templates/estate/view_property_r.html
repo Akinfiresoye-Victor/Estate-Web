@@ -177,7 +177,27 @@
           </div>
         </div>
       </div>
-
+{# ── Property Amenities / Features ───────────────────────── #}
+{% with property.property_features.all as features %}
+  {% if features %}
+  <div class="section-card">
+    <div class="section-head">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      <h3>Amenities &amp; Features</h3>
+    </div>
+    <div class="section-body">
+      <div class="amenities-grid">
+        {% for f in features %}
+          <div class="amenity-chip">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ f.name }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endwith %}
       {# Map #}
       <div class="section-card">
         <div class="section-head">

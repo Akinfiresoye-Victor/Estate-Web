@@ -31,6 +31,7 @@ urlpatterns = [
     path('schedule/delete/<appointment_uuid>', core_views.delete_appointment, name='delete-appointment'),
     path('faq', core_views.estate_web_guide, name='faq'),
     path('toggle_listing/<str:property_type>/<int:property_id>/', core_views.toggle_listing, name='toggle-listing'),
+    path('ai-description/', core_views.ai_description_generator, name='ai-description'),
     
 ]
 

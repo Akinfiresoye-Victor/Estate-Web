@@ -201,7 +201,7 @@
           {% endif %}
 
           {% for field in form %}
-            {% if field.name != 'property_category' and field.name != 'residential' and field.name != 'commercial' and field.name != 'lands' %}
+            {% if field.name != 'property_category' and field.name != 'residential' and field.name != 'commercial' and field.name != 'lands' and field.name != 'property_features' %}
             <div class="form-group">
               <label for="{{ field.id_for_label }}" class="form-label">
                 {% if 'price' in field.name or 'price_range' in field.name %}
@@ -234,6 +234,24 @@
 
               {% if field.name == 'description' or field.name == 'property_description' %}
                 {{ field|add_class:"form-textarea" }}
+                  <!-- AI hint text -->
+              <div class="ai-hint-text">
+                <i class="bi bi-info-circle"></i>
+                <span>
+                  Tip: Fill in <strong>State, Location, Bedrooms, Bathrooms and Price</strong> first, 
+                  then click Generate — the AI will use those details. Or type a few notes in the box above 
+                  (e.g. <em>"3 bedroom flat in Akure, close to FUTA, has 24hr light"</em>) for a more personalised result.
+                  <br><br>
+                  <strong>⚠️ Note:</strong> This AI feature is experimental. Always review and edit the generated 
+                  description before publishing — it may not always be accurate or well-structured.
+                </span>
+              </div>
+
+                  <button type="button" id="aiDescBtn" class="ai-generate-btn">
+                    <i class="bi bi-stars"></i>
+                    <span id="aiDescBtnText">Generate with AI</span>
+                  </button>
+                  <div id="aiDescStatus" class="ai-status-msg" style="display:none;"></div>
               {% else %}
                 {{ field|add_class:"form-input" }}
               {% endif %}
@@ -249,7 +267,34 @@
             </div>
             {% endif %}
           {% endfor %}
+          {# ══ PROPERTY FEATURES ══════════════════════════════════════════ #}
+          <div class="form-group features-group">
+            <label class="form-label">
+              <i class="bi bi-star-fill"></i> {{ form.property_features.label }}
+            </label>
 
+            <div class="features-grid" id="featuresGrid">
+              {% for checkbox in form.property_features %}
+                <label class="feature-chip">
+                  {{ checkbox.tag }}
+                  <span>{{ checkbox.choice_label }}</span>
+                </label>
+              {% endfor %}
+            </div>
+
+            <button type="button" class="features-toggle" id="featuresToggle">
+              <i class="bi bi-chevron-down" id="featuresToggleIcon"></i>
+              <span id="featuresToggleText">Show More</span>
+            </button>
+
+            {% if form.property_features.errors %}
+              <div class="field-error">
+                {% for e in form.property_features.errors %}
+                  <i class="bi bi-exclamation-circle-fill"></i>{{ e }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
         </div>{# end step-body #}
 
         <div class="step-footer">
@@ -678,8 +723,114 @@ document.addEventListener('DOMContentLoaded', function () {
   cropContainer.addEventListener('click', function (e) {
     if (e.target === cropContainer) closeCrop(true);
   });
+/* ═══════════════════════════════════════════════
+   PROPERTY FEATURES — SHOW MORE / LESS
+═══════════════════════════════════════════════ */
+var featuresGrid   = document.getElementById('featuresGrid');
+var featuresToggle = document.getElementById('featuresToggle');
+var featuresIcon   = document.getElementById('featuresToggleIcon');
+var featuresText   = document.getElementById('featuresToggleText');
 
+if (featuresGrid && featuresToggle) {
+  // Only show the button if content is actually overflowing
+// ✅ Count chips directly — always reliable
+var chips = featuresGrid ? featuresGrid.querySelectorAll('.feature-chip') : [];
+var CHIPS_PER_ROW = 4; // matches your grid (4 columns on desktop)
+var MAX_VISIBLE_ROWS = 2;
+
+if (chips.length <= CHIPS_PER_ROW * MAX_VISIBLE_ROWS) {
+    featuresToggle.style.display = 'none'; // all fit, no button needed
+} else {
+    featuresToggle.style.display = 'flex'; // there's overflow, show button
+}
+
+  featuresToggle.addEventListener('click', function () {
+    var isExpanded = featuresGrid.classList.toggle('expanded');
+    featuresText.textContent = isExpanded ? 'Show Less' : 'Show More';
+    featuresIcon.className   = isExpanded
+      ? 'bi bi-chevron-up'
+      : 'bi bi-chevron-down';
+  });
+}
 });
+/* ═══════════════════════════════════════════════
+   AI DESCRIPTION GENERATOR
+═══════════════════════════════════════════════ */
+var aiDescBtn    = document.getElementById('aiDescBtn');
+var aiDescStatus = document.getElementById('aiDescStatus');
+
+var descTextarea = document.getElementById('id_description') 
+                || document.getElementById('id_property_description');
+
+if (aiDescBtn && descTextarea) {
+  aiDescBtn.addEventListener('click', function () {
+
+    var stateEl     = document.getElementById('id_state');
+    var locationEl  = document.getElementById('id_location');
+    var bedroomsEl  = document.getElementById('id_bedrooms');
+    var bathroomsEl = document.getElementById('id_bathrooms');
+    var priceEl     = document.getElementById('id_price_range') || document.getElementById('id_price');
+    var catEl       = document.querySelector('[name="property_category"]');
+    var resEl       = document.querySelector('[name="residential"]');
+    var comEl       = document.querySelector('[name="commercial"]');
+    var lanEl       = document.querySelector('[name="lands"]');
+
+    var formText = [
+      catEl       && catEl.value       ? 'Category: '    + catEl.value                : '',
+      resEl       && resEl.value       ? 'Type: '        + resEl.value                : '',
+      comEl       && comEl.value       ? 'Type: '        + comEl.value                : '',
+      lanEl       && lanEl.value       ? 'Type: '        + lanEl.value                : '',
+      stateEl     && stateEl.value     ? 'State: '       + stateEl.value              : '',
+      locationEl  && locationEl.value  ? 'Location: '    + locationEl.value           : '',
+      bedroomsEl  && bedroomsEl.value  ? 'Bedrooms: '    + bedroomsEl.value           : '',
+      bathroomsEl && bathroomsEl.value ? 'Bathrooms: '   + bathroomsEl.value          : '',
+      priceEl     && priceEl.value     ? 'Price: '       + priceEl.value              : '',
+      descTextarea.value.trim()        ? 'Extra notes: ' + descTextarea.value.trim()  : '',
+    ].filter(Boolean).join(', ');
+
+    if (!formText) {
+      aiDescStatus.textContent = 'Please fill in some details or type a short note in the description box (e.g. "3 bedroom flat in Akure, close to FUTA, has 24hr light").';
+      aiDescStatus.className   = 'ai-status-msg error';
+      aiDescStatus.style.display = 'block';
+      return;
+    }
+
+    aiDescBtn.disabled = true;
+    document.getElementById('aiDescBtnText').textContent = 'Generating...';
+    aiDescStatus.textContent   = 'AI is writing your description...';
+    aiDescStatus.className     = 'ai-status-msg';
+    aiDescStatus.style.display = 'block';
+
+    fetch("{% url 'ai-description' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      },
+      body: JSON.stringify({ form_text: formText }),
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.error) {
+        aiDescStatus.textContent = 'Error: ' + data.error;
+        aiDescStatus.className   = 'ai-status-msg error';
+      } else {
+        descTextarea.value       = data.description;
+        aiDescStatus.textContent = '✓ Description generated! Feel free to edit it.';
+        aiDescStatus.className   = 'ai-status-msg';
+      }
+    })
+    .catch(function () {
+      aiDescStatus.textContent = 'Network error. Please try again.';
+      aiDescStatus.className   = 'ai-status-msg error';
+    })
+    .finally(function () {
+      aiDescBtn.disabled = false;
+      document.getElementById('aiDescBtnText').textContent = 'Generate with AI';
+    });
+
+  });
+}
 </script>
 {% endblock %}
 

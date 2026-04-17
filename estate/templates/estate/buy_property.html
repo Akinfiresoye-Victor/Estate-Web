@@ -141,7 +141,18 @@
           </div>
 
           <p class="buy-desc">{{ bought.property_description|truncatewords:15 }}</p>
-
+        {# ── Feature Preview Pills ── #}
+        {% with bought.property_features.all|slice:":2" as features %}
+          {% if features %}
+            <div class="card-feat-preview">
+              {% for f in features %}
+                <span class="card-feat-pill">
+                  <i class="bi bi-check-circle-fill"></i> {{ f.name }}
+                </span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
           <div class="buy-meta">
             <span class="buy-meta-item">
               <i class="bi bi-telephone-fill"></i> {{ bought.phone_number }}

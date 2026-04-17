@@ -869,3 +869,85 @@ body {
     font-size: 1.4rem;
   }
 }
+
+/* ══ CARD FEATURE PREVIEW (buy.css & rent.css) ══════════════ */
+.card-feat-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.card-feat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #15803d;
+  white-space: nowrap;
+}
+
+/* For buy pages — blue tone instead of green */
+.buy-card .card-feat-pill {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.card-feat-pill i {
+  font-size: 0.65rem;
+}
+
+/* ══ AMENITIES GRID (view_prop_s.css & view_prop_r.css) ══════ */
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.65rem;
+}
+
+.amenity-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  color: #334155;
+  font-weight: 500;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.amenity-chip:hover {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.amenity-chip i {
+  color: #22c55e;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+/* ── Mobile ──────────────────────── */
+@media (max-width: 480px) {
+  .amenities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .amenity-chip {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .card-feat-pill {
+    font-size: 0.68rem;
+  }
+}

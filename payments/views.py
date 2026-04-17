@@ -123,6 +123,7 @@ def pricing_page(request):
     except:
         current_plan = "free"
     if current_plan== "free":
+        messages.success(request, "Pricing Features will be effective July")
         messages.success(request, "🚀 Launch Promo: Claim your 3 months of free access today!")
 
     plans = role_plans.get(role, [])

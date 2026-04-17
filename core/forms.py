@@ -50,6 +50,12 @@ class FeedbackForm(ModelForm):
 
 #Form for putting properties up for sale
 class LeaseForm(ModelForm):
+    property_features=forms.ModelMultipleChoiceField(
+        queryset=PropertyFeatures.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='Select Property Features'
+    )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -73,12 +79,6 @@ class LeaseForm(ModelForm):
 
     class Meta:
         model=PropertyManagementRent
-        property_features=forms.ModelMultipleChoiceField(
-            queryset=PropertyFeatures.objects.all(),
-            widget=forms.CheckboxSelectMultiple,
-            required=False,
-            label='Select Property Features'
-        )
         fields=(
                 'property_category','residential','commercial','lands','description', 'state','location', 'bedrooms','bathrooms','parking_spaces','size' ,
                 'phone_number','property_features','price_range','rent_rate','base_image'
@@ -113,6 +113,12 @@ class LeaseForm(ModelForm):
 
 #Form for putting properties up for sale
 class SellForm(ModelForm):
+    property_features=forms.ModelMultipleChoiceField(
+        queryset=PropertyFeatures.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='Select Property Features'
+    )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -137,12 +143,6 @@ class SellForm(ModelForm):
     class Meta:
     
         model=PropertyManagementSale
-        property_features=forms.ModelMultipleChoiceField(
-            queryset=PropertyFeatures.objects.all(),
-            widget=forms.CheckboxSelectMultiple,
-            required=False,
-            label='Select Property Features'
-        )
         fields=('property_category','residential','commercial','lands','property_description', 'location', 'state','bathrooms','bedrooms','parking_spaces',
                 'phone_number','size','property_features', 'price', 'base_image')
         labels={
