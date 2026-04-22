@@ -1593,3 +1593,28 @@ def ai_description_generator(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+
+
+"""
+Generate with ai html code
+                  <!-- AI hint text -->
+              <div class="ai-hint-text">
+                <i class="bi bi-info-circle"></i>
+                <span>
+                  Tip: Fill in <strong>State, Location, Bedrooms, Bathrooms and Price</strong> first, 
+                  then click Generate — the AI will use those details. Or type a few notes in the box above 
+                  (e.g. <em>"3 bedroom flat in Akure, close to FUTA, has 24hr light"</em>) for a more personalised result.
+                  <br><br>
+                  <strong>⚠️ Note:</strong> This AI feature is experimental. Always review and edit the generated 
+                  description before publishing — it may not always be accurate or well-structured.
+                </span>
+              </div>
+
+                  <button type="button" id="aiDescBtn" class="ai-generate-btn">
+                    <i class="bi bi-stars"></i>
+                    <span id="aiDescBtnText">Generate with AI</span>
+                  </button>
+                  <div id="aiDescStatus" class="ai-status-msg" style="display:none;"></div>
+"""
