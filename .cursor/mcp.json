@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "rubberduck-codebase-intelligence": {
+      "url": "https://codebase.rubberduck.com/mcp",
+      "headers": {
+        "Authorization": "Bearer 319f1ca48a466b02c5fbcac1eb57c5b309e171f602fd47b8abfbf1baf19990e2"
+      }
+    },
+    "rubberduck-semantic-intelligence": {
+      "url": "https://semantic.rubberduck.com/mcp",
+      "headers": {
+        "Authorization": "Bearer 319f1ca48a466b02c5fbcac1eb57c5b309e171f602fd47b8abfbf1baf19990e2"
+      }
+    }
+  }
+}

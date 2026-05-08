@@ -56,3 +56,6 @@ Thumbs.db
 estate_web_code_audit.md
 post_fix_code_audit.md
 speed_security_audit.md
+
+# RubberDuck indexer config (contains auth token)
+.rubberduck/

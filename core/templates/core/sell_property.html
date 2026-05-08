@@ -223,12 +223,29 @@
                 {{ field.label }}
               </label>
 
-              {% if field.name == 'description' or field.name == 'property_description' %}
-                {{ field|add_class:"form-textarea" }}
-              {% else %}
-                {{ field|add_class:"form-input" }}
-              {% endif %}
-
+          {% if field.name == 'description' or field.name == 'property_description' %}
+            {{ field|add_class:"form-textarea" }}
+            <div class="ai-section">
+              <div class="ai-hint-text">
+                <i class="bi bi-info-circle"></i>
+                <span>
+                  Tip: Fill in <strong>State, Location, Bedrooms, Bathrooms and Price</strong> first,
+                  then click Generate — the AI will use those details. Or type a few notes in the box above
+                  (e.g. <em>"3 bedroom flat in Akure, close to FUTA, has 24hr light"</em>) for a more personalised result.
+                  <br><br>
+                  <strong>⚠️ Note:</strong> This AI feature is experimental. Always review and edit the generated
+                  description before publishing — it may not always be accurate or well-structured.
+                </span>
+              </div>
+              <button type="button" id="aiDescBtn" class="ai-generate-btn">
+                <i class="bi bi-stars"></i>
+                <span id="aiDescBtnText">Generate with AI</span>
+              </button>
+              <div id="aiDescStatus" class="ai-status-msg" style="display:none;"></div>
+            </div>
+          {% else %}
+            {{ field|add_class:"form-input" }}
+          {% endif %}
               {% if field.help_text %}
                 <div class="form-help-text">{{ field.help_text }}</div>
               {% endif %}

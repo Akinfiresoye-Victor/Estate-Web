@@ -313,3 +313,13 @@ class ErrorLog(models.Model):
 
 class Waitlist(models.Model):
     email=models.EmailField('Persons Email', null=False, blank=False, max_length=50)
+
+
+
+class FlaggedUsers(models.Model):
+    user_reported=models.IntegerField(blank=False, null=False)
+    role=models.CharField(max_length=10, default='Customer', blank=False, null=False)
+    report_from_role=models.CharField(max_length=10, default='Customer', blank=False, null=False)
+    report_reason=models.CharField(choices=REPORT_REASONS, default='other')
+    more_reason=models.CharField(max_length=250, default=None,null=True, blank=True )
+    time_reported=models.DateTimeField(default=timezone.now)

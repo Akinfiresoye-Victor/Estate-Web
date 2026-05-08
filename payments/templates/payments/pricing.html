@@ -325,10 +325,156 @@
     line-height: 1.6;
   }
 
+  /* ── Modal Styles ── */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 60, 78, 0.6);
+    backdrop-filter: blur(4px);
+    animation: modalFadeIn 0.3s ease-out;
+  }
+
+  .modal-content {
+    background-color: var(--white);
+    margin: 10% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(26, 60, 78, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid var(--border);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0;
+  }
+
+  .modal-close {
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    line-height: 1;
+  }
+
+  .modal-close:hover {
+    color: var(--text);
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .modal-icon {
+    margin-bottom: 1rem;
+  }
+
+  .modal-message {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .modal-warning {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--border);
+    justify-content: flex-end;
+  }
+
+  .btn-modal {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    min-width: 100px;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-cancel:hover {
+    background: #f8fafc;
+    color: var(--text);
+  }
+
+  .btn-confirm {
+    background: #dc2626;
+    color: var(--white);
+  }
+
+  .btn-confirm:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+  }
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   /* ── Responsive ── */
   @media (max-width: 600px) {
     .plans-grid { grid-template-columns: 1fr; }
     .current-plan-banner { flex-direction: column; }
+    .modal-content {
+      margin: 20% auto;
+      width: 95%;
+    }
+    .modal-footer {
+      flex-direction: column-reverse;
+    }
+    .btn-modal {
+      width: 100%;
+    }
   }
 </style>
 {% endblock %}
@@ -383,7 +529,7 @@
         {% if request.user.subscription.plan == 'starter' %}
           <span class="btn-subscribe disabled">Current Plan</span>
         {% else %}
-          <a href="{% url 'initiate_payment' 'starter' %}" class="btn-subscribe outline">Downgrade to Free</a>
+          <a href="#" class="btn-subscribe outline" onclick="showDowngradeModal('{% url 'initiate_payment' 'starter' %}'); return false;">Downgrade to Free</a>
         {% endif %}
       </div>
     </div>
@@ -478,7 +624,7 @@
         {% if request.user.subscription.plan == 'basic' %}
           <span class="btn-subscribe disabled">Current Plan</span>
         {% else %}
-          <a href="{% url 'initiate_payment' 'basic' %}" class="btn-subscribe outline">Downgrade to Free</a>
+          <a href="#" class="btn-subscribe outline" onclick="showDowngradeModal('{% url 'initiate_payment' 'basic' %}'); return false;">Downgrade to Free</a>
         {% endif %}
       </div>
     </div>
@@ -568,7 +714,7 @@
         {% if request.user.subscription.plan == 'landlord_basic' %}
           <span class="btn-subscribe disabled">Current Plan</span>
         {% else %}
-          <a href="{% url 'initiate_payment' 'landlord_basic' %}" class="btn-subscribe outline">Downgrade to Free</a>
+          <a href="#" class="btn-subscribe outline" onclick="showDowngradeModal('{% url 'initiate_payment' 'landlord_basic' %}'); return false;">Downgrade to Free</a>
         {% endif %}
       </div>
     </div>
@@ -629,7 +775,7 @@
         {% if request.user.subscription.plan == 'standard' %}
           <span class="btn-subscribe disabled">Current Plan</span>
         {% else %}
-          <a href="{% url 'initiate_payment' 'standard' %}" class="btn-subscribe outline">Downgrade to Free</a>
+          <a href="#" class="btn-subscribe outline" onclick="showDowngradeModal('{% url 'initiate_payment' 'standard' %}'); return false;">Downgrade to Free</a>
         {% endif %}
       </div>
     </div>
@@ -666,4 +812,78 @@
   {% endif %}
 
 </div>
+
+<script>
+  // Modal functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    let downgradeModal = document.getElementById('downgradeModal');
+    let confirmDowngradeBtn = document.getElementById('confirmDowngrade');
+    let cancelDowngradeBtn = document.getElementById('cancelDowngrade');
+    let modalCloseBtn = document.querySelector('.modal-close');
+    let downgradeUrl = '';
+
+    // Function to show modal
+    window.showDowngradeModal = function(url) {
+      downgradeUrl = url;
+      downgradeModal.style.display = 'block';
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    // Function to hide modal
+    function hideDowngradeModal() {
+      downgradeModal.style.display = 'none';
+      document.body.style.overflow = 'auto'; // Restore scrolling
+      downgradeUrl = '';
+    }
+
+    // Event listeners
+    cancelDowngradeBtn.onclick = hideDowngradeModal;
+    modalCloseBtn.onclick = hideDowngradeModal;
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target == downgradeModal) {
+        hideDowngradeModal();
+      }
+    }
+
+    // Confirm downgrade
+    confirmDowngradeBtn.onclick = function() {
+      if (downgradeUrl) {
+        window.location.href = downgradeUrl;
+      }
+    }
+
+    // Handle ESC key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && downgradeModal.style.display === 'block') {
+        hideDowngradeModal();
+      }
+    });
+  });
+</script>
+
+<!-- Downgrade Confirmation Modal -->
+<div id="downgradeModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirm Downgrade</h3>
+      <span class="modal-close">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="modal-message">Are you sure you want to downgrade to the free plan?</p>
+      <p class="modal-warning">This action will immediately reduce your current plan features and may limit your access to premium services.</p>
+    </div>
+    <div class="modal-footer">
+      <button id="cancelDowngrade" class="btn-modal btn-cancel">Cancel</button>
+      <button id="confirmDowngrade" class="btn-modal btn-confirm">Yes, Downgrade</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

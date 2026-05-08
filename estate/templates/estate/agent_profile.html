@@ -3,6 +3,27 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'agent/css/agent_profile.css' %}">
+
+.rp-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #b91c1c;
+  background: transparent;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 6px 12px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.rp-trigger-btn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #991b1b;
+  text-decoration: none;
+}
 {% endblock %}
 
 {% block content %}
@@ -86,6 +107,14 @@
       <a href="https://wa.me/{{ agent.phone_number }}" target="_blank" class="ap-btn whatsapp">
         <i class="bi bi-whatsapp"></i> WhatsApp
       </a>
+      {% endif %}
+      {% if request.user.is_authenticated %}
+        {% if request.user != agent.user %}
+          <a href="{%url 'report-user' agent.user.id agent%}" class="rp-trigger-btn">
+            <i class="bi bi-flag"></i>
+            Report Agent
+          </a>
+        {% endif %}
       {% endif %}
       <button class="ap-back-btn" onclick="history.back()">
         <i class="bi bi-arrow-left"></i> Back

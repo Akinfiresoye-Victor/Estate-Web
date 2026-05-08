@@ -52,6 +52,7 @@ def dashboard(request):
 
     try:
         company= CompanyInformation.objects.get(user=request.user)
+        print(company.unique_company_id)
         if not company.is_company_email_verified:
             messages.info(request, 'Verify company email(in settings) to access more tools')
         social_links = company.social.all()

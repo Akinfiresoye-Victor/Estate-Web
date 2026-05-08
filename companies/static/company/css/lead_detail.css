@@ -744,3 +744,263 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .content-grid {
+      grid-template-columns: 1fr 360px;
+      align-items: start;
+    }
+  }
+
+  /* ── Report Customer button ───────────────────────────── */
+  .rp-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #b91c1c;
+    background: transparent;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 6px 12px;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .rp-trigger-btn:hover {
+    background: #fef2f2;
+    border-color: #f87171;
+    color: #991b1b;
+    text-decoration: none;
+  }
+
+  /* ══════════════════════════════════════════════════════
+     AI LEAD SUMMARY CARD
+  ══════════════════════════════════════════════════════ */
+
+  /* Header badge */
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    background: linear-gradient(135deg, rgba(139,115,85,.15), rgba(193,155,118,.18));
+    color: #8b7355;
+    border: 1px solid rgba(193,155,118,.35);
+    border-radius: 20px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  /* Empty state */
+  .ai-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 0.5rem 1rem;
+    gap: 0.6rem;
+  }
+  .ai-empty-state > i {
+    font-size: 2.2rem;
+    color: #c19b76;
+    opacity: 0.7;
+  }
+  .ai-empty-state > p {
+    font-size: 0.83rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 340px;
+  }
+  .ai-rate-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(26,60,78,.06);
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #4a5568;
+  }
+  .ai-rate-hint i { font-size: 0.75rem; color: #1a3c4e; }
+
+  /* Loading state */
+  .ai-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    gap: 0.85rem;
+  }
+  .ai-loading p {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin: 0;
+  }
+
+  /* Spinner ring */
+  .ai-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(193,155,118,.2);
+    border-top-color: #c19b76;
+    border-radius: 50%;
+    animation: ai-spin 0.75s linear infinite;
+  }
+  @keyframes ai-spin { to { transform: rotate(360deg); } }
+
+  /* Result state */
+  .ai-result { display: flex; flex-direction: column; gap: 0.85rem; }
+
+  .ai-text {
+    background: rgba(26,60,78,.04);
+    border-left: 3px solid #c19b76;
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.78;
+    color: #1e293b;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Timestamp under result */
+  .ai-timestamp {
+    font-size: 0.67rem;
+    font-weight: 600;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .ai-result-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .ai-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.5rem 0.9rem;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    border: 1.5px solid;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  /* Regenerate button */
+  .ai-regen-btn {
+    background: transparent;
+    color: #1a3c4e;
+    border-color: rgba(26,60,78,.3);
+  }
+  .ai-regen-btn:hover {
+    background: rgba(26,60,78,.06);
+    border-color: #1a3c4e;
+    color: #1a3c4e;
+  }
+  /* Copy button */
+  .ai-copy-btn {
+    background: transparent;
+    color: #6b7280;
+    border-color: #e5e7eb;
+  }
+  .ai-copy-btn:hover {
+    background: #f4f6f8;
+    border-color: #d1d5db;
+    color: #374151;
+  }
+  .ai-copy-btn.copied {
+    color: #28a745;
+    border-color: rgba(40,167,69,.35);
+    background: rgba(40,167,69,.06);
+  }
+
+  /* Error state */
+  .ai-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(220,53,69,.05);
+    border: 1.5px solid rgba(220,53,69,.2);
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 0.85rem;
+  }
+  .ai-error > i { font-size: 1.4rem; color: #dc3545; }
+  .ai-error > p { font-size: 0.82rem; color: #dc3545; margin: 0; font-weight: 600; }
+
+  /* Rate-limit error gets a softer colour */
+  .ai-error.rate-limit > i,
+  .ai-error.rate-limit > p { color: #f59e0b; }
+  .ai-error.rate-limit {
+    background: rgba(245,158,11,.05);
+    border-color: rgba(245,158,11,.25);
+  }
+
+  /* Generate / main CTA button */
+  .ai-generate-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0.8rem 1.25rem;
+    background: linear-gradient(135deg, #1a3c4e 0%, #2d5a73 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.22s ease;
+    margin-top: 0.25rem;
+    letter-spacing: 0.2px;
+  }
+  .ai-generate-btn:hover {
+    background: linear-gradient(135deg, #2d5a73 0%, #1a3c4e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(26,60,78,.22);
+  }
+  .ai-generate-btn:active { transform: translateY(0); }
+  .ai-generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .ai-generate-btn i { font-size: 1rem; }
+
+  /* Fade-in for result */
+  @keyframes ai-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ai-fade { animation: ai-fade-in 0.35s ease-out both; }
+
+  /* Mobile: stack result actions vertically on very small screens */
+  @media (max-width: 360px) {
+    .ai-result-actions { flex-direction: column; }
+    .ai-action-btn { width: 100%; justify-content: center; }
+  }

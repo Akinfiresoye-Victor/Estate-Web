@@ -1,0 +1,455 @@
+/* ============================================================
+   report_page.css  —  prefix: rp-
+   Estate Web | core/report_page.html
+   Mobile-first, desktop-enhanced
+   ============================================================ */
+
+/* ── CSS Variables (mirrors global design tokens) ───────────── */
+:root {
+  --rp-primary:      #1a3c4e;
+  --rp-primary-lt:   #2d5a73;
+  --rp-secondary:    #c19b76;
+  --rp-accent:       #8b7355;
+  --rp-danger:       #dc2626;
+  --rp-danger-lt:    #fef2f2;
+  --rp-danger-border:#fecaca;
+  --rp-success:      #16a34a;
+  --rp-success-lt:   #f0fdf4;
+  --rp-success-border:#bbf7d0;
+  --rp-warning-bg:   #fffbeb;
+  --rp-warning-border:#fde68a;
+  --rp-warning-text: #92400e;
+  --rp-text-dark:    #1e293b;
+  --rp-text-mid:     #374151;
+  --rp-text-light:   #6b7280;
+  --rp-bg:           #f4f6f8;
+  --rp-white:        #ffffff;
+  --rp-border:       #e5e7eb;
+  --rp-radius:       12px;
+  --rp-radius-sm:    8px;
+  --rp-shadow:       0 2px 12px rgba(26, 60, 78, 0.08);
+  --rp-shadow-md:    0 4px 24px rgba(26, 60, 78, 0.12);
+  --rp-transition:   0.18s ease;
+}
+
+/* ── Page wrapper ────────────────────────────────────────────── */
+.rp-page {
+  min-height: 100vh;
+  background-color: var(--rp-bg);
+  padding: 24px 16px 48px;
+}
+
+/* ── Centered container ──────────────────────────────────────── */
+.rp-container {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ── Card shell ──────────────────────────────────────────────── */
+.rp-card {
+  background: var(--rp-white);
+  border-radius: var(--rp-radius);
+  box-shadow: var(--rp-shadow);
+  padding: 24px 20px;
+  border: 1px solid var(--rp-border);
+}
+
+/* ── Header row ──────────────────────────────────────────────── */
+.rp-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.rp-header-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: #fef2f2;
+  border-radius: var(--rp-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rp-danger);
+  font-size: 20px;
+}
+
+.rp-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.rp-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--rp-text-dark);
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+
+.rp-subtitle {
+  font-size: 0.875rem;
+  color: var(--rp-text-light);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Warning banner ──────────────────────────────────────────── */
+.rp-warning {
+  display: flex;
+  gap: 10px;
+  background: var(--rp-warning-bg);
+  border: 1px solid var(--rp-warning-border);
+  border-radius: var(--rp-radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 24px;
+}
+
+.rp-warning-icon {
+  flex-shrink: 0;
+  color: #d97706;
+  font-size: 15px;
+  margin-top: 2px;
+}
+
+.rp-warning-text {
+  font-size: 0.8125rem;
+  color: var(--rp-warning-text);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── Divider between header/warning and form ─────────────────── */
+.rp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Field wrapper ───────────────────────────────────────────── */
+.rp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Label ───────────────────────────────────────────────────── */
+.rp-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rp-text-mid);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rp-required {
+  color: var(--rp-danger);
+  font-size: 0.9rem;
+}
+
+.rp-optional {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--rp-text-light);
+  background: var(--rp-bg);
+  border: 1px solid var(--rp-border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  line-height: 1.6;
+}
+
+/* ── Select ──────────────────────────────────────────────────── */
+.rp-select-wrap {
+  position: relative;
+}
+
+.rp-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--rp-white);
+  border: 1.5px solid var(--rp-border);
+  border-radius: var(--rp-radius-sm);
+  padding: 10px 40px 10px 14px;
+  font-size: 0.9375rem;
+  color: var(--rp-text-dark);
+  cursor: pointer;
+  transition: border-color var(--rp-transition), box-shadow var(--rp-transition);
+  outline: none;
+  line-height: 1.5;
+}
+
+.rp-select:focus {
+  border-color: var(--rp-primary);
+  box-shadow: 0 0 0 3px rgba(26, 60, 78, 0.1);
+}
+
+.rp-select-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--rp-text-light);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* ── Textarea ─────────────────────────────────────────────────── */
+/* Django's form.more_reason already has class="form-control"
+   from the widget attrs. We also add rp-textarea via JS.
+   Both selectors are listed here for coverage. */
+.rp-textarea,
+textarea.form-control {
+  width: 100%;
+  border: 1.5px solid var(--rp-border) !important;
+  border-radius: var(--rp-radius-sm) !important;
+  padding: 10px 14px !important;
+  font-size: 0.9375rem !important;
+  color: var(--rp-text-dark) !important;
+  background: var(--rp-white) !important;
+  resize: vertical;
+  min-height: 110px;
+  transition: border-color var(--rp-transition), box-shadow var(--rp-transition);
+  outline: none !important;
+  box-shadow: none !important;
+  line-height: 1.6;
+  font-family: inherit;
+}
+
+.rp-textarea:focus,
+textarea.form-control:focus {
+  border-color: var(--rp-primary) !important;
+  box-shadow: 0 0 0 3px rgba(26, 60, 78, 0.1) !important;
+}
+
+/* ── Hint text below textarea ────────────────────────────────── */
+.rp-field-hint {
+  font-size: 0.8rem;
+  color: var(--rp-text-light);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Character counter ───────────────────────────────────────── */
+.rp-char-count {
+  font-size: 0.75rem;
+  color: var(--rp-text-light);
+  text-align: right;
+  margin: 0;
+  transition: color var(--rp-transition);
+}
+
+.rp-char-count--warn {
+  color: var(--rp-danger);
+  font-weight: 600;
+}
+
+/* ── Field-level error ───────────────────────────────────────── */
+.rp-field-error {
+  font-size: 0.8rem;
+  color: var(--rp-danger);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rp-field-error .bi {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* ── Action buttons row ──────────────────────────────────────── */
+.rp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* ── Button base ─────────────────────────────────────────────── */
+.rp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: var(--rp-radius-sm);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: background var(--rp-transition), color var(--rp-transition),
+              border-color var(--rp-transition), box-shadow var(--rp-transition);
+  line-height: 1;
+  text-align: center;
+}
+
+/* Primary — filled dark teal */
+.rp-btn--primary {
+  background: var(--rp-primary);
+  color: var(--rp-white);
+  border-color: var(--rp-primary);
+}
+
+.rp-btn--primary:hover,
+.rp-btn--primary:focus {
+  background: var(--rp-primary-lt);
+  border-color: var(--rp-primary-lt);
+  color: var(--rp-white);
+  box-shadow: 0 4px 12px rgba(26, 60, 78, 0.2);
+  text-decoration: none;
+}
+
+/* Ghost — outline */
+.rp-btn--ghost {
+  background: transparent;
+  color: var(--rp-text-light);
+  border-color: var(--rp-border);
+}
+
+.rp-btn--ghost:hover,
+.rp-btn--ghost:focus {
+  background: var(--rp-bg);
+  color: var(--rp-text-dark);
+  border-color: #cbd5e1;
+  text-decoration: none;
+}
+
+/* ── Footer privacy note ─────────────────────────────────────── */
+.rp-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--rp-text-light);
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--rp-border);
+}
+
+.rp-footer-note .bi {
+  color: var(--rp-success);
+  font-size: 13px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SUCCESS STATE
+   ─────────────────────────────────────────────────────────── */
+.rp-card--success {
+  text-align: center;
+  padding: 36px 24px;
+  border-top: 4px solid var(--rp-success);
+}
+
+.rp-success-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--rp-success-lt);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--rp-success);
+  font-size: 28px;
+  border: 2px solid var(--rp-success-border);
+}
+
+.rp-success-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--rp-text-dark);
+  margin: 0 0 10px;
+}
+
+.rp-success-body {
+  font-size: 0.9rem;
+  color: var(--rp-text-light);
+  margin: 0 0 20px;
+  line-height: 1.6;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rp-success-notice {
+  display: flex;
+  gap: 8px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: var(--rp-radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.rp-success-notice .bi {
+  flex-shrink: 0;
+  color: #0284c7;
+  font-size: 15px;
+  margin-top: 1px;
+}
+
+.rp-success-notice span {
+  font-size: 0.8125rem;
+  color: #0c4a6e;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DESKTOP — min-width: 580px
+   ─────────────────────────────────────────────────────────── */
+@media (min-width: 580px) {
+  .rp-page {
+    padding: 40px 24px 64px;
+  }
+
+  .rp-card {
+    padding: 32px 32px;
+  }
+
+  .rp-title {
+    font-size: 1.35rem;
+  }
+
+  .rp-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Submit button fills left; Cancel sits right */
+  .rp-btn--primary {
+    flex: 1;
+  }
+
+  .rp-btn--ghost {
+    flex-shrink: 0;
+  }
+
+  .rp-card--success {
+    padding: 48px 40px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LARGE DESKTOP — min-width: 900px
+   ─────────────────────────────────────────────────────────── */
+@media (min-width: 900px) {
+  .rp-page {
+    padding: 56px 32px 80px;
+  }
+
+  .rp-container {
+    max-width: 600px;
+  }
+
+  .rp-card {
+    box-shadow: var(--rp-shadow-md);
+  }
+}

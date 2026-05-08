@@ -62,10 +62,19 @@
           <a href="mailto:{{ company.email }}" class="cp-btn-contact text-decoration-none">
               <i class="bi bi-envelope-fill"></i> Contact Company
           </a>
+          {% if request.user.is_authenticated %}
+            {% if request.user != company.user %}
+              <a href="{%url 'report-user' company.user.id company%}" class="rp-trigger-btn">
+                <i class="bi bi-flag"></i>
+                Report Company
+              </a>
+            {% endif %}
+          {% endif %}
           <button class="cp-btn-share" onclick="shareCompany()" title="Share">
             <i class="bi bi-share-fill"></i>
           </button>
         </div>
+
       </div>
 
     </div>

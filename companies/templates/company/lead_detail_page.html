@@ -4,24 +4,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'company/css/lead_detail.css' %}">
-<style>
-  /* ── Two-column layout fix ──────────────────────────────────────────
-     Ensures sidebar sits on the right on desktop.
-     Add these rules to lead_detail.css and remove this style block.
-  ─────────────────────────────────────────────────────────────────── */
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  @media (min-width: 900px) {
-    .content-grid {
-      grid-template-columns: 1fr 360px;
-      align-items: start;
-    }
-  }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -31,6 +13,7 @@
 <div id="lead_id_data"
      data-lead-id="{{ lead.id }}"
      data-update-url="{% url 'company:update-lead-status' lead.id %}"
+     data-ai-url="{% url 'ai-lead-summarize' lead.id %}"
      style="display:none;"></div>
 
 {# ── Delete Modal ─────────────────────────────────────────────────── #}
@@ -237,6 +220,61 @@
         </div>
       </div>
 
+      {# ── AI Lead Summary ──────────────────────────────────────────── #}
+      <div class="detail-card">
+        <div class="card-header">
+          <h3><i class="bi bi-stars"></i> AI Lead Summary</h3>
+          <span class="ai-badge"><i class="bi bi-cpu"></i> AI Powered</span>
+        </div>
+        <div class="card-body">
+
+          {# Empty / prompt state #}
+          <div id="ai-empty" class="ai-empty-state">
+            <i class="bi bi-robot"></i>
+            <p>Generate an AI-powered summary to quickly understand this lead's needs and get actionable closing advice.</p>
+            <div class="ai-rate-hint">
+              <i class="bi bi-info-circle"></i> 3 summaries per minute
+            </div>
+          </div>
+
+          {# Loading state — hidden by default #}
+          <div id="ai-loading" class="ai-loading" style="display:none;">
+            <div class="ai-spinner"></div>
+            <p>Analysing lead data…</p>
+          </div>
+
+          {# Result state — hidden by default #}
+          <div id="ai-result" class="ai-result" style="display:none;">
+            <div id="ai-text" class="ai-text"></div>
+            <div class="ai-timestamp">
+              <i class="bi bi-clock"></i>
+              <span id="ai-time"></span>
+            </div>
+            <div class="ai-result-actions">
+              <button class="ai-action-btn ai-regen-btn" onclick="generateSummary()">
+                <i class="bi bi-arrow-clockwise"></i> Regenerate
+              </button>
+              <button class="ai-action-btn ai-copy-btn" id="ai-copy-btn" onclick="copySummary()">
+                <i class="bi bi-clipboard"></i> Copy
+              </button>
+            </div>
+          </div>
+
+          {# Error state — hidden by default #}
+          <div id="ai-error" class="ai-error" style="display:none;">
+            <i class="bi bi-exclamation-circle"></i>
+            <p id="ai-error-msg">Something went wrong. Please try again.</p>
+          </div>
+
+          {# Main CTA — always visible unless loading #}
+          <button id="ai-generate-btn" class="ai-generate-btn" onclick="generateSummary()">
+            <i class="bi bi-stars"></i> Summarize Lead
+          </button>
+
+        </div>
+      </div>
+      {# ── END AI Lead Summary ─────────────────────────────────────── #}
+
     </div>
     {# ── END main-column ─────────────────────────────────────────── #}
 
@@ -350,6 +388,10 @@
                     title="Delete">
               <i class="bi bi-trash"></i> Delete Lead
             </button>
+            <a href="#" class="rp-trigger-btn">
+              <i class="bi bi-flag"></i>
+              Report Customer
+            </a>
           </div>
         </div>
       </div>
@@ -434,6 +476,131 @@
   window.createTask        = function () { alert('Create task feature coming soon'); };
   window.sendDocument      = function () { alert('Send document feature coming soon'); };
   window.openReassignModal = function () { alert('Reassign feature coming soon'); };
+
+  /* ══════════════════════════════════════════════════════════════════
+     AI LEAD SUMMARY
+  ══════════════════════════════════════════════════════════════════ */
+
+  /* Helpers to show/hide the four states */
+  function setAIState(state) {
+    // state: 'empty' | 'loading' | 'result' | 'error'
+    var states = ['empty', 'loading', 'result', 'error'];
+    states.forEach(function (s) {
+      document.getElementById('ai-' + s).style.display = (s === state) ? '' : 'none';
+    });
+
+    var btn = document.getElementById('ai-generate-btn');
+    if (state === 'loading') {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating…';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-stars"></i> Summarize Lead';
+      // Hide the main CTA once a result is showing (regen btn takes over)
+      btn.style.display = (state === 'result') ? 'none' : '';
+    }
+  }
+
+  /* Main generate function */
+  window.generateSummary = function () {
+    var el  = document.getElementById('lead_id_data');
+    if (!el) return;
+
+    var url  = el.getAttribute('data-ai-url');
+    var CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    setAIState('loading');
+
+    fetch(url, {
+      method: 'POST',              // your view is GET-safe via @require_POST? 
+      // Actually the view uses @require_POST so we POST with no body:
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
+      },
+      credentials: 'same-origin',
+    })
+    // Note: if @require_POST, switch to POST:
+    .then(function (response) {
+      return response.json().then(function (data) {
+        return { ok: response.ok, status: response.status, data: data };
+      });
+    })
+    .then(function (result) {
+      if (!result.ok || result.data.error) {
+        var msg = result.data.error || 'Something went wrong. Please try again.';
+        var errEl  = document.getElementById('ai-error');
+        var msgEl  = document.getElementById('ai-error-msg');
+        msgEl.textContent = msg;
+
+        // Detect rate limit (HTTP 429 or Ratelimited text)
+        if (result.status === 429 || msg.toLowerCase().includes('ratelimited') || msg.toLowerCase().includes('rate')) {
+          errEl.className = 'ai-error rate-limit';
+          msgEl.textContent = 'Rate limit reached. You can generate 3 summaries per minute — please wait a moment.';
+        } else {
+          errEl.className = 'ai-error';
+        }
+
+        setAIState('error');
+
+        // Reset to empty state after 5 seconds so user can retry
+        setTimeout(function () {
+          if (document.getElementById('ai-error').style.display !== 'none') {
+            setAIState('empty');
+          }
+        }, 6000);
+        return;
+      }
+
+      // Success
+      var textEl = document.getElementById('ai-text');
+      var timeEl = document.getElementById('ai-time');
+
+      textEl.textContent = result.data.summary;
+      textEl.classList.add('ai-fade');
+
+      var now = new Date();
+      timeEl.textContent = 'Generated at ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      setAIState('result');
+
+      // Show the result card; re-apply fade
+      document.getElementById('ai-result').classList.add('ai-fade');
+    })
+    .catch(function (err) {
+      console.error('AI Summary error:', err);
+      document.getElementById('ai-error-msg').textContent = 'Network error. Please check your connection and try again.';
+      document.getElementById('ai-error').className = 'ai-error';
+      setAIState('error');
+    });
+  };
+
+  /* Copy summary to clipboard */
+  window.copySummary = function () {
+    var text = document.getElementById('ai-text').textContent;
+    if (!text) return;
+
+    navigator.clipboard.writeText(text).then(function () {
+      var btn = document.getElementById('ai-copy-btn');
+      btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+        btn.classList.remove('copied');
+      }, 2500);
+    }).catch(function () {
+      // Fallback for older mobile browsers
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    });
+  };
 
 }());
 

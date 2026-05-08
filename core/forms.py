@@ -348,3 +348,18 @@ class PartnershipForm(forms.ModelForm):
             raise forms.ValidationError('Please give us a bit more detail — at least 30 characters.')
         return text
 
+
+class ReportForm(ModelForm):
+    class Meta:
+        model= FlaggedUsers
+        fields=(
+            'report_reason', 'more_reason'
+        )
+
+        labels={
+            'report_reason': 'Select Reason For Report',
+            'more_reason': 'Provide More Details(if any...)'
+        }
+        widgets={
+            'more_reason': forms.Textarea(attrs={'class': 'form-control'})
+        }

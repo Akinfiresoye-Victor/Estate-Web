@@ -4,13 +4,38 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'agent/css/agent_lead_detail.css' %}">
+<style>
+.rp-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #b91c1c;
+  background: transparent;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 6px 12px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.rp-trigger-btn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #991b1b;
+  text-decoration: none;
+}
+</style>
 {% endblock %}
 
 {% block content %}
 
 {# ── Hidden data — status/stage JS logic depends on these ─────────── #}
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-<div id="agent_lead_data" data-lead-id="{{ lead.id }}" style="display:none;"></div>
+<div id="agent_lead_data"
+     data-lead-id="{{ lead.id }}"
+     data-ai-url="{% url 'ai-lead-summarize' lead.id %}"
+     style="display:none;"></div>
 
 {# ── Delete Modal ─────────────────────────────────────────────────── #}
 <div class="delete-modal-overlay" id="deleteModal">
@@ -149,7 +174,12 @@
                   </span>
                 </span>
               </div>
-            </div>
+            </div>  
+            {% comment %} FIXME Find a way to input the URL {% endcomment %}
+              <a href="#" class="rp-trigger-btn">
+                <i class="bi bi-flag"></i>
+                Report Customer
+              </a
 
           </div>
         </div>
@@ -251,6 +281,64 @@
           </div>
         </div>
       </div>
+
+      {# ── AI Lead Summary ──────────────────────────────────────────── #}
+      <div class="info-card">
+        <div class="info-card-header">
+          <div class="header-title">
+            <i class="bi bi-stars"></i>
+            <h3>AI Lead Summary</h3>
+          </div>
+          <span class="ai-badge"><i class="bi bi-cpu"></i> AI Powered</span>
+        </div>
+        <div class="info-card-body">
+
+          {# Empty / prompt state #}
+          <div id="ai-empty" class="ai-empty-state">
+            <i class="bi bi-robot"></i>
+            <p>Generate an AI-powered summary to quickly understand this lead's needs and get actionable closing advice.</p>
+            <div class="ai-rate-hint">
+              <i class="bi bi-info-circle"></i> 3 summaries per minute
+            </div>
+          </div>
+
+          {# Loading state — hidden by default #}
+          <div id="ai-loading" class="ai-loading" style="display:none;">
+            <div class="ai-spinner"></div>
+            <p>Analysing lead data…</p>
+          </div>
+
+          {# Result state — hidden by default #}
+          <div id="ai-result" class="ai-result" style="display:none;">
+            <div id="ai-text" class="ai-text"></div>
+            <div class="ai-timestamp">
+              <i class="bi bi-clock"></i>
+              <span id="ai-time"></span>
+            </div>
+            <div class="ai-result-actions">
+              <button class="ai-action-btn ai-regen-btn" onclick="generateSummary()">
+                <i class="bi bi-arrow-clockwise"></i> Regenerate
+              </button>
+              <button class="ai-action-btn ai-copy-btn" id="ai-copy-btn" onclick="copySummary()">
+                <i class="bi bi-clipboard"></i> Copy
+              </button>
+            </div>
+          </div>
+
+          {# Error state — hidden by default #}
+          <div id="ai-error" class="ai-error" style="display:none;">
+            <i class="bi bi-exclamation-circle"></i>
+            <p id="ai-error-msg">Something went wrong. Please try again.</p>
+          </div>
+
+          {# Main CTA — always visible unless loading #}
+          <button id="ai-generate-btn" class="ai-generate-btn" onclick="generateSummary()">
+            <i class="bi bi-stars"></i> Summarize Lead
+          </button>
+
+        </div>
+      </div>
+      {# ── END AI Lead Summary ─────────────────────────────────────── #}
 
     </section>
 
@@ -436,6 +524,73 @@
   window.shareLeadInfo         = function () { alert('Share lead info — coming soon!'); };
 
 }());
+
+/* ── AI Lead Summary ────────────────────────────────────────────────── */
+window.generateSummary = function () {
+  var leadData = document.getElementById('agent_lead_data');
+  if (!leadData) { alert('Error: Lead data not found'); return; }
+
+  var aiUrl = leadData.getAttribute('data-ai-url');
+  var CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  // Show loading, hide others
+  document.getElementById('ai-empty').style.display = 'none';
+  document.getElementById('ai-loading').style.display = 'flex';
+  document.getElementById('ai-result').style.display = 'none';
+  document.getElementById('ai-error').style.display = 'none';
+  document.getElementById('ai-generate-btn').style.display = 'none';
+
+  fetch(aiUrl, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': CSRF,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify({})
+  })
+  .then(function (res) {
+    if (!res.ok) throw new Error('Network response was not ok');
+    return res.json();
+  })
+  .then(function (data) {
+    if (data.error) throw new Error(data.error);
+
+    // Hide loading, show result
+    document.getElementById('ai-loading').style.display = 'none';
+    document.getElementById('ai-result').style.display = 'block';
+    document.getElementById('ai-text').innerHTML = data.summary;
+
+    // Format timestamp
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('ai-time').textContent = 'Generated at ' + timeStr;
+  })
+  .catch(function (err) {
+    console.error('Error:', err);
+    document.getElementById('ai-loading').style.display = 'none';
+    document.getElementById('ai-error').style.display = 'flex';
+    document.getElementById('ai-error-msg').textContent = err.message || 'Failed to generate summary. Please try again.';
+  });
+};
+
+window.copySummary = function () {
+  var text = document.getElementById('ai-text').innerText;
+  if (!text) { alert('Nothing to copy'); return; }
+
+  navigator.clipboard.writeText(text).then(function () {
+    var btn = document.getElementById('ai-copy-btn');
+    var originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check-circle"></i> Copied!';
+    setTimeout(function () {
+      btn.innerHTML = originalText;
+    }, 2000);
+  }).catch(function (err) {
+    console.error('Failed to copy:', err);
+    alert('Failed to copy to clipboard');
+  });
+};
 
 /* ── Delete Modal ─────────────────────────────────────────────────── */
 function showDeleteModal(deleteUrl) {

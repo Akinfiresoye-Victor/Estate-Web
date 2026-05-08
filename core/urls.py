@@ -1,5 +1,6 @@
 from django.urls import path
 from core import views as core_views
+from core import ai_features as ai
 
 urlpatterns = [
     path('waitlist-signup/', core_views.waitlist_signup, name='waitlist-signup'),
@@ -31,7 +32,9 @@ urlpatterns = [
     path('schedule/delete/<appointment_uuid>', core_views.delete_appointment, name='delete-appointment'),
     path('faq', core_views.estate_web_guide, name='faq'),
     path('toggle_listing/<str:property_type>/<int:property_id>/', core_views.toggle_listing, name='toggle-listing'),
-    path('ai-description/', core_views.ai_description_generator, name='ai-description'),
+    path('ai-description/', ai.ai_description_generator, name='ai-description'),
+    path('ai-summarize-lead/<int:lead_id>/', ai.ai_lead_summarize, name='ai-lead-summarize'),
+    path('report_user/<int:reportee_id>/<str:reportee_role>', core_views.report_user, name='report-user')
     
 ]
 

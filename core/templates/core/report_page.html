@@ -1,0 +1,164 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Report User — Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/report_page.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="rp-page">
+  <div class="rp-container">
+
+    {% if submitted %}
+    {# ───────────────── SUCCESS STATE ───────────────── #}
+    <div class="rp-card rp-card--success">
+      <div class="rp-success-icon">
+        <i class="bi bi-shield-check-fill"></i>
+      </div>
+      <h1 class="rp-success-title">Report Submitted</h1>
+      <p class="rp-success-body">
+        Thank you for helping keep Estate Web safe. Our team will review this report
+        and take appropriate action. We take all reports seriously.
+      </p>
+      <div class="rp-success-notice">
+        <i class="bi bi-info-circle"></i>
+        <span>Reports are reviewed within 24–48 hours. We may not be able to share the outcome due to privacy reasons.</span>
+      </div>
+      <a href="javascript:history.back()" class="rp-btn rp-btn--primary">
+        <i class="bi bi-arrow-left"></i>
+        Go Back
+      </a>
+    </div>
+
+    {% else %}
+    {# ───────────────── REPORT FORM ───────────────── #}
+    <div class="rp-card">
+
+      {# Header #}
+      <div class="rp-header">
+        <div class="rp-header-icon">
+          <i class="bi bi-flag-fill"></i>
+        </div>
+        <div class="rp-header-text">
+          <h1 class="rp-title">Report a User</h1>
+          <p class="rp-subtitle">
+            Help us keep the platform safe and trustworthy.
+            Your report is confidential.
+          </p>
+        </div>
+      </div>
+
+      {# Warning banner #}
+      <div class="rp-warning">
+        <i class="bi bi-exclamation-triangle-fill rp-warning-icon"></i>
+        <p class="rp-warning-text">
+          Only report genuine issues — fraudulent listings, impersonation, harassment,
+          or suspicious behaviour. False reports may result in account action.
+        </p>
+      </div>
+
+      {# Form #}
+      <form method="POST" class="rp-form" novalidate>
+        {% csrf_token %}
+
+        {# Report Reason — select dropdown #}
+        <div class="rp-field">
+          <label class="rp-label" for="{{ form.report_reason.id_for_label }}">
+            {{ form.report_reason.label }}
+            <span class="rp-required" aria-label="required">*</span>
+          </label>
+          <div class="rp-select-wrap">
+            {{ form.report_reason }}
+            <i class="bi bi-chevron-down rp-select-arrow" aria-hidden="true"></i>
+          </div>
+          {% if form.report_reason.errors %}
+            <p class="rp-field-error">
+              <i class="bi bi-x-circle-fill"></i>
+              {{ form.report_reason.errors.0 }}
+            </p>
+          {% endif %}
+        </div>
+
+        {# More Details — optional textarea #}
+        <div class="rp-field">
+          <label class="rp-label" for="{{ form.more_reason.id_for_label }}">
+            {{ form.more_reason.label }}
+            <span class="rp-optional">Optional</span>
+          </label>
+          {{ form.more_reason }}
+          <p class="rp-field-hint">
+            Provide specific details — dates, screenshots, or anything that helps us investigate.
+          </p>
+          <p class="rp-char-count" id="rp-char-count">0 / 250</p>
+          {% if form.more_reason.errors %}
+            <p class="rp-field-error">
+              <i class="bi bi-x-circle-fill"></i>
+              {{ form.more_reason.errors.0 }}
+            </p>
+          {% endif %}
+        </div>
+
+        {# Actions #}
+        <div class="rp-actions">
+          <button type="submit" class="rp-btn rp-btn--primary">
+            <i class="bi bi-flag"></i>
+            Submit Report
+          </button>
+          <a href="javascript:history.back()" class="rp-btn rp-btn--ghost">
+            Cancel
+          </a>
+        </div>
+
+      </form>
+
+      {# Footer note #}
+      <p class="rp-footer-note">
+        <i class="bi bi-lock-fill"></i>
+        Your identity will not be shared with the reported user.
+      </p>
+
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  // ── Character counter for the textarea ──
+  var textarea = document.querySelector('[name="more_reason"]');
+  var counter  = document.getElementById('rp-char-count');
+
+  if (textarea && counter) {
+    function updateCount() {
+      var len = textarea.value.length;
+      counter.textContent = len + ' / 250';
+      // Turn red when close to the limit
+      counter.classList.toggle('rp-char-count--warn', len >= 220);
+    }
+    textarea.addEventListener('input', updateCount);
+    updateCount(); // run on load in case form re-rendered with errors
+  }
+
+  // ── Add rp-select class to Django-rendered select ──
+  // Django renders the <select> tag itself; we can't add a class inside
+  // the template without a custom widget, so we do it here.
+  var select = document.querySelector('[name="report_reason"]');
+  if (select) {
+    select.classList.add('rp-select');
+  }
+
+  // ── Add rp-textarea class to Django-rendered textarea ──
+  // The ReportForm already adds 'form-control' via widget attrs,
+  // but we add our own class too for our custom styles.
+  var ta = document.querySelector('[name="more_reason"]');
+  if (ta) {
+    ta.classList.add('rp-textarea');
+  }
+})();
+</script>
+{% endblock %}

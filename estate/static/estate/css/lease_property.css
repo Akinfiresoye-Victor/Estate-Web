@@ -686,3 +686,63 @@ select.form-input {
   margin-top: 2px;
   flex-shrink: 0;  /* stops the icon from squishing on small screens */
 }
+
+
+
+/* ═══════════════════════
+   AI DESCRIPTION SECTION
+═══════════════════════ */
+.ai-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.ai-hint-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f0f4ff;
+  border-left: 3px solid #6366f1;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+.ai-hint-text i {
+  color: #6366f1;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.ai-generate-btn {
+  align-self: flex-start;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s;
+}
+.ai-generate-btn:hover { opacity: 0.88; }
+.ai-generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ai-status-msg { font-size: 0.8rem; color: #6b7280; }
+.ai-status-msg.error { color: #ef4444; }
+
+/* Full-width button on mobile — easier to tap */
+@media (max-width: 580px) {
+  .ai-generate-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -314,3 +314,19 @@ RENT_RATE=[
     ('Quarterly', 'Quarterly (3 Months)'),
     ('Bi-Annually', 'Bi-Annually (6 Months)'),
 ]
+
+
+REPORT_REASONS=[
+    ('Fraud/Scam', 'Fraud/Scam activity'),
+    ('Fake listings', 'Fake Listings or Misleading information'),
+    ('Impersonation', 'Impersonation(pretending to be someone else)'),
+    ('Harassment or abusive behavior', 'Harassment or abusive behavior'),
+    ('Spam', 'Spam'),
+    ('Inappropirate content', 'Inappropirate Content'),
+    ('Failure to deliver agreed service', 'Failure to deliver agreed service'),
+    ('Suspicious activity', 'Suspicious activity'),
+    ('Violation of Platform rules', 'Violation of Platform rules'),
+    ('Unverified/Illegal Properties', 'Unverified/Illegal Properties'),
+    ('Hidden Charges/Unclear Pricing', 'Hidden Charges/Unclear Pricing'),
+    ('other', 'other')
+]

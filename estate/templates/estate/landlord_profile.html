@@ -5,6 +5,27 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'landlord/css/landlord_profile.css' %}">
 <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+
+.rp-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #b91c1c;
+  background: transparent;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 6px 12px;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.rp-trigger-btn:hover {
+  background: #fef2f2;
+  border-color: #f87171;
+  color: #991b1b;
+  text-decoration: none;
+}
 {% endblock %}
 
 {% block content %}
@@ -78,6 +99,14 @@
             class="lp-btn-contact text-decoration-none">
               <i class="bi bi-envelope-fill"></i> Contact Landlord
           </a>
+          {% if request.user.is_authenticated %}
+            {% if request.user != landlord.user %}
+              <a href="{%url 'report-user' landlord.user.id landlord%}" class="rp-trigger-btn">
+                <i class="bi bi-flag"></i>
+                Report Landlord
+              </a>
+            {% endif %}
+          {% endif %}
           <a href="tel:{{ landlord.phone_number }}" class="lp-btn-call">
             <i class="bi bi-telephone-fill"></i> Call Now
           </a>

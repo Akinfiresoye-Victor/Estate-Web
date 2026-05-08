@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from decouple import config
 from django.contrib import messages
-
+from requests.exceptions import ConnectionError, Timeout, RequestException
 
 PLAN_PRICES = {
     "growth": 15000,
@@ -48,6 +48,15 @@ def initiate_payment(request, plan):
             return redirect(result["data"]["authorization_url"])  # send user to Paystack page
         
         return render(request, "payments/error.html", {"message": "Could not initiate payment"})
+    except ConnectionError:
+        messages.error(request, 'Connection Error...')
+        return redirect("pricing_page")
+    except Timeout:
+        messages.error(request, "Loading Timeout")
+        return redirect("pricing_page")
+    except RequestException:
+        messages.error(request, "An error occurred while processing your request")
+        return redirect("pricing_page")
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

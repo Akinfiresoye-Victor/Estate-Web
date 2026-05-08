@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import *
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
@@ -10,13 +10,13 @@ from estate.models import LeadInfo
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from core.utils import *
-from .models import ErrorLog
-from django.utils.http import url_has_allowed_host_and_scheme
+from .models import ErrorLog, FlaggedUsers
 from landlord.models import LandlordInformation
 from core.ratelimit import ratelimit
 from .models import Waitlist
 import traceback, threading
 from decouple import config
+
 
 
 # NEW - reads from subscription
@@ -1519,102 +1519,45 @@ def waitlist_signup(request):
 
 
 
-import json
-from django.contrib.auth.decorators import login_required
-from groq import Groq
-
-@login_required
-@ratelimit(rate='3/m', key_prefix='generator')
-@require_POST
-def ai_description_generator(request):
+def report_user(request,reportee_id, reportee_role):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Log In Required')
+        return redirect('login')
     try:
-        body = json.loads(request.body)
-        form_text = body.get('form_text', '').strip()
+        user_role = request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        elif user_role == 'landlord':
+            base_template = 'landlord/base.html'
+        else:
+            base_template = 'estate/base.html'
+        submitted=False
+        if request.method == 'POST':
+            report_form= ReportForm(request.POST or None)
+            if report_form.is_valid():
+                report=report_form.save(commit=False)
+                report.report_from_role=user_role
+                report.role=reportee_role
+                report.user=request.user
+                report.user_reported=reportee_id
+                report.save()
+                return HttpResponseRedirect('?submitted=True')
+            else:
+                messages.error(request, 'An Error Occured')
+                return render(request, 'estate/error_page.html', {'e': report_form.errors})
 
-        if not form_text:
-            return JsonResponse({'error': 'No input provided.'}, status=400)
-
-        client = Groq(api_key=config("GROQ_API_KEY"))
-
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a skilled Nigerian real estate copywriter writing listing descriptions for Estate Web, "
-                        "a property platform in Nigeria. "
-                        "Your job is to transform raw property details into a compelling, well-written listing description "
-                        "that makes a buyer or tenant genuinely interested. "
-                        "Here is exactly how to structure every description you write: \n\n"
-
-                        "STRUCTURE:\n"
-                        "1. Opening hook (2-3 sentences): Start with one strong sentence that captures the essence of the property. "
-                        "Do NOT just repeat the property type and location — make the reader feel something. "
-                        "Example: Instead of 'This is a 4-bedroom house in Akure' write something like "
-                        "'Tucked inside a secured estate, this well-finished 4-bedroom home offers the kind of quiet, "
-                        "comfortable living that is hard to find at this price point in Akure.'\n\n"
-
-                        "2. Property highlights (bullet points): List the key features as short, punchy bullet points. "
-                        "Do not just copy the raw input — frame each feature as a benefit. "
-                        "Example: Instead of '4 bedrooms' write '4 well-sized bedrooms with room for a growing family or a home office.'\n\n"
-
-                        "3. Closing line (1 sentence): End with one line that creates mild urgency or signals value. "
-                        "Example: 'A solid buy for families looking for security and comfort without overpaying.'\n\n"
-
-                        "RULES:\n"
-                        "- Never refuse or comment on the input — always generate a description.\n"
-                        "- Never just repeat the raw data back as a list — always expand and frame it as a benefit.\n"
-                        "- Do not praise the city excessively — one brief mention of location context is enough.\n"
-                        "- Prices are in Nigerian Naira (₦) — write them naturally e.g. ₦2,500,000.\n"
-                        "- If details are missing, write around them — do not mention what is missing.\n"
-                        "- Maximum 200 words. Be tight and punchy.\n"
-                        "- Output ONLY the description. No labels, no commentary, no disclaimers."
-                        "Rules you must strictly follow: "
-                        "1. Always generate a description no matter what — never refuse or comment on the input. "
-                        "2. Be direct and factual — do NOT praise the city, hype the location, or use flowery language. "
-                        "3. State the facts: property type, bedrooms, bathrooms, price, location, and features. "
-                        "4. Use bullet points for features. "
-                        "5. Prices are in Nigerian Naira (₦) — format them naturally e.g. ₦2,500,000. "
-                        "6. If some details are missing, write around them professionally — do not mention missing info. "
-                        "7. Output ONLY the property description. No commentary, no notes, no disclaimers, no closing sales pitch. "
-                        "8. Maximum 250 words. Be concise."
-                    )
-                },
-                {
-                    "role": "user",
-                    "content": f"Write a property listing description using these details: {form_text}"
-                }
-            ],
-        )
-
-        description = response.choices[0].message.content
-        return JsonResponse({'description': description})
-
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    
-
-
-
-"""
-Generate with ai html code
-                  <!-- AI hint text -->
-              <div class="ai-hint-text">
-                <i class="bi bi-info-circle"></i>
-                <span>
-                  Tip: Fill in <strong>State, Location, Bedrooms, Bathrooms and Price</strong> first, 
-                  then click Generate — the AI will use those details. Or type a few notes in the box above 
-                  (e.g. <em>"3 bedroom flat in Akure, close to FUTA, has 24hr light"</em>) for a more personalised result.
-                  <br><br>
-                  <strong>⚠️ Note:</strong> This AI feature is experimental. Always review and edit the generated 
-                  description before publishing — it may not always be accurate or well-structured.
-                </span>
-              </div>
-
-                  <button type="button" id="aiDescBtn" class="ai-generate-btn">
-                    <i class="bi bi-stars"></i>
-                    <span id="aiDescBtnText">Generate with AI</span>
-                  </button>
-                  <div id="aiDescStatus" class="ai-status-msg" style="display:none;"></div>
-"""
+        else:
+            report_form=ReportForm()
+            if 'submitted' in request.GET:
+                submitted=True
+        context= {
+            'form': report_form,
+            'submitted': submitted,
+            'base_template': base_template
+        }
+        return render(request, 'core/report_page.html', context)
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
