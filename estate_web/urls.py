@@ -52,7 +52,7 @@ urlpatterns = [
 
 
 admin.site.site_title="Admin Page" #The browsers title
-admin.site.site_header="My Club Administration Page"
+admin.site.site_header="Estate Web Administration Page"
 admin.site.index_title= "Welcome To THe admin Area......"
 
 

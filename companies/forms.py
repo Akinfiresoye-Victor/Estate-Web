@@ -290,6 +290,7 @@ class EditEmployeeForm(forms.ModelForm):
                 ('Finance',     'Finance'),
                 ('Administration', 'Administration'),
                 ('Unassigned',  'Unassigned'),
+                ('IT/Customer Support',  'IT/Customer Support'),
             ]),
             'agent_status': forms.Select(),
             # agent_headshot uses Django's default ClearableFileInput

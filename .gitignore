@@ -42,8 +42,9 @@ pythonrc.py
 env.txt
 
 # Personal/Test
-docs/TODO.md
-docs/TODO_new.md
+/docs/
+/Estate Web Plans/
+/AGENTS.md
 
 # IDEs
 .vscode/
@@ -59,3 +60,5 @@ speed_security_audit.md
 
 # RubberDuck indexer config (contains auth token)
 .rubberduck/
+.docs/
+Estate

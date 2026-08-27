@@ -15,7 +15,6 @@ from landlord.models import LandlordInformation
 from core.ratelimit import ratelimit
 from .models import Waitlist
 import traceback, threading
-from decouple import config
 
 
 
@@ -1299,14 +1298,14 @@ def view_client(request, appointment_uuid):
     if request.user.role == 'customer':
         messages.error(request, 'Access denied: Unauthorized action.')
         return redirect('landing')
-    user_role = request.user.role
-    if user_role == 'company':
-        base_template = 'company/base.html'
-    elif user_role == 'agent':
-        base_template = 'agent/base.html'
-    else:
-        base_template = 'estate/base.html'
     try:
+        user_role = request.user.role
+        if user_role == 'company':
+            base_template = 'company/base.html'
+        elif user_role == 'agent':
+            base_template = 'agent/base.html'
+        else:
+            base_template = 'estate/base.html'
         if request.user.role == 'company':
             company=CompanyInformation.objects.get(user= request.user)
             lead_item=LeadInfo.objects.filter(company_uuid=company.unique_company_id).first()
@@ -1560,4 +1559,40 @@ def report_user(request,reportee_id, reportee_role):
         return render(request, 'core/report_page.html', context)
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def boost_property(request, property_type, property_id):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('landing')
+    if request.user.role == 'customer':
+        messages.warning(request, 'Error Denied')
+        return redirect('landing')
+    try:
+            if request.user.role == 'company':
+                company=CompanyInformation.objects.get(user=request.user)
+                if property_type == 'rent':
+                    property= PropertyManagementRent.objects.get(id=property_id, company_uuid=company.unique_company_id)
+                elif property_type == 'sale':
+                    property= PropertyManagementSale.objects.get(id=property_id, company_uuid=company.unique_company_id)
+                else:
+                    messages.error(request, 'Invalid Property Type')
+                    return redirect('manage-listings')
+            elif request.user.role == 'agent':
+                agent=AgentInformation.objects.get(user=request.user)
+                if property_type == 'rent':
+                    property= PropertyManagementRent.objects.get(id=property_id, agent_uuid=agent.agent_uuid)
+                elif property_type == 'sale':
+                    property= PropertyManagementSale.objects.get(id=property_id, agent_uuid=agent.agent_uuid)
+                else:
+                    messages.error(request, 'Invalid Property Type')
+                    return redirect('manage-listings')
+            else:
+                messages.error(request, 'Access Denied')
+                return redirect('landing')
+            messages.success(request, 'Property boosted successfully!')
+            return redirect('manage-listings')
+    except Exception:
+        error=ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})

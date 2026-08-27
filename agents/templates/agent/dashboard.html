@@ -316,6 +316,16 @@
           <div class="action-info"><h4>Analytics</h4><p>Track insights</p></div>
         </a>
 
+        <a href="{% url 'agent:my-company' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-building-fill"></i></div>
+          <div class="action-info"><h4>My Company</h4><p>Manage your company details</p></div>
+        </a>
+        
+        <a href="{% url 'agent:settings' %}" class="action-card">
+          <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
+          <div class="action-info"><h4>Settings</h4><p>Preferences</p></div>
+        </a>
+
         <div class="action-card coming-soon-card">
           <div class="cs-badge"><i class="bi bi-clock-history"></i> Soon</div>
           <div class="action-icon disabled-icon"><i class="bi bi-briefcase"></i></div>
@@ -327,11 +337,6 @@
           <div class="action-icon disabled-icon"><i class="bi bi-file-earmark-text"></i></div>
           <div class="action-info"><h4>Documents</h4><p>Contracts</p></div>
         </div>
-
-        <a href="{% url 'agent:settings' %}" class="action-card">
-          <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
-          <div class="action-info"><h4>Settings</h4><p>Preferences</p></div>
-        </a>
 
       </div>
     </section>
