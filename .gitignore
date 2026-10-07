@@ -61,4 +61,6 @@ speed_security_audit.md
 # RubberDuck indexer config (contains auth token)
 .rubberduck/
 .docs/
+.cursor
+.kombai
 Estate

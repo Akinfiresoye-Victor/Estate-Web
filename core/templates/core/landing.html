@@ -4,996 +4,1077 @@
 <head>
   <link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Estate Web is bringing verified, fraud-resistant property listings to Nigeria. Join early access and be notified when listings go live across Lagos, Abuja, and beyond.">
-  <title>Estate Web — Verified Properties Coming to Nigeria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Estate Web is preparing a clearer way to find property in Nigeria. Join the waitlist for an update when verified listings go live.">
+  <meta name="theme-color" content="#0d1117">
+  <title>Estate Web — Find a home with confidence</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --ink:#0d1117;--ink-soft:#1c2733;--gold:#c19b76;--gold-lt:#d4b896;--gold-dk:#9a7655;
-  --ivory:#faf8f4;--mist:#f0ede8;--slate:#8a8f98;--white:#ffffff;--sale:#2563eb;--lease:#16a34a;
-  --border:rgba(193,155,118,.22);--border-lt:rgba(255,255,255,.12);
-  --shadow-gold:0 8px 40px rgba(193,155,118,.22);--shadow-dark:0 12px 48px rgba(13,17,23,.35);
-  --shadow-sm:0 2px 12px rgba(13,17,23,.08);--radius:16px;--radius-sm:8px;
-  --ease:all 0.32s cubic-bezier(.4,0,.2,1);
-  --display:'Cormorant Garamond',Georgia,serif;--body:'DM Sans',system-ui,sans-serif;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--body);color:var(--ink);line-height:1.6;background:var(--ivory);overflow-x:hidden}
-h1,h2,h3,h4,h5,h6{font-family:var(--display);font-weight:600;line-height:1.15}
-.gold{color:var(--gold)}
-.eyebrow{display:inline-block;font-family:var(--body);font-size:0.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:0.85rem}
-.eyebrow-light{color:rgba(193,155,118,.9)}
-.gold-rule{display:inline-block;width:40px;height:2px;background:var(--gold);vertical-align:middle;margin-right:10px}
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #0d1117;
+      --ink-soft: #1c2733;
+      --gold: #c19b76;
+      --gold-lt: #d4b896;
+      --gold-dk: #9a7655;
+      --ivory: #faf8f4;
+      --mist: #f0ede8;
+      --slate: #8a8f98;
+      --white: #ffffff;
+      --sale: #2563eb;
+      --lease: #16a34a;
+      --border: rgba(13, 17, 23, .12);
+      --border-dark: rgba(255, 255, 255, .16);
+      --copy-muted: var(--ink-soft);
+      --copy-on-dark: rgba(255, 255, 255, .78);
+      --shadow-card: 0 12px 30px rgba(13, 17, 23, .08);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+    }
 
-/* PRELAUNCH BANNER */
-.prelaunch-banner{background:linear-gradient(90deg,var(--ink) 0%,var(--ink-soft) 100%);border-bottom:1px solid rgba(193,155,118,.2);padding:0.55rem 0;text-align:center}
-.prelaunch-banner-inner{display:flex;align-items:center;justify-content:center;gap:0.65rem;flex-wrap:wrap;font-size:0.78rem;color:rgba(255,255,255,.7);font-family:var(--body)}
-.prelaunch-pill{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:var(--ink);padding:3px 10px;border-radius:20px;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px}
-.prelaunch-banner a{color:var(--gold);text-decoration:none;font-weight:700;transition:color 0.2s}
-.prelaunch-banner a:hover{color:var(--gold-lt);text-decoration:underline}
+    html { scroll-behavior: auto; }
+    body.estate-landing {
+      margin: 0;
+      overflow-x: clip;
+      background: var(--ivory);
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
 
-/* NAVBAR */
-.navbar{background:rgba(13,17,23,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:0.9rem 0;position:sticky;top:0;z-index:1000;border-bottom:1px solid var(--border-lt)}
-.navbar-brand{font-family:var(--display);font-size:1.5rem;font-weight:700;color:var(--white)!important;letter-spacing:0.3px;display:flex;align-items:center;gap:0.55rem}
-.logo{height:48px;width:auto;object-fit:contain;border-radius:6px}
-.navbar-toggler{border:1px solid var(--border-lt)!important;padding:0.4rem 0.65rem}
-.navbar-toggler-icon{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28193, 155, 118, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e")!important}
-.nav-link{color:rgba(255,255,255,.75)!important;font-weight:500;font-size:0.9rem;padding:0.5rem 1rem!important;transition:color 0.25s;letter-spacing:0.2px}
-.nav-link:hover{color:var(--gold)!important}
-.btn-nav{background:var(--gold);color:var(--ink)!important;border:none;padding:0.6rem 1.4rem;font-weight:700;font-size:0.85rem;border-radius:var(--radius-sm);transition:var(--ease);text-decoration:none;display:inline-block;letter-spacing:0.3px}
-.btn-nav:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:var(--shadow-gold);color:var(--ink)!important}
-.dropdown-menu{background:var(--ink-soft);border:1px solid var(--border-lt);border-radius:var(--radius);padding:0.5rem;margin-top:0.75rem;box-shadow:var(--shadow-dark)}
-.dropdown-item{padding:0.75rem 1rem;border-radius:var(--radius-sm);color:rgba(255,255,255,.8);font-size:0.88rem;display:flex;align-items:center;gap:0.75rem;transition:var(--ease)}
-.dropdown-item:hover{background:rgba(193,155,118,.15);color:var(--gold)}
-.dropdown-item i{font-size:1.1rem;color:var(--gold)}
-.dropdown-item small{color:rgba(255,255,255,.45)!important;font-size:0.75rem}
+    .estate-landing h1,
+    .estate-landing h2,
+    .estate-landing h3,
+    .estate-landing h4,
+    .estate-landing h5,
+    .estate-landing h6 {
+      margin: 0;
+      color: inherit;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 600;
+      line-height: 1.08;
+    }
 
-/* ALERTS */
-.messages-container{position:fixed;top:1rem;right:1rem;z-index:9999;max-width:360px;display:flex;flex-direction:column;gap:0.5rem}
-.alert{border-radius:10px;padding:0.85rem 1.1rem;box-shadow:var(--shadow-dark);animation:slideRight 0.35s ease both;border:none;display:flex;align-items:center;gap:0.65rem;font-size:0.88rem;font-family:var(--body)}
-@keyframes slideRight{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+    .estate-landing p { margin: 0; }
+    .estate-landing a { color: inherit; }
+    .estate-landing img { display: block; max-width: 100%; }
+    .estate-landing .container { --bs-gutter-x: 1.5rem; }
+    .estate-landing main { display: block; }
 
-/* HERO – IMPROVED WITH REAL BACKGROUND */
-.hero{min-height:100svh;background:linear-gradient(160deg,rgba(13,17,23,.88) 0%,rgba(13,17,23,.75) 55%,rgba(28,39,51,.88) 100%), url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&h=1080&fit=crop&auto=format') no-repeat center center/cover;display:flex;align-items:center;color:var(--white);padding:5rem 0 4rem;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(193,155,118,.15) 0%,transparent 45%),radial-gradient(circle at 10% 80%,rgba(193,155,118,.08) 0%,transparent 40%);pointer-events:none}
-.hero::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,transparent 0%,var(--gold) 35%,var(--gold-dk) 70%,transparent 100%);pointer-events:none}
-.hero-inner{position:relative;z-index:2}
-.hero-index{font-family:var(--display);font-size:clamp(5rem,20vw,14rem);font-weight:700;color:rgba(193,155,118,.05);line-height:1;position:absolute;top:-1.5rem;right:-1rem;pointer-events:none;user-select:none;letter-spacing:-5px}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(193,155,118,.12);border:1px solid rgba(193,155,118,.25);color:var(--gold);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:6px 14px;border-radius:20px;margin-bottom:1.5rem;animation:fadeUp 0.9s ease both}
-.hero-eyebrow i{font-size:0.8rem}
-.hero h1{font-size:clamp(2.4rem,7vw,5.2rem);font-weight:700;color:var(--white);margin-bottom:1.25rem;letter-spacing:-0.5px;animation:fadeUp 0.9s 0.1s ease both}
-.hero h1 em{font-style:italic;color:var(--gold)}
-.hero-sub{font-size:clamp(0.9rem,1.8vw,1.05rem);color:rgba(255,255,255,.65);font-weight:300;max-width:560px;margin-bottom:2.5rem;line-height:1.9;animation:fadeUp 0.9s 0.18s ease both}
+    .estate-landing a:focus-visible,
+    .estate-landing button:focus-visible,
+    .estate-landing input:focus-visible {
+      outline: 3px solid var(--gold-dk);
+      outline-offset: 3px;
+      box-shadow: none;
+    }
 
-/* WAITLIST FORM (hero) */
-.waitlist-form-wrap{max-width:520px;margin-bottom:2.75rem;animation:fadeUp 0.9s 0.26s ease both}
-.waitlist-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.45);margin-bottom:0.6rem;display:block}
-.waitlist-row{display:flex;gap:0.5rem;flex-wrap:wrap}
-.waitlist-input{flex:1;min-width:200px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:var(--radius-sm);color:var(--white);font-family:var(--body);font-size:0.9rem;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s}
-.waitlist-input::placeholder{color:rgba(255,255,255,.35)}
-.waitlist-input:focus{border-color:var(--gold)}
-.btn-waitlist{display:inline-flex;align-items:center;gap:7px;padding:0.75rem 1.6rem;background:var(--gold);color:var(--ink);font-weight:700;font-size:0.88rem;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:var(--body);letter-spacing:0.3px;transition:var(--ease);white-space:nowrap}
-.btn-waitlist:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:var(--shadow-gold)}
-.waitlist-note{font-size:0.72rem;color:rgba(255,255,255,.35);margin-top:0.6rem;display:flex;align-items:center;gap:5px}
-.waitlist-note i{color:var(--gold);font-size:0.75rem}
+    .skip-link {
+      position: absolute;
+      z-index: 1100;
+      top: 8px;
+      left: 8px;
+      padding: 10px 14px;
+      transform: translateY(-160%);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .skip-link:focus { transform: translateY(0); }
 
-/* HERO ACTIONS */
-.hero-actions{display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:3rem;animation:fadeUp 0.9s 0.34s ease both}
-.btn-hero-outline{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.6rem;background:transparent;color:rgba(255,255,255,.85);font-weight:600;font-size:0.88rem;border-radius:var(--radius-sm);text-decoration:none;border:1.5px solid rgba(255,255,255,.25);font-family:var(--body);transition:var(--ease)}
-.btn-hero-outline:hover{border-color:var(--gold);color:var(--gold)}
-.btn-hero-gold{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.6rem;background:transparent;color:var(--gold);font-weight:700;font-size:0.88rem;border-radius:var(--radius-sm);text-decoration:none;border:1.5px solid rgba(193,155,118,.45);font-family:var(--body);transition:var(--ease)}
-.btn-hero-gold:hover{background:rgba(193,155,118,.15);color:var(--gold-lt)}
+    /* Compact, familiar navigation keeps the page's existing Bootstrap behavior. */
+    .site-nav {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: rgba(250, 248, 244, .97);
+    }
+    .site-nav .container { min-height: 72px; }
+    .site-nav .navbar-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0;
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .site-logo {
+      width: 38px;
+      height: 38px;
+      padding: 3px;
+      border-radius: 50%;
+      background: var(--ink);
+      object-fit: contain;
+    }
+    .site-nav .navbar-toggler {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+    }
+    .site-nav .navbar-toggler:focus { box-shadow: 0 0 0 3px rgba(193, 155, 118, .25); }
+    .site-nav .navbar-toggler-icon {
+      width: 1.15em;
+      height: 1.15em;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%230d1117' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    .site-nav .navbar-nav { gap: 4px; }
+    .site-nav .nav-link {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      padding: 10px 14px;
+      border: 0;
+      background: transparent;
+      color: var(--ink-soft);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color .2s ease, background-color .2s ease;
+    }
+    .site-nav .nav-link:hover,
+    .site-nav .nav-link:focus-visible { color: var(--gold-dk); }
+    .site-nav .nav-link.nav-sign-in {
+      justify-content: center;
+      min-width: 104px;
+      margin-left: 4px;
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: var(--white);
+    }
+    .site-nav .nav-link.nav-sign-in:hover { background: var(--ink-soft); color: var(--gold-lt); }
+    .site-nav .dropdown-menu {
+      min-width: 250px;
+      margin-top: 7px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: var(--shadow-card);
+    }
+    .site-nav .dropdown-item {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 7px;
+      color: var(--ink-soft);
+      font-size: .9rem;
+      white-space: normal;
+    }
+    .site-nav .dropdown-item:hover,
+    .site-nav .dropdown-item:focus { background: var(--ivory); color: var(--ink); }
+    .site-nav .dropdown-item i { color: var(--gold-dk); font-size: 1.05rem; }
+    .site-nav .dropdown-item small { color: var(--copy-muted); font-size: .78rem; }
 
-/* ACCOUNT CARDS */
-.account-strip{animation:fadeUp 0.9s 0.42s ease both}
-.account-label{font-size:0.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:block}
-.account-cards{display:flex;gap:0.75rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-.account-cards::-webkit-scrollbar{display:none}
-.account-card{flex-shrink:0;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:1.25rem 1.5rem;text-decoration:none;color:var(--white);transition:var(--ease);min-width:160px;display:flex;flex-direction:column;gap:0.5rem}
-.account-card:hover{background:rgba(193,155,118,.18);border-color:var(--gold);transform:translateY(-5px);box-shadow:0 12px 32px rgba(193,155,118,.2);color:var(--white)}
-.account-card-icon{font-size:1.8rem;line-height:1}
-.account-card h3{font-family:var(--display);font-size:1.05rem;font-weight:600;color:var(--white);margin:0}
-.account-card p{font-size:0.72rem;color:rgba(255,255,255,.55);margin:0;line-height:1.45}
-.account-card-arrow{margin-top:auto;font-size:0.75rem;color:var(--gold);opacity:0;transition:opacity 0.2s}
-.account-card:hover .account-card-arrow{opacity:1}
-.account-card-soon{position:relative;cursor:default;opacity:0.7;border:1px dashed rgba(193,155,118,.4)!important;background:rgba(193,155,118,.04)!important}
-.account-card-soon:hover{transform:none!important;box-shadow:none!important}
-.account-card-soon h3{color:rgba(255,255,255,.5)}
-.account-card-soon p{color:rgba(255,255,255,.32)}
-.account-card-soon-badge{position:absolute;top:10px;right:10px;padding:3px 8px;background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:var(--ink);border-radius:20px;font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--body)}
+    .messages-container { padding-top: 12px; }
+    .messages-container .alert {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      padding: 12px 14px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(13, 17, 23, .08);
+      font-size: .94rem;
+    }
+    .messages-container .alert i { flex: 0 0 auto; }
+    .messages-container .btn-close { min-width: 36px; min-height: 36px; margin-left: auto; }
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    /* A content-height hero puts the email action before decorative material. */
+    .hero-section {
+      padding: 42px 0 54px;
+      background: var(--ivory);
+    }
+    .hero-layout { row-gap: 32px; }
+    .hero-copy { max-width: 590px; }
+    .hero-status {
+      max-width: 40ch;
+      margin-bottom: 18px !important;
+      color: var(--gold-dk);
+      font-size: .94rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .hero-title {
+      max-width: 12ch;
+      margin-bottom: 17px !important;
+      font-size: clamp(2.7rem, 11vw, 5.3rem);
+      letter-spacing: -.045em;
+    }
+    .hero-title span { color: var(--gold-dk); }
+    .hero-description {
+      max-width: 52ch;
+      margin-bottom: 25px !important;
+      color: var(--copy-muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .waitlist-form-wrap {
+      max-width: 520px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: 0 10px 26px rgba(13, 17, 23, .045);
+    }
+    .waitlist-field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: .92rem;
+      font-weight: 700;
+    }
+    .waitlist-control { display: grid; gap: 9px; }
+    .estate-landing .waitlist-input {
+      min-height: 52px;
+      padding: 12px 14px;
+      border: 1px solid rgba(13, 17, 23, .24);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 16px;
+    }
+    .estate-landing .waitlist-input::placeholder { color: var(--copy-muted); opacity: 1; }
+    .estate-landing .waitlist-input:focus {
+      border-color: var(--gold-dk);
+      box-shadow: 0 0 0 3px rgba(193, 155, 118, .22);
+    }
+    .estate-landing .btn-waitlist {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 12px 18px;
+      border: 1px solid var(--ink);
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: var(--white);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: .94rem;
+      font-weight: 700;
+      transition: transform .2s var(--ease-out), background-color .2s ease, color .2s ease;
+    }
+    .estate-landing .btn-waitlist:hover { transform: translateY(-1px); background: var(--ink-soft); color: var(--gold-lt); }
+    .estate-landing .btn-waitlist:active { transform: translateY(0); }
+    .waitlist-helper {
+      display: block;
+      margin-top: 9px !important;
+      color: var(--copy-muted);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+    .partner-inline-link {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      gap: 7px;
+      margin-top: 13px;
+      color: var(--ink-soft) !important;
+      font-size: .9rem;
+      font-weight: 600;
+      text-decoration-color: rgba(154, 118, 85, .6);
+      text-underline-offset: 4px;
+    }
+    .partner-inline-link:hover { color: var(--gold-dk) !important; }
+    .hero-visual { position: relative; }
+    .hero-image {
+      width: 100%;
+      aspect-ratio: 1.24 / 1;
+      border-radius: 12px;
+      background: var(--mist);
+      object-fit: cover;
+      object-position: center 52%;
+    }
+    .hero-image-caption {
+      margin-top: 9px !important;
+      color: var(--copy-muted);
+      font-size: .78rem;
+      line-height: 1.45;
+    }
 
-/* TICKER */
-.ticker-wrap{background:var(--gold);padding:0.65rem 0;overflow:hidden;white-space:nowrap}
-.ticker-track{display:inline-flex;gap:0;animation:ticker 30s linear infinite}
-.ticker-item{display:inline-flex;align-items:center;gap:0.6rem;font-size:0.73rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);padding:0 2.5rem}
-.ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--ink);opacity:0.4}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    /* Explain the actual pre-launch state instead of relying on a progress graphic. */
+    .launch-story {
+      padding: 50px 0;
+      background: var(--ink);
+      color: var(--white);
+    }
+    .launch-story h2 {
+      max-width: 15ch;
+      margin-bottom: 20px;
+      color: var(--white);
+      font-size: clamp(2rem, 6vw, 3.25rem);
+      letter-spacing: -.025em;
+    }
+    .launch-lead {
+      max-width: 52ch;
+      color: var(--copy-on-dark);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .launch-details {
+      margin-top: 30px;
+      border-top: 1px solid var(--border-dark);
+    }
+    .launch-detail {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border-dark);
+    }
+    .launch-detail h3 {
+      margin-bottom: 6px;
+      color: var(--gold-lt);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: .96rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .launch-detail p { max-width: 55ch; color: var(--copy-on-dark); font-size: .94rem; line-height: 1.65; }
 
-/* TRUST STRIP */
-.trust-strip{background:var(--white);border-bottom:1px solid var(--mist);padding:2.5rem 0}
-.trust-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
-.trust-item{display:flex;align-items:flex-start;gap:1rem}
-.trust-icon{width:46px;height:46px;flex-shrink:0;background:rgba(193,155,118,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:var(--gold-dk)}
-.trust-title{font-family:var(--display);font-size:0.95rem;font-weight:600;color:var(--ink);margin-bottom:0.15rem}
-.trust-desc{font-size:0.78rem;color:var(--slate);line-height:1.6;margin:0}
+    /* A simple gallery is reserved for genuinely comparable properties. */
+    .listings-section { padding: 58px 0 64px; background: var(--white); }
+    .section-heading {
+      max-width: 680px;
+      margin-bottom: 24px;
+    }
+    .section-heading h2 {
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-size: clamp(2.15rem, 6.5vw, 3.5rem);
+      letter-spacing: -.03em;
+    }
+    .section-heading p { max-width: 58ch; color: var(--copy-muted); font-size: .98rem; line-height: 1.7; }
+    .sample-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 0 22px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--gold);
+      background: var(--ivory);
+      color: var(--ink-soft);
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+    .sample-notice i { margin-top: 2px; color: var(--gold-dk); }
+    .property-card {
+      overflow: hidden;
+      height: 100%;
+      border: 1px solid rgba(13, 17, 23, .12);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: 0 4px 14px rgba(13, 17, 23, .035);
+      transition: transform .24s var(--ease-out), box-shadow .24s ease;
+    }
+    .property-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
+    .property-image-wrap { position: relative; overflow: hidden; aspect-ratio: 1.42 / 1; background: var(--mist); }
+    .property-image { width: 100%; height: 100%; object-fit: cover; transition: transform .45s var(--ease-out); }
+    .property-card:hover .property-image { transform: scale(1.025); }
+    .property-type {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 5px 9px;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .95);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .property-type.sale { color: var(--sale); }
+    .property-type.rent { color: var(--lease); }
+    .property-card .card-body { display: flex; flex-direction: column; padding: 17px; }
+    .property-sample-label {
+      margin-bottom: 8px;
+      color: var(--gold-dk);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .035em;
+      text-transform: uppercase;
+    }
+    .property-title {
+      margin-bottom: 7px !important;
+      color: var(--ink);
+      font-size: 1.34rem;
+      line-height: 1.15;
+    }
+    .property-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px !important;
+      color: var(--copy-muted);
+      font-size: .9rem;
+    }
+    .property-location i { color: var(--gold-dk); }
+    .property-price {
+      margin-bottom: 14px !important;
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+    .property-price small { color: var(--copy-muted); font-family: 'DM Sans', system-ui, sans-serif; font-size: .8rem; font-weight: 500; }
+    .property-specs {
+      display: flex;
+      min-height: 40px;
+      flex-wrap: wrap;
+      gap: 8px 15px;
+      padding: 11px 0;
+      border-top: 1px solid var(--border);
+      color: var(--copy-muted);
+      font-size: .84rem;
+    }
+    .property-spec { display: inline-flex; align-items: center; gap: 6px; }
+    .property-spec i { color: var(--gold-dk); }
+    .property-notify {
+      display: flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-top: auto;
+      padding: 10px;
+      border: 1px solid rgba(154, 118, 85, .42);
+      border-radius: var(--radius-sm);
+      background: var(--ivory);
+      color: var(--ink-soft) !important;
+      font-size: .86rem;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: border-color .2s ease, background-color .2s ease, color .2s ease;
+    }
+    .property-notify:hover { border-color: var(--gold-dk); background: var(--mist); color: var(--ink) !important; }
 
-/* PREVIEW SECTION – REAL IMAGES */
-.preview-section{background:var(--ivory);padding:5rem 0}
-.section-header{margin-bottom:2.5rem}
-.section-header h2{font-size:clamp(1.8rem,4vw,3rem);color:var(--ink);margin-bottom:0.5rem}
-.section-sub{font-size:0.88rem;color:var(--slate);line-height:1.65;max-width:520px}
-.preview-banner{display:inline-flex;align-items:center;gap:8px;background:rgba(193,155,118,.08);border:1px solid rgba(193,155,118,.25);border-radius:var(--radius-sm);padding:0.55rem 1.1rem;font-size:0.75rem;font-weight:700;color:var(--gold-dk);margin-bottom:2rem;font-family:var(--body)}
-.preview-banner i{font-size:0.85rem}
-.preview-grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
-.preview-card{background:var(--white);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);position:relative}
-.preview-card-img-wrap{height:190px;position:relative;overflow:hidden}
-.preview-card-img-wrap img{width:100%;height:100%;object-fit:cover}
-.preview-type-badge{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:20px;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--body)}
-.preview-type-badge.sale{background:rgba(37,99,235,.15);color:#2563eb;border:1px solid rgba(37,99,235,.25)}
-.preview-type-badge.rent{background:rgba(22,163,74,.15);color:#16a34a;border:1px solid rgba(22,163,74,.25)}
-.preview-sample-tag{position:absolute;top:10px;right:10px;padding:3px 9px;border-radius:20px;background:rgba(13,17,23,.55);color:rgba(255,255,255,.75);font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:var(--body);backdrop-filter:blur(4px)}
-.preview-card-body{padding:1rem 1.1rem 1.2rem}
-.preview-card-title{font-family:var(--display);font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:0.3rem}
-.preview-card-location{font-size:0.78rem;color:var(--slate);display:flex;align-items:center;gap:4px;margin-bottom:0.85rem}
-.preview-card-price{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:0.75rem;line-height:1}
-.preview-card-price small{font-family:var(--body);font-size:0.68rem;color:var(--slate);font-weight:500}
-.preview-card-specs{display:flex;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:0.75rem}
-.preview-spec{display:flex;align-items:center;gap:5px;font-size:0.76rem;color:var(--slate);font-weight:500}
-.preview-spec i{color:var(--gold-dk);font-size:0.85rem}
-.preview-notify-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:0.85rem;padding:0.6rem;background:rgba(193,155,118,.08);border:1.5px solid rgba(193,155,118,.25);border-radius:var(--radius-sm);color:var(--gold-dk);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:var(--body);transition:var(--ease);text-decoration:none}
-.preview-notify-btn:hover{background:rgba(193,155,118,.18);color:var(--gold-dk)}
+    /* Useful capabilities stay scannable without another row of icon cards. */
+    .capabilities-section { padding: 58px 0; background: var(--ivory); }
+    .capabilities-heading { max-width: 580px; margin-bottom: 25px; }
+    .capabilities-heading h2 { margin-bottom: 12px; font-size: clamp(2.1rem, 6vw, 3.25rem); letter-spacing: -.03em; }
+    .capabilities-heading p { color: var(--copy-muted); font-size: .98rem; }
+    .capability-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--border);
+      list-style: none;
+    }
+    .capability-item {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .capability-icon { padding-top: 2px; color: var(--gold-dk); font-size: 1.05rem; }
+    .capability-item h3 {
+      margin-bottom: 4px;
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: .98rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .capability-item p { max-width: 55ch; color: var(--copy-muted); font-size: .91rem; line-height: 1.6; }
 
-/* WAITLIST SECTION */
-.waitlist-section{background:var(--ink);padding:5rem 0;position:relative;overflow:hidden}
-.waitlist-section::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 50%,rgba(193,155,118,.08) 0%,transparent 50%);pointer-events:none}
-.waitlist-inner{position:relative;z-index:1;max-width:640px;margin:0 auto;text-align:center}
-.waitlist-inner h2{font-size:clamp(1.8rem,4vw,3.2rem);color:var(--white);margin-bottom:0.85rem}
-.waitlist-inner h2 em{font-style:italic;color:var(--gold)}
-.waitlist-inner p{font-size:0.9rem;color:rgba(255,255,255,.5);margin-bottom:2.25rem;line-height:1.85}
-.waitlist-form-large{display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center}
-.waitlist-input-lg{flex:1;min-width:240px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);border-radius:var(--radius-sm);color:var(--white);font-family:var(--body);font-size:0.9rem;padding:0.85rem 1.1rem;outline:none;transition:border-color 0.2s}
-.waitlist-input-lg::placeholder{color:rgba(255,255,255,.3)}
-.waitlist-input-lg:focus{border-color:var(--gold)}
-.btn-waitlist-lg{display:inline-flex;align-items:center;gap:7px;padding:0.85rem 2rem;background:var(--gold);color:var(--ink);font-weight:700;font-size:0.9rem;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:var(--body);letter-spacing:0.3px;transition:var(--ease);white-space:nowrap}
-.btn-waitlist-lg:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:var(--shadow-gold)}
-.waitlist-social-proof{margin-top:1.5rem;font-size:0.75rem;color:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;gap:8px}
-.waitlist-social-proof span{color:var(--gold);font-weight:700}
-.waitlist-perks{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;margin-top:2rem}
-.waitlist-perk{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:rgba(255,255,255,.5)}
-.waitlist-perk i{color:var(--gold);font-size:0.8rem}
+    /* Partner routes and coverage are presented as information, not fake metrics. */
+    .partners-section { padding: 58px 0 64px; background: var(--mist); }
+    .partners-intro { max-width: 660px; margin-bottom: 26px; }
+    .partners-intro h2 { margin-bottom: 12px; font-size: clamp(2.15rem, 6.5vw, 3.5rem); letter-spacing: -.03em; }
+    .partners-intro p { color: var(--copy-muted); font-size: .98rem; line-height: 1.7; }
+    .partner-callout {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 34px;
+      padding: 22px;
+      border-radius: 12px;
+      background: var(--ink);
+      color: var(--white);
+    }
+    .partner-callout h3 { margin-bottom: 6px; color: var(--white); font-size: 1.65rem; }
+    .partner-callout p { max-width: 56ch; color: var(--copy-on-dark); font-size: .94rem; line-height: 1.65; }
+    .partner-apply-link {
+      display: inline-flex;
+      min-height: 48px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border-radius: var(--radius-sm);
+      background: var(--gold);
+      color: var(--ink) !important;
+      font-size: .9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .2s var(--ease-out), background-color .2s ease;
+    }
+    .partner-apply-link:hover { transform: translateY(-1px); background: var(--gold-lt); }
+    .partner-apply-link:active { transform: translateY(0); }
+    .role-paths { display: grid; gap: 10px; margin: 0 0 34px; }
+    .role-path {
+      display: flex;
+      min-height: 60px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 15px;
+      border-top: 1px solid rgba(13, 17, 23, .2);
+      color: var(--ink) !important;
+      font-weight: 700;
+      text-decoration: none;
+      transition: color .2s ease, border-color .2s ease;
+    }
+    .role-path:last-child { border-bottom: 1px solid rgba(13, 17, 23, .2); }
+    .role-path:hover { border-color: var(--gold-dk); color: var(--gold-dk) !important; }
+    .role-path i { color: var(--gold-dk); font-size: 1.05rem; }
+    .market-list-heading { margin-bottom: 12px !important; color: var(--ink); font-size: 1.6rem; }
+    .market-list {
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid rgba(13, 17, 23, .17);
+      list-style: none;
+    }
+    .market-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(13, 17, 23, .17);
+      color: var(--copy-muted);
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+    .market-name { color: var(--ink); font-weight: 700; }
+    .market-state { color: var(--gold-dk); font-size: .78rem; font-weight: 700; }
+    .planned-market {
+      margin-top: 14px !important;
+      color: var(--copy-muted);
+      font-size: .88rem;
+    }
+    .planned-market strong { color: var(--ink); }
 
-/* PARTNERS SECTION */
-.partners-section{background:var(--white);padding:5rem 0;border-top:1px solid var(--mist)}
-.partner-progress-header{text-align:center;margin-bottom:3rem}
-.partner-progress-header h2{font-size:clamp(1.8rem,4vw,3rem);color:var(--ink);margin-bottom:0.65rem}
-.partner-progress-header p{font-size:0.88rem;color:var(--slate);max-width:500px;margin:0 auto;line-height:1.8}
-.partner-cities-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:3rem}
-.partner-city-card{background:var(--ivory);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1.1rem}
-.city-icon{width:46px;height:46px;flex-shrink:0;background:rgba(13,17,23,.06);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
-.city-info{flex:1}
-.city-name{font-family:var(--display);font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:0.2rem}
-.city-desc{font-size:0.78rem;color:var(--slate)}
-.city-status{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--body);flex-shrink:0}
-.city-status.onboarding{background:rgba(22,163,74,.1);color:#16a34a;border:1px solid rgba(22,163,74,.2)}
-.city-status.soon{background:rgba(193,155,118,.1);color:var(--gold-dk);border:1px solid rgba(193,155,118,.25)}
-.city-status i{font-size:0.65rem}
-.onboard-progress-wrap{max-width:560px;margin:0 auto 3rem;text-align:center}
-.onboard-progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem}
-.onboard-progress-label span{font-size:0.78rem;color:var(--slate);font-weight:500}
-.onboard-progress-label strong{font-family:var(--display);font-size:0.9rem;color:var(--ink)}
-.onboard-bar-track{height:8px;background:var(--mist);border-radius:99px;overflow:hidden}
-.onboard-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-lt) 100%);border-radius:99px;width:0%;transition:width 1.2s ease}
-.onboard-bar-note{font-size:0.72rem;color:var(--slate);margin-top:0.5rem}
-.partner-cta-row{background:var(--ink);border-radius:var(--radius);padding:2.25rem 2rem;display:flex;flex-direction:column;align-items:flex-start;gap:1.5rem}
-.partner-cta-text h3{font-family:var(--display);font-size:1.5rem;color:var(--white);margin-bottom:0.5rem}
-.partner-cta-text p{font-size:0.85rem;color:rgba(255,255,255,.5);line-height:1.75;margin:0}
-.btn-partner{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.8rem;background:var(--gold);color:var(--ink);font-weight:700;font-size:0.88rem;border-radius:var(--radius-sm);text-decoration:none;font-family:var(--body);transition:var(--ease);flex-shrink:0;white-space:nowrap}
-.btn-partner:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:var(--shadow-gold);color:var(--ink)}
+    .waitlist-section {
+      scroll-margin-top: 18px;
+      padding: 48px 0;
+      background: var(--ink);
+      color: var(--white);
+    }
+    .waitlist-close { max-width: 760px; margin: 0 auto; }
+    .waitlist-close h2 { margin-bottom: 10px; color: var(--white); font-size: clamp(2.1rem, 6vw, 3.5rem); }
+    .waitlist-close > p { max-width: 58ch; margin-bottom: 22px !important; color: var(--copy-on-dark); font-size: .98rem; line-height: 1.7; }
+    .waitlist-close .waitlist-field-label { color: var(--white); }
+    .waitlist-close .waitlist-helper { color: rgba(255, 255, 255, .78); }
+    .waitlist-close .waitlist-input { border-color: rgba(255, 255, 255, .35); }
+    .waitlist-close .waitlist-input:focus { border-color: var(--gold-lt); }
+    .estate-landing .waitlist-close .btn-waitlist { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+    .estate-landing .waitlist-close .btn-waitlist:hover { border-color: var(--gold-lt); background: var(--gold-lt); color: var(--ink); }
+    .waitlist-close .waitlist-form-wrap { border-color: var(--border-dark); background: rgba(255, 255, 255, .06); box-shadow: none; }
+    .estate-landing .waitlist-close .waitlist-input { background: var(--white); color: var(--ink); }
+    .estate-landing .launch-story a:focus-visible,
+    .estate-landing .waitlist-section a:focus-visible,
+    .estate-landing .waitlist-section button:focus-visible,
+    .estate-landing .waitlist-section input:focus-visible,
+    .estate-landing .partner-callout a:focus-visible {
+      outline-color: var(--gold-lt);
+    }
 
-/* FEATURES */
-.features-section{background:var(--ivory);padding:5rem 0}
-.features-header{margin-bottom:3rem}
-.features-header h2{font-size:clamp(1.8rem,4vw,3rem);color:var(--ink);margin-bottom:0.5rem}
-.feature-grid{display:grid;grid-template-columns:1fr;gap:0;border:1px solid rgba(13,17,23,.10);border-radius:var(--radius);overflow:hidden}
-.feature-row{display:grid;grid-template-columns:56px 1fr;border-bottom:1px solid rgba(13,17,23,.08);transition:var(--ease);background:var(--white)}
-.feature-row:last-child{border-bottom:none}
-.feature-row:hover{background:var(--ink)}
-.feature-row:hover .feat-num{color:var(--gold);border-right-color:rgba(193,155,118,.3)}
-.feature-row:hover .feat-title{color:var(--white)}
-.feature-row:hover .feat-desc{color:rgba(255,255,255,.6)}
-.feature-row:hover .feat-icon{background:rgba(193,155,118,.15);color:var(--gold)}
-.feature-row:hover .feat-arrow{color:var(--gold);opacity:1}
-.feat-num{font-family:var(--display);font-size:0.72rem;font-weight:600;color:rgba(13,17,23,.25);display:flex;align-items:flex-start;justify-content:center;padding:1.4rem 0 0;border-right:1px solid rgba(13,17,23,.08);transition:var(--ease)}
-.feat-body{padding:1.3rem 1.4rem;display:flex;gap:1rem;align-items:flex-start}
-.feat-icon{width:38px;height:38px;background:rgba(193,155,118,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;color:var(--gold-dk);flex-shrink:0;transition:var(--ease)}
-.feat-content{flex:1}
-.feat-title{font-family:var(--display);font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:0.2rem;transition:var(--ease)}
-.feat-desc{font-size:0.8rem;color:var(--slate);line-height:1.65;margin:0;transition:var(--ease)}
-.feat-arrow{color:var(--slate);opacity:0;font-size:0.9rem;transition:var(--ease);flex-shrink:0;margin-top:2px}
+    .site-footer {
+      padding: 40px 0 20px;
+      background: #0a0d12;
+      color: var(--white);
+    }
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 11px;
+      color: var(--gold-lt) !important;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .footer-brand .site-logo { width: 32px; height: 32px; }
+    .footer-about { max-width: 38ch; color: var(--copy-on-dark); font-size: .9rem; line-height: 1.7; }
+    .footer-column-title {
+      margin: 0 0 10px !important;
+      color: var(--gold-lt) !important;
+      font-family: 'DM Sans', system-ui, sans-serif !important;
+      font-size: .9rem !important;
+      font-weight: 700 !important;
+      letter-spacing: .01em;
+    }
+    .footer-links { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+    .footer-links a {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      gap: 7px;
+      color: var(--copy-on-dark);
+      font-size: .88rem;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+    .footer-links a:hover { color: var(--gold-lt); }
+    .footer-contact { display: grid; gap: 10px; }
+    .footer-contact a { color: var(--copy-on-dark); font-size: .9rem; text-decoration: none; }
+    .footer-contact a:hover { color: var(--gold-lt); }
+    .footer-contact-label { display: block; margin-bottom: 2px; color: var(--gold-lt); font-size: .78rem; font-weight: 700; }
+    .footer-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, .16);
+      color: rgba(255, 255, 255, .72);
+      font-size: .8rem;
+    }
+    .footer-bottom a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 
-/* AGENT/LANDLORD CTA */
-.list-cta-section{background:var(--ivory);padding:5rem 0;border-top:1px solid var(--mist)}
-.list-cta-grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
-.list-cta-card{background:var(--ink);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:2rem 1.75rem;transition:var(--ease)}
-.list-cta-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-dark);border-color:rgba(193,155,118,.2)}
-.list-cta-icon{width:50px;height:50px;background:rgba(193,155,118,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;color:var(--gold);margin-bottom:1.25rem}
-.list-cta-card h3{font-family:var(--display);font-size:1.4rem;color:var(--white);margin-bottom:0.6rem}
-.list-cta-card p{font-size:0.83rem;color:rgba(255,255,255,.48);line-height:1.75;margin-bottom:1.5rem}
-.list-cta-bullets{list-style:none;padding:0;margin-bottom:1.75rem}
-.list-cta-bullets li{font-size:0.8rem;color:rgba(255,255,255,.58);padding:0.3rem 0;display:flex;align-items:center;gap:0.5rem}
-.list-cta-bullets li i{color:var(--gold);font-size:0.75rem;flex-shrink:0}
-.btn-list-cta{display:inline-flex;align-items:center;gap:8px;padding:0.75rem 1.6rem;background:var(--gold);color:var(--ink);font-weight:700;font-size:0.85rem;border-radius:var(--radius-sm);text-decoration:none;font-family:var(--body);transition:var(--ease)}
-.btn-list-cta:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:var(--shadow-gold);color:var(--ink)}
+    @media (min-width: 576px) {
+      .hero-section { padding-top: 55px; padding-bottom: 64px; }
+      .waitlist-form-wrap { padding: 20px; }
+      .property-card .card-body { padding: 19px; }
+      .market-row { grid-template-columns: minmax(130px, .38fr) 1fr auto; align-items: baseline; gap: 14px; }
+      .footer-bottom { flex-direction: row; justify-content: space-between; }
+    }
 
-/* PROMISE */
-.promise-section{background:var(--ink);padding:5rem 0;position:relative;overflow:hidden}
-.promise-section::before{content:'EW';position:absolute;font-family:var(--display);font-size:32vw;font-weight:700;color:rgba(255,255,255,.02);top:50%;left:50%;transform:translate(-50%,-50%);letter-spacing:-10px;pointer-events:none;white-space:nowrap}
-.promise-header h2{font-size:clamp(1.8rem,4vw,3.2rem);color:var(--white);margin-bottom:1rem}
-.promise-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:3rem;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden}
-.promise-item{padding:1.75rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);transition:var(--ease)}
-.promise-item:hover{background:rgba(193,155,118,.07);border-color:rgba(193,155,118,.2)}
-.promise-num{font-family:var(--display);font-size:2.8rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:0.75rem;opacity:0.8}
-.promise-item h4{font-size:1rem;color:var(--white);margin-bottom:0.4rem}
-.promise-item p{font-size:0.8rem;color:rgba(255,255,255,.45);line-height:1.7;margin:0}
+    @media (min-width: 768px) {
+      .hero-section { padding: 62px 0 78px; }
+      .hero-layout { row-gap: 0; }
+      .hero-image { aspect-ratio: .88 / 1; border-radius: 14px; }
+      .waitlist-control { grid-template-columns: minmax(0, 1fr) auto; }
+      .waitlist-control .btn-waitlist { min-width: 180px; }
+      .launch-story { padding: 64px 0; }
+      .launch-details { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; margin-top: 0; border-top: 0; }
+      .launch-detail { padding: 15px 0; }
+      .launch-detail + .launch-detail { border-top: 1px solid var(--border-dark); }
+      .listings-section, .capabilities-section, .partners-section { padding-top: 72px; padding-bottom: 76px; }
+      .sample-notice { max-width: 750px; }
+      .capability-list { grid-template-columns: 1fr 1fr; column-gap: 30px; }
+      .capability-item:nth-child(2) { border-top: 0; }
+      .partners-intro { margin-bottom: 32px; }
+      .partner-callout { flex-direction: row; align-items: center; justify-content: space-between; padding: 26px 30px; }
+      .waitlist-section { padding: 62px 0; }
+      .site-footer { padding-top: 50px; }
+    }
 
-/* FOOTER */
-footer{background:#0a0d12;color:var(--white);padding:4rem 0 1.5rem;border-top:1px solid rgba(255,255,255,.05)}
-.footer-brand{font-family:var(--display);font-size:1.8rem;font-weight:700;color:var(--gold);margin-bottom:0.85rem;display:block}
-.footer-about{color:rgba(255,255,255,.42);font-size:0.83rem;line-height:1.85;margin-bottom:0;max-width:300px}
-.footer-heading{font-family:var(--display);font-size:1rem;color:var(--gold);margin-bottom:1.25rem;font-weight:600}
-.footer-links{list-style:none;padding:0}
-.footer-links li{margin-bottom:0.75rem}
-.footer-links a{color:rgba(255,255,255,.48);text-decoration:none;font-size:0.83rem;display:inline-flex;align-items:center;gap:6px;transition:color 0.22s,padding-left 0.22s}
-.footer-links a:hover{color:var(--gold);padding-left:4px}
-.contact-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-left:3px solid var(--gold);padding:1.4rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0}
-.contact-item{display:flex;align-items:flex-start;gap:0.85rem;margin-bottom:1rem;font-size:0.83rem;color:rgba(255,255,255,.55)}
-.contact-item:last-child{margin-bottom:0}
-.contact-item i{font-size:1rem;color:var(--gold);margin-top:2px;flex-shrink:0}
-.contact-item strong{color:rgba(255,255,255,.8);display:block;margin-bottom:1px}
-.contact-item a{color:rgba(255,255,255,.55);text-decoration:none;transition:color 0.2s}
-.contact-item a:hover{color:var(--gold)}
-.footer-bottom{border-top:1px solid rgba(255,255,255,.06);margin-top:3rem;padding-top:1.5rem;text-align:center;color:rgba(255,255,255,.28);font-size:0.78rem}
-.footer-bottom a{color:rgba(255,255,255,.28);text-decoration:none;transition:color 0.2s}
-.footer-bottom a:hover{color:var(--gold)}
+    @media (min-width: 992px) {
+      .site-nav .navbar-toggler { display: none; }
+      .site-nav .navbar-collapse { justify-content: flex-end; }
+      .site-nav .navbar-nav { align-items: center; }
+      .hero-section { padding: 48px 0 86px; }
+      .hero-layout { --bs-gutter-x: 3.5rem; }
+      .hero-title { font-size: clamp(4rem, 5.4vw, 5.6rem); }
+      .hero-visual { padding-left: 20px; }
+      .hero-image { aspect-ratio: .91 / 1; }
+      .launch-story { padding: 74px 0; }
+      .launch-story-layout { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); align-items: center; gap: 64px; }
+      .launch-details { margin-top: 0; }
+      .property-image-wrap { aspect-ratio: 1.28 / 1; }
+      .partner-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: 52px; align-items: start; }
+      .partner-callout { grid-column: 1 / -1; }
+      .role-paths { margin-bottom: 0; }
+      .waitlist-close { max-width: 850px; }
+    }
 
-/* RESPONSIVE */
-@media(min-width:580px){
-  .account-cards{display:grid;grid-template-columns:repeat(3,1fr);overflow-x:unset}
-  .account-card{min-width:unset}
-  .trust-grid{grid-template-columns:repeat(4,1fr)}
-  .preview-grid{grid-template-columns:repeat(2,1fr)}
-  .partner-cities-grid{grid-template-columns:repeat(2,1fr)}
-  .list-cta-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media(min-width:640px){
-  .account-cards{grid-template-columns:repeat(4,1fr)}
-  .promise-grid{grid-template-columns:repeat(2,1fr)}
-  .partner-cta-row{flex-direction:row;align-items:center}
-}
-@media(min-width:900px){
-  .hero{padding:0}
-  .account-cards{grid-template-columns:repeat(5,1fr)}
-  .preview-grid{grid-template-columns:repeat(3,1fr)}
-  .partner-cities-grid{grid-template-columns:repeat(3,1fr)}
-  .feature-row{grid-template-columns:72px 1fr}
-  .feat-num{font-size:0.75rem;padding:1.6rem 0 0}
-  .feat-body{padding:1.65rem 1.85rem}
-  .promise-grid{grid-template-columns:repeat(4,1fr)}
-  .promise-num{font-size:3.2rem}
-  .preview-section{padding:6rem 0}
-  .waitlist-section{padding:6rem 0}
-  .partners-section{padding:6rem 0}
-  .features-section{padding:6rem 0}
-  .list-cta-section{padding:6rem 0}
-  .promise-section{padding:6rem 0}
-  footer{padding:6rem 0 2rem}
-}
-@media(max-width:991px){
-  .navbar-collapse{background:var(--ink-soft);padding:1rem 1rem 1.25rem;border-radius:0 0 var(--radius) var(--radius);border-top:1px solid var(--border-lt);margin-top:0.5rem}
-  .btn-nav{display:block;width:100%;text-align:center;margin-top:0.5rem}
-  .dropdown-menu{background:rgba(255,255,255,.04);box-shadow:none;border:1px solid rgba(255,255,255,.08)}
-  .messages-container{top:0.75rem;right:0.75rem;left:0.75rem;max-width:none}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}
-  .ticker-track{animation:none}
-}
-</style>
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
-<body>
+<body class="estate-landing">
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
-<!-- PRE-LAUNCH BANNER -->
-<div class="prelaunch-banner">
-  <div class="container">
-    <div class="prelaunch-banner-inner">
-      <span class="prelaunch-pill"><i class="bi bi-stars"></i> Early Access</span>
-      <span>We are currently onboarding verified real estate companies and agents across Nigeria.</span>
-      <a href="{% url 'partner-with-us' %}">Become a launch partner &rarr;</a>
-    </div>
-  </div>
-</div>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="#">
-      <img src="{% static 'estate/images/favicon.ico' %}" alt="Estate Web Logo" class="logo">
-      Estate Web
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-lg-center">
-        <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About</a></li>
-        <li class="nav-item"><a href="{% url 'faq' %}" class="nav-link">Help</a></li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="registerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Register</a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
-            <li>
-              <a class="dropdown-item" href="{% url 'register-customer' %}">
-                <i class="bi bi-person"></i>
-                <div><strong>Customer</strong><small class="d-block">Find trusted properties with ease</small></div>
-              </a>
-            </li>
-            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'register-agent' %}">
-                <i class="bi bi-award"></i>
-                <div><strong>Agent</strong><small class="d-block">List properties and grow your business</small></div>
-              </a>
-            </li>
-            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'register-company' %}">
-                <i class="bi bi-building"></i>
-                <div><strong>Company</strong><small class="d-block">Manage properties at scale</small></div>
-              </a>
-            </li>
-            <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08)"></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'register-landlord' %}">
-                <i class="bi bi-shield-shaded"></i>
-                <div><strong>Landlord</strong><small class="d-block">Secure your property, find tenants</small></div>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item"><a href="{% url 'login' %}" class="btn-nav">Sign In</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- ALERTS -->
-<div class="messages-container">
-  {% if messages %}
-    {% for message in messages %}
-      {% if message.tags == 'error' or message.tags == 'danger' %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <i class="bi bi-exclamation-triangle-fill"></i>{{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% elif message.tags == 'warning' %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <i class="bi bi-exclamation-circle-fill"></i>{{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% elif message.tags == 'info' %}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-          <i class="bi bi-info-circle-fill"></i>{{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% else %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <i class="bi bi-check-circle-fill"></i>{{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-</div>
-
-<!-- HERO -->
-<section class="hero" id="hero">
-  <div class="hero-index" aria-hidden="true">EW</div>
-  <div class="container">
-    <div class="hero-inner">
-      <div class="hero-eyebrow">
-        <i class="bi bi-patch-check-fill"></i>
-        Verified Listings Coming to Nigeria
-      </div>
-      <h1>Find Properties You Can<br><em>Actually Trust</em></h1>
-      <p class="hero-sub">
-        We are partnering with verified real estate companies and agents across Nigeria to bring secure, transparent property listings to buyers and renters nationwide. Launching soon.
-      </p>
-
-      <!-- HERO WAITLIST FORM -->
-      <div class="waitlist-form-wrap">
-        <span class="waitlist-label">
-          <i class="bi bi-bell-fill" style="color:var(--gold);margin-right:5px"></i>
-          Get notified when listings go live
-        </span>
-        <form action="{% url 'waitlist-signup' %}" method="POST" class="waitlist-row">
-          {% csrf_token %}
-          <input type="hidden" name="source" value="hero">
-          <input type="email" name="email" class="waitlist-input" placeholder="Enter your email address" required autocomplete="email">
-          <button type="submit" class="btn-waitlist">
-            <i class="bi bi-send-fill"></i> Join Early Access
-          </button>
-        </form>
-        <p class="waitlist-note">
-          <i class="bi bi-shield-lock"></i>
-          No spam. Unsubscribe any time. We notify you when properties go live in your area.
-        </p>
-      </div>
-
-      <!-- SECONDARY ACTIONS -->
-      <div class="hero-actions">
-        <a href="{% url 'partner-with-us' %}" class="btn-hero-gold">
-          <i class="bi bi-building-fill-add"></i> List Your Properties
-        </a>
-        <a href="{% url 'about' %}" class="btn-hero-outline">
-          <i class="bi bi-play-circle"></i> Learn More
-        </a>
-        <a href="{% url 'login' %}" class="btn-hero-outline">
-          <i class="bi bi-box-arrow-in-right"></i> Sign In
-        </a>
-      </div>
-
-      <!-- ACCOUNT CARDS -->
-      <div class="account-strip">
-        <span class="account-label">
-          <span class="gold-rule"></span> Create your account now, browse on launch
-        </span>
-        <div class="account-cards">
-          <a href="{% url 'register-customer' %}" class="account-card">
-            <div class="account-card-icon">👤</div>
-            <h3>Customer</h3>
-            <p>Be ready when listings go live</p>
-            <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
-          </a>
-          <a href="{% url 'register-agent' %}" class="account-card">
-            <div class="account-card-icon">🏅</div>
-            <h3>Agent</h3>
-            <p>Start listing properties early</p>
-            <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
-          </a>
-          <a href="{% url 'register-company' %}" class="account-card">
-            <div class="account-card-icon">🏢</div>
-            <h3>Company</h3>
-            <p>Onboard your team now</p>
-            <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
-          </a>
-          <a href="{% url 'register-landlord' %}" class="account-card">
-            <div class="account-card-icon">🤵</div>
-            <h3>Landlord</h3>
-            <p>Secure tenants before launch</p>
-            <span class="account-card-arrow"><i class="bi bi-arrow-right"></i> Register</span>
-          </a>
-          <div class="account-card account-card-soon">
-            <div class="account-card-soon-badge">Soon</div>
-            <div class="account-card-icon">💼</div>
-            <h3>Investor</h3>
-            <p>Investment opportunities</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TICKER -->
-<div class="ticker-wrap" aria-hidden="true">
-  <div class="ticker-track">
-    <span class="ticker-item">Verified Listings<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Fraud Protection<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Direct Contact<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Transparent Pricing<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Agent Dashboards<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Company Tools<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Save Favourites<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Launching Soon<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Verified Listings<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Fraud Protection<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Direct Contact<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Transparent Pricing<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Agent Dashboards<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Company Tools<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Save Favourites<span class="ticker-dot"></span></span>
-    <span class="ticker-item">Launching Soon<span class="ticker-dot"></span></span>
-  </div>
-</div>
-
-<!-- TRUST SIGNALS -->
-<div class="trust-strip">
-  <div class="container">
-    <div class="trust-grid">
-      <div class="trust-item">
-        <div class="trust-icon"><i class="bi bi-patch-check-fill"></i></div>
-        <div>
-          <div class="trust-title">Identity Verified Agents</div>
-          <p class="trust-desc">Every agent and company is verified by our team before going live on the platform.</p>
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-icon"><i class="bi bi-shield-fill-check"></i></div>
-        <div>
-          <div class="trust-title">Fraud-Resistant Listings</div>
-          <p class="trust-desc">Built-in listing checks and fraud warnings protect every property on the platform.</p>
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-icon"><i class="bi bi-telephone-fill"></i></div>
-        <div>
-          <div class="trust-title">Direct Contact, No Middlemen</div>
-          <p class="trust-desc">Connect directly to the agent or landlord with no hidden fees or unnecessary gatekeeping.</p>
-        </div>
-      </div>
-      <div class="trust-item">
-        <div class="trust-icon"><i class="bi bi-eye-slash-fill"></i></div>
-        <div>
-          <div class="trust-title">No Sign-Up to Browse</div>
-          <p class="trust-desc">Once listings go live, anyone can browse properties without creating an account first.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- COMING LISTINGS PREVIEW – REAL IMAGES -->
-<section class="preview-section">
-  <div class="container">
-    <div class="section-header">
-      <span class="eyebrow"><span class="gold-rule"></span>Property Listings</span>
-      <h2>Verified listings launching soon</h2>
-      <p class="section-sub">
-        We are currently onboarding real estate companies and agents across Nigeria.
-        Here is a preview of the type of properties that will be available on launch.
-      </p>
-    </div>
-
-    <div class="preview-banner">
-      <i class="bi bi-info-circle-fill"></i>
-      Sample preview &mdash; these are example listings, not live properties
-    </div>
-
-    <div class="preview-grid">
-
-      <div class="preview-card">
-        <div class="preview-card-img-wrap">
-          <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop&auto=format" alt="4 Bedroom Detached Duplex in Lekki Phase 1, Lagos" loading="lazy">
-          <span class="preview-type-badge sale">For Sale</span>
-          <span class="preview-sample-tag">Sample</span>
-        </div>
-        <div class="preview-card-body">
-          <div class="preview-card-title">4 Bedroom Detached Duplex</div>
-          <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> Lekki Phase 1, Lagos</div>
-          <div class="preview-card-price">&#8358;85,000,000</div>
-          <div class="preview-card-specs">
-            <div class="preview-spec"><i class="bi bi-door-open"></i> 4 beds</div>
-            <div class="preview-spec"><i class="bi bi-water"></i> 3 baths</div>
-            <div class="preview-spec"><i class="bi bi-car-front"></i> 2 parking</div>
-          </div>
-          <a href="#waitlist-section" class="preview-notify-btn"><i class="bi bi-bell"></i> Notify Me When Live</a>
-        </div>
-      </div>
-
-      <div class="preview-card">
-        <div class="preview-card-img-wrap">
-          <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop&auto=format" alt="3 Bedroom Flat, Fully Serviced in Maitama, Abuja" loading="lazy">
-          <span class="preview-type-badge rent">For Rent</span>
-          <span class="preview-sample-tag">Sample</span>
-        </div>
-        <div class="preview-card-body">
-          <div class="preview-card-title">3 Bedroom Flat, Fully Serviced</div>
-          <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> Maitama, Abuja</div>
-          <div class="preview-card-price">&#8358;3,500,000 <small>/yr</small></div>
-          <div class="preview-card-specs">
-            <div class="preview-spec"><i class="bi bi-door-open"></i> 3 beds</div>
-            <div class="preview-spec"><i class="bi bi-water"></i> 2 baths</div>
-            <div class="preview-spec"><i class="bi bi-lightning-charge"></i> 24hr power</div>
-          </div>
-          <a href="#waitlist-section" class="preview-notify-btn"><i class="bi bi-bell"></i> Notify Me When Live</a>
-        </div>
-      </div>
-
-      <div class="preview-card">
-        <div class="preview-card-img-wrap">
-          <img src="https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=600&h=400&fit=crop&auto=format" alt="Residential Land 600sqm in Ajah, Lagos" loading="lazy">
-          <span class="preview-type-badge sale">For Sale</span>
-          <span class="preview-sample-tag">Sample</span>
-        </div>
-        <div class="preview-card-body">
-          <div class="preview-card-title">Residential Land &mdash; 600sqm</div>
-          <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> Ajah, Lagos</div>
-          <div class="preview-card-price">&#8358;28,000,000</div>
-          <div class="preview-card-specs">
-            <div class="preview-spec"><i class="bi bi-arrows-angle-expand"></i> 600sqm</div>
-            <div class="preview-spec"><i class="bi bi-file-earmark-check"></i> C of O</div>
-          </div>
-          <a href="#waitlist-section" class="preview-notify-btn"><i class="bi bi-bell"></i> Notify Me When Live</a>
-        </div>
-      </div>
-
-      <div class="preview-card">
-        <div class="preview-card-img-wrap">
-          <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&h=400&fit=crop&auto=format" alt="2 Bedroom Apartment in GRA, Port Harcourt" loading="lazy">
-          <span class="preview-type-badge rent">For Rent</span>
-          <span class="preview-sample-tag">Sample</span>
-        </div>
-        <div class="preview-card-body">
-          <div class="preview-card-title">2 Bedroom Apartment, GRA</div>
-          <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> GRA, Port Harcourt</div>
-          <div class="preview-card-price">&#8358;1,200,000 <small>/yr</small></div>
-          <div class="preview-card-specs">
-            <div class="preview-spec"><i class="bi bi-door-open"></i> 2 beds</div>
-            <div class="preview-spec"><i class="bi bi-water"></i> 2 baths</div>
-            <div class="preview-spec"><i class="bi bi-shield-check"></i> Gated</div>
-          </div>
-          <a href="#waitlist-section" class="preview-notify-btn"><i class="bi bi-bell"></i> Notify Me When Live</a>
-        </div>
-      </div>
-
-      <div class="preview-card">
-        <div class="preview-card-img-wrap">
-          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop&auto=format" alt="Office Space 500sqm in Victoria Island, Lagos" loading="lazy">
-          <span class="preview-type-badge sale">For Sale</span>
-          <span class="preview-sample-tag">Sample</span>
-        </div>
-        <div class="preview-card-body">
-          <div class="preview-card-title">Office Space &mdash; 500sqm</div>
-          <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> Victoria Island, Lagos</div>
-          <div class="preview-card-price">&#8358;180,000,000</div>
-          <div class="preview-card-specs">
-            <div class="preview-spec"><i class="bi bi-arrows-angle-expand"></i> 500sqm</div>
-            <div class="preview-spec"><i class="bi bi-tag"></i> Commercial</div>
-          </div>
-          <a href="#waitlist-section" class="preview-notify-btn"><i class="bi bi-bell"></i> Notify Me When Live</a>
-        </div>
-      </div>
-
-      <div class="preview-card">
-        <div class="preview-card-img-wrap">
-          <img src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&h=400&fit=crop&auto=format" alt="5 Bedroom Detached House in Bodija, Ibadan" loading="lazy">
-          <span class="preview-type-badge rent">For Rent</span>
-          <span class="preview-sample-tag">Sample</span>
-        </div>
-        <div class="preview-card-body">
-          <div class="preview-card-title">5 Bedroom Detached House</div>
-          <div class="preview-card-location"><i class="bi bi-geo-alt-fill" style="color:var(--gold)"></i> Bodija, Ibadan</div>
-          <div class="preview-card-price">&#8358;2,000,000 <small>/yr</small></div>
-          <div class="preview-card-specs">
-            <div class="preview-spec"><i class="bi bi-door-open"></i> 5 beds</div>
-            <div class="preview-spec"><i class="bi bi-water"></i> 4 baths</div>
-            <div class="preview-spec"><i class="bi bi-tree"></i> Compound</div>
-          </div>
-          <a href="#waitlist-section" class="preview-notify-btn"><i class="bi bi-bell"></i> Notify Me When Live</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- WAITLIST SECTION -->
-<section class="waitlist-section" id="waitlist-section">
-  <div class="container">
-    <div class="waitlist-inner">
-      <span class="eyebrow eyebrow-light"><span class="gold-rule"></span>Early Access</span>
-      <h2>Get notified when<br>listings go <em>live</em></h2>
-      <p>Be the first to access verified properties in Lagos, Abuja, Port Harcourt, and beyond. Enter your email and we will notify you the moment listings are available in your area.</p>
-      <form action="{% url 'waitlist-signup' %}" method="POST" class="waitlist-form-large">
-        {% csrf_token %}
-        <input type="hidden" name="source" value="waitlist_section">
-        <input type="email" name="email" class="waitlist-input-lg" placeholder="Your email address" required autocomplete="email">
-        <button type="submit" class="btn-waitlist-lg"><i class="bi bi-bell-fill"></i> Notify Me</button>
-      </form>
-      <div class="waitlist-social-proof">
-        <i class="bi bi-people-fill"></i>
-        Join <span>early access</span> &mdash; be part of the first wave
-      </div>
-      <div class="waitlist-perks">
-        <div class="waitlist-perk"><i class="bi bi-check-circle-fill"></i> Free forever to browse</div>
-        <div class="waitlist-perk"><i class="bi bi-check-circle-fill"></i> No sign-up needed to search</div>
-        <div class="waitlist-perk"><i class="bi bi-check-circle-fill"></i> Priority access on launch</div>
-        <div class="waitlist-perk"><i class="bi bi-check-circle-fill"></i> No spam, unsubscribe anytime</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PARTNERS ONBOARDING -->
-<section class="partners-section">
-  <div class="container">
-    <div class="partner-progress-header">
-      <span class="eyebrow"><span class="gold-rule"></span>Partner Onboarding</span>
-      <h2>Real estate companies currently onboarding</h2>
-      <p>We are actively working with leading real estate companies and independent agents across Nigeria's key property markets. This is not a placeholder &mdash; onboarding is live and progressing.</p>
-    </div>
-
-    <div class="onboard-progress-wrap">
-      <div class="onboard-progress-label">
-        <span>Agent &amp; company onboarding</span>
-        <strong>In progress</strong>
-      </div>
-      <div class="onboard-bar-track">
-        <div class="onboard-bar-fill" id="onboardBar"></div>
-      </div>
-      <p class="onboard-bar-note">Currently onboarding verified companies and agents ahead of full platform launch</p>
-    </div>
-
-    <div class="partner-cities-grid">
-      <div class="partner-city-card">
-        <div class="city-icon">&#127970;</div>
-        <div class="city-info">
-          <div class="city-name">Lagos</div>
-          <div class="city-desc">Partner agencies in Lekki, VI, Ikeja, and Yaba</div>
-        </div>
-        <span class="city-status onboarding"><i class="bi bi-circle-fill"></i> Onboarding</span>
-      </div>
-      <div class="partner-city-card">
-        <div class="city-icon">&#127963;</div>
-        <div class="city-info">
-          <div class="city-name">Abuja</div>
-          <div class="city-desc">Property companies across Maitama, Asokoro, and Wuse</div>
-        </div>
-        <span class="city-status onboarding"><i class="bi bi-circle-fill"></i> Onboarding</span>
-      </div>
-      <div class="partner-city-card">
-        <div class="city-icon">&#9973;</div>
-        <div class="city-info">
-          <div class="city-name">Port Harcourt</div>
-          <div class="city-desc">Estate managers in GRA and surrounding areas</div>
-        </div>
-        <span class="city-status onboarding"><i class="bi bi-circle-fill"></i> Onboarding</span>
-      </div>
-      <div class="partner-city-card">
-        <div class="city-icon">&#127807;</div>
-        <div class="city-info">
-          <div class="city-name">Ogun / Oyo</div>
-          <div class="city-desc">Residential agents in Sagamu, Ibadan, and Abeokuta</div>
-        </div>
-        <span class="city-status onboarding"><i class="bi bi-circle-fill"></i> Onboarding</span>
-      </div>
-      <div class="partner-city-card">
-        <div class="city-icon">&#127758;</div>
-        <div class="city-info">
-          <div class="city-name">Delta / Enugu</div>
-          <div class="city-desc">Property firms across the South-East and South-South</div>
-        </div>
-        <span class="city-status onboarding"><i class="bi bi-circle-fill"></i> Onboarding</span>
-      </div>
-      <div class="partner-city-card">
-        <div class="city-icon">&#128506;</div>
-        <div class="city-info">
-          <div class="city-name">All Other States</div>
-          <div class="city-desc">Nationwide rollout planned following initial launch</div>
-        </div>
-        <span class="city-status onboarding"><i class="bi bi-circle-fill"></i> Onboarding</span>
-      </div>
-    </div>
-
-    <div class="partner-cta-row">
-      <div class="partner-cta-text">
-        <h3>Are you a real estate company or agent?</h3>
-        <p>Partner with Estate Web to list verified properties and reach thousands of buyers and tenants across Nigeria. Onboarding is open now &mdash; join ahead of our full launch.</p>
-      </div>
-      <a href="{% url 'partner-with-us' %}" class="btn-partner">
-        <i class="bi bi-building-fill-add"></i> Partner With Us
+  <nav class="navbar navbar-expand-lg site-nav" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'landing' %}" aria-label="Estate Web home">
+        <img src="{% static 'estate/images/favicon.ico' %}" alt="" class="site-logo" width="38" height="38">
+        <span>Estate Web</span>
       </a>
-    </div>
-
-  </div>
-</section>
-
-<!-- PLATFORM FEATURES -->
-<section class="features-section">
-  <div class="container">
-    <div class="features-header">
-      <span class="eyebrow"><span class="gold-rule"></span>Platform Features</span>
-      <h2>Built for how Nigerians<br>actually buy and rent property</h2>
-    </div>
-    <div class="feature-grid">
-      <div class="feature-row">
-        <div class="feat-num">01</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-shield-check"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Verified Listings Only</h3><p class="feat-desc">Every property is checked for authenticity before going public. No ghost listings, no unverified agents.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feat-num">02</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-search-heart"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Smart Search &amp; Filters</h3><p class="feat-desc">Filter by price, state, property type, bedrooms, and more. Find what you need fast on any device.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feat-num">03</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-phone"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Direct Contact, No Gatekeeping</h3><p class="feat-desc">Connect directly with the agent or landlord. No hidden middlemen, no unnecessary fees to view a property.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feat-num">04</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-bookmark-heart"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Save &amp; Compare Properties</h3><p class="feat-desc">Save your favourite listings and compare multiple properties side by side before making any decision.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feat-num">05</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-tools"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Full Agent &amp; Company Dashboards</h3><p class="feat-desc">Built-in lead management, appointments, team tools, and analytics &mdash; everything agents and companies need in one place.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feat-num">06</div>
-        <div class="feat-body">
-          <div class="feat-icon"><i class="bi bi-eye-slash-fill"></i></div>
-          <div class="feat-content"><h3 class="feat-title">Browse Without an Account</h3><p class="feat-desc">Anyone can search and view property listings without registering. No forced sign-ups to see information.</p></div>
-          <i class="bi bi-arrow-right feat-arrow"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- AGENT / LANDLORD CTA -->
-<section class="list-cta-section">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:3rem">
-      <span class="eyebrow"><span class="gold-rule"></span>For Agents &amp; Landlords</span>
-      <h2 style="font-size:clamp(1.8rem,4vw,3rem);color:var(--ink);margin-bottom:.75rem">List your property<br>in minutes</h2>
-      <p style="color:var(--slate);font-size:.88rem;max-width:480px;margin:0 auto;line-height:1.8">Start building your listing profile now and be ready for full platform launch. No technical skills required.</p>
-    </div>
-    <div class="list-cta-grid">
-      <div class="list-cta-card">
-        <div class="list-cta-icon"><i class="bi bi-award-fill"></i></div>
-        <h3>Individual Agents</h3>
-        <p>Build your profile, manage your listings, track leads, and get discovered by thousands of buyers and renters across Nigeria.</p>
-        <ul class="list-cta-bullets">
-          <li><i class="bi bi-check-circle-fill"></i> Personal dashboard and analytics</li>
-          <li><i class="bi bi-check-circle-fill"></i> Leads, inquiries, and appointments</li>
-          <li><i class="bi bi-check-circle-fill"></i> Verified agent badge</li>
-          <li><i class="bi bi-check-circle-fill"></i> Both sale and rental listings</li>
-        </ul>
-        <a href="{% url 'register-agent' %}" class="btn-list-cta"><i class="bi bi-person-plus"></i> Register as Agent</a>
-      </div>
-      <div class="list-cta-card">
-        <div class="list-cta-icon"><i class="bi bi-building-fill"></i></div>
-        <h3>Real Estate Companies</h3>
-        <p>Manage your entire team of agents, control a large property portfolio, and unlock company-wide analytics from one dashboard.</p>
-        <ul class="list-cta-bullets">
-          <li><i class="bi bi-check-circle-fill"></i> Unlimited team members via invite link</li>
-          <li><i class="bi bi-check-circle-fill"></i> Company-wide lead management</li>
-          <li><i class="bi bi-check-circle-fill"></i> Starter &rarr; Growth &rarr; Enterprise tiers</li>
-          <li><i class="bi bi-check-circle-fill"></i> Verified company badge</li>
-        </ul>
-        <a href="{% url 'register-company' %}" class="btn-list-cta"><i class="bi bi-building"></i> Register Company</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROMISE -->
-<section class="promise-section">
-  <div class="container">
-    <div class="promise-header text-center">
-      <span class="eyebrow eyebrow-light"><span class="gold-rule"></span>Our Promise</span>
-      <h2>Your smarter way to<br><em style="color:var(--gold)">find, sell, and manage</em> properties</h2>
-      <p style="color:rgba(255,255,255,.45);font-size:.85rem;max-width:460px;margin:1rem auto 0;line-height:1.85;">We are building the property platform Nigeria deserves &mdash; honest, fast, and fraud-resistant.</p>
-    </div>
-    <div class="promise-grid">
-      <div class="promise-item"><div class="promise-num">01</div><h4>Honest Platform</h4><p>We show you what we have &mdash; no inflated numbers or fake listings to make the platform look bigger than it is.</p></div>
-      <div class="promise-item"><div class="promise-num">02</div><h4>Secure by Design</h4><p>Your data and interactions are protected with industry-grade security and encrypted authentication.</p></div>
-      <div class="promise-item"><div class="promise-num">03</div><h4>No Hidden Fees</h4><p>Clear pricing throughout. Browsing is free. What you see is what the platform offers &mdash; no surprises.</p></div>
-      <div class="promise-item"><div class="promise-num">04</div><h4>Built for Nigeria</h4><p>Designed for Nigerian users on mobile, on slower connections, who need clarity and trust above everything else.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-12 col-lg-4">
-        <span class="footer-brand">Estate Web</span>
-        <p class="footer-about">A modern real estate platform connecting Nigerian property buyers, sellers, and renters. Launching with verified listings across Lagos, Abuja, Port Harcourt, and beyond.</p>
-      </div>
-      <div class="col-6 col-lg-3">
-        <h5 class="footer-heading">Platform</h5>
-        <ul class="footer-links">
-          <li><a href="{% url 'about' %}"><i class="bi bi-arrow-right"></i> About Us</a></li>
-          <li><a href="{% url 'faq' %}"><i class="bi bi-arrow-right"></i> Help &amp; FAQ</a></li>
-          <li><a href="{% url 'partner-with-us' %}"><i class="bi bi-arrow-right"></i> Partner With Us</a></li>
-          <li><a href="{% url 'terms-agreement' %}"><i class="bi bi-arrow-right"></i> Terms &amp; Privacy</a></li>
-        </ul>
-        <h5 class="footer-heading" style="margin-top:1.5rem">Accounts</h5>
-        <ul class="footer-links">
-          <li><a href="{% url 'register-agent' %}"><i class="bi bi-arrow-right"></i> Agent Registration</a></li>
-          <li><a href="{% url 'register-company' %}"><i class="bi bi-arrow-right"></i> Company Registration</a></li>
-          <li><a href="{% url 'login' %}"><i class="bi bi-arrow-right"></i> Sign In</a></li>
+      <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About</a></li>
+          <li class="nav-item"><a href="{% url 'faq' %}" class="nav-link">Help</a></li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="registerDropdown" data-bs-toggle="dropdown" aria-expanded="false">Register</button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="registerDropdown">
+              <li><a class="dropdown-item" href="{% url 'register-customer' %}"><i class="bi bi-person" aria-hidden="true"></i><span><strong>Customer</strong><small class="d-block">Find a place to call home</small></span></a></li>
+              <li><a class="dropdown-item" href="{% url 'register-agent' %}"><i class="bi bi-award" aria-hidden="true"></i><span><strong>Agent</strong><small class="d-block">List properties and manage leads</small></span></a></li>
+              <li><a class="dropdown-item" href="{% url 'register-company' %}"><i class="bi bi-building" aria-hidden="true"></i><span><strong>Company</strong><small class="d-block">Bring your team onto the platform</small></span></a></li>
+              <li><a class="dropdown-item" href="{% url 'register-landlord' %}"><i class="bi bi-house-check" aria-hidden="true"></i><span><strong>Landlord</strong><small class="d-block">Manage your property listings</small></span></a></li>
+            </ul>
+          </li>
+          <li class="nav-item"><a href="{% url 'login' %}" class="nav-link nav-sign-in">Sign in</a></li>
         </ul>
       </div>
-      <div class="col-12 col-lg-5">
-        <h5 class="footer-heading">Contact Us</h5>
-        <div class="contact-box">
-          <div class="contact-item">
-            <i class="bi bi-envelope-fill"></i>
-            <div><strong>Email</strong><a href="mailto:contact@estatewebng.com">contact@estatewebng.com</a></div>
+    </div>
+  </nav>
+
+  <div class="messages-container container" aria-live="polite" aria-atomic="false">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'error' or message.tags == 'danger' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><span>{{ message }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
-          <div class="contact-item">
-            <i class="bi bi-telephone-fill"></i>
-            <div><strong>Phone</strong><a href="tel:09138549855">09138549855</a></div>
+        {% elif message.tags == 'warning' %}
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i><span>{{ message }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
-          <div class="contact-item">
-            <i class="bi bi-info-circle-fill"></i>
-            <div><strong>Pre-Launch Status</strong>Currently onboarding verified agents and companies ahead of full launch.</div>
+        {% elif message.tags == 'info' %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill" aria-hidden="true"></i><span>{{ message }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% else %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i><span>{{ message }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <main id="main-content">
+    <section class="hero-section" id="hero">
+      <div class="container">
+        <div class="row hero-layout align-items-lg-start">
+          <div class="col-12 col-lg-6">
+            <div class="hero-copy">
+              <p class="hero-status">We’re onboarding verified agents and companies across Nigeria.</p>
+              <h1 class="hero-title">Find a home<br>you can <span>trust.</span></h1>
+              <p class="hero-description">Estate Web is preparing a clearer way to find property. Join the early access list and we’ll email you when listings are ready to browse.</p>
+
+              <div class="waitlist-form-wrap">
+                <form action="{% url 'waitlist-signup' %}" method="POST" class="waitlist-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="source" value="hero">
+                  <label class="waitlist-field-label" for="hero-email">Get an email when listings go live</label>
+                  <div class="waitlist-control">
+                    <input type="email" id="hero-email" name="email" class="form-control waitlist-input" placeholder="you@example.com" required autocomplete="email" aria-describedby="hero-email-help">
+                    <button type="submit" class="btn btn-waitlist"><i class="bi bi-arrow-right" aria-hidden="true"></i> Notify me at launch</button>
+                  </div>
+                  <p class="waitlist-helper" id="hero-email-help">One update when the marketplace opens. No spam.</p>
+                </form>
+              </div>
+              <a href="{% url 'partner-with-us' %}" class="partner-inline-link">List properties? Apply to partner <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <figure class="hero-visual mb-0">
+              <img class="hero-image" src="https://images.unsplash.com/photo-1752622176337-5d9315e2df6e?crop=entropy&amp;cs=srgb&amp;fm=jpg&amp;ixid=M3w3NTAwNDR8MHwxfHNlYXJjaHw4fHxEb2N1bWVudGFyeSUyMHBob3RvZ3JhcGglMjBjb250ZW1wb3JhcnklMjByZXNpZGVudGlhbCUyMGJ1aWxkaW5nJTIwc3RyZWV0JTIwbGV2ZWwlMjByZXNpZGVudGlhbCUyMGFyY2hpdGVjdHVyZSUyMExhZ29zJTIwTmlnZXJpYSUyMHBob3RvZ3JhcGhlZCUyMG5hdHVyYWwlMjBkYXlsaWdodCUyMGJlbGlldmFibGUlMjBzdXJyb3VuZGluZ3MlMjBubyUyMHBlb3BsZSUyMHBvc2VkJTIwYWR2ZXJ0aXNlbWVudCUyMHVzZWQlMjBvbmx5JTIwcGxhY2UlMjBzZXR0aW5nJTIwbm90fGVufDB8fHx8MTc5MTQwMjk4N3ww&amp;ixlib=rb-4.1.0&amp;q=85" alt="Residential street and homes in Lagos, Nigeria — neighborhood context only, photograph by Mac Nzombola on Unsplash." width="900" height="1000" fetchpriority="high">
+              <figcaption class="hero-image-caption">A view of the neighbourhoods and homes that shape Nigeria’s property market.</figcaption>
+            </figure>
           </div>
         </div>
       </div>
-    </div>
-    <div class="footer-bottom">
-      &copy; 2026 Estate Web. All rights reserved. | <a href="{% url 'terms-agreement' %}">Legal</a>
-    </div>
-  </div>
-</footer>
+    </section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  /* Auto-dismiss alerts */
-  document.querySelectorAll('.alert').forEach(function (alert) {
-    setTimeout(function () {
-      alert.classList.remove('show');
-      setTimeout(function () { alert.remove(); }, 500);
-    }, 5000);
-  });
+    <section class="launch-story" aria-labelledby="launch-story-title">
+      <div class="container launch-story-layout">
+        <div>
+          <h2 id="launch-story-title">A more thoughtful start to the search.</h2>
+          <p class="launch-lead">We’re bringing property seekers and listing professionals together in one place, with a clear distinction between what’s happening now and what’s coming next.</p>
+        </div>
+        <div class="launch-details">
+          <article class="launch-detail">
+            <h3>Right now</h3>
+            <p>Real estate companies and independent agents are onboarding ahead of launch. Listings shown below are examples, not properties available to view.</p>
+          </article>
+          <article class="launch-detail">
+            <h3>When listings go live</h3>
+            <p>People will be able to browse property listings without an account and contact the agent, company or landlord responsible for a property.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-  /* Animate the onboarding progress bar on scroll into view */
-  var bar = document.getElementById('onboardBar');
-  if (bar && 'IntersectionObserver' in window) {
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { bar.style.width = '35%'; obs.unobserve(bar); }
+    <section class="listings-section" aria-labelledby="listings-title">
+      <div class="container">
+        <div class="section-heading">
+          <h2 id="listings-title">A first look at the homes and spaces to come.</h2>
+          <p>These examples show the kinds of sale and rental listings people will be able to explore across Nigeria.</p>
+        </div>
+        <p class="sample-notice"><i class="bi bi-info-circle-fill" aria-hidden="true"></i><span><strong>Example listings — not live properties.</strong> Photos and listing details are for illustration and don’t represent homes currently available on Estate Web.</span></p>
+
+        <div class="row g-3 g-lg-4 property-grid">
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="card property-card">
+              <div class="property-image-wrap">
+                <img class="property-image" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&amp;h=400&amp;fit=crop&amp;auto=format" alt="4 Bedroom Detached Duplex in Lekki Phase 1, Lagos" width="600" height="420" loading="lazy">
+                <span class="property-type sale">For Sale</span>
+              </div>
+              <div class="card-body">
+                <p class="property-sample-label">Example property · not live</p>
+                <h3 class="property-title">4 Bedroom Detached Duplex</h3>
+                <p class="property-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Lekki Phase 1, Lagos</p>
+                <p class="property-price">&#8358;85,000,000</p>
+                <div class="property-specs"><span class="property-spec"><i class="bi bi-door-open" aria-hidden="true"></i>4 beds</span><span class="property-spec"><i class="bi bi-water" aria-hidden="true"></i>3 baths</span><span class="property-spec"><i class="bi bi-car-front" aria-hidden="true"></i>2 parking</span></div>
+                <a href="#waitlist-section" class="property-notify"><i class="bi bi-bell" aria-hidden="true"></i> Notify me when listings go live</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="card property-card">
+              <div class="property-image-wrap">
+                <img class="property-image" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&amp;h=400&amp;fit=crop&amp;auto=format" alt="3 Bedroom Flat, Fully Serviced in Maitama, Abuja" width="600" height="420" loading="lazy">
+                <span class="property-type rent">For Rent</span>
+              </div>
+              <div class="card-body">
+                <p class="property-sample-label">Example property · not live</p>
+                <h3 class="property-title">3 Bedroom Flat, Fully Serviced</h3>
+                <p class="property-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Maitama, Abuja</p>
+                <p class="property-price">&#8358;3,500,000 <small>/yr</small></p>
+                <div class="property-specs"><span class="property-spec"><i class="bi bi-door-open" aria-hidden="true"></i>3 beds</span><span class="property-spec"><i class="bi bi-water" aria-hidden="true"></i>2 baths</span><span class="property-spec"><i class="bi bi-lightning-charge" aria-hidden="true"></i>24hr power</span></div>
+                <a href="#waitlist-section" class="property-notify"><i class="bi bi-bell" aria-hidden="true"></i> Notify me when listings go live</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="card property-card">
+              <div class="property-image-wrap">
+                <img class="property-image" src="https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=600&amp;h=400&amp;fit=crop&amp;auto=format" alt="Residential Land 600sqm in Ajah, Lagos" width="600" height="420" loading="lazy">
+                <span class="property-type sale">For Sale</span>
+              </div>
+              <div class="card-body">
+                <p class="property-sample-label">Example property · not live</p>
+                <h3 class="property-title">Residential Land — 600sqm</h3>
+                <p class="property-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Ajah, Lagos</p>
+                <p class="property-price">&#8358;28,000,000</p>
+                <div class="property-specs"><span class="property-spec"><i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>600sqm</span><span class="property-spec"><i class="bi bi-file-earmark-check" aria-hidden="true"></i>C of O</span></div>
+                <a href="#waitlist-section" class="property-notify"><i class="bi bi-bell" aria-hidden="true"></i> Notify me when listings go live</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="card property-card">
+              <div class="property-image-wrap">
+                <img class="property-image" src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&amp;h=400&amp;fit=crop&amp;auto=format" alt="2 Bedroom Apartment in GRA, Port Harcourt" width="600" height="420" loading="lazy">
+                <span class="property-type rent">For Rent</span>
+              </div>
+              <div class="card-body">
+                <p class="property-sample-label">Example property · not live</p>
+                <h3 class="property-title">2 Bedroom Apartment, GRA</h3>
+                <p class="property-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> GRA, Port Harcourt</p>
+                <p class="property-price">&#8358;1,200,000 <small>/yr</small></p>
+                <div class="property-specs"><span class="property-spec"><i class="bi bi-door-open" aria-hidden="true"></i>2 beds</span><span class="property-spec"><i class="bi bi-water" aria-hidden="true"></i>2 baths</span><span class="property-spec"><i class="bi bi-shield-check" aria-hidden="true"></i>Gated</span></div>
+                <a href="#waitlist-section" class="property-notify"><i class="bi bi-bell" aria-hidden="true"></i> Notify me when listings go live</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="card property-card">
+              <div class="property-image-wrap">
+                <img class="property-image" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&amp;h=400&amp;fit=crop&amp;auto=format" alt="Office Space 500sqm in Victoria Island, Lagos" width="600" height="420" loading="lazy">
+                <span class="property-type sale">For Sale</span>
+              </div>
+              <div class="card-body">
+                <p class="property-sample-label">Example property · not live</p>
+                <h3 class="property-title">Office Space — 500sqm</h3>
+                <p class="property-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Victoria Island, Lagos</p>
+                <p class="property-price">&#8358;180,000,000</p>
+                <div class="property-specs"><span class="property-spec"><i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>500sqm</span><span class="property-spec"><i class="bi bi-tag" aria-hidden="true"></i>Commercial</span></div>
+                <a href="#waitlist-section" class="property-notify"><i class="bi bi-bell" aria-hidden="true"></i> Notify me when listings go live</a>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="card property-card">
+              <div class="property-image-wrap">
+                <img class="property-image" src="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=600&amp;h=400&amp;fit=crop&amp;auto=format" alt="5 Bedroom Detached House in Bodija, Ibadan" width="600" height="420" loading="lazy">
+                <span class="property-type rent">For Rent</span>
+              </div>
+              <div class="card-body">
+                <p class="property-sample-label">Example property · not live</p>
+                <h3 class="property-title">5 Bedroom Detached House</h3>
+                <p class="property-location"><i class="bi bi-geo-alt-fill" aria-hidden="true"></i> Bodija, Ibadan</p>
+                <p class="property-price">&#8358;2,000,000 <small>/yr</small></p>
+                <div class="property-specs"><span class="property-spec"><i class="bi bi-door-open" aria-hidden="true"></i>5 beds</span><span class="property-spec"><i class="bi bi-water" aria-hidden="true"></i>4 baths</span><span class="property-spec"><i class="bi bi-tree" aria-hidden="true"></i>Compound</span></div>
+                <a href="#waitlist-section" class="property-notify"><i class="bi bi-bell" aria-hidden="true"></i> Notify me when listings go live</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="capabilities-section" aria-labelledby="capabilities-title">
+      <div class="container">
+        <div class="capabilities-heading">
+          <h2 id="capabilities-title">The details that make a search easier.</h2>
+          <p>Tools for finding a place, getting in touch and managing property work.</p>
+        </div>
+        <ul class="capability-list">
+          <li class="capability-item"><i class="bi bi-shield-check capability-icon" aria-hidden="true"></i><div><h3>Listings from verified agents and companies</h3><p>Agents and companies are reviewed by the Estate Web team before going live.</p></div></li>
+          <li class="capability-item"><i class="bi bi-search capability-icon" aria-hidden="true"></i><div><h3>Search by what matters to you</h3><p>Filter by price, state, property category and other listing details.</p></div></li>
+          <li class="capability-item"><i class="bi bi-telephone capability-icon" aria-hidden="true"></i><div><h3>Contact the listing party directly</h3><p>Reach the agent, company or landlord connected to a property.</p></div></li>
+          <li class="capability-item"><i class="bi bi-bookmark-heart capability-icon" aria-hidden="true"></i><div><h3>Save and compare options</h3><p>Keep track of properties you like and review choices side by side.</p></div></li>
+          <li class="capability-item"><i class="bi bi-kanban capability-icon" aria-hidden="true"></i><div><h3>Practical tools for listing professionals</h3><p>Agents and companies can manage enquiries, appointments, teams and listing activity.</p></div></li>
+          <li class="capability-item"><i class="bi bi-eye capability-icon" aria-hidden="true"></i><div><h3>Browse without an account</h3><p>Property search is open to visitors; an account is not required to browse when listings are live.</p></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="partners-section" aria-labelledby="partners-title">
+      <div class="container">
+        <div class="partners-intro">
+          <h2 id="partners-title">For the people bringing property to market.</h2>
+          <p>Onboarding is open for agents and real estate companies. Landlords can also create an account and prepare their property listings for launch.</p>
+        </div>
+
+        <div class="partner-layout">
+          <div class="partner-callout">
+            <div>
+              <h3>Work with Estate Web</h3>
+              <p>Apply to list verified properties and build a presence before the marketplace opens.</p>
+            </div>
+            <a href="{% url 'partner-with-us' %}" class="partner-apply-link">Apply to partner <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+          </div>
+
+          <nav class="role-paths" aria-label="Registration for property professionals">
+            <a class="role-path" href="{% url 'register-agent' %}"><span>Register as an agent</span><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+            <a class="role-path" href="{% url 'register-company' %}"><span>Register a real estate company</span><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+            <a class="role-path" href="{% url 'register-landlord' %}"><span>Register as a landlord</span><i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+          </nav>
+
+          <div class="market-coverage">
+            <h3 class="market-list-heading">Where onboarding is under way</h3>
+            <ul class="market-list">
+              <li class="market-row"><span class="market-name">Lagos</span><span>Partner agencies in Lekki, VI, Ikeja, and Yaba</span><span class="market-state">Onboarding</span></li>
+              <li class="market-row"><span class="market-name">Abuja</span><span>Property companies across Maitama, Asokoro, and Wuse</span><span class="market-state">Onboarding</span></li>
+              <li class="market-row"><span class="market-name">Port Harcourt</span><span>Estate managers in GRA and surrounding areas</span><span class="market-state">Onboarding</span></li>
+              <li class="market-row"><span class="market-name">Ogun / Oyo</span><span>Residential agents in Sagamu, Ibadan, and Abeokuta</span><span class="market-state">Onboarding</span></li>
+              <li class="market-row"><span class="market-name">Delta / Enugu</span><span>Property firms across the South-East and South-South</span><span class="market-state">Onboarding</span></li>
+            </ul>
+            <p class="planned-market"><strong>Other states:</strong> broader rollout is planned following the initial launch.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="waitlist-section" id="waitlist-section" aria-labelledby="waitlist-title">
+      <div class="container">
+        <div class="waitlist-close">
+          <h2 id="waitlist-title">Be ready when listings open.</h2>
+          <p>Leave your email and we’ll send one update when people can start browsing properties on Estate Web.</p>
+          <div class="waitlist-form-wrap">
+            <form action="{% url 'waitlist-signup' %}" method="POST" class="waitlist-form">
+              {% csrf_token %}
+              <input type="hidden" name="source" value="waitlist_section">
+              <label class="waitlist-field-label" for="launch-email">Email address</label>
+              <div class="waitlist-control">
+                <input type="email" id="launch-email" name="email" class="form-control waitlist-input" placeholder="you@example.com" required autocomplete="email" aria-describedby="launch-email-help">
+                <button type="submit" class="btn btn-waitlist"><i class="bi bi-bell" aria-hidden="true"></i> Notify me at launch</button>
+              </div>
+              <p class="waitlist-helper" id="launch-email-help">No spam. Unsubscribe at any time.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="row g-4 g-lg-5">
+        <div class="col-12 col-md-6 col-lg-4">
+          <a class="footer-brand" href="{% url 'landing' %}"><img src="{% static 'estate/images/favicon.ico' %}" alt="" class="site-logo" width="32" height="32"><span>Estate Web</span></a>
+          <p class="footer-about">A property marketplace being built for buyers, renters and listing professionals across Nigeria.</p>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+          <h2 class="footer-column-title">Explore</h2>
+          <ul class="footer-links">
+            <li><a href="{% url 'about' %}">About us</a></li>
+            <li><a href="{% url 'faq' %}">Help &amp; FAQ</a></li>
+            <li><a href="{% url 'partner-with-us' %}">Partner with us</a></li>
+            <li><a href="{% url 'terms-agreement' %}">Terms &amp; privacy</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-md-3 col-lg-3">
+          <h2 class="footer-column-title">Accounts</h2>
+          <ul class="footer-links">
+            <li><a href="{% url 'register-customer' %}">Customer</a></li>
+            <li><a href="{% url 'register-agent' %}">Agent</a></li>
+            <li><a href="{% url 'register-company' %}">Company</a></li>
+            <li><a href="{% url 'register-landlord' %}">Landlord</a></li>
+            <li><a href="{% url 'login' %}">Sign in</a></li>
+          </ul>
+        </div>
+        <div class="col-12 col-lg-3">
+          <h2 class="footer-column-title">Contact</h2>
+          <div class="footer-contact">
+            <div><span class="footer-contact-label">Email</span><a href="mailto:contact@estatewebng.com">contact@estatewebng.com</a></div>
+            <div><span class="footer-contact-label">Phone</span><a href="tel:09138549855">09138549855</a></div>
+            <p class="footer-about">Currently onboarding agents and companies ahead of launch.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Estate Web. All rights reserved.</span>
+        <a href="{% url 'terms-agreement' %}">Legal</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      document.querySelectorAll('a[href="#waitlist-section"]').forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          var target = document.getElementById('waitlist-section');
+          var emailInput = target && target.querySelector('input[type="email"]');
+          if (!target || !emailInput) return;
+
+          event.preventDefault();
+          target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+          window.requestAnimationFrame(function () {
+            emailInput.focus({ preventScroll: true });
+          });
+        });
       });
-    }, { threshold: 0.4 });
-    obs.observe(bar);
-  }
-
-  /* Smooth scroll + focus for "Notify Me When Live" preview card buttons */
-  document.querySelectorAll('a[href="#waitlist-section"]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      var target = document.getElementById('waitlist-section');
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setTimeout(function () {
-          var input = target.querySelector('input[type="email"]');
-          if (input) input.focus();
-        }, 600);
-      }
     });
-  });
-});
-</script>
-
+  </script>
 </body>
 </html>
