@@ -1,0 +1,338 @@
+{% extends 'estate/base.html' %}
+{% load static humanize %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/buy.css' %}">
+  <link rel="stylesheet" href="{% static 'estate/css/safety_tips.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+<!-- Safety Shield Trigger - Top Right -->
+<button class="safety-trigger" id="safetyTrigger">
+  <i class="bi bi-shield-check"></i>
+  Safety Tips
+</button>
+
+<!-- Safety Modal -->
+<div class="safety-modal" id="safetyModal">
+  <div class="safety-modal-content">
+    <button class="safety-close" id="safetyClose">&times;</button>
+    {% include 'estate/includes/safety_tips.html' %}
+  </div>
+</div>
+
+<!-- ── HERO ──────────────────────────────────────── -->
+<section class="buy-hero">
+  <div class="buy-hero-inner">
+    <span class="buy-hero-pill">
+      <i class="bi bi-stars"></i> Premium Properties
+    </span>
+    <h1>Find Your Dream Home</h1>
+    <p>
+      {% if on_sale %}
+        Explore <strong>{{ on_sale.paginator.count }}</strong> exceptional properties available for sale
+      {% else %}
+        Browse properties available for sale across Nigeria
+      {% endif %}
+    </p>
+  </div>
+  <div class="buy-hero-wave">
+    <svg viewBox="0 0 1200 80" preserveAspectRatio="none">
+      <path d="M0,40 C300,80 900,0 1200,40 L1200,80 L0,80 Z" fill="#f4f6f8"/>
+    </svg>
+  </div>
+</section>
+
+
+<!-- ── MAIN CONTENT ──────────────────────────────── -->
+<div class="buy-page">
+
+  <!-- FILTER BAR -->
+  <div class="buy-filters">
+    <div class="buy-filters-header">
+      <h2 class="buy-filters-title">
+        <i class="bi bi-sliders"></i> Filter Properties
+      </h2>
+      <button type="button" class="buy-filter-toggle" id="filterToggle" onclick="toggleFilters()">
+        <i class="bi bi-funnel"></i>
+        <span id="filterToggleText">Show Filters</span>
+      </button>
+    </div>
+
+    <div class="buy-filter-body" id="filterContent">
+      <form method="get" class="buy-filter-form">
+        {{ salefilter.form }}
+        {% csrf_token %}
+        <div class="buy-filter-actions">
+          <button type="submit" class="btn-apply">
+            <i class="bi bi-search"></i> Apply Filters
+          </button>
+          <button type="reset" class="btn-reset" onclick="window.location.href='?'">
+            <i class="bi bi-arrow-clockwise"></i> Reset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  {% if on_sale %}
+
+  <!-- RESULTS INFO -->
+  <div class="buy-results-bar">
+    <div class="buy-results-left">
+      <i class="bi bi-house-fill"></i>
+      <span><strong>{{ on_sale.paginator.count }}</strong> Properties Found</span>
+    </div>
+    <span class="buy-results-page">
+      Page {{ on_sale.number }} of {{ on_sale.paginator.num_pages }}
+    </span>
+  </div>
+
+
+  <!-- PROPERTY GRID -->
+  <div class="buy-grid">
+    {% for bought, wishlist in buy %}
+      {% if bought.is_listed %}
+      <article class="buy-card">
+
+        <div class="buy-card-image">
+          {% if bought.base_image %}
+            <img src="{{ bought.base_image.url }}" alt="Property" class="buy-img" loading="lazy">
+          {% else %}
+            <div class="buy-img-placeholder">
+              <i class="bi bi-building"></i>
+            </div>
+          {% endif %}
+
+          <span class="buy-for-sale-badge">For Sale</span>
+
+          {# data-url and data-added drive the AJAX logic below #}
+          <button class="buy-wishlist-btn wl-toggle"
+                  data-url="{% url 'customer:toggle-wishlist-buy' bought.id %}"
+                  data-added="{% if wishlist %}true{% else %}false{% endif %}"
+                  aria-label="{% if wishlist %}Remove from wishlist{% else %}Add to wishlist{% endif %}">
+            <i class="bi bi-heart{% if wishlist %}-fill{% endif %}"></i>
+          </button>
+          <button class="cmp-toggle-btn"
+                  data-url="{% url 'customer:toggle-compare' 'sale' bought.id %}"
+                  data-type="sale"
+                  data-id="{{ bought.id }}"
+                  title="Compare">
+            <i class="bi bi-bar-chart-steps"></i>
+          </button>
+        </div>
+
+        <div class="buy-card-body">
+          <div class="buy-price">₦{{ bought.price|floatformat:2|intcomma }}</div>
+
+          <h3 class="buy-card-title">
+            {% if bought.residential %}{{ bought.residential }}
+            {% elif bought.commercial %}{{ bought.commercial }}
+            {% elif bought.lands %}{{ bought.lands }}
+            {% else %}Property Listing{% endif %}
+          </h3>
+
+          <div class="buy-location">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>{{ bought.location }}, {{ bought.state }}</span>
+          </div>
+
+          <p class="buy-desc">{{ bought.property_description|truncatewords:15 }}</p>
+        {# ── Feature Preview Pills ── #}
+        {% with bought.property_features.all|slice:":2" as features %}
+          {% if features %}
+            <div class="card-feat-preview">
+              {% for f in features %}
+                <span class="card-feat-pill">
+                  <i class="bi bi-check-circle-fill"></i> {{ f.name }}
+                </span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+          <div class="buy-meta">
+            <span class="buy-meta-item">
+              <i class="bi bi-telephone-fill"></i> {{ bought.phone_number }}
+            </span>
+            <span class="buy-meta-item">
+              <i class="bi bi-calendar3"></i> {{ bought.listed_date|date:"M d, Y" }}
+            </span>
+          </div>
+
+          <a href="{% url 'customer:view-property-s' property_id=bought.id %}" class="buy-btn-view">
+            View Details <i class="bi bi-arrow-right-short"></i>
+          </a>
+        </div>
+      </article>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+
+  <!-- PAGINATION -->
+  {% if on_sale.paginator.num_pages > 1 %}
+  <div class="buy-pagination">
+    <nav class="buy-pag-nav" aria-label="Property pages">
+      {% if on_sale.has_previous %}
+        <a href="?page=1" class="pag-btn" aria-label="First"><i class="bi bi-chevron-bar-left"></i></a>
+        <a href="?page={{ on_sale.previous_page_number }}" class="pag-btn" aria-label="Previous"><i class="bi bi-chevron-left"></i></a>
+      {% endif %}
+      {% for i in nums %}
+        <a href="?page={{ forloop.counter }}"
+           class="pag-btn {% if on_sale.number == forloop.counter %}pag-active{% endif %}"
+           {% if on_sale.number == forloop.counter %}aria-current="page"{% endif %}>
+          {{ forloop.counter }}
+        </a>
+      {% endfor %}
+      {% if on_sale.has_next %}
+        <a href="?page={{ on_sale.next_page_number }}" class="pag-btn" aria-label="Next"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ on_sale.paginator.num_pages }}" class="pag-btn" aria-label="Last"><i class="bi bi-chevron-bar-right"></i></a>
+      {% endif %}
+    </nav>
+    <p class="pag-summary">Page <strong>{{ on_sale.number }}</strong> of <strong>{{ on_sale.paginator.num_pages }}</strong></p>
+  </div>
+  {% endif %}
+
+
+  {% else %}
+  <div class="buy-empty">
+    <div class="buy-empty-icon"><i class="bi bi-house-x"></i></div>
+    <h2>No Properties Found</h2>
+    <p>We couldn't find any properties matching your filters. Try adjusting your search or check back later.</p>
+    <button onclick="window.location.href='?'" class="btn-apply">
+      <i class="bi bi-arrow-clockwise"></i> Clear Filters
+    </button>
+  </div>
+  {% endif %}
+
+</div><!-- end .buy-page -->
+{%endblock%}
+
+
+{%block extra_js%}
+<script>
+/* ── Filter toggle ─────────────────────────────── */
+function toggleFilters() {
+  var body = document.getElementById('filterContent');
+  var text = document.getElementById('filterToggleText');
+  body.classList.toggle('open');
+  text.textContent = body.classList.contains('open') ? 'Hide Filters' : 'Show Filters';
+}
+
+/* ── AJAX Wishlist ─────────────────────────────── */
+(function () {
+  var CSRF = '{{ csrf_token }}';
+
+  document.querySelectorAll('.wl-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var url   = btn.dataset.url;
+      var icon  = btn.querySelector('i');
+      var added = btn.dataset.added === 'true';
+
+      /* Optimistic update — flips immediately so it feels instant */
+      setHeart(icon, !added);
+      btn.dataset.added = String(!added);
+      btn.disabled = true;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': CSRF,
+        },
+        credentials: 'same-origin',
+      })
+      .then(function (res) {
+        if (res.status === 401) {
+          /* Not logged in — revert and go to login */
+          setHeart(icon, added);
+          btn.dataset.added = String(added);
+          window.location.href = '{% url "login" %}?next=' + encodeURIComponent(window.location.pathname);
+          return null;
+        }
+        if (!res.ok) throw new Error('Server error ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data) return;
+        /* Confirm with server's actual state */
+        setHeart(icon, data.added);
+        btn.dataset.added = String(data.added);
+        btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+
+        window.showEstateToast(
+          data.added ? 'Property added to your wishlist.' : 'Property removed from your wishlist.',
+          'success'
+        );
+      })
+      .catch(function () {
+        /* Network failure — roll back */
+        setHeart(icon, added);
+        btn.dataset.added = String(added);
+      })
+      .finally(function () {
+        btn.disabled = false;
+      });
+    });
+  });
+
+  function setHeart(icon, isAdded) {
+    icon.classList.toggle('bi-heart',      !isAdded);
+    icon.classList.toggle('bi-heart-fill',  isAdded);
+    icon.style.color = isAdded ? '#ef4444' : '';
+  }
+}());
+
+/* ── Compare Toggle ────────────────────────────── */
+document.querySelectorAll('.cmp-toggle-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    fetch(btn.dataset.url, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'same-origin',
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.error === 'max_reached') {
+        window.showEstateToast(d.message, 'warning');
+        return;
+      }
+      btn.classList.toggle('active', d.action === 'added');
+      window.showEstateToast(
+        d.action === 'added' ? 'Added to comparison list.' : 'Removed from comparison list.',
+        'success'
+      );
+    })
+    .catch(function () {
+      window.showEstateToast('Something went wrong. Try again.', 'error');
+    });
+  });
+}); // ✅ forEach properly closed here
+
+/* ── Safety Modal ──────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function () {
+  const trigger = document.getElementById('safetyTrigger');
+  const modal   = document.getElementById('safetyModal');
+  const close   = document.getElementById('safetyClose');
+
+  trigger.addEventListener('click', function () {
+    modal.classList.add('active');
+  });
+
+  close.addEventListener('click', function () {
+    modal.classList.remove('active');
+  });
+
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) modal.classList.remove('active');
+  });
+});
+</script>
+
+{% endblock %}

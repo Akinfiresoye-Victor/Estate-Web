@@ -1,0 +1,558 @@
+{% extends base_template %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'company/css/company_profile.css' %}">
+<link rel="icon" type="image/ico" href="{% static 'estate/images/favicon.ico' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ── Back ───────────────────────────────────────────────────────── #}
+<div class="cp-back-wrap">
+  <a href="javascript:history.back()" class="cp-back-btn">
+    <i class="bi bi-arrow-left-circle-fill"></i> Go Back
+  </a>
+</div>
+
+
+{# ── HERO ────────────────────────────────────────────────────────── #}
+<div class="cp-hero">
+  <div class="cp-hero-bg" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="cp-hero-inner">
+
+      {# Logo #}
+      <div class="cp-logo-wrap">
+        {% if company.company_logo %}
+          <img src="{{ company.company_logo.url }}" alt="{{ company.company_name }}" class="cp-logo-img">
+        {% else %}
+          <div class="cp-logo-placeholder">
+            <i class="bi bi-building"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      {# Info #}
+      <div class="cp-hero-info">
+        <div class="cp-hero-top">
+          <h1 class="cp-company-name">{{ company.company_name }}</h1>
+          {% if company.verified %}
+          <span class="cp-verified-badge">
+            <i class="bi bi-patch-check-fill"></i> Verified
+          </span>
+          {% endif %}
+        </div>
+
+        <div class="cp-hero-meta">
+          <span class="cp-meta-item">
+            <i class="bi bi-geo-alt-fill"></i>{{ company.service_areas }}
+          </span>
+          <span class="cp-meta-item">
+            <i class="bi bi-calendar-check"></i>Est. {{ company.year_established }}
+          </span>
+          <span class="cp-meta-item">
+            <i class="bi bi-houses-fill"></i>{{ total_properties }} Properties
+          </span>
+        </div>
+
+          <a href="mailto:{{ company.email }}" class="cp-btn-contact text-decoration-none">
+              <i class="bi bi-envelope-fill"></i> Contact Company
+          </a>
+          {% if request.user.is_authenticated %}
+            {% if request.user != company.user %}
+              <a href="{%url 'report-user' company.user.id company%}" class="rp-trigger-btn">
+                <i class="bi bi-flag"></i>
+                Report Company
+              </a>
+            {% endif %}
+          {% endif %}
+          <button class="cp-btn-share" onclick="shareCompany()" title="Share">
+            <i class="bi bi-share-fill"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{# ── STATS STRIP ──────────────────────────────────────────────────── #}
+<div class="cp-stats-strip">
+  <div class="container">
+    <div class="cp-stats-row">
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ total_properties }}</span>
+        <span class="cp-stat-label">Total Listings</span>
+      </div>
+
+      <div class="cp-stat-divider" aria-hidden="true"></div>
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ properties_for_sale }}</span>
+        <span class="cp-stat-label">For Sale</span>
+      </div>
+
+      <div class="cp-stat-divider" aria-hidden="true"></div>
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ properties_for_rent }}</span>
+        <span class="cp-stat-label">For Rent</span>
+      </div>
+
+      <div class="cp-stat-divider" aria-hidden="true"></div>
+
+      <div class="cp-stat">
+        <span class="cp-stat-num">{{ average_rating|floatformat:1 }}</span>
+        <span class="cp-stat-label">
+          <i class="bi bi-star-fill" style="color:#f59e0b;font-size:.65rem;"></i> Rating
+        </span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{# ── BODY ─────────────────────────────────────────────────────────── #}
+<div class="cp-body">
+  <div class="container">
+    <div class="cp-layout">
+
+
+      {# ── SIDEBAR ── #}
+      <aside class="cp-sidebar">
+
+        {# About #}
+        <div class="cp-card">
+          <div class="cp-card-hd">
+            <i class="bi bi-info-circle-fill"></i>
+            <h3>About</h3>
+          </div>
+          <div class="cp-card-bd">
+            <p class="cp-about-text">{{ company.company_bio }}</p>
+            <div class="cp-info-row">
+              <div class="cp-info-icon"><i class="bi bi-person-badge-fill"></i></div>
+              <div>
+                <span class="cp-info-label">Principal Broker</span>
+                <span class="cp-info-val">{{ company.principal_broker }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Contact #}
+        <div class="cp-card">
+          <div class="cp-card-hd">
+            <i class="bi bi-telephone-fill"></i>
+            <h3>Contact</h3>
+          </div>
+          <div class="cp-card-bd">
+
+            <a href="tel:{{ company.phone_number }}" class="cp-contact-row">
+              <div class="cp-contact-icon"><i class="bi bi-phone"></i></div>
+              <div>
+                <span class="cp-info-label">Phone</span>
+                <span class="cp-info-val">{{ company.phone_number }}</span>
+              </div>
+            </a>
+
+            <a href="mailto:{{ company.email }}" class="cp-contact-row">
+              <div class="cp-contact-icon"><i class="bi bi-envelope"></i></div>
+              <div>
+                <span class="cp-info-label">Email</span>
+                <span class="cp-info-val">{{ company.email }}</span>
+              </div>
+            </a>
+
+            <div class="cp-contact-row no-link">
+              <div class="cp-contact-icon"><i class="bi bi-geo-alt"></i></div>
+              <div>
+                <span class="cp-info-label">Address</span>
+                <span class="cp-info-val">{{ company.address }}</span>
+              </div>
+            </div>
+{%if company.email%}
+              <a href="mailto:{{ company.email }}?subject=Property%20Inquiry%20-%20Estate%20Web&body=Hello,%20I%20am%20interested%20in%20your%20properties."
+                class="cp-btn-msg text-decoration-none">
+                  <i class="bi bi-send-fill"></i> Send Message
+              </a>
+{%endif%}
+
+          </div>
+        </div>
+
+        {# Social #}
+        {% if social_links %}
+        <div class="cp-card">
+          <div class="cp-card-hd">
+            <i class="bi bi-share-fill"></i>
+            <h3>Follow Us</h3>
+          </div>
+          <div class="cp-card-bd">
+            <div class="cp-social-grid">
+              {% for link in social_links %}
+                <a href="{{ link.link_to_social }}" target="_blank" class="cp-social-btn" title="{{ link.social_platform }}">
+                  <i class="bi bi-{{ link.social_platform|lower }}"></i>
+                  <span>{{ link.social_platform }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </aside>
+
+
+      {# ── MAIN ── #}
+      <main class="cp-main">
+
+        {# Properties #}
+        <section class="cp-section">
+          <div class="cp-section-hd">
+            <h2 class="cp-section-title">
+              <i class="bi bi-houses-fill"></i> Recent Listings
+            </h2>
+          </div>
+
+          {% if on_sale or on_lease %}
+            <div class="cp-props-grid">
+
+              {% for property in on_sale %}
+              <article class="cp-prop-card">
+                <div class="cp-prop-img-wrap">
+                  {% if property.base_image %}
+                    <img src="{{ property.base_image.url }}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% endif %}
+                  <span class="cp-prop-badge cp-badge-sale">For Sale</span>
+                </div>
+                <div class="cp-prop-body">
+                  <h3 class="cp-prop-title">
+                    {% if property.property_category == 'Residential' %}{{ property.residential }}
+                    {% elif property.property_category == 'Commercial' %}{{ property.commercial }}
+                    {% else %}{{ property.lands }}{% endif %}
+                  </h3>
+                  <p class="cp-prop-loc"><i class="bi bi-geo-alt"></i>{{ property.location }}</p>
+                  <div class="cp-prop-features">
+                    {% if property.bedrooms %}<span class="cp-feat"><i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds</span>{% endif %}
+                    {% if property.bathrooms %}<span class="cp-feat"><i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths</span>{% endif %}
+                  </div>
+                  <div class="cp-prop-footer">
+                    <div class="cp-prop-price">
+                      <span class="cp-price">₦{{ property.price|floatformat:2|intcomma }}</span>
+                    </div>
+                    <a href="{% url 'customer:view-property-s' property.id %}" class="cp-btn-view">
+                      View <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </article>
+              {% endfor %}
+
+              {% for property in on_lease %}
+              <article class="cp-prop-card">
+                <div class="cp-prop-img-wrap">
+                  {% if property.base_image %}
+                    <img src="{{ property.base_image.url }}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'estate/images/placeholder-property.jpg' %}" alt="Property" class="cp-prop-img" loading="lazy">
+                  {% endif %}
+                  <span class="cp-prop-badge cp-badge-rent">For Rent</span>
+                </div>
+                <div class="cp-prop-body">
+                  <h3 class="cp-prop-title">
+                    {% if property.property_category == 'Residential' %}{{ property.residential }}
+                    {% elif property.property_category == 'Commercial' %}{{ property.commercial }}
+                    {% else %}{{ property.lands }}{% endif %}
+                  </h3>
+                  <p class="cp-prop-loc"><i class="bi bi-geo-alt"></i>{{ property.location }}</p>
+                  <div class="cp-prop-features">
+                    {% if property.bedrooms %}<span class="cp-feat"><i class="bi bi-door-open"></i>{{ property.bedrooms }} Beds</span>{% endif %}
+                    {% if property.bathrooms %}<span class="cp-feat"><i class="bi bi-droplet"></i>{{ property.bathrooms }} Baths</span>{% endif %}
+                  </div>
+                  <div class="cp-prop-footer">
+                    <div class="cp-prop-price">
+                      <span class="cp-price">₦{{ property.price_range|floatformat:0|intcomma }}</span>
+                      <span class="cp-price-period">/yr</span>
+                    </div>
+                    <a href="{% url 'customer:view-property-r' property.id %}" class="cp-btn-view">
+                      View <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </article>
+              {% endfor %}
+
+            </div>
+          {% else %}
+            <div class="cp-empty">
+              <i class="bi bi-house-x"></i>
+              <h4>No Properties Yet</h4>
+              <p>{{ company.company_name }} hasn't listed any properties yet.</p>
+            </div>
+          {% endif %}
+        </section>
+
+
+        {# Reviews #}
+        <section class="cp-section">
+          <div class="cp-section-hd">
+            <h2 class="cp-section-title">
+              <i class="bi bi-chat-quote-fill"></i> Reviews
+              {% if total_reviews > 0 %}
+                <span class="cp-review-count">{{ total_reviews }}</span>
+              {% endif %}
+            </h2>
+
+            {% if user.is_authenticated and not user_has_reviewed %}
+              <button class="cp-btn-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                <i class="bi bi-pencil-square"></i> Write Review
+              </button>
+            {% elif user_has_reviewed %}
+              <span class="cp-reviewed-tag">
+                <i class="bi bi-check-circle-fill"></i> Reviewed
+              </span>
+            {% else %}
+              <a href="{% url 'login' %}?next={{ request.path }}" class="cp-btn-review">
+                <i class="bi bi-pencil-square"></i> Login to Review
+              </a>
+            {% endif %}
+          </div>
+
+          {% if reviews %}
+            <div class="cp-rating-summary">
+              <span class="cp-rating-big">{{ average_rating|floatformat:1 }}</span>
+              <div class="cp-rating-right">
+                <div class="cp-stars">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= average_rating|floatformat:0 %}
+                      <i class="bi bi-star-fill"></i>
+                    {% else %}
+                      <i class="bi bi-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <span class="cp-rating-label">{{ total_reviews }} review{{ total_reviews|pluralize }}</span>
+              </div>
+            </div>
+
+            <div class="cp-reviews-list">
+              {% for review in reviews %}
+              <div class="cp-review-item">
+                <div class="cp-review-hd">
+                  <div class="cp-reviewer-avatar">{{ review.user.username.0|upper }}</div>
+                  <div class="cp-reviewer-meta">
+                    <strong>{{ review.user.username }}</strong>
+                    <span>{{ review.created_at|date:"M d, Y" }}</span>
+                  </div>
+                  <div class="cp-review-stars">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= review.rating %}
+                        <i class="bi bi-star-fill"></i>
+                      {% else %}
+                        <i class="bi bi-star"></i>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <p class="cp-review-text">{{ review.comment }}</p>
+              </div>
+              {% endfor %}
+            </div>
+
+          {% else %}
+            <div class="cp-empty">
+              <i class="bi bi-chat-left-text"></i>
+              <h4>No Reviews Yet</h4>
+              <p>Be the first to review {{ company.company_name }}!</p>
+            </div>
+          {% endif %}
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+</div>
+
+
+{# ── Mobile Sticky CTA ────────────────────────────────────────────── #}
+<div class="cp-sticky-cta" id="cpStickyCta">
+  <button class="cp-sticky-btn" data-bs-toggle="modal" data-bs-target="#contactModal">
+    <i class="bi bi-envelope-fill"></i> Contact {{ company.company_name }}
+  </button>
+</div>
+
+
+{# ── CONTACT MODAL ───────────────────────────────────────────────── #}
+<div class="modal fade" id="contactModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content cp-modal-content">
+      <div class="modal-header cp-modal-hd">
+        <h5 class="modal-title">
+          <i class="bi bi-envelope-fill"></i> Contact {{ company.company_name }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body cp-modal-bd">
+        <form id="contactForm" method="post" action="#">
+          {% csrf_token %}
+          <div class="cp-form-group">
+            <label class="cp-form-label">Your Name</label>
+            <input type="text" name="name" class="cp-form-input" placeholder="Full name" required>
+          </div>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Email Address</label>
+            <input type="email" name="email" class="cp-form-input" placeholder="your@email.com" required>
+          </div>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Phone Number</label>
+            <input type="tel" name="phone" class="cp-form-input" placeholder="08XX XXX XXXX" required>
+          </div>
+          <div class="cp-form-group">
+            <label class="cp-form-label">Message</label>
+            <textarea name="message" class="cp-form-input cp-form-textarea" rows="4"
+                      placeholder="Tell us what you're looking for..." required></textarea>
+          </div>
+          <button type="submit" class="cp-form-submit">
+            <i class="bi bi-send-fill"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{# ── REVIEW MODAL ─────────────────────────────────────────────────── #}
+<div class="modal fade" id="reviewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content cp-modal-content">
+      <div class="modal-header cp-modal-hd">
+        <h5 class="modal-title">
+          <i class="bi bi-star-fill"></i> Review {{ company.company_name }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body cp-modal-bd">
+        {% if user.is_authenticated %}
+          {% if user_has_reviewed %}
+            <div class="cp-alert-info">
+              <i class="bi bi-info-circle-fill"></i>
+              You have already submitted a review for this company.
+            </div>
+          {% else %}
+            <form id="reviewForm" method="post"
+                  action="{% url 'customer:review-company' company.unique_company_id %}">
+              {% csrf_token %}
+
+              <div class="cp-form-group">
+                <label class="cp-form-label">Your Rating <span style="color:#dc2626">*</span></label>
+                <div class="cp-star-input" id="starInput">
+                  <input type="radio" name="rating" value="5" id="star5" required>
+                  <label for="star5"><i class="bi bi-star-fill"></i></label>
+                  <input type="radio" name="rating" value="4" id="star4">
+                  <label for="star4"><i class="bi bi-star-fill"></i></label>
+                  <input type="radio" name="rating" value="3" id="star3">
+                  <label for="star3"><i class="bi bi-star-fill"></i></label>
+                  <input type="radio" name="rating" value="2" id="star2">
+                  <label for="star2"><i class="bi bi-star-fill"></i></label>
+                  <input type="radio" name="rating" value="1" id="star1">
+                  <label for="star1"><i class="bi bi-star-fill"></i></label>
+                </div>
+                <div class="cp-rating-text" id="ratingText">Select a rating</div>
+              </div>
+
+              <div class="cp-form-group">
+                <label class="cp-form-label">Your Review <span style="color:#dc2626">*</span></label>
+                <textarea name="comment" class="cp-form-input cp-form-textarea" rows="5" required
+                  placeholder="Share your experience with {{ company.company_name }}..."></textarea>
+                <span class="cp-form-hint">Minimum 10 characters</span>
+              </div>
+
+              <button type="submit" class="cp-form-submit">
+                <i class="bi bi-check-circle-fill"></i> Submit Review
+              </button>
+            </form>
+          {% endif %}
+        {% else %}
+          <div class="cp-alert-warn">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a> to write a review.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  /* ── Star rating ── */
+  var ratings = {
+    '5': 'Excellent — 5 stars',
+    '4': 'Very Good — 4 stars',
+    '3': 'Good — 3 stars',
+    '2': 'Fair — 2 stars',
+    '1': 'Poor — 1 star'
+  };
+  document.querySelectorAll('.cp-star-input input[type="radio"]').forEach(function (inp) {
+    inp.addEventListener('change', function () {
+      var txt = document.getElementById('ratingText');
+      if (txt) { txt.textContent = ratings[this.value]; txt.classList.add('active'); }
+    });
+  });
+
+  /* ── Review form validation ── */
+  var reviewForm = document.getElementById('reviewForm');
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', function (e) {
+      var checked = document.querySelector('.cp-star-input input:checked');
+      var comment = document.querySelector('textarea[name="comment"]');
+      if (!checked) { e.preventDefault(); alert('Please select a star rating.'); return; }
+      if (comment && comment.value.trim().length < 10) {
+        e.preventDefault(); alert('Please write at least 10 characters.'); comment.focus();
+      }
+    });
+  }
+
+  /* ── Share ── */
+  window.shareCompany = function () {
+    if (navigator.share) {
+      navigator.share({ title: '{{ company.company_name }}', url: window.location.href })
+        .catch(function () {});
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+        .then(function () { alert('Link copied to clipboard!'); })
+        .catch(function () {});
+    }
+  };
+
+  /* ── Sticky CTA: hide when hero contact btn is visible ── */
+  var stickyCta = document.getElementById('cpStickyCta');
+  var heroBtn   = document.querySelector('.cp-btn-contact');
+  if (stickyCta && heroBtn) {
+    var obs = new IntersectionObserver(function (entries) {
+      stickyCta.classList.toggle('cp-sticky-cta--hidden', entries[0].isIntersecting);
+    }, { threshold: 0.5 });
+    obs.observe(heroBtn);
+  }
+
+}());
+</script>
+{% endblock %}

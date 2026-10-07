@@ -1,0 +1,821 @@
+/* ═══════════════════════════════════════════════════
+   compare.css — Property Comparison Page
+   Mobile-first. Estate Web palette. Prefix: cmp-
+   ═══════════════════════════════════════════════════ */
+
+:root {
+    --primary: #1a3c4e;
+    --primary-lt: #2d5a73;
+    --secondary: #c19b76;
+    --accent: #8b7355;
+    --sale: #2563eb;
+    --sale-lt: rgba(37, 99, 235, .1);
+    --lease: #16a34a;
+    --lease-lt: rgba(22, 163, 74, .1);
+    --text-dark: #1e293b;
+    --text-mid: #4a5568;
+    --text-light: #6b7280;
+    --bg: #f4f6f8;
+    --white: #ffffff;
+    --border: #e5e7eb;
+    --success: #16a34a;
+    --shadow-sm: 0 1px 4px rgba(26, 60, 78, .07), 0 2px 8px rgba(26, 60, 78, .05);
+    --shadow-md: 0 4px 16px rgba(26, 60, 78, .10);
+    --shadow-lg: 0 8px 32px rgba(26, 60, 78, .14);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --ease: all 0.22s ease;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════════ */
+.cmp-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    padding: 1.25rem;
+}
+
+.cmp-hero-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.cmp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, .9);
+    text-decoration: none;
+    font-size: 0.76rem;
+    font-weight: 700;
+    transition: var(--ease);
+    white-space: nowrap;
+}
+
+.cmp-back:hover {
+    background: rgba(255, 255, 255, .22);
+    color: var(--white);
+}
+
+.cmp-hero-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.cmp-hero-text h1 {
+    font-size: clamp(1rem, 4vw, 1.5rem);
+    font-weight: 800;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 1px;
+}
+
+.cmp-hero-text h1 i {
+    color: var(--secondary);
+}
+
+.cmp-hero-text p {
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, .7);
+    margin: 0;
+}
+
+.cmp-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.55rem 1rem;
+    background: rgba(220, 38, 38, .2);
+    border: 1px solid rgba(220, 38, 38, .35);
+    border-radius: var(--radius-sm);
+    color: #fca5a5;
+    font-size: 0.78rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--ease);
+    white-space: nowrap;
+}
+
+.cmp-clear-btn:hover {
+    background: rgba(220, 38, 38, .4);
+    color: var(--white);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════════════ */
+.cmp-empty-wrap {
+    min-height: 65vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+.cmp-empty {
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.cmp-empty-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(26, 60, 78, .06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--text-light);
+}
+
+.cmp-empty h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.cmp-empty p {
+    font-size: 0.85rem;
+    color: var(--text-mid);
+    line-height: 1.7;
+    max-width: 320px;
+}
+
+.cmp-empty-actions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   SHARED BUTTONS
+   ═══════════════════════════════════════════════════ */
+.cmp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.65rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: var(--ease);
+}
+
+.cmp-btn.sale {
+    background: var(--sale);
+    color: var(--white);
+}
+
+.cmp-btn.lease {
+    background: var(--lease);
+    color: var(--white);
+}
+
+.cmp-btn.sm {
+    font-size: 0.76rem;
+    padding: 0.5rem 0.9rem;
+}
+
+.cmp-btn:hover {
+    opacity: .88;
+    transform: translateY(-2px);
+}
+
+.cmp-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: var(--ease);
+    flex: 1;
+}
+
+.cmp-view-btn.sale {
+    background: var(--sale-lt);
+    color: var(--sale);
+}
+
+.cmp-view-btn.lease {
+    background: var(--lease-lt);
+    color: var(--lease);
+}
+
+.cmp-view-btn:hover {
+    opacity: .8;
+}
+
+.cmp-inq-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: var(--primary);
+    color: var(--white);
+    transition: var(--ease);
+    flex: 1;
+}
+
+.cmp-inq-btn:hover {
+    background: var(--primary-lt);
+    color: var(--white);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   STATUS BADGE
+   ═══════════════════════════════════════════════════ */
+.cmp-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.cmp-status.live {
+    background: var(--lease-lt);
+    color: var(--success);
+}
+
+.cmp-status.stored {
+    background: rgba(107, 114, 128, .1);
+    color: var(--text-light);
+}
+
+.cmp-type-badge {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 0.3px;
+}
+
+.cmp-type-badge.sale {
+    background: var(--sale);
+}
+
+.cmp-type-badge.lease {
+    background: var(--lease);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   IMAGE PLACEHOLDER
+   ═══════════════════════════════════════════════════ */
+.cmp-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--border);
+    background: var(--bg);
+}
+
+.cmp-img-placeholder.sm {
+    font-size: 1.5rem;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   REMOVE BUTTON
+   ═══════════════════════════════════════════════════ */
+.cmp-remove-card {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 0, 0, .5);
+    border: none;
+    border-radius: 50%;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: var(--ease);
+    z-index: 2;
+}
+
+.cmp-remove-card:hover {
+    background: rgba(220, 38, 38, .8);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   MOBILE — swipeable card strip
+   Desktop table is hidden on mobile
+   ═══════════════════════════════════════════════════ */
+.cmp-mobile-strip {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 1.25rem 1rem 0.5rem;
+}
+
+.cmp-mobile-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.cmp-mobile-card,
+.cmp-add-slot {
+    flex: 0 0 calc(85vw);
+    /* show hint of next card */
+    min-width: 260px;
+    max-width: 340px;
+    scroll-snap-align: start;
+}
+
+.cmp-mobile-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Image */
+.cmp-img-wrap {
+    position: relative;
+    height: 195px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg);
+}
+
+.cmp-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.cmp-mobile-card:hover .cmp-img-wrap img {
+    transform: scale(1.04);
+}
+
+/* Card top */
+.cmp-card-top {
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.cmp-card-top h3 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 3px;
+    line-height: 1.3;
+}
+
+.cmp-location {
+    font-size: 0.74rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.cmp-location i {
+    color: var(--secondary);
+    font-size: 0.72rem;
+}
+
+.cmp-price {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.cmp-price span {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+/* Stats */
+.cmp-stats {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(26, 60, 78, .02);
+}
+
+.cmp-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.cmp-stat i {
+    font-size: 0.95rem;
+    color: var(--secondary);
+}
+
+.cmp-stat span {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.cmp-stat small {
+    font-size: 0.62rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.cmp-stat-sep {
+    width: 1px;
+    height: 30px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+/* Details */
+.cmp-details {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.cmp-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(229, 231, 235, .5);
+    font-size: 0.78rem;
+}
+
+.cmp-detail-row:last-child {
+    border-bottom: none;
+}
+
+.cmp-detail-lbl {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.cmp-detail-val {
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+/* Description */
+.cmp-desc {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.cmp-desc-lbl {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.cmp-desc p {
+    font-size: 0.8rem;
+    color: var(--text-mid);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* CTA buttons */
+.cmp-view-btn,
+.cmp-inq-btn {
+    margin: 0;
+    border-radius: 0;
+}
+
+.cmp-view-btn {
+    border-bottom: 1px solid var(--border);
+}
+
+/* Empty slot */
+.cmp-add-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 2px dashed var(--border);
+    min-height: 300px;
+}
+
+.cmp-add-slot-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--text-light);
+}
+
+.cmp-add-slot-inner i {
+    font-size: 2rem;
+    color: var(--border);
+}
+
+.cmp-add-slot-inner p {
+    font-size: 0.82rem;
+    margin: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   SCROLL DOTS
+   ═══════════════════════════════════════════════════ */
+.cmp-dots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 0.75rem 0 1.25rem;
+}
+
+.cmp-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: var(--ease);
+}
+
+.cmp-dot.active {
+    background: var(--secondary);
+    width: 20px;
+    border-radius: 4px;
+}
+
+.cmp-dot.empty {
+    opacity: 0.35;
+}
+
+
+/* Desktop table hidden on mobile */
+.cmp-desktop-wrap {
+    display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   720px+ — switch from cards to table
+   ═══════════════════════════════════════════════════ */
+@media (min-width: 720px) {
+
+    .cmp-hero {
+        padding: 1.5rem 2rem;
+    }
+
+    /* Hide mobile strip, show desktop table */
+    .cmp-mobile-strip,
+    .cmp-dots {
+        display: none;
+    }
+
+    .cmp-desktop-wrap {
+        display: block;
+        padding: 1.5rem 1.5rem 4rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .cmp-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        table-layout: fixed;
+    }
+
+    /* First column = row label */
+    .cmp-table th {
+        width: 140px;
+        padding: 0.85rem 1rem;
+        background: rgba(26, 60, 78, .03);
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-mid);
+        text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .cmp-table th i {
+        color: var(--secondary);
+        margin-right: 4px;
+    }
+
+    .cmp-table td {
+        padding: 0.85rem 1.1rem;
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .cmp-table td:last-child,
+    .cmp-table th:last-child {
+        border-right: none;
+    }
+
+    .cmp-highlight-row td,
+    .cmp-highlight-row th {
+        background: rgba(26, 60, 78, .03);
+    }
+
+    /* Image row */
+    .cmp-img-row th,
+    .cmp-img-row td {
+        padding: 0;
+        border-bottom: 2px solid var(--border);
+    }
+
+    .cmp-td-img {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: var(--bg);
+    }
+
+    .cmp-td-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.35s ease;
+    }
+
+    .cmp-td-img:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Name cell */
+    .cmp-name-cell {
+        text-align: left;
+    }
+
+    .cmp-name-cell small {
+        display: block;
+        font-size: 0.72rem;
+        color: var(--text-light);
+        font-weight: 400;
+        margin-top: 2px;
+    }
+
+    .cmp-name-cell small i {
+        color: var(--secondary);
+        font-size: 0.7rem;
+    }
+
+    /* Price cell */
+    .cmp-price-cell {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .cmp-per {
+        font-size: 0.72rem;
+        font-weight: 400;
+        color: var(--text-light);
+    }
+
+    /* Empty col */
+    .cmp-empty-col {
+        background: rgba(0, 0, 0, .015);
+        color: var(--text-light);
+    }
+
+    .cmp-add-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        color: var(--text-light);
+    }
+
+    .cmp-add-col i {
+        font-size: 1.5rem;
+        color: var(--border);
+    }
+
+    .cmp-add-col a {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--secondary);
+        text-decoration: none;
+    }
+
+    .cmp-add-col a:hover {
+        color: var(--primary);
+    }
+
+    /* Actions row */
+    .cmp-actions-row td {
+        padding: 1rem;
+    }
+
+    .cmp-td-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .cmp-remove-card.sm {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        z-index: 2;
+    }
+
+    /* Remove type-badge position fix inside table */
+    .cmp-table .cmp-type-badge {
+        top: 0.5rem;
+        left: 0.5rem;
+    }
+
+}
+
+
+/* ═══════════════════════════════════════════════════
+   Reduced motion
+   ═══════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}

@@ -1,0 +1,532 @@
+{% extends base_template %}
+{% load static %}
+{% load property_extras %}
+{% load humanize %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/view_prop_s.css' %}">
+  <link rel="stylesheet" href="{% static 'estate/css/safety_tips.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{# ── Back Button ─────────────────────────────────────────────────── #}
+<div class="container">
+    <a href="javascript:history.back()" class="back-button">
+      <i class="bi bi-arrow-left"></i> Go Back
+    </a>
+</div>
+
+{# ── Sticky CTA Bar — mobile only ────────────────────────────────── #}
+<div class="sticky-cta">
+  <a href="{% url 'customer:inquiry-form' property.property_type property.id %}"
+     class="btn-contact primary">
+    <i class="bi bi-envelope-fill"></i> Book Property
+  </a>
+  <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}"
+     class="btn-contact secondary">
+    <i class="bi bi-telephone-fill"></i> Call Now
+  </a>
+</div>
+
+{# ── Page Wrapper ────────────────────────────────────────────────── #}
+<div class="detail-wrapper">
+
+  {# ── Hero ─────────────────────────────────────────────────────── #}
+  <div class="property-hero">
+
+    <div class="hero-image">
+      {% if property.base_image %}
+        <img src="{{ property.base_image.url }}"
+             id="heroMainImg"
+             style="cursor:pointer;"
+             onclick="openLightbox(0)"
+             onerror="this.onerror=null;this.src='https://placehold.co/1200x600/eff6ff/2563eb?text=No+Image';"
+             alt="Property Image">
+      {% else %}
+        <img src="https://placehold.co/1200x600/eff6ff/2563eb?text=No+Image"
+             alt="Placeholder">
+      {% endif %}
+
+      <span class="hero-badge">
+        <i class="bi bi-tag-fill"></i> For Sale
+      </span>
+
+      <div class="hero-price-pill">
+        ₦{{ property.price|default:"N/A"|floatformat:2|intcomma }}
+      </div>
+
+      {# ── Wishlist Button ─────────────────────────────────────── #}
+      {% if user.role == 'customer' %}
+      <a href="{% url 'customer:toggle-wishlist-buy' property.id %}"
+         class="detail-wishlist-btn wl-toggle"
+         data-url="{% url 'customer:toggle-wishlist-buy' property.id %}"
+         data-added="{% if in_wishlist %}true{% else %}false{% endif %}"
+         aria-label="{% if in_wishlist %}Remove from wishlist{% else %}Add to wishlist{% endif %}"
+         title="{% if in_wishlist %}Remove from wishlist{% else %}Save to wishlist{% endif %}">
+        <i class="bi bi-heart{% if in_wishlist %}-fill{% endif %}"></i>
+      </a>
+      {% endif %}
+    </div>
+
+    {# Gallery strip — clickable thumbnails #}
+    {% with property|get_images as extra_images %}
+      {% if extra_images %}
+        <div class="gallery-strip">
+          {% for img in extra_images|slice:"1:8" %}
+            <div class="gallery-thumb" onclick="openLightbox({{ forloop.counter }})" style="cursor:pointer;">
+              <img src="{{ img.url }}"
+                   onerror="this.onerror=null;this.src='https://placehold.co/400x300/eff6ff/2563eb?text=No+Image';"
+                   alt="Property Image {{ forloop.counter }}">
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="hero-body">
+      <h1 class="property-title">
+        {% if property.property_category == 'Commercial' %}
+          {{ property.commercial }}
+        {% elif property.property_category == 'Land' %}
+          {{ property.lands }}
+        {% elif property.property_category == 'Residential' %}
+          {{ property.residential }}
+        {% else %}
+          Property Listing
+        {% endif %}
+      </h1>
+
+      <div class="property-location">
+        <div class="location-item">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>{{ property.location|default:"Unknown Location" }}</span>
+        </div>
+        <div class="location-item">
+          <i class="bi bi-globe"></i>
+          <span>{{ property.state|default:"Unspecified" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Two-column layout ────────────────────────────────────────── #}
+  <div class="property-card">
+
+    {# ── Left: Main Content ──────────────────────────────────────── #}
+    <div class="main-content">
+
+      {# Description #}
+      <div class="section-card">
+        <div class="section-head">
+          <i class="bi bi-text-paragraph"></i>
+          <h3>Description</h3>
+        </div>
+        <div class="section-body">
+          <p class="description-text">
+            {{ property.property_description|default:"No detailed description available for this property." }}
+          </p>
+        </div>
+      </div>
+
+      {# Key Features #}
+      <div class="section-card">
+        <div class="section-head">
+          <i class="bi bi-stars"></i>
+          <h3>Key Features</h3>
+        </div>
+        <div class="section-body">
+          <div class="features-grid">
+
+            <div class="feature-item">
+              <div class="feature-icon"><i class="bi bi-door-closed-fill"></i></div>
+              <div class="feature-content">
+                <span class="feature-label">Bedrooms</span>
+                <div class="feature-value">{{ property.bedrooms|default:"N/A" }}</div>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon"><i class="bi bi-droplet-fill"></i></div>
+              <div class="feature-content">
+                <span class="feature-label">Bathrooms</span>
+                <div class="feature-value">{{ property.bathrooms|default:"N/A" }}</div>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon"><i class="bi bi-p-circle-fill"></i></div>
+              <div class="feature-content">
+                <span class="feature-label">Parking</span>
+                <div class="feature-value">{{ property.parking_spaces|default:"0" }}</div>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <div class="feature-icon"><i class="bi bi-rulers"></i></div>
+              <div class="feature-content">
+                <span class="feature-label">Size</span>
+                <div class="feature-value">{{ property.size|default:"N/A" }} <small>sqft</small></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+{# ── Property Amenities / Features ───────────────────────── #}
+{% with property.property_features.all as features %}
+  {% if features %}
+  <div class="section-card">
+    <div class="section-head">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      <h3>Amenities &amp; Features</h3>
+    </div>
+    <div class="section-body">
+      <div class="amenities-grid">
+        {% for f in features %}
+          <div class="amenity-chip">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ f.name }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endwith %}
+      {# Map #}
+      <div class="section-card">
+        <div class="section-head">
+          <i class="bi bi-pin-map-fill"></i>
+          <h3>Property Location</h3>
+        </div>
+        <div class="section-body">
+          <div class="map-placeholder">
+            <i class="bi bi-geo-alt-fill"></i>
+            <p>Map integration coming soon!</p>
+            <img src="https://placehold.co/1000x300/eff6ff/2563eb?text=Map+Placeholder"
+                 alt="Map Placeholder">
+          </div>
+        </div>
+      </div>
+
+    </div>{# end main-content #}
+
+    {# ── Right: Sidebar ──────────────────────────────────────────── #}
+    <div class="sidebar-content">
+
+      {# Price Card — desktop only #}
+      <div class="price-card">
+        <span class="price-label">Sale Price</span>
+        <span class="price-amount">
+          ₦{{ property.price|default:"N/A"|floatformat:2|intcomma }}
+        </span>
+
+        <div class="price-divider"></div>
+
+        <div class="contact-buttons">
+          <a href="{% url 'customer:inquiry-form' property.property_type property.id %}"
+             class="btn-contact primary">
+            <i class="bi bi-envelope-fill"></i> Book Property
+          </a>
+          <a href="tel:{% if agent_info %}{{ agent_info.phone_number }}{% elif company_info %}{{ company_info.phone_number }}{% else %}{{ property.phone_number }}{% endif %}"
+             class="btn-contact secondary">
+            <i class="bi bi-telephone-fill"></i> Call Now
+          </a>
+        </div>
+      </div>
+
+      {# Safety Center #}
+      <div class="safety-center sidebar-section">
+        <button class="safety-trigger sidebar-trigger">
+          <i class="bi bi-shield-check"></i> Trust & Safety Tips
+        </button>
+        <div class="safety-modal sidebar-modal">
+          <div class="safety-modal-content">
+            <button class="safety-close">&times;</button>
+            {% include 'estate/includes/safety_tips.html' %}
+          </div>
+        </div>
+      </div>
+
+      {# Agent / Company / Landlord Details #}
+      <div class="section-card">
+        <div class="section-head">
+          <i class="bi bi-person-badge"></i>
+          <h3>
+            {% if landlord_info %}Landlord
+            {% elif company_info %}Company
+            {% elif agent_info %}Agent
+            {% else %}Seller
+            {% endif %} Details
+          </h3>
+        </div>
+        <div class="section-body">
+
+          <div class="contact-info">
+            <div class="contact-item">
+              <span class="contact-label">Listed By</span>
+              <span class="contact-value">
+                {% if landlord_info %}
+                  {{ landlord_info.first_name }} {{ landlord_info.last_name|default:"" }}
+                {% elif agent_info %}
+                  {{ agent_info.first_name|default:"N/A" }}
+                {% elif company_info %}
+                  {{ company_info.company_name|default:"N/A" }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-label">Phone</span>
+              <span class="contact-value">
+                {% if landlord_info %}
+                  {{ landlord_info.phone_number|default:"N/A" }}
+                {% elif agent_info %}
+                  {{ agent_info.phone_number|default:"N/A" }}
+                {% elif company_info %}
+                  {{ company_info.phone_number|default:"N/A" }}
+                {% else %}
+                  {{ property.phone_number|default:"N/A" }}
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-label">Last Updated</span>
+              <span class="contact-value">{{ property.last_updated|date:"M d, Y"|default:"N/A" }}</span>
+            </div>
+
+            <div class="contact-item">
+              <span class="contact-label">Listed On</span>
+              <span class="contact-value">{{ property.listed_date|date:"M d, Y"|default:"N/A" }}</span>
+            </div>
+          </div>
+
+          <div class="contact-action-btns">
+            {% if property.agent_uuid and property.agent_uuid != 'None' %}
+              <a href="{% url 'customer:agent-profile' agent_uuid=property.agent_uuid %}"
+                class="btn-contact secondary">
+                <i class="bi bi-person-circle"></i> View Agent's Profile
+              </a>
+            {% endif %}
+
+            {% if property.company_uuid and property.company_uuid != 'None' %}
+              <a href="{% url 'customer:company-profile' company_uuid=property.company_uuid %}"
+                class="btn-contact secondary">
+                <i class="bi bi-building"></i> View Company's Profile
+              </a>
+            {% endif %}
+
+            {% if property.landlord_uuid and property.landlord_uuid != 'None' %}
+              <a href="{% url 'customer:landlord-profile' landlord_uuid=property.landlord_uuid %}"
+                class="btn-contact secondary">
+                <i class="bi bi-building"></i> View Landlord's Profile
+              </a>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>{# end sidebar-content #}
+
+  </div>{# end property-card #}
+
+  {# ── Flag / Report Listing ─────────────────────────────────────── #}
+  <div class="flag-listing-bar">
+    <a href="{% url 'customer:flag-listing' property_type=property.property_type property_id=property.id %}" class="btn-flag-listing" id="flag-listing-btn">
+      <i class="bi bi-flag-fill"></i> Report Listing
+    </a>
+  </div>
+
+</div>{# end detail-wrapper #}
+
+
+{# ── LIGHTBOX ─────────────────────────────────────────────────────── #}
+<div class="vps-lightbox" id="vpsLightbox">
+  <button class="vps-lb-close" onclick="closeLightbox()">&times;</button>
+  <button class="vps-lb-arrow vps-lb-prev" onclick="shiftLightbox(-1)">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  <div class="vps-lb-img-wrap">
+    <img id="vpsLightboxImg" src="" alt="Property Image">
+  </div>
+  <button class="vps-lb-arrow vps-lb-next" onclick="shiftLightbox(1)">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+  <div class="vps-lb-counter" id="vpsLbCounter"></div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<style>
+.vps-lightbox {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.92);
+  z-index: 9999;
+  align-items: center; justify-content: center;
+}
+.vps-lightbox.open { display: flex; }
+.vps-lb-img-wrap {
+  max-width: 92vw; max-height: 88vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.vps-lb-img-wrap img {
+  max-width: 100%; max-height: 88vh;
+  border-radius: 8px; object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+}
+.vps-lb-close {
+  position: absolute; top: 16px; right: 20px;
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.6rem;
+  width: 42px; height: 42px; border-radius: 50%;
+  cursor: pointer; line-height: 1; transition: background .2s;
+}
+.vps-lb-close:hover { background: rgba(255,255,255,.3); }
+.vps-lb-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1.3rem;
+  width: 46px; height: 46px; border-radius: 50%;
+  cursor: pointer; transition: background .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.vps-lb-arrow:hover { background: rgba(255,255,255,.3); }
+.vps-lb-prev { left: 16px; }
+.vps-lb-next { right: 16px; }
+.vps-lb-counter {
+  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.5); color: #fff;
+  padding: 4px 14px; border-radius: 20px; font-size: .75rem;
+}
+.gallery-thumb { cursor: pointer; }
+.gallery-thumb:hover img { opacity: .85; }
+</style>
+
+<script>
+/* ── Build image list from page ─────────────────── */
+var vpsImages = [];
+var vpsCurrentIndex = 0;
+
+document.addEventListener('DOMContentLoaded', function () {
+  /* Base/hero image first */
+  var heroImg = document.getElementById('heroMainImg');
+  if (heroImg) vpsImages.push(heroImg.src);
+
+  /* Then gallery thumbnails */
+  document.querySelectorAll('.gallery-thumb img').forEach(function (img) {
+    vpsImages.push(img.src);
+  });
+
+  /* Close on backdrop click */
+  document.getElementById('vpsLightbox').addEventListener('click', function (e) {
+    if (e.target === this) closeLightbox();
+  });
+});
+
+function openLightbox(index) {
+  if (!vpsImages.length) return;
+  vpsCurrentIndex = index;
+  renderLightbox();
+  document.getElementById('vpsLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('vpsLightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function shiftLightbox(dir) {
+  vpsCurrentIndex = (vpsCurrentIndex + dir + vpsImages.length) % vpsImages.length;
+  renderLightbox();
+}
+
+function renderLightbox() {
+  document.getElementById('vpsLightboxImg').src = vpsImages[vpsCurrentIndex];
+  document.getElementById('vpsLbCounter').textContent =
+    (vpsCurrentIndex + 1) + ' / ' + vpsImages.length;
+}
+
+/* Keyboard navigation */
+document.addEventListener('keydown', function (e) {
+  var lb = document.getElementById('vpsLightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowRight') shiftLightbox(1);
+  if (e.key === 'ArrowLeft')  shiftLightbox(-1);
+  if (e.key === 'Escape')     closeLightbox();
+});
+
+/* ── Safety Modal ───────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.safety-trigger').forEach(function (trigger) {
+    var modal = trigger.closest('.safety-center')?.querySelector('.safety-modal')
+                || document.getElementById('safetyModal');
+    var close = modal?.querySelector('.safety-close');
+
+    if (trigger && modal) trigger.addEventListener('click', () => modal.classList.add('active'));
+    if (close) close.addEventListener('click', () => modal.classList.remove('active'));
+    if (modal) modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  });
+});
+
+/* ── Wishlist ────────────────────────────────────── */
+(function() {
+  const csrftoken = '{{ csrf_token }}';
+
+  function showToast(message, isAdded) {
+    let toast = document.getElementById('wishlist-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'wishlist-toast';
+      toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 20px;border-radius:10px;z-index:10000;display:flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;font-size:14px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+      document.body.appendChild(toast);
+    }
+    toast.innerHTML = '<span>' + (isAdded ? '❤️' : '💔') + '</span><span>' + message + '</span>';
+    toast.style.display = 'flex';
+    setTimeout(function() { toast.style.display = 'none'; }, 2500);
+  }
+
+  document.querySelectorAll('.detail-wishlist-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const url = btn.getAttribute('href');
+      const icon = btn.querySelector('i');
+      btn.style.pointerEvents = 'none';
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.added !== undefined) {
+          if (data.added) {
+            icon.classList.remove('bi-heart');
+            icon.classList.add('bi-heart-fill');
+            showToast('Added to wishlist!', true);
+          } else {
+            icon.classList.remove('bi-heart-fill');
+            icon.classList.add('bi-heart');
+            showToast('Removed from wishlist', false);
+          }
+          btn.setAttribute('data-added', data.added);
+          btn.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+        }
+      })
+      .catch(function() { showToast('Something went wrong. Try again.', false); })
+      .finally(function() { btn.style.pointerEvents = 'auto'; });
+    });
+  });
+})();
+</script>
+{% endblock %}

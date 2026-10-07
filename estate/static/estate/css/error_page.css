@@ -1,0 +1,348 @@
+/* ===================================
+   ESTATE WEB — ERROR PAGE
+   Matches estate/base.html light theme
+   =================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --gold:         #c19b76;
+  --gold-dark:    #a07d5a;
+  --gold-bg:      #fdf8f4;
+  --gold-border:  #e8d5c0;
+
+  --text-main:    #1e2329;
+  --text-secondary:#4a5568;
+  --text-muted:   #718096;
+
+  --bg-page:      #f4f6f9;
+  --bg-card:      #ffffff;
+  --bg-subtle:    #f8f9fa;
+  --border-light: #e2e8f0;
+
+  --danger:       #c0392b;
+  --danger-bg:    #fff5f5;
+  --danger-border:#feb2b2;
+  --success:      #276749;
+  --success-bg:   #f0faf5;
+
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    16px;
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.08);
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Poppins', system-ui, sans-serif;
+  --transition:   0.2s ease;
+}
+
+/* ===================================
+   PAGE WRAPPER
+   =================================== */
+.error-page-wrapper {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem 3rem;
+  background: var(--bg-page);
+}
+
+/* ===================================
+   BACK BUTTON
+   =================================== */
+.error-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition);
+  margin-bottom: 2rem;
+  align-self: flex-start;
+  max-width: 700px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error-back-btn:hover {
+  background: var(--gold-bg);
+  border-color: var(--gold-border);
+  color: var(--gold-dark);
+}
+
+/* ===================================
+   MAIN ERROR CARD
+   =================================== */
+.error-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 2.5rem 2rem;
+  max-width: 700px;
+  width: 100%;
+  text-align: center;
+  border: 1.5px solid var(--border-light);
+}
+
+/* ===================================
+   ERROR ICON
+   =================================== */
+.error-icon-wrap {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.error-icon-wrap.is-crash {
+  background: var(--danger-bg);
+  border: 2px solid var(--danger-border);
+}
+
+.error-icon-wrap.is-soft {
+  background: var(--gold-bg);
+  border: 2px solid var(--gold-border);
+}
+
+.error-icon-wrap i {
+  font-size: 1.875rem;
+}
+
+.error-icon-wrap.is-crash i { color: var(--danger); }
+.error-icon-wrap.is-soft  i { color: var(--gold-dark); }
+
+/* ===================================
+   HEADINGS & TEXT
+   =================================== */
+.error-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 0.75rem;
+  line-height: 1.25;
+}
+
+.error-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.75rem;
+  line-height: 1.6;
+}
+
+/* ===================================
+   SOFT ERROR MESSAGE BOX
+   (used when `e` is passed — e.g. "Property not found")
+   =================================== */
+.error-message-box {
+  background: var(--gold-bg);
+  border: 1.5px solid var(--gold-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;
+  text-align: left;
+}
+
+.error-message-box p {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===================================
+   REF ID BOX
+   (used when `ref_id` is passed — server crash)
+   =================================== */
+.error-ref-box {
+  background: var(--danger-bg);
+  border: 1.5px solid var(--danger-border);
+  border-radius: var(--radius-md);
+  padding: 1.125rem 1.25rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  text-align: left;
+}
+
+.error-ref-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 0.375rem;
+}
+
+.error-ref-value {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.04em;
+  display: block;
+  word-break: break-all;
+}
+
+.error-ref-hint {
+  font-family: var(--font-body);
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  display: block;
+}
+
+/* Copy button for ref ID */
+.copy-ref-btn {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.copy-ref-btn:hover {
+  background: var(--gold-bg);
+  border-color: var(--gold-border);
+  color: var(--gold-dark);
+}
+
+.copy-ref-btn.copied {
+  background: var(--success-bg);
+  border-color: #9ae6b4;
+  color: var(--success);
+}
+
+/* ===================================
+   ACTION BUTTONS ROW
+   =================================== */
+.error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.error-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.375rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+}
+
+.error-btn-primary {
+  background: var(--gold);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(193,155,118,0.35);
+}
+
+.error-btn-primary:hover {
+  background: var(--gold-dark);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(193,155,118,0.45);
+}
+
+.error-btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-light);
+}
+
+.error-btn-secondary:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  border-color: var(--text-muted);
+}
+
+/* ===================================
+   DIVIDER + CONTACT LINE
+   =================================== */
+.error-divider {
+  border: none;
+  border-top: 1px solid var(--border-light);
+  margin: 1.875rem 0 1.375rem;
+}
+
+.error-contact-line {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.error-contact-line a {
+  color: var(--gold-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.error-contact-line a:hover {
+  text-decoration: underline;
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 600px) {
+  .error-card {
+    padding: 2rem 1.25rem;
+  }
+
+  .error-back-btn {
+    font-size: 0.8125rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .error-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .error-btn {
+    justify-content: center;
+  }
+
+  .copy-ref-btn {
+    position: static;
+    margin-top: 0.75rem;
+    align-self: flex-start;
+  }
+
+  .error-ref-box {
+    padding-right: 1.25rem;
+  }
+}

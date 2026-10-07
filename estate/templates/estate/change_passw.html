@@ -1,0 +1,316 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Change Password — Estate Web{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'estate/css/change_pass.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="cp-page">
+
+  <!-- ===== PAGE HEADER ===== -->
+  <div class="cp-page-header">
+    <a href="javascript:history.back()" class="cp-back-link">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <div>
+      <h1 class="cp-page-title">Change Password</h1>
+      <p class="cp-page-sub">Update your password to keep your account secure.</p>
+    </div>
+  </div>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="cp-layout">
+
+    <!-- LEFT — security info panel -->
+    <aside class="cp-info-panel">
+
+      <div class="cp-panel-icon-wrap">
+        <i class="bi bi-shield-lock-fill cp-panel-icon"></i>
+      </div>
+
+      <h2 class="cp-panel-title">Password requirements</h2>
+
+      <ul class="cp-req-list">
+        <li class="cp-req-item" id="req-length">
+          <span class="cp-req-dot"></span>
+          At least 8 characters
+        </li>
+        <li class="cp-req-item" id="req-upper">
+          <span class="cp-req-dot"></span>
+          One uppercase letter
+        </li>
+        <li class="cp-req-item" id="req-number">
+          <span class="cp-req-dot"></span>
+          One number
+        </li>
+        <li class="cp-req-item" id="req-special">
+          <span class="cp-req-dot"></span>
+          One special character
+        </li>
+        <li class="cp-req-item" id="req-notnumeric">
+          <span class="cp-req-dot"></span>
+          Cannot be entirely numeric
+        </li>
+      </ul>
+
+      <div class="cp-panel-divider"></div>
+
+      <div class="cp-tip">
+        <p class="cp-tip-label"><i class="bi bi-lightbulb"></i> Tips</p>
+        <ul class="cp-tip-list">
+          <li>Use a password you don't use anywhere else.</li>
+          <li>Avoid using your name, email, or date of birth.</li>
+          <li>Consider a password manager.</li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT — form -->
+    <div class="cp-form-section">
+
+      <!-- Django messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="cp-alert {{ message.tags }}">
+            <i class="bi bi-{% if message.tags == 'success' %}check-circle-fill{% elif message.tags == 'error' %}x-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Non-field errors -->
+      {% if form.non_field_errors %}
+        <div class="cp-alert error">
+          <i class="bi bi-x-circle-fill"></i>
+          <span>{{ form.non_field_errors|join:" " }}</span>
+        </div>
+      {% endif %}
+
+      <div class="cp-form-card">
+
+        <form method="POST" class="cp-form" id="changePassForm">
+          {% csrf_token %}
+
+          <!-- Current Password -->
+          <div class="cp-form-group">
+            <label class="cp-label" for="{{ form.old_password.id_for_label }}">
+              Current Password <span class="cp-required">*</span>
+            </label>
+            <div class="cp-input-wrap">
+              <i class="bi bi-lock cp-input-icon"></i>
+              {{ form.old_password }}
+              <button type="button"
+                      class="cp-toggle-btn"
+                      data-target="{{ form.old_password.id_for_label }}"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if form.old_password.errors %}
+              <p class="cp-field-error">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ form.old_password.errors|join:" " }}
+              </p>
+            {% endif %}
+
+            <p class="cp-forgot-link">
+              <a href="{% url 'account_reset_password' %}">
+                <i class="bi bi-key-fill me-1"></i>Forgot your current password?
+              </a>
+            </p>
+          </div>
+
+          <!-- New Password -->
+          <div class="cp-form-group">
+            <label class="cp-label" for="{{ form.new_password1.id_for_label }}">
+              New Password <span class="cp-required">*</span>
+            </label>
+            <div class="cp-input-wrap">
+              <i class="bi bi-key cp-input-icon"></i>
+              {{ form.new_password1 }}
+              <button type="button"
+                      class="cp-toggle-btn"
+                      data-target="{{ form.new_password1.id_for_label }}"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if form.new_password1.errors %}
+              <p class="cp-field-error">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ form.new_password1.errors|join:" " }}
+              </p>
+            {% endif %}
+
+            <!-- Strength bar -->
+            <div class="cp-strength-wrap" id="strengthWrap" style="display:none;">
+              <div class="cp-strength-track">
+                <div class="cp-strength-fill" id="strengthFill"></div>
+              </div>
+              <span class="cp-strength-label" id="strengthLabel">Weak</span>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="cp-form-group">
+            <label class="cp-label" for="{{ form.new_password2.id_for_label }}">
+              Confirm New Password <span class="cp-required">*</span>
+            </label>
+            <div class="cp-input-wrap">
+              <i class="bi bi-lock-fill cp-input-icon"></i>
+              {{ form.new_password2 }}
+              <button type="button"
+                      class="cp-toggle-btn"
+                      data-target="{{ form.new_password2.id_for_label }}"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if form.new_password2.errors %}
+              <p class="cp-field-error">
+                <i class="bi bi-exclamation-circle"></i>
+                {{ form.new_password2.errors|join:" " }}
+              </p>
+            {% endif %}
+            <!-- Match indicator -->
+            <p class="cp-match-hint" id="matchHint" style="display:none;"></p>
+          </div>
+
+          <!-- Mobile-only requirements (shown inline on small screens) -->
+          <div class="cp-mobile-reqs" id="mobileReqs">
+            <p class="cp-mobile-reqs-title">Requirements</p>
+            <ul class="cp-req-list">
+              <li class="cp-req-item" id="m-req-length"><span class="cp-req-dot"></span> At least 8 characters</li>
+              <li class="cp-req-item" id="m-req-upper"><span class="cp-req-dot"></span> One uppercase letter</li>
+              <li class="cp-req-item" id="m-req-number"><span class="cp-req-dot"></span> One number</li>
+              <li class="cp-req-item" id="m-req-special"><span class="cp-req-dot"></span> One special character</li>
+              <li class="cp-req-item" id="m-req-notnumeric"><span class="cp-req-dot"></span> Cannot be entirely numeric</li>
+            </ul>
+          </div>
+
+          <!-- Actions -->
+          <div class="cp-form-actions">
+            <a href="javascript:history.back()" class="cp-btn-cancel">Cancel</a>
+            <button type="submit" class="cp-btn-submit" id="btnSubmit">
+              <span class="cp-btn-text">
+                <i class="bi bi-check2-circle"></i> Update Password
+              </span>
+              <span class="cp-btn-loading" style="display:none;">
+                <span class="cp-spinner"></span> Updating...
+              </span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ---- Toggle password visibility ----
+  document.querySelectorAll('.cp-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const icon  = btn.querySelector('i');
+      if (!input) return;
+      const isPass = input.type === 'password';
+      input.type = isPass ? 'text' : 'password';
+      icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  });
+
+  // ---- Requirement checker (updates both sidebar + mobile list) ----
+  const checks = {
+    length:     v => v.length >= 8,
+    upper:      v => /[A-Z]/.test(v),
+    number:     v => /[0-9]/.test(v),
+    special:    v => /[^a-zA-Z0-9]/.test(v),
+    notnumeric: v => !/^\d+$/.test(v) || v.length === 0,
+  };
+
+  function updateReq(id, passing) {
+    ['', 'm-'].forEach(prefix => {
+      const el = document.getElementById(prefix + 'req-' + id);
+      if (!el) return;
+      el.classList.toggle('met', passing);
+      el.classList.toggle('unmet', !passing);
+    });
+  }
+
+  // ---- Strength meter ----
+  const strengthWrap  = document.getElementById('strengthWrap');
+  const strengthFill  = document.getElementById('strengthFill');
+  const strengthLabel = document.getElementById('strengthLabel');
+
+  const newPassInput = document.querySelector('input[name="new_password1"]');
+  if (newPassInput) {
+    newPassInput.addEventListener('input', () => {
+      const v = newPassInput.value;
+      strengthWrap.style.display = v.length ? 'flex' : 'none';
+
+      let score = 0;
+      Object.entries(checks).forEach(([key, fn]) => {
+        const pass = fn(v);
+        if (pass) score++;
+        updateReq(key, pass);
+      });
+
+      const levels = [
+        { w: '20%',  color: '#e05c5c', label: 'Very weak' },
+        { w: '40%',  color: '#e0933a', label: 'Weak' },
+        { w: '60%',  color: '#c19b76', label: 'Fair' },
+        { w: '80%',  color: '#7db87d', label: 'Good' },
+        { w: '100%', color: '#3aaa6e', label: 'Strong' },
+      ];
+      const lvl = levels[Math.max(score - 1, 0)];
+      strengthFill.style.width      = lvl.w;
+      strengthFill.style.background = lvl.color;
+      strengthLabel.textContent     = lvl.label;
+      strengthLabel.style.color     = lvl.color;
+    });
+  }
+
+  // ---- Confirm password match hint ----
+  const confirmInput = document.querySelector('input[name="new_password2"]');
+  const matchHint    = document.getElementById('matchHint');
+
+  if (confirmInput && newPassInput) {
+    function checkMatch() {
+      const v1 = newPassInput.value;
+      const v2 = confirmInput.value;
+      if (!v2.length) { matchHint.style.display = 'none'; return; }
+      matchHint.style.display = 'flex';
+      if (v1 === v2) {
+        matchHint.textContent  = '✓ Passwords match';
+        matchHint.className    = 'cp-match-hint match';
+      } else {
+        matchHint.textContent  = '✕ Passwords do not match';
+        matchHint.className    = 'cp-match-hint no-match';
+      }
+    }
+    confirmInput.addEventListener('input', checkMatch);
+    newPassInput.addEventListener('input', checkMatch);
+  }
+
+  // ---- Loading state on submit ----
+  document.getElementById('changePassForm').addEventListener('submit', function () {
+    const btn      = document.getElementById('btnSubmit');
+    const textSpan = btn.querySelector('.cp-btn-text');
+    const loadSpan = btn.querySelector('.cp-btn-loading');
+    textSpan.style.display = 'none';
+    loadSpan.style.display = 'flex';
+    btn.disabled = true;
+  });
+</script>
+{% endblock %}

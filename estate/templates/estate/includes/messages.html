@@ -1,0 +1,209 @@
+{% load static %}
+<style>
+  /* Premium Messages Container */
+  .estate-messages-container {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10000;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+  }
+
+  .estate-alert {
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    animation: estateSlideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s ease;
+  }
+
+  .estate-alert::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    border-radius: 6px 0 0 6px;
+  }
+
+  /* Status Colors */
+  .estate-alert-success::before { background-color: #10b981; }
+  .estate-alert-error::before, .estate-alert-danger::before { background-color: #ef4444; }
+  .estate-alert-warning::before { background-color: #f59e0b; }
+  .estate-alert-info::before { background-color: #3b82f6; }
+
+  .estate-alert-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .estate-alert-success .estate-alert-icon { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+  .estate-alert-error .estate-alert-icon, .estate-alert-danger .estate-alert-icon { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+  .estate-alert-warning .estate-alert-icon { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+  .estate-alert-info .estate-alert-icon { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+
+  .estate-alert-content {
+    flex-grow: 1;
+    font-weight: 500;
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    padding-right: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .estate-alert-close {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .estate-alert-close:hover {
+    color: #4b5563;
+  }
+
+  @keyframes estateSlideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes estateFadeOut {
+    to {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.95);
+    }
+  }
+
+  .estate-alert.hiding {
+    animation: estateFadeOut 0.4s forwards;
+  }
+
+  /* Mobile Adjustments */
+  @media (max-width: 640px) {
+    .estate-messages-container {
+      top: 1rem;
+      right: 1rem;
+      left: 1rem;
+      max-width: none;
+      width: auto;
+    }
+    
+    .estate-alert {
+      padding: 0.85rem 1rem;
+    }
+  }
+</style>
+
+<div class="estate-messages-container" id="estateMessages">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="estate-alert estate-alert-{{ message.tags|default:'info' }}" role="alert">
+        <div class="estate-alert-icon">
+          {% if message.tags == 'success' %}
+            <i class="bi bi-check2-circle"></i>
+          {% elif message.tags == 'error' or message.tags == 'danger' %}
+            <i class="bi bi-exclamation-octagon"></i>
+          {% elif message.tags == 'warning' %}
+            <i class="bi bi-exclamation-triangle"></i>
+          {% else %}
+            <i class="bi bi-info-circle"></i>
+          {% endif %}
+        </div>
+        <div class="estate-alert-content">
+          {{ message }}
+        </div>
+        <button type="button" class="estate-alert-close" onclick="dismissEstateAlert(this.parentElement)" aria-label="Close">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<script>
+  function dismissEstateAlert(element) {
+    if (element.classList.contains('hiding')) return;
+    element.classList.add('hiding');
+    setTimeout(() => {
+      element.remove();
+    }, 400);
+  }
+
+  // Global function to show toasts from JavaScript (AJAX, etc.)
+  window.showEstateToast = function(message, tags = 'info') {
+    const container = document.getElementById('estateMessages');
+    if (!container) return;
+
+    const alert = document.createElement('div');
+    alert.className = `estate-alert estate-alert-${tags}`;
+    alert.setAttribute('role', 'alert');
+
+    let iconHtml = '<i class="bi bi-info-circle"></i>';
+    if (tags === 'success') iconHtml = '<i class="bi bi-check2-circle"></i>';
+    else if (tags === 'error' || tags === 'danger') iconHtml = '<i class="bi bi-exclamation-octagon"></i>';
+    else if (tags === 'warning') iconHtml = '<i class="bi bi-exclamation-triangle"></i>';
+
+    alert.innerHTML = `
+      <div class="estate-alert-icon">${iconHtml}</div>
+      <div class="estate-alert-content">${message}</div>
+      <button type="button" class="estate-alert-close" onclick="dismissEstateAlert(this.parentElement)" aria-label="Close">
+        <i class="bi bi-x"></i>
+      </button>
+    `;
+
+    container.appendChild(alert);
+
+    // Auto dismiss
+    setTimeout(() => {
+      dismissEstateAlert(alert);
+    }, 5000);
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.estate-alert');
+    alerts.forEach((alert, index) => {
+      // Auto dismiss after 5 seconds + staggering for multiple messages
+      setTimeout(() => {
+        dismissEstateAlert(alert);
+      }, 5000 + (index * 800));
+    });
+  });
+</script>

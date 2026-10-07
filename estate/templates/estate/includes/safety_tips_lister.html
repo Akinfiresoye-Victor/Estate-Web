@@ -1,0 +1,106 @@
+<style>
+  .ew-tips{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:580px;margin:0 auto;border:0.5px solid #d1d5db;border-radius:12px;overflow:hidden;background:#fff}
+  .ew-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #e5e7eb}
+  .ew-tab{padding:12px 8px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:#6b7280;display:flex;flex-direction:column;align-items:center;gap:5px;transition:background 0.2s,color 0.2s;border-bottom:2px solid transparent}
+  .ew-tab svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .ew-tab.active{color:#1a3c4e;border-bottom-color:#c19b76;background:#f8f9fa}
+  .ew-tab:hover:not(.active){background:#f3f4f6;color:#374151}
+  .ew-panel{display:none;padding:20px}
+  .ew-panel.active{display:block}
+  .ew-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:0.5px solid #e5e7eb}
+  .ew-header-icon{width:40px;height:40px;border-radius:8px;background:#edf2f5;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .ew-header-icon svg{width:20px;height:20px;stroke:#1a3c4e;fill:none;stroke-width:1.8}
+  .ew-header h3{margin:0 0 3px;font-size:15px;font-weight:600;color:#1a3c4e}
+  .ew-header p{margin:0;font-size:12px;color:#6b7280;line-height:1.4}
+  .ew-tip{display:flex;gap:12px;padding:12px 0;border-bottom:0.5px solid #f3f4f6}
+  .ew-tip:last-child{border-bottom:none;padding-bottom:0}
+  .ew-dot{width:8px;height:8px;border-radius:50%;background:#c19b76;flex-shrink:0;margin-top:6px}
+  .ew-tip h4{margin:0 0 3px;font-size:13px;font-weight:600;color:#1e293b}
+  .ew-tip p{margin:0;font-size:12px;color:#6b7280;line-height:1.5}
+  .ew-footer{padding:12px 20px;background:#f8f4ef;border-top:0.5px solid #e5e7eb;font-size:12px;color:#8b7355;display:flex;align-items:center;gap:8px}
+  .ew-footer svg{width:14px;height:14px;stroke:#c19b76;fill:none;stroke-width:1.8;flex-shrink:0}
+  @media(max-width:420px){.ew-tab{font-size:11px;padding:10px 4px}.ew-tab svg{width:16px;height:16px}.ew-panel{padding:16px}.ew-header-icon{width:34px;height:34px}}
+</style>
+
+<div class="ew-tips">
+
+  <div class="ew-tabs">
+    <button class="ew-tab active" data-tab="landlord">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Landlord
+    </button>
+    <button class="ew-tab" data-tab="agent">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+      Agent
+    </button>
+    <button class="ew-tab" data-tab="company">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      Company
+    </button>
+  </div>
+
+  <div class="ew-panel active" id="tab-landlord">
+    <div class="ew-header">
+      <div class="ew-header-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <h3>Protect Your Property</h3>
+        <p>Simple steps to avoid bad tenants and squatter disputes.</p>
+      </div>
+    </div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Verify Work & Bank Before Signing</h4><p>Request 3 months bank statements and an employer letter. No verifiable income means no lease.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Clear All Utility Bills First</h4><p>Get receipts for NEPA/PHCN, water, and waste levy before handing over keys. Don't inherit debt.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Collect 1-Year Rent + 2 Months Security</h4><p>Never accept less upfront. Security deposit covers damages discovered after they move out.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Early-Exit Penalty in the Agreement</h4><p>If a tenant needs to break the lease, charge at least 3 months rent penalty. Put it in the contract.</p></div></div>
+  </div>
+
+  <div class="ew-panel" id="tab-agent">
+    <div class="ew-header">
+      <div class="ew-header-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+      </div>
+      <div>
+        <h3>Protect Your Commission</h3>
+        <p>Stop tenants cutting you out after viewings.</p>
+      </div>
+    </div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Never Give Out the Landlord's Number</h4><p>Direct all contact through Estate Web. If a tenant calls the landlord directly, you lose your commission.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Run Group Viewings, Not Solo Ones</h4><p>Always bring a colleague. Having a witness protects you from false claims and commission disputes.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Sign Your Commission Agreement Before Viewings</h4><p>Get 10% commission in a signed agreement first. A verbal promise is not enforceable.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Use Estate Web for All Communication</h4><p>Every message and call logged on the platform is your proof if a dispute arises.</p></div></div>
+  </div>
+
+  <div class="ew-panel" id="tab-company">
+    <div class="ew-header">
+      <div class="ew-header-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      </div>
+      <div>
+        <h3>Scale Without Risk</h3>
+        <p>Keep your portfolio and agents well-managed.</p>
+      </div>
+    </div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Verify All Sub-Agents Before Onboarding</h4><p>Check government-issued ID and Estate Web profiles before letting any agent handle your listings.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Track Every Viewing via the Dashboard</h4><p>Estate Web logs all activity. Use your analytics to spot unusual commission patterns early.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Use Standard Lawyer-Reviewed Contracts</h4><p>No verbal agreements between agents and clients. Every deal needs a signed document.</p></div></div>
+    <div class="ew-tip"><div class="ew-dot"></div><div><h4>Keep Company Listings Under Central Control</h4><p>Only verified company agents should have access to list or delist properties on your behalf.</p></div></div>
+  </div>
+
+  <div class="ew-footer">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Estate Web logs every viewing, message, and inquiry. Your activity is always on record.
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.ew-tab').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.ew-tab').forEach(function(t){ t.classList.remove('active'); });
+      document.querySelectorAll('.ew-panel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>

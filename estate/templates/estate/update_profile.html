@@ -1,0 +1,112 @@
+{% extends 'estate/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/update_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+<div class="up-page">
+
+  <!-- ── LEFT PANEL ── -->
+  <aside class="up-panel">
+    <div class="up-panel-inner">
+      <a href="javascript:history.back()" class="up-back">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+
+      <div class="up-panel-brand">
+        <div class="up-avatar-ring">
+          <div class="up-avatar-placeholder">
+            <i class="bi bi-person-fill"></i>
+          </div>
+        </div>
+        <h2 class="up-panel-title">Update<br>Profile</h2>
+        <p class="up-panel-sub">Maintain an up-to-date profile to ensure seamless communication with agents and property owners.</p>
+      </div>
+
+      <ul class="up-panel-tips">
+        <li><i class="bi bi-telephone-fill"></i> Accurate info ensures you never miss a viewing update</li>
+      </ul>
+
+      <div class="up-panel-deco" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── RIGHT FORM ── -->
+  <main class="up-main">
+
+    <!-- Mobile-only back + heading -->
+    <div class="up-mobile-header">
+      <a href="javascript:history.back()" class="up-back up-back--mobile">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+      <div class="up-mobile-title">
+        <h1>Update Profile</h1>
+        <p>Make changes to your account information</p>
+      </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="up-form" novalidate>
+      {% csrf_token %}
+
+      <div class="up-form-body">
+        <div class="up-form-grid">
+          {% for field in form %}
+            <div class="up-field{% if field.field.widget.attrs.fullwidth %} up-field--full{% endif %}">
+              <div class="up-input-wrap">
+                {% render_field field class="up-input" placeholder=" " attrs="rows:4" %}
+                <label class="up-label" for="{{ field.id_for_label }}">
+                  {{ field.label }}
+                </label>
+                <span class="up-focus-bar"></span>
+              </div>
+              {% if field.errors %}
+                <p class="up-error">
+                  <i class="bi bi-exclamation-circle-fill"></i>
+                  {% for error in field.errors %}{{ error }}{% endfor %}
+                </p>
+              {% endif %}
+              {% if field.help_text %}
+                <p class="up-hint">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="up-form-footer">
+        <a href="{% url 'customer:settings' %}" class="up-btn up-btn--ghost">
+          <i class="bi bi-x-lg"></i> Cancel
+        </a>
+        <button type="submit" class="up-btn up-btn--primary">
+          <i class="bi bi-check2"></i> Save Changes
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+</div>
+
+{% else %}
+
+<!-- ── NOT LOGGED IN ── -->
+<div class="up-gate">
+  <div class="up-gate-inner">
+    <div class="up-gate-icon"><i class="bi bi-lock-fill"></i></div>
+    <h2>Login Required</h2>
+    <p>You need to be logged in to update your profile.</p>
+    <a href="{% url 'login' %}" class="up-btn up-btn--primary">
+      <i class="bi bi-box-arrow-in-right"></i> Go to Login
+    </a>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %}
