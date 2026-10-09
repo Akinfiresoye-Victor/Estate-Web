@@ -25,7 +25,7 @@ from landlord.models import LandlordInformation
 from core.ratelimit import ratelimit
 from django.utils import timezone
 import threading
-
+from core.recommendations import log_interaction
 
 
 '''Algorithms Start👇'''
@@ -265,7 +265,7 @@ def view_property_on_sale(request, property_id):
             property_id=property_id,
             property_type="Sale"
         ).exists()
-
+        log_interaction(request.user, 'Sale', property_id, 'view')
         return render(request, 'estate/view_property_s.html', {
             'property':      prop,
             'agent_info':    agent_in_charge,
@@ -353,7 +353,7 @@ def view_property_on_lease(request, property_id):
             property_id=property_id,
             property_type="Rent"
         ).exists()
-
+        log_interaction(request.user, 'Rent', property_id, 'view')
         return render(request, 'estate/view_property_r.html', {
             'property':      property_to_be_viewed,
             'agent_info':    agent_in_charge,
@@ -470,6 +470,7 @@ def toggle_wishlist_rent(request, property_id):
             prop.total_likes += 1
             prop.save(update_fields=['total_likes'])
             added = True
+            log_interaction(request.user, 'Rent', property_id, 'save')
  
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'added': added, 'likes': prop.total_likes})
@@ -523,6 +524,7 @@ def toggle_wishlist_buy(request, property_id):
             prop.total_likes += 1
             prop.save(update_fields=['total_likes'])
             added = True
+            log_interaction(request.user, 'Sale', property_id, 'save')
  
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'added': added, 'likes': prop.total_likes})
@@ -946,6 +948,7 @@ def inquiry_form(request, property_type, property_id):
                 inq_form.date_created=timezone.now().date()
                 
                 inq_form.save()
+                log_interaction(request.user, property_type, property_id, 'inquire')
 
                 # ── Send Emails ───────────────────────────────────────────
                 # 1. To Receiver (Owner)
@@ -1058,6 +1061,7 @@ def flag_listing(request, property_id, property_type):
                 )
                 onsale_property.flagged=True
                 onsale_property.save()
+                log_interaction(request.user, property_type, property_id, 'hide')
                 messages.success(request, 'Thank you for your report. We will review this listing shortly.')
             else:
                 messages.error(request, 'This listing has already been reported.')
@@ -1075,12 +1079,12 @@ def flag_listing(request, property_id, property_type):
                 )
                 leased_property.flagged=True
                 leased_property.save()
+                log_interaction(request.user, property_type, property_id, 'hide')
                 messages.success(request, 'Thank you for your report. We will review this listing shortly.')
             if 'HTTP_REFERER' in request.META:
                 return redirect(request.META['HTTP_REFERER'])  
             else:
                 return redirect('landing')
-            
             
         else:
             messages.error(request, 'An error occurred while identifying the property type.')
@@ -1088,6 +1092,7 @@ def flag_listing(request, property_id, property_type):
                 return redirect(request.META['HTTP_REFERER'])  
             else:
                 return redirect('landing')
+        
     except ObjectDoesNotExist:
         messages.error(request, 'Property not found.')
         if 'HTTP_REFERER' in request.META:
@@ -1394,3 +1399,19 @@ def view_landlord_profile(request, landlord_uuid):
     except Exception:
         error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+
+
+def users_recomendation(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'Login Required')
+        return redirect('login')
+    if not request.user.role == 'customer':
+        messages.info(request, 'You cannot view your own profile.')
+        return redirect('landing')
+    
+    try:
+        pass
+    except:
+        error= ErrorLog.objects.create(traceback= traceback.format_exc())
+        return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
+        

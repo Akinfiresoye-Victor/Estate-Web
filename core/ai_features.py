@@ -23,7 +23,7 @@ def ai_description_generator(request):
         client = Groq(api_key=config("GROQ_API_KEY"))
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-20b",
             messages=[
                 {
                     "role": "system",

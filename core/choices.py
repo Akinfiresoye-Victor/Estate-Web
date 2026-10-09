@@ -330,3 +330,13 @@ REPORT_REASONS=[
     ('Hidden Charges/Unclear Pricing', 'Hidden Charges/Unclear Pricing'),
     ('other', 'other')
 ]
+
+
+
+ACTION_CHOICES = [
+    ('view', 'Viewed'),
+    ('save', 'Saved'),
+    ('inquire', 'Inquired'),
+    ('hide', 'Hid'),
+    ('recommend_click', 'Clicked a recommendation'),
+]

@@ -1,17 +1,20 @@
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import Sum
 from django.shortcuts import render
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from django.template import TemplateDoesNotExist
 from agents.models import AgentInformation
 from companies.models import CompanyInformation, SessionId
 from core.models import PropertyManagementRent, PropertyManagementSale, PropertyViews, WishlistStorageUnit, ErrorLog
 from estate.models import LeadInfo
+from core.models import PropertyInteraction
 import traceback
+from django.db.models import Sum, Case, When, IntegerField
+
+
+
 
 def agent_reset_button(analytics, agent_uuid, lease_views, sale_views):
     """Reset monthly tracking if 30 days have passed"""
@@ -640,3 +643,64 @@ def send_estate_email(subject, template_name, context, recipient_list):
             traceback=f"Email Error ({subject}) to {recipient_list}: {str(e)}\n{traceback.format_exc()}"
         )
         return False
+
+
+
+
+
+
+def get_saved_ids(user, limit=50):
+    rows = (PropertyInteraction.objects.filter(user=user, action='save').order_by('-created_at').values('property_type', 'property_id')[:limit])
+
+    sale_ids = {r['property_id'] for r in rows if r['property_type'] == 'Sale'}
+    rent_ids = {r['property_id'] for r in rows if r['property_type'] == 'Rent'}
+    return sale_ids, rent_ids
+
+
+def _pre_score(user, sale_ids, rent_ids):
+    """
+    Calculates composite interaction scores for given sale and rent property IDs.
+    Returns two dictionaries mapping: property_id -> total_score
+    """
+    # Combine sets to perform a single database query
+    all_ids = sale_ids | rent_ids
+    if not all_ids:
+        return {}, {}
+
+    score_rules = Case(
+        When(action='view', then=5),
+        When(action='save', then=10),
+        When(action='inquire', then=15),
+        When(action='recommendation_click', then=1),
+        When(action='hide', then=-40),
+        default=0,
+        output_field=IntegerField()
+    )
+
+    aggregated_scores = (
+        PropertyInteraction.objects.filter(user=user, property_id__in=all_ids)
+        .values('property_id')
+        .annotate(total_score=Sum(score_rules))
+    )
+
+    score_map = {item['property_id']: item['total_score'] for item in aggregated_scores}
+
+
+    sale_scores = {pid: score_map.get(pid, 0) for pid in sale_ids}
+    rent_scores = {pid: score_map.get(pid, 0) for pid in rent_ids}
+
+    return sale_scores, rent_scores
+
+#TODO add algorithm for recomendation clicks
+
+
+
+
+
+
+# rows = PropertyManagementSale.objects.filter(is_listed=True).values_list(
+#     'state', 'price', 'property_category'
+# )
+
+# for state, price, category in rows:
+#     print(state, price, category)

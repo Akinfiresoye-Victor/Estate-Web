@@ -323,3 +323,37 @@ class FlaggedUsers(models.Model):
     report_reason=models.CharField(choices=REPORT_REASONS, default='other')
     more_reason=models.CharField(max_length=250, default=None,null=True, blank=True )
     time_reported=models.DateTimeField(default=timezone.now)
+    
+
+
+
+
+class PropertyInteraction(models.Model):
+    user= models.ForeignKey(settings.AUTH_USER_MODEL, on_delete= models.CASCADE, related_name='property_interactions')
+    property_type= models.CharField(max_length=10)
+    property_id= models.IntegerField()
+    action= models.CharField(max_length=20, choices= ACTION_CHOICES)
+    created_at= models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        indexes=[
+            models.Index(fields=['user', 'action', '-created_at']),
+            models.Index(fields=['user', 'property_id']),
+        ]
+    def __str__(self):
+        return f"{self.user} {self.action} {self.property_type}#{self.property_id}"
+    
+
+
+#TODO when upgrading this add the Property feature logic fo rbetter and more precise recommendations
+class ReccomendationData(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    property_type = models.CharField(max_length=10, default='Sale')  # 'Sale' or 'Rent'
+    state_recomendation = models.CharField(max_length=200, default=None, blank=True, null=True)
+    average_price = models.DecimalField(max_digits=100, null=True, blank=True, decimal_places=2, default=0)
+    average_beds = models.IntegerField(default=0, blank=True, null=True)
+    average_bathrooms = models.IntegerField(default=0, blank=True, null=True)
+    recomended_category = models.CharField(max_length=100, default=None, blank=True, null=True)
+
+    class Meta:
+        unique_together = ('user', 'property_type')
