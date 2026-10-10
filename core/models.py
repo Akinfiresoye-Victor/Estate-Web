@@ -2,11 +2,9 @@ from django.db import models
 from .choices import *
 from .validators import validate_image
 from django.utils import timezone
-from members.models import User 
 import uuid
 from django.conf import settings
-from members.models import User
-
+from django.contrib.postgres.fields import ArrayField
 
 class PropertyFeatures(models.Model):
     name=models.CharField(max_length=100)
@@ -346,14 +344,35 @@ class PropertyInteraction(models.Model):
 
 
 #TODO when upgrading this add the Property feature logic fo rbetter and more precise recommendations
-class ReccomendationData(models.Model):
+class RecommendationData(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     property_type = models.CharField(max_length=10, default='Sale')  # 'Sale' or 'Rent'
-    state_recomendation = models.CharField(max_length=200, default=None, blank=True, null=True)
+    state_recomendations = models.JSONField(default=list, blank=True)
     average_price = models.DecimalField(max_digits=100, null=True, blank=True, decimal_places=2, default=0)
     average_beds = models.IntegerField(default=0, blank=True, null=True)
     average_bathrooms = models.IntegerField(default=0, blank=True, null=True)
-    recomended_category = models.CharField(max_length=100, default=None, blank=True, null=True)
+    recomended_category = models.JSONField(default=list, blank=True)
+
+
 
     class Meta:
         unique_together = ('user', 'property_type')
+        
+
+
+class RecommendedProperties(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    property_type = models.CharField(max_length=10, default='Sale')
+    property_id = models.IntegerField()
+    recommendation_score = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'property_type', 'property_id'],
+                name='uniq_user_recommended_property',
+            ),
+        ]
+        indexes = [
+            models.Index(fields=['user', '-recommendation_score']),
+        ]

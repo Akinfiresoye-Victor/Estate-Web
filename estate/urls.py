@@ -28,6 +28,7 @@ urlpatterns = [
     path('profile/agent/<agent_uuid>', views.agent_profile, name='agent-profile'),
     path('profile/company/<company_uuid>', views.company_profile, name='company-profile'),
     path('profile/landlord/<landlord_uuid>', views.view_landlord_profile, name='landlord-profile'),
+    path('smart_recommendations/', views.users_recomendation, name='smart-recommendations'),
 ]
 
 

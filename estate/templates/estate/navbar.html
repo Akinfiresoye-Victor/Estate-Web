@@ -19,6 +19,9 @@
       <a href="{% url 'customer:rent-property' %}" class="nb-link">
         <i class="bi bi-key-fill"></i> Rent
       </a>
+      <a href="{% url 'customer:smart-recommendations' %}" class="nb-link">
+        <i class="bi bi-stars"></i> Smart Recommendations
+      </a>
       <a href="{% url 'customer:wishlist' %}" class="nb-link">
         <i class="bi bi-heart-fill"></i> Wishlist
       </a>
@@ -115,6 +118,15 @@
         <div class="nb-canvas-text">
           <strong>Rent / Lease</strong>
           <span>Find rental properties</span>
+        </div>
+        <i class="bi bi-chevron-right nb-canvas-arrow"></i>
+      </a>
+
+      <a href="{% url 'customer:smart-recommendations' %}" class="nb-canvas-link">
+        <div class="nb-canvas-icon compare"><i class="bi bi-stars"></i></div>
+        <div class="nb-canvas-text">
+          <strong>Smart Recommendations</strong>
+          <span>Homes picked for you</span>
         </div>
         <i class="bi bi-chevron-right nb-canvas-arrow"></i>
       </a>

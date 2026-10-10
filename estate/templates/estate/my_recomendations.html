@@ -1,0 +1,116 @@
+{% extends 'estate/base.html' %}
+{% load static humanize %}
+
+{% block title %}Smart Recommendations | Estate Web{% endblock %}
+{% block meta_description %}Discover properties selected for you based on your activity on Estate Web.{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'estate/css/my_recomendations.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="recommendations-page">
+  <header class="recommendations-hero">
+    <div class="recommendations-hero-content">
+      <span class="recommendations-eyebrow"><i class="bi bi-stars"></i> Made for you</span>
+      <h1>Your smart recommendations</h1>
+      <p>Property picks shaped around the homes and locations you have explored.</p>
+    </div>
+    <div class="recommendations-hero-mark" aria-hidden="true">
+      <i class="bi bi-house-heart"></i>
+    </div>
+  </header>
+
+  <div class="recommendations-content">
+    <div class="recommendations-heading">
+      <div>
+        <span class="recommendations-kicker">Your next move</span>
+        <h2>Picked for your taste</h2>
+      </div>
+      <span class="recommendations-count">
+        {{ recommended_properties|length }} {% if recommended_properties|length == 1 %}property{% else %}properties{% endif %}
+      </span>
+    </div>
+
+    {% if recommended_properties %}
+      <div class="recommendations-grid">
+        {% for item in recommended_properties %}
+          {% with property=item.property %}
+          <article class="recommendation-card">
+            <a class="recommendation-image-link"
+               href="{% if item.property_type == 'Sale' %}{% url 'customer:view-property-s' property.id %}{% else %}{% url 'customer:view-property-r' property.id %}{% endif %}"
+               aria-label="View {{ property.location }} property">
+              {% if property.base_image %}
+                <img class="recommendation-image"
+                     src="{{ property.base_image.url }}"
+                     alt="{{ property.residential|default:property.commercial }} in {{ property.location }}"
+                     loading="lazy">
+              {% else %}
+                <div class="recommendation-image-placeholder">
+                  <i class="bi bi-building"></i>
+                </div>
+              {% endif %}
+              <span class="recommendation-type {% if item.property_type == 'Rent' %}lease{% endif %}">
+                {% if item.property_type == 'Sale' %}For sale{% else %}For lease{% endif %}
+              </span>
+              <span class="recommendation-match"><i class="bi bi-stars"></i> {{ item.score }} match</span>
+            </a>
+
+            <div class="recommendation-card-body">
+              <p class="recommendation-price">
+                ₦{% if item.property_type == 'Sale' %}{{ property.price|floatformat:0|intcomma }}{% else %}{{ property.price_range|floatformat:0|intcomma }}{% endif %}
+                {% if item.property_type == 'Rent' %}<span>/ {{ property.rent_rate|default:"Yearly" }}</span>{% endif %}
+              </p>
+              <h3>
+                {% if property.property_category == 'Commercial' %}{{ property.commercial }}
+                {% elif property.property_category == 'Land' %}{{ property.lands }}
+                {% else %}{{ property.residential|default:"Property listing" }}{% endif %}
+              </h3>
+              <p class="recommendation-location">
+                <i class="bi bi-geo-alt-fill"></i> {{ property.location }}, {{ property.state }}
+              </p>
+              <div class="recommendation-details">
+                {% if property.bedrooms %}
+                  <span><i class="bi bi-door-closed"></i> {{ property.bedrooms }} beds</span>
+                {% endif %}
+                {% if property.bathrooms %}
+                  <span><i class="bi bi-droplet"></i> {{ property.bathrooms }} baths</span>
+                {% endif %}
+                {% if property.size %}
+                  <span><i class="bi bi-aspect-ratio"></i> {{ property.size|intcomma }} m²</span>
+                {% endif %}
+              </div>
+              <p class="recommendation-description">
+                {% if item.property_type == 'Sale' %}
+                  {{ property.property_description|truncatewords:22 }}
+                {% else %}
+                  {{ property.description|truncatewords:22 }}
+                {% endif %}
+              </p>
+              <a class="recommendation-view-link"
+                 href="{% if item.property_type == 'Sale' %}{% url 'customer:view-property-s' property.id %}{% else %}{% url 'customer:view-property-r' property.id %}{% endif %}">
+                View property <i class="bi bi-arrow-up-right"></i>
+              </a>
+            </div>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <section class="recommendations-empty">
+        <div class="recommendations-empty-icon"><i class="bi bi-stars"></i></div>
+        <h2>Your recommendations are taking shape</h2>
+        <p>Explore or save a few properties and we’ll use your activity to find more homes that fit your taste.</p>
+        <div class="recommendations-empty-actions">
+          <a href="{% url 'customer:buy-property' %}" class="recommendation-button">
+            <i class="bi bi-house"></i> Browse for sale
+          </a>
+          <a href="{% url 'customer:rent-property' %}" class="recommendation-button secondary">
+            <i class="bi bi-key"></i> Browse rentals
+          </a>
+        </div>
+      </section>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

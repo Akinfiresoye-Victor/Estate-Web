@@ -1410,8 +1410,47 @@ def users_recomendation(request):
         return redirect('landing')
     
     try:
-        pass
-    except:
-        error= ErrorLog.objects.create(traceback= traceback.format_exc())
+        recommendations = list(
+            RecommendedProperties.objects.filter(user=request.user)
+            .order_by('-recommendation_score')
+        )
+        property_ids = {
+            property_type: {
+                recommendation.property_id
+                for recommendation in recommendations
+                if recommendation.property_type == property_type
+            }
+            for property_type in ('Sale', 'Rent')
+        }
+        properties = {
+            'Sale': {
+                property_obj.pk: property_obj
+                for property_obj in PropertyManagementSale.objects.filter(
+                    pk__in=property_ids['Sale'],
+                    is_listed=True,
+                )
+            },
+            'Rent': {
+                property_obj.pk: property_obj
+                for property_obj in PropertyManagementRent.objects.filter(
+                    pk__in=property_ids['Rent'],
+                    is_listed=True,
+                )
+            },
+        }
+        recommended_properties = [
+            {
+                'property': properties[recommendation.property_type][recommendation.property_id],
+                'property_type': recommendation.property_type,
+                'score': recommendation.recommendation_score,
+            }
+            for recommendation in recommendations
+            if recommendation.property_type in properties
+            and recommendation.property_id in properties[recommendation.property_type]
+        ]
+        return render(request, 'estate/my_recomendations.html', {
+            'recommended_properties': recommended_properties,
+        })
+    except Exception:
+        error = ErrorLog.objects.create(traceback=traceback.format_exc())
         return render(request, 'estate/error_page.html', {'ref_id': error.ref_id})
-        

@@ -375,6 +375,7 @@ def update_company_profile(request):
 
 
 def company_analytics(request):
+    print(request.user.id)
     if not request.user.is_authenticated:
         messages.warning(request, 'Login required')
         return redirect('login')
